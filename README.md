@@ -9,7 +9,16 @@ Azure Blockchain Development Kit simplifies how you create, connect to, build an
 ## Prerequisites
 
 1. If you do not have an Azure subscription, create a [free account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F) before you begin.
-2. Install the Visual Studio Code extension [Azure Blockchain Development Kit.](https://marketplace.visualstudio.com/items?itemName=azblockchain.azure-blockchain)
+
+## System Requirements
+
+- Supported Operating Systems
+  - Windows 10
+  - Mac OSX
+- VS Code 1.32.0 (or greater)
+- Python 2.7.15
+- Node 10.15.x
+- Git 2.10.x
 
 ## Create an Azure Blockchain Service
 
@@ -17,7 +26,7 @@ The first thing to do is to create an Azure Blockchain Service in your subscript
 
 1. Click `-> Create Azure Blockchain Service` in the AZURE BLOCKCHAIN tab, or type `Azure Blockchain: Create Azure Blockchain Service` in the [Command Palette](https://github.com/Microsoft/vscode-azure-blockchain-ethereum/wiki/Command-Palette).
 
-   ![](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/createConsortium.png?token=ABGEWEM7XVG2ODKL4KMIP4S4ZHVQM)
+   ![Create and Azure Blockchain Service](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/createConsortium.png)
 
 2. Choose your subscription, resource group and region to deploy to.
 
@@ -36,7 +45,7 @@ For developers who are not familiar with Truffle, or prefer to use the Command P
 
 1. From the [Command Palette](https://github.com/Microsoft/vscode-azure-blockchain-ethereum/wiki/Command-Palette), type `Azure Blockchain: New Solidity Project`
 
-   ![](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/createNewProject.gif?token=ABGEWEJFZ7IMTZXACCDF4G24ZHUTO) 
+   ![Command Palette - New Solidity Project](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/createNewProject.gif) 
 
 2. Select an empty directory to scaffold out your project.
 
@@ -46,7 +55,7 @@ For developers who are not familiar with Truffle, or prefer to use the Command P
 
 Once complete, your project directory should look like this:
 
-[![](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/newProjectDirCloseup.png?token=ABGEWEOZPMMPB2VFTDWJ3MC4ZIHWY)](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/newProjectDir.png?token=ABGEWEO7BWXVWJ6PLU6XZVS4ZIGZG#lightbox)
+[![completed directory](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/newProjectDirCloseup.png)](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/newProjectDir.png#lightbox)
 
 
 ## Build your Solidity Contract
@@ -57,35 +66,46 @@ Your newly scaffolded out directory includes a simple contract and all the neces
 
 1. From the [Command Palette](https://github.com/Microsoft/vscode-azure-blockchain-ethereum/wiki/Command-Palette), type `Azure Blockchain: Build Contracts`
 
-   ![](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/buildContracts.png?token=ABGEWEJM7FLONTLNNVN42324ZHVKW)
+   ![Command Palette - Build Contracts](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/buildContracts.png)
 
 #### Option 2: Right click on your .sol file
 
 1. Select your contract Solidity (.sol) file, right click and choose `Build Contracts`
 
-   ![](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/buildContractRightClick.gif?token=ABGEWENKLUD24OLDONXK5BC4ZHUDS)
+   ![Right click shortcut - build contracts](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/buildContractRightClick.gif)
 
 ## Deploy your smart contract to Azure Blockchain Service
 
-Once compiled, you will have your contract, contract metadata (e.g., contract ABI, bytecode) available in the ./build directory. Once you deployment/creation of the Azure Blockchain Service is complete you will also see that consortium in your VS Code Blockchain tab. Once all these components are ready, deploying your new contract is simple and fast. Use the following steps to deploy your contract
+Once compiled, you will have your contract, contract metadata (e.g., contract ABI, bytecode) available in the smart contract .json file which will be located in the`./build directory` 
+
+Once you deployment/creation of the Azure Blockchain Service is complete you will also see that consortium in your VS Code Blockchain tab. Once all these components are ready, deploying your new contract is simple and fast. Use the following steps to deploy your contract
 
 #### Option 1: Command Palette
 
 1. From the [Command Palette](https://github.com/Microsoft/vscode-azure-blockchain-ethereum/wiki/Command-Palette), type `Azure Blockchain: Deploy Contracts`
 
-   [TODO - screen shot]
+   ![Command Palette - Deploy Contracts](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/deployContracts.png)
 
 #### Option 2: Right click on your .sol file
 
 1. Select your contract Solidity (.sol) file, right click and choose `Deploy Contracts`
 
-   [TODO - screenshot]
+   ![Right click smart contract - deploy contract](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/deployContractsRightClick.png)
 
 ## Interact with your contract in Azure Blockchain Service
 
 Once deployed, you can then interact with your contract using the sample UI generated by the VS Code extension.
 
-[TODO - drizzle stuff]
+To generate a simple UI to interact with your contract choose one of the following options
+
+#### Option 1: Command Palette
+
+COMING SOON
+
+#### Option 2: Right click on your smart contract .json file
+
+
+COMING SOON
 
 ## Code of Conduct
 
