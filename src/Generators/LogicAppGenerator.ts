@@ -41,12 +41,20 @@ export class LogicAppGenerator {
       const fileName = path.basename(filePath.fsPath);
       const contractName = fileName.Remove(fileName.length - 4);
       const compiledContractPath = dirPath + contractName + '.json';
+      let picks: QuickPickItem[];
 
-      const picks: QuickPickItem[] = [
-        { label: 'Logic App' },
-        { label: 'Flow App' },
-        { label: 'Azure Function' },
-      ];
+      if(workflowType === 'Service') {
+          picks = [
+          { label: 'Logic App' },
+          { label: 'Flow App' },
+          { label: 'Azure Function' },
+        ];
+      } else {
+        picks = [
+          { label: 'Logic App' },
+          { label: 'Flow App' },
+        ];
+      }
 
       const serviceTypeSelection: string = (await showQuickPick(picks, { })).label;
       const serviceType: int = this.getServiceTypeFromString(serviceTypeSelection);
