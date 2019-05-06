@@ -43,7 +43,7 @@ export class LogicAppGenerator {
       const compiledContractPath = dirPath + contractName + '.json';
       let picks: QuickPickItem[];
 
-      if(workflowType === 'Service') {
+      if (workflowType === 'Service') {
           picks = [
           { label: 'Logic App' },
           { label: 'Flow App' },
@@ -83,11 +83,19 @@ export class LogicAppGenerator {
       return;
     }
 
-    const picks: QuickPickItem[] = [
-      { label: 'Logic App' },
-      { label: 'Flow App' },
-      { label: 'Azure Function' },
-    ];
+    let picks: QuickPickItem[];
+    if (workflowType === 'Service') {
+        picks = [
+        { label: 'Logic App' },
+        { label: 'Flow App' },
+        { label: 'Azure Function' },
+      ];
+    } else {
+      picks = [
+        { label: 'Logic App' },
+        { label: 'Flow App' },
+      ];
+    }
 
     const serviceTypeSelection: string = (await showQuickPick(picks, { })).label;
     const serviceType: int = this.getServiceTypeFromString(serviceTypeSelection);
@@ -142,8 +150,6 @@ export class LogicAppGenerator {
       resourceGroupItem.description,
       workflowType,
       serviceType);
-    Output.outputLine(Constants.outputChannel.logicAppGenerator, contents.abi.toString());
-
   }
 
   private async createLogicAppFromAbi(

@@ -5,7 +5,7 @@
   "publisher": "AzBlockchain",
   "preview": true,
   "icon": "images/blockchain-service-logo.png",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum"
@@ -43,6 +43,10 @@
     "onCommand:truffle.deployContracts",
     "onCommand:azureBlockchainService.pushLedgerEvents",
     "onCommand:azureBlockchainService.pushCurrentLedgerEvents",
+    "onCommand:azureBlockchainService.generateReportPublishingWorkflows",
+    "onCommand:azureBlockchainService.generateMicroservicesWorkflows",
+    "onCommand:azureBlockchainService.generateEventPublishingWorkflows",
+    "onCommand:azureBlockchainService.generateDataPublishingWorkflows",
     "onCommand:remix.viewGasEstimates",
     "onCommand:azureBlockchainService.connectConsortium",
     "onCommand:drizzle.generateSmartContractUI",
@@ -215,11 +219,11 @@
           "command": "azureBlockchainService.pushLedgerEvents"
         },
         {
-          "when": "resourceLangId == json",
+          "when": "false",
           "command": "azureBlockchainService.pushCurrentLedgerEvents"
         },
         {
-          "when": "resourceLangId == solidity",
+          "when": "false",
           "command": "azureBlockchainService.pushCurrentLedgerEvents"
         },
         {
@@ -241,6 +245,22 @@
         {
           "when": "false",
           "command": "azureBlockchainService.disconnectConsortium"
+        },
+        {
+          "when": "resourceLangId == solidity",
+          "command": "azureBlockchainService.generateMicroservicesWorkflows"
+        },
+        {
+          "when": "resourceLangId == solidity",
+          "command": "azureBlockchainService.generateDataPublishingWorkflows"
+        },
+        {
+          "when": "resourceLangId == solidity",
+          "command": "azureBlockchainService.generateEventPublishingWorkflows"
+        },
+        {
+          "when": "resourceLangId == solidity",
+          "command": "azureBlockchainService.generateReportPublishingWorkflows"
         },
         {
           "when": "false",
