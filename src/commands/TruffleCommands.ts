@@ -4,7 +4,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { format } from 'url';
-import { env, Uri } from 'vscode';
+import { env, ProgressLocation, Uri, window } from 'vscode';
 import { Constants } from '../Constants';
 import {
   getWorkspaceRoot,
@@ -35,16 +35,21 @@ const localGanacheRegexp = new RegExp(`127\.0\.0\.1\:${Constants.defaultLocalhos
 
 export namespace TruffleCommands {
   export async function buildContracts(): Promise<void> {
-    if (!await required.checkRequiredApps()) {
-      return;
-    }
+    await window.withProgress({
+      location: ProgressLocation.Window,
+      title: Constants.statusBarMessages.buildingContracts,
+    }, async () => {
+      if (!await required.checkRequiredApps()) {
+        return;
+      }
 
-    try {
-      Output.show();
-      await outputCommandHelper.executeCommand(getWorkspaceRoot(), 'npx', 'truffle', 'compile');
-    } catch (error) {
-      throw Error(error);
-    }
+      try {
+        Output.show();
+        await outputCommandHelper.executeCommand(getWorkspaceRoot(), 'npx', 'truffle', 'compile');
+      } catch (error) {
+        throw Error(error);
+      }
+    });
   }
 
   export async function deployContracts(consortiumTreeManager: ConsortiumTreeManager): Promise<void> {
@@ -197,7 +202,8 @@ async function execute(deployDestination: IDeployDestination[]): Promise<void> {
 async function createNewDeploymentNetwork(consortiumTreeManager: ConsortiumTreeManager, truffleConfigPath: string)
   : Promise<void> {
   const consortium = await ConsortiumCommands.connectConsortium(consortiumTreeManager);
-  return createNetwork(consortium, truffleConfigPath);
+
+  await createNetwork(consortium, truffleConfigPath);
 }
 
 async function createNetwork(consortium: Consortium, truffleConfigPath: string): Promise<void> {
@@ -206,29 +212,28 @@ async function createNetwork(consortium: Consortium, truffleConfigPath: string):
   await truffleConfig.setNetworks(network);
 
   await deployToNetwork(network.name, truffleConfigPath);
-
-  if (network.options.provider) {
-    network.options.provider.mnemonic = undefined;
-  }
-
-  return await truffleConfig.setNetworks(network);
 }
 
 async function createMainNetwork(consortium: Consortium, truffleConfigPath: string): Promise<void> {
   await showConfirmPaidOperationDialog();
 
-  return await createNetwork(consortium, truffleConfigPath);
+  await createNetwork(consortium, truffleConfigPath);
 }
 
 async function deployToNetwork(networkName: string, truffleConfigPath: string): Promise<void> {
-  const workspaceRoot = path.dirname(truffleConfigPath);
+  return window.withProgress({
+    location: ProgressLocation.Window,
+    title: Constants.statusBarMessages.deployingContracts(networkName),
+  }, async () => {
+    const workspaceRoot = path.dirname(truffleConfigPath);
 
-  await fs.ensureDir(workspaceRoot);
-  await outputCommandHelper.executeCommand(
-    workspaceRoot,
-    'npx',
-    'truffle', 'migrate', '--reset', '--network', networkName,
-  );
+    await fs.ensureDir(workspaceRoot);
+    await outputCommandHelper.executeCommand(
+      workspaceRoot,
+      'npx',
+      'truffle', 'migrate', '--reset', '--network', networkName,
+    );
+  });
 }
 
 async function createLocalGanacheNetwork(consortium: Consortium, truffleConfigPath: string): Promise<void> {

@@ -36,14 +36,18 @@ function main() {
   });
 
   $(document).ready(() => {
-    vscode.postMessage({ command: 'documentready'});
+    vscode.postMessage({ command: 'documentReady'});
+  });
+
+  $('#showOnStartup').change(function() {
+    vscode.postMessage({ command: 'toggleShowPage', value: this.checked});
   });
 
   window.addEventListener('message', (event) => {
     const message = event.data; // The JSON data our extension sent
 
-    if (message.versions) {
-      const versions = message.versions;
+    if (message.command === 'versions') {
+      const versions = message.value;
       if (Array.isArray(versions)) {
         versions.forEach((version) => {
           const element = $(`#${version.app}`);
@@ -52,6 +56,9 @@ function main() {
           spinner.toggleClass('spinner', false);
         });
       }
+    }
+    if (message.command === 'showOnStartup') {
+      $('#showOnStartup').attr('checked', !!message.value);
     }
   });
 }

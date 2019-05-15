@@ -15,12 +15,11 @@ import { CommandContext, isWorkspaceOpen, required, setCommandContext } from './
 import { MnemonicRepository } from './MnemonicService/MnemonicRepository';
 import { CancellationEvent } from './Models';
 import { Output } from './Output';
-import { RequirementsPage } from './RequirementsPage';
+import { RequirementsPage, WelcomePage } from './pages';
 import { TelemetryClient } from './TelemetryClient';
 import { ConsortiumTree } from './treeService/ConsortiumTree';
 import { ConsortiumTreeManager } from './treeService/ConsortiumTreeManager';
 import { ConsortiumView } from './ViewItems';
-import { WelcomePage } from './WelcomePage';
 
 export async function activate(context: ExtensionContext) {
   Constants.initialize(context);
@@ -35,26 +34,23 @@ export async function activate(context: ExtensionContext) {
   const consortiumTreeManager = new ConsortiumTreeManager(context);
   const consortiumTree = new ConsortiumTree(consortiumTreeManager);
 
-  welcomePage.checkAndShow();
+  await welcomePage.checkAndShow();
   window.registerTreeDataProvider('AzureBlockchain', consortiumTree);
 
   //#region azureBlockchain extension commands
   const refresh = commands.registerCommand('azureBlockchainService.refresh', (element) => {
     consortiumTree.refresh(element);
   });
-  const showWelcomePage = commands.registerCommand('azureBlockchainService.showWelcomePage', () => {
-    welcomePage.show();
+  const showWelcomePage = commands.registerCommand('azureBlockchainService.showWelcomePage', async () => {
+    return welcomePage.show();
   });
-  const showRequirementsPage = commands.registerCommand('azureBlockchainService.showRequirementsPage', () => {
-    requirementsPage.show();
+  const showRequirementsPage = commands.registerCommand('azureBlockchainService.showRequirementsPage',
+    async (checkShowOnStartup: boolean) => {
+    return checkShowOnStartup ? requirementsPage.checkAndShow() : requirementsPage.show();
   });
   const copyRPCEndpointAddress = commands.registerCommand('azureBlockchainService.copyRPCEndpointAddress',
     async (viewItem: ConsortiumView) => {
     await tryExecute(() => AzureBlockchain.copyRPCEndpointAddress(viewItem));
-  });
-  const copyAccessKey = commands.registerCommand('azureBlockchainService.copyAccessKey',
-    async (viewItem: ConsortiumView) => {
-    await tryExecute(() => AzureBlockchain.copyAccessKey(viewItem));
   });
   const installNpm = commands.registerCommand('azureBlockchainService.required.installNpm', async () => {
     await tryExecute(() => required.installNpm());
@@ -102,7 +98,7 @@ export async function activate(context: ExtensionContext) {
 
   //#region commands with dialog
   const createConsortium = commands.registerCommand('azureBlockchainService.createConsortium', async () => {
-    await tryExecute(() => ConsortiumCommands.createConsortium());
+    await tryExecute(() => ConsortiumCommands.createConsortium(consortiumTreeManager));
   });
   const connectConsortium = commands.registerCommand('azureBlockchainService.connectConsortium', async () => {
     await tryExecute(() => ConsortiumCommands.connectConsortium(consortiumTreeManager));
@@ -175,7 +171,6 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(copyByteCode);
   context.subscriptions.push(copyABI);
   context.subscriptions.push(copyRPCEndpointAddress);
-  context.subscriptions.push(copyAccessKey);
   context.subscriptions.push(startGanacheServer);
   context.subscriptions.push(stopGanacheServer);
   context.subscriptions.push(generateMicroservicesWorkflows);

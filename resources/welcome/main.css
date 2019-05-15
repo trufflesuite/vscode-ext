@@ -74,13 +74,12 @@ header p {
   display: flex;
   flex-direction: row;
   align-content: stretch;
-  min-width: 620px;
+  min-width: 660px;
 }
 
 #main-content {
   max-width: 740px;
-  /* float: left; */
-  padding-right: 40px;
+  margin-right: 40px;
   min-width: 400px;
 }
 
@@ -243,9 +242,12 @@ header p {
   width: 40px;
 }
 
+.showOnStartup {
+  margin: 40px 0;
+}
+
 footer {
-  padding-top: 60px;
-  padding-bottom: 40px;
+  margin: 40px 0;
   text-align: center
 }
 
@@ -260,7 +262,6 @@ footer {
   align-items: stretch;
   align-content: center;
   min-width: 400px;
-  max-width: 600px;
 }
 
 .required-app {
@@ -269,13 +270,18 @@ footer {
   text-align: center;
   align-items: center;
   align-content: space-between;
-  flex: 0 1 185px;
+  flex: 1;
   margin-top: 25px;
+}
+
+.required-app:not(:last-child) {
+  margin-right: 25px;
 }
 
 .required-app img {
   flex: 1;
-  width: 60px;
+  max-width: 60px;
+  max-height: 60px;
 }
 
 .required-app div {
@@ -347,11 +353,14 @@ footer {
   align-items: stretch;
   align-content: center;
   min-width: 400px;
-  max-width: 600px;
 }
 
 .partners > a {
-  flex: 0 1 185px;
+  flex: 1;
+}
+
+.partners > a:not(:last-child) {
+  margin-right: 15px;
 }
 
 .specific-partner {
@@ -361,6 +370,10 @@ footer {
 
 .specific-partner > div:first-child {
   flex: 1;
+}
+
+.specific-partner > div:last-child {
+  height: 30px;
 }
 
 .specific-partner > div {

@@ -12,8 +12,4 @@ export class ConsortiumView extends ExtensionView<Consortium> {
   public async getRPCAddress(): Promise<string> {
     return this.extensionItem.getRPCAddress();
   }
-
-  public async getAccessKey(): Promise<string> {
-    return this.extensionItem.getAccessKey();
-  }
 }

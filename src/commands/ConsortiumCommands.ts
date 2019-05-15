@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import { GanacheCommands } from '../commands/GanacheCommands';
+import { ConsortiumResourceExplorer } from '../ConsortiumResourceExplorer';
 import { Constants } from '../Constants';
 import { showInputBox, showQuickPick } from '../helpers';
 import {
+  AzureConsortium,
   Consortium,
   ItemType,
   LocalNetworkConsortium,
@@ -15,26 +16,29 @@ import {
 import { ConsortiumTreeManager } from '../treeService/ConsortiumTreeManager';
 import { UrlValidator } from '../validators/UrlValidator';
 import { ConsortiumView } from '../ViewItems';
-import { WestlakeCommands } from './WestlakeCommands';
+import { GanacheCommands } from './GanacheCommands';
 
 interface IConsortiumDestination {
-  cmd: (childrenFilters?: string[]) => Promise<Consortium>;
+  cmd: (excludedItems?: string[]) => Promise<Consortium>;
   itemType: ItemType;
   label: string;
 }
 
 export namespace ConsortiumCommands {
-  export async function createConsortium(): Promise<Consortium> {
+  export async function createConsortium(consortiumTreeManager: ConsortiumTreeManager): Promise<Consortium> {
     const createConsortiumDestination: IConsortiumDestination[] = [
       {
-        cmd: WestlakeCommands.createWestlakeConsortium,
+        cmd: selectOrCreateConsortium,
         itemType: ItemType.AZURE_BLOCKCHAIN,
         label: Constants.uiCommandStrings.CreateConsortiumAzureBlockchainService,
       },
     ];
 
     const destination = await selectDestination(createConsortiumDestination);
-    return await destination.cmd();
+    const networkItem = await getNetwork(consortiumTreeManager, destination.itemType);
+    const childrenFilters = await getChildrenFilters(networkItem);
+
+    return destination.cmd(childrenFilters);
   }
 
   export async function connectConsortium(consortiumTreeManager: ConsortiumTreeManager): Promise<Consortium> {
@@ -45,7 +49,7 @@ export namespace ConsortiumCommands {
         label: Constants.uiCommandStrings.ConnectConsortiumLocalGanache,
       },
       {
-        cmd: WestlakeCommands.selectWestlakeConsortium,
+        cmd: selectOrCreateConsortium,
         itemType: ItemType.AZURE_BLOCKCHAIN,
         label: Constants.uiCommandStrings.ConnectConsortiumAzureBlockchainService,
       },
@@ -67,7 +71,7 @@ export namespace ConsortiumCommands {
   export async function disconnectConsortium(consortiumTreeManager: ConsortiumTreeManager, viewItem: ConsortiumView)
     : Promise<void> {
       if (viewItem.extensionItem instanceof LocalNetworkConsortium) {
-        GanacheCommands.stopGanacheServer();
+        await GanacheCommands.stopGanacheServer();
       }
       return consortiumTreeManager.removeItem(viewItem.extensionItem);
   }
@@ -112,6 +116,11 @@ async function getNetwork(consortiumTreeManager: ConsortiumTreeManager, itemType
   }
 
   return networkItem;
+}
+
+async function selectOrCreateConsortium(excludedItems?: string[]): Promise<AzureConsortium> {
+  const azureResourceExplorer = new ConsortiumResourceExplorer();
+  return azureResourceExplorer.selectOrCreateConsortium(excludedItems);
 }
 
 async function connectLocalNetwork(): Promise<LocalNetworkConsortium> {

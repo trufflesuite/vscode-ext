@@ -2,23 +2,10 @@
 // Licensed under the MIT license.
 
 import { Uri, window } from 'vscode';
-import { ConsortiumResourceExplorer } from '../ConsortiumResourceExplorer';
 import { Constants } from '../Constants';
-import { AzureConsortium } from '../Models';
 import { TruffleCommands } from './TruffleCommands';
 
 export namespace WestlakeCommands {
-
-  export async function createWestlakeConsortium(): Promise<AzureConsortium> {
-    const azureResourceExplorer = new ConsortiumResourceExplorer();
-    return azureResourceExplorer.createConsortium();
-  }
-
-  export async function selectWestlakeConsortium(childrenFilters?: string[]): Promise<AzureConsortium> {
-    const azureResourceExplorer = new ConsortiumResourceExplorer();
-    return azureResourceExplorer.selectConsortium(childrenFilters);
-  }
-
   export async function showLedgerEventsDialog(uri: Uri): Promise<void> {
     const ledgerEventsDestination = [
       {
@@ -44,7 +31,7 @@ export namespace WestlakeCommands {
       throw new Error('Action aborted');
     }
 
-    return await target.cmd(uri);
+    return target.cmd(uri);
   }
 }
 

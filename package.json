@@ -5,7 +5,7 @@
   "publisher": "AzBlockchain",
   "preview": true,
   "icon": "images/blockchain-service-logo.png",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum"
@@ -51,7 +51,6 @@
     "onCommand:azureBlockchainService.connectConsortium",
     "onCommand:drizzle.generateSmartContractUI",
     "onCommand:azureBlockchainService.copyRPCEndpointAddress",
-    "onCommand:azureBlockchainService.copyAccessKey",
     "onCommand:azureBlockchainService.createConsortium",
     "onCommand:azureBlockchainService.disconnectConsortium"
   ],
@@ -167,18 +166,13 @@
         "category": "Azure Blockchain"
       },
       {
-        "command": "azureBlockchainService.copyAccessKey",
-        "title": "Copy Access Key",
-        "category": "Azure Blockchain"
-      },
-      {
         "command": "azureBlockchainService.createConsortium",
         "title": "Create Azure Blockchain Service",
         "category": "Azure Blockchain"
       },
       {
         "command": "azureBlockchainService.disconnectConsortium",
-        "title": "Disconnect Consortium",
+        "title": "Disconnect",
         "category": "Azure Blockchain"
       },
       {
@@ -237,10 +231,6 @@
         {
           "when": "false",
           "command": "azureBlockchainService.copyRPCEndpointAddress"
-        },
-        {
-          "when": "false",
-          "command": "azureBlockchainService.copyAccessKey"
         },
         {
           "when": "false",
@@ -309,11 +299,6 @@
           "group": "azureBlockchain-0@0"
         },
         {
-          "command": "azureBlockchainService.copyAccessKey",
-          "when": "view == AzureBlockchain && viewItem == consortium",
-          "group": "azureBlockchain-0@1"
-        },
-        {
           "command": "azureBlockchainService.startGanacheServer",
           "when": "view == AzureBlockchain && viewItem == localconsortium && azureBlockchainService:isGanacheRunning == false",
           "group": "azureBlockchain-1@0"
@@ -326,7 +311,7 @@
         {
           "command": "azureBlockchainService.disconnectConsortium",
           "when": "view == AzureBlockchain && viewItem == consortium",
-          "group": "azureBlockchain-1@1"
+          "group": "azureBlockchain-0@1"
         },
         {
           "command": "azureBlockchainService.copyRPCEndpointAddress",
@@ -336,7 +321,7 @@
         {
           "command": "azureBlockchainService.disconnectConsortium",
           "when": "view == AzureBlockchain && viewItem == localconsortium",
-          "group": "azureBlockchain-1@1"
+          "group": "azureBlockchain-0@1"
         }
       ],
       "explorer/context": [

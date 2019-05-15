@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import * as fs from 'fs-extra';
-import { Uri, window, workspace } from 'vscode';
+import { ProgressLocation, Uri, window, workspace } from 'vscode';
 import { Constants } from '../Constants';
 import {
   createTemporaryDir,
@@ -50,7 +50,12 @@ export namespace ProjectCommands {
 }
 
 async function createNewEmptyProject(projectPath: string): Promise<void> {
-  await createProject(projectPath, Constants.defaultTruffleBox);
+  return window.withProgress({
+    location: ProgressLocation.Window,
+    title: Constants.statusBarMessages.creatingProject,
+  }, async () => {
+    return createProject(projectPath, Constants.defaultTruffleBox);
+  });
 }
 
 async function createProjectFromTruffleBox(projectPath: string): Promise<void> {
@@ -65,9 +70,8 @@ async function createProject(projectPath: string, truffleBoxName: string): Promi
   const path = (arrayFiles.length) ? createTemporaryDir(projectPath) : projectPath;
 
   try {
-    window.showInformationMessage(Constants.informationMessage.newProjectCreationStarted);
     Output.show();
-    await outputCommandHelper.executeCommand(path, 'npx', 'truffle', 'unbox', truffleBoxName);
+    await outputCommandHelper.executeCommand(path, 'npx', Constants.truffleCommand, 'unbox', truffleBoxName);
     if (arrayFiles.length) {
       fs.moveSync(path, projectPath);
     }
@@ -75,10 +79,9 @@ async function createProject(projectPath: string, truffleBoxName: string): Promi
       0,
       workspace.workspaceFolders ? workspace.workspaceFolders.length : null,
       {uri: Uri.file(projectPath)});
-    window.showInformationMessage(Constants.informationMessage.newProjectCreationFinished);
   } catch (error) {
-    // TODO: cleanup files after failed truffle unbox
-    throw Error(error);
+    arrayFiles.length ? fs.removeSync(path) : fs.emptyDirSync(path);
+    throw Error([Constants.errorMessageStrings.NewProjectCreationFailed, error.message].join(' '));
   }
 }
 

@@ -56,16 +56,12 @@ export abstract class Consortium extends ExtensionItem {
   }
 
   public async getRPCAddress(): Promise<string> {
-    return this.urls.length === 0 ? '' : this.urls[0].origin;
-  }
-
-  public async getAccessKey(): Promise<string> {
     if (this.urls.length === 0) {
       return '';
     }
 
     const url = this.urls[0];
-    return url.pathname === '/' ? '' : url.pathname || '';
+    return url.pathname === '/' ? url.origin : `${url.origin}/${url.pathname}`;
   }
 
   public getConsortiumId(): number {

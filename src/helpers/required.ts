@@ -4,9 +4,6 @@ import { Constants } from '../Constants';
 import { Output } from '../Output';
 import { executeCommand, tryExecuteCommand } from './command';
 import { CommandContext, setCommandContext } from './commandContext';
-import Timeout = NodeJS.Timeout;
-
-let timeoutID: NodeJS.Timeout;
 
 export namespace required {
   export interface IRequiredVersion {
@@ -18,7 +15,6 @@ export namespace required {
 
   const currentState: {[key: string]: IRequiredVersion} = {};
   const requiredApps = [ 'node', 'npm', 'git' ];
-  // const auxiliaryApps = [ 'python', 'truffle', 'ganache' ];
 
   export function isValid(version: string, minVersion: string, maxVersion?: string): boolean {
     return !!semver.valid(version) &&
@@ -27,37 +23,47 @@ export namespace required {
   }
 
   /**
-   * Function check all apps:
-   * Node.js, npm, git, truffle, ganache, python
+   * Function check all apps: Node.js, npm, git, truffle, ganache, python
+   * Show Requirements Page with checking showOnStartup flag
    */
   export async function checkAllApps(): Promise<boolean> {
     const versions = await getAllVersions();
     const invalid = versions.some((version) => !version.isValid);
 
     if (invalid) {
-      showRequiredAppsMessage();
-      return false;
+      const message = Constants.informationMessage.invalidRequiredVersion;
+      const details = Constants.informationMessage.seeDetailsRequirementsPage;
+      window
+        .showErrorMessage(`${message}. ${details}`, Constants.informationMessage.detailsButton)
+        .then((answer) => {
+          if (answer) {
+            commands.executeCommand('azureBlockchainService.showRequirementsPage');
+          }
+        });
+      commands.executeCommand('azureBlockchainService.showRequirementsPage', true);
     }
 
-    return true;
+    return !invalid;
   }
 
   /**
-   * Function check only required apps:
-   * Node.js, npm, git
+   * Function check only required apps: Node.js, npm, git
+   * Show Requirements Page
    */
-  export async function checkRequiredApps(message?: string): Promise<boolean> {
+  export async function checkRequiredApps(): Promise<boolean> {
     const versions = await getAllVersions();
     const invalid = versions
       .filter((version) => requiredApps.includes(version.app))
       .some((version) => !version.isValid);
 
     if (invalid) {
-      showRequiredAppsMessage(message || Constants.errorMessageStrings.RequiredAppsAreNotInstalled);
-      return false;
+      const message = Constants.errorMessageStrings.RequiredAppsAreNotInstalled;
+      const details = Constants.informationMessage.seeDetailsRequirementsPage;
+      window.showErrorMessage(`${message}. ${details}`);
+      commands.executeCommand('azureBlockchainService.showRequirementsPage');
     }
 
-    return true;
+    return !invalid;
   }
 
   export async function getAllVersions(): Promise<IRequiredVersion[]> {
@@ -77,21 +83,6 @@ export namespace required {
       await createRequiredVersion('ganache', getGanacheVersion, CommandContext.GanacheIsAvailable);
 
     return Object.values(currentState);
-  }
-
-  export function showRequiredAppsMessage(message?: string): void {
-    commands.executeCommand('azureBlockchainService.showRequirementsPage');
-
-    clearTimeout(timeoutID as Timeout);
-    timeoutID = setTimeout(async () => {
-      try {
-        message = message || Constants.informationMessage.invalidRequiredVersion;
-
-        window.showErrorMessage(`${message} ${Constants.informationMessage.seeDetailsRequirementsPage}`);
-      } catch (e) {
-        // ignore
-      }
-    }, 500);
   }
 
   export async function getNodeVersion(): Promise<string> {

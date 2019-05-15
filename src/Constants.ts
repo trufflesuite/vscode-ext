@@ -8,6 +8,9 @@ import { ExtensionContext } from 'vscode';
 export class Constants {
   public static extensionContext: ExtensionContext;
   public static temporaryDirectory = '';
+  public static logicAppOutputDir = 'generatedLogicApp';
+  public static flowAppOutputDir = 'generatedFlowApp';
+  public static azureFunctionOutputDir = 'generatedAzureFunction';
 
   public static extensionId = '';
   public static extensionVersion = '';
@@ -23,7 +26,8 @@ export class Constants {
     telemetryClient: 'Telemetry Client',
   };
 
-  public static isWelcomePageShown = 'isWelcomePageShown';
+  public static showOnStartupWelcomePage = 'showOnStartupWelcomePage';
+  public static showOnStartupRequirementsPage = 'showOnStartupRequirementsPage';
 
   public static defaultTruffleBox = 'Azure-Samples/Blockchain-Ethereum-Template';
   public static tempPath = 'tempPath';
@@ -43,6 +47,11 @@ export class Constants {
       min: '2.7.15',
     },
     truffle: '5.0.0',
+  };
+
+  public static webViewPages = {
+    requirements: 'Azure Blockchain Development Kit - Preview',
+    welcome: 'Welcome to Azure Blockchain',
   };
 
   public static contractExtension = {
@@ -82,8 +91,6 @@ export class Constants {
     gasPrice: 100000000000,
   };
 
-  public static telemetry = 'Telemetry';
-
   public static networkName = {
     azure: 'Azure Blockchain Service',
     local: 'Local Network',
@@ -110,6 +117,7 @@ export class Constants {
     enterTruffleBoxName: 'Enter pre-built Truffle project',
     enterWestlakeUrl: 'Enter Westlake url',
     enterYourGanacheUrl: 'Enter your Ganache url',
+    provideResourceGroupName: 'Provide a resource group name',
     selectConsortiumProtocol: 'Select protocol',
     selectConsortiumRegion: 'Select region',
     selectResourceGroup: 'Select resource group',
@@ -138,11 +146,13 @@ export class Constants {
     deployedUrlStructure: 'host:port',
     generateMnemonic: 'Generate mnemonic',
     pasteMnemonic: 'Paste mnemonic',
+    resourceGroupName: 'Resource Group Name',
     selectConsortium: 'Select consortium',
     selectDeployDestination: 'Select deploy destination',
     selectLedgerEventsDestination: 'Select ledger events destination',
     selectNewProjectPath: 'Select new project path',
-    selectResourceGroup: 'Select a resource group to select or create your consortium in...',
+    selectResourceGroup: 'Select a resource group',
+    selectRgLocation: 'Select a location to create your Resource Group in...',
     selectSubscription: 'Select subscription',
     selectTypeOfMnemonic: 'Select type of mnemonic',
     selectTypeOfSolidityProject: 'Select type of solidity project',
@@ -170,22 +180,6 @@ export class Constants {
     runningCommand: 'Running command',
   };
 
-  public static mnemonicMessages = {
-    invalidStorageTypeSelected: 'Invalid storage type selected',
-    whereStored: 'Where are your mnemonics stored?',
-  };
-
-  public static mnemonicTypeQuickPick = {
-    text: {
-      local: 'In local file',
-      truffle: 'In truffle-config',
-    },
-    types: {
-      local: 'local',
-      truffle: 'truffle',
-    },
-  };
-
   public static typeOfSolidityProject = {
     action: {
       emptyProject: 'createEmptyProject',
@@ -210,10 +204,15 @@ export class Constants {
     },
   };
 
-  public static requestApiVersion = '2018-06-01-preview';
-  public static requestAcceptLanguage = 'en-US';
-  public static requestBaseUri = 'https://management.azure.com';
-  public static azurePortalBasUri = 'https://portal.azure.com/#@microsoft.onmicrosoft.com';
+  public static statusBarMessages = {
+    buildingContracts: 'Building contracts',
+    checkingRequirementDependencies: 'Checking requirement dependencies version',
+    creatingConsortium: 'Creating new consortium',
+    creatingProject: 'Creating new project',
+    deployingContracts: (destination: string) => {
+      return `Deploying contracts to '${destination}'`;
+    },
+  };
 
   public static welcomePagePath = '';
   public static requirementsPagePath = '';
@@ -221,11 +220,6 @@ export class Constants {
 
   public static dataCopied = ' copied to clipboard';
   public static rpcEndpointAddress = 'RPCEndpointAddress';
-  public static accessKey = 'AccessKey';
-
-  public static folderStrings = {
-    folderNotSelected: 'Folder not selected',
-  };
 
   public static ganacheCommandStrings = {
     serverAlreadyRunning: 'Ganache server already running',
@@ -249,6 +243,7 @@ export class Constants {
   public static errorMessageStrings = {
     ActionAborted: 'Action aborted',
     GitIsNotInstalled: 'Git is not installed',
+    NewProjectCreationFailed: 'Command createProject has failed.',
     NoSubscriptionFound: 'No subscription found.',
     NoSubscriptionFoundClick: 'No subscription found, click an Azure account ' +
       'at the bottom left corner and choose Select All',
@@ -263,10 +258,32 @@ export class Constants {
     newProjectCreationFinished: 'New project was created successfully',
     newProjectCreationStarted: 'New project creation is started',
     seeDetailsRequirementsPage: 'Please see details on the Requirements Page',
-    seeDetailsWelcomePage: 'Please see details on Welcome Page',
+  };
+
+  public static microservicesWorkflows = {
+    Data: 'Data',
+    Messaging: 'Messaging',
+    Reporting: 'Reporting',
+    Service: 'Service',
+  };
+
+  public static logicApp = {
+    AzureFunction: 'Azure Function',
+    FlowApp: 'Flow App',
+    LogicApp: 'Logic App',
   };
 
   public static gitCommand = 'git';
+  public static truffleCommand = 'truffle';
+
+  public static azureResourceExplorer = {
+    portalBasUri: 'https://portal.azure.com/#@microsoft.onmicrosoft.com',
+    providerName: 'Microsoft.Blockchain',
+    requestAcceptLanguage: 'en-US',
+    requestApiVersion: '2018-06-01-preview',
+    requestBaseUri: 'https://management.azure.com',
+    resourceType: 'blockchainMembers',
+  };
 
   public static initialize(context: ExtensionContext) {
     this.extensionContext = context;

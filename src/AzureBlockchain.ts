@@ -11,11 +11,6 @@ export namespace AzureBlockchain {
     await AzureBlockchain.addDataInClipboard(Constants.rpcEndpointAddress, rpcEndpointAddress);
   }
 
-  export async function copyAccessKey(consortiumNode: ConsortiumView): Promise<void> {
-    const accessKey = await consortiumNode.getAccessKey();
-    await AzureBlockchain.addDataInClipboard(Constants.accessKey, accessKey);
-  }
-
   export async function addDataInClipboard(typeOfData: string, data?: string | null) {
     if (data) {
       await env.clipboard.writeText(data);

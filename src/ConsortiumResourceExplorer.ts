@@ -1,37 +1,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import { ResourceManagementClient, SubscriptionClient, SubscriptionModels } from 'azure-arm-resource';
-import { commands, extensions, ProgressLocation, QuickPickItem, window } from 'vscode';
+import { ProgressLocation, QuickPickItem, window } from 'vscode';
 import { AzureBlockchainServiceClient, IAzureMemberDto, ICreateQuorumMember } from './ARMBlockchain';
-import { AzureAccount } from './azure-account.api';
 import { Constants } from './Constants';
 import { showInputBox, showQuickPick } from './helpers';
-import { AzureConsortium, LocationItem, Member, ResourceGroupItem, SubscriptionItem, TransactionNode } from './Models';
-import { getAzureRegions } from './Regions';
+import { AzureConsortium, Member, ResourceGroupItem, SubscriptionItem, TransactionNode } from './Models';
+import { ConsortiumItem } from './Models/ConsortiumItem';
+import { ResourceExplorerAndGenerator } from './ResourceExplorerAndGenerator';
 import { WestlakeInputValidator } from './validators/WestlakeInputValidator';
 
-export class ConsortiumResourceExplorer {
-  private readonly _accountApi: AzureAccount;
-
-  constructor() {
-    this._accountApi = extensions.getExtension<AzureAccount>('ms-vscode.azure-account')!.exports;
-  }
-
-  public async selectConsortium(childrenFilters?: string[]): Promise<AzureConsortium> {
+export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
+  public async selectOrCreateConsortium(childrenFilters?: string[]): Promise<AzureConsortium> {
     await this.waitForLogin();
 
     const subscriptionItem = await this.getOrSelectSubscriptionItem();
-    const resourceGroupItem = await this.getOrSelectResourceGroup(subscriptionItem);
-    return await this.getOrSelectConsortiumItem(subscriptionItem, resourceGroupItem, childrenFilters);
-  }
+    const resourceGroupItem = await this.getOrCreateResourceGroupItem(subscriptionItem);
 
-  public async createConsortium(): Promise<AzureConsortium> {
-    await this.waitForLogin();
-
-    const subscriptionItem = await this.getOrSelectSubscriptionItem();
-    const resourceGroupItem = await this.getOrCreateResourceGroup(subscriptionItem);
-    return await this.createConsortiumItem(subscriptionItem, resourceGroupItem);
+    return this.getOrCreateConsortiumItem(subscriptionItem, resourceGroupItem, childrenFilters);
   }
 
   public async getAccessKeys(consortium: AzureConsortium): Promise<string[]> {
@@ -64,10 +50,10 @@ export class ConsortiumResourceExplorer {
       subscriptionItem.session.credentials,
       subscriptionItem.subscriptionId,
       resourceGroupItem.label,
-      Constants.requestBaseUri,
-      Constants.requestApiVersion,
+      Constants.azureResourceExplorer.requestBaseUri,
+      Constants.azureResourceExplorer.requestApiVersion,
       {
-        acceptLanguage: Constants.requestAcceptLanguage,
+        acceptLanguage: Constants.azureResourceExplorer.requestAcceptLanguage,
         filters: [],
         generateClientRequestId: true,
         longRunningOperationRetryTimeout: 30,
@@ -80,175 +66,82 @@ export class ConsortiumResourceExplorer {
     );
   }
 
-  private async getResourceClient(subscriptionItem: SubscriptionItem)
-    : Promise<ResourceManagementClient.ResourceManagementClient> {
-    return new ResourceManagementClient.ResourceManagementClient(
-      subscriptionItem.session.credentials,
-      subscriptionItem.subscriptionId,
-      subscriptionItem.session.environment.resourceManagerEndpointUrl,
-    );
-  }
-
-  private async getOrSelectSubscriptionItem(): Promise<SubscriptionItem> {
-    return showQuickPick(
-      await this.loadSubscriptionItems(),
-      { placeHolder: Constants.placeholders.selectSubscription, ignoreFocusOut: true },
-    );
-  }
-
-  private async loadSubscriptionItems(): Promise<SubscriptionItem[]> {
-    await this._accountApi.waitForFilters();
-
-    const subscriptionItems = this._accountApi.filters
-      .map((filter) => new SubscriptionItem(
-        filter.subscription.displayName || '',
-        filter.subscription.subscriptionId || '',
-        filter.session,
-      ));
-
-    if (subscriptionItems.length === 0) {
-      throw new Error(Constants.errorMessageStrings.NoSubscriptionFoundClick);
-    }
-
-    return subscriptionItems;
-  }
-
-  private async getOrSelectResourceGroup(subscriptionItem: SubscriptionItem): Promise<ResourceGroupItem> {
-    return showQuickPick(
-      this.getResourceGroupItems(subscriptionItem),
-      { placeHolder: Constants.placeholders.selectResourceGroup, ignoreFocusOut: true },
-    );
-  }
-
-  private async getOrCreateResourceGroup(subscriptionItem: SubscriptionItem): Promise<ResourceGroupItem> {
-    const createGroupItem: QuickPickItem = {
-      label: '$(plus) Create Resource Group',
-    };
-    const items: QuickPickItem[] = [];
-    items.push(createGroupItem);
-    items.push(...await this.getResourceGroupItems(subscriptionItem));
+  private async getOrCreateConsortiumItem(
+    subscriptionItem: SubscriptionItem,
+    resourceGroupItem: ResourceGroupItem,
+    excludedItems?: string[],
+  ): Promise<AzureConsortium> {
     const pick = await showQuickPick(
-      items,
-      { placeHolder: Constants.placeholders.selectResourceGroup, ignoreFocusOut: true },
-    );
-
-    if (pick instanceof (ResourceGroupItem)) {
-      return pick;
-    } else {
-      return this.createResourceGroup(subscriptionItem);
-    }
-  }
-
-  private async createResourceGroup(subscriptionItem: SubscriptionItem): Promise<ResourceGroupItem> {
-    const resourceGroupName = await showInputBox({
-      ignoreFocusOut: true,
-      placeHolder: 'Resource Group Name',
-      prompt: 'Provide a resource group name',
-      validateInput: WestlakeInputValidator.validateNames,
-    });
-
-    const locationItem = await showQuickPick(
-      this.getLocationItems(subscriptionItem),
-      { placeHolder: 'Select a location to create your Resource Group in...', ignoreFocusOut: true },
-    );
-
-    return window.withProgress({
-      location: ProgressLocation.Notification,
-      title: `Creating resource group '${resourceGroupName}'`,
-    }, async () => {
-      if (subscriptionItem.subscriptionId === undefined) {
-        throw new Error(Constants.errorMessageStrings.NoSubscriptionFound);
-      } else {
-        const resourceManagementClient = await this.getResourceClient(subscriptionItem);
-        const resourceGroup = await resourceManagementClient.resourceGroups.createOrUpdate(
-          resourceGroupName,
-          { location: locationItem.description },
-        );
-        return new ResourceGroupItem(resourceGroup.name, resourceGroup.location);
-      }
-    });
-  }
-
-  private async getResourceGroupItems(subscriptionItem: SubscriptionItem): Promise<ResourceGroupItem[]> {
-    const resourceManagementClient = await this.getResourceClient(subscriptionItem);
-    const resourceGroups = await resourceManagementClient.resourceGroups.list();
-    return resourceGroups.map((resourceGroup) => new ResourceGroupItem(resourceGroup.name, resourceGroup.location));
-  }
-
-  private async getLocationItems(subscriptionItem: SubscriptionItem): Promise<LocationItem[]> {
-    const subscriptionClient = new SubscriptionClient.SubscriptionClient(
-      subscriptionItem.session.credentials,
-      subscriptionItem.session.environment.resourceManagerEndpointUrl,
-    );
-
-    const locations = await subscriptionClient.subscriptions.listLocations(subscriptionItem.subscriptionId);
-    return locations.map((location: SubscriptionModels.Location) => new LocationItem(location));
-  }
-
-  private async getOrSelectConsortiumItem(
-    subscriptionItem: SubscriptionItem,
-    resourceGroupItem: ResourceGroupItem,
-    childrenFilters?: string[])
-    : Promise<AzureConsortium> {
-    const consortiumItems = this.getNewConsortiumItems(subscriptionItem, resourceGroupItem, childrenFilters);
-
-    return showQuickPick(consortiumItems,
+      this.getConsortiumItems(subscriptionItem, resourceGroupItem, excludedItems),
       { placeHolder: Constants.placeholders.selectConsortium, ignoreFocusOut: true });
+
+    if (pick instanceof ConsortiumItem) {
+      return this.getAzureConsortium(pick, subscriptionItem, resourceGroupItem);
+    } else {
+      return this.createAzureConsortium(subscriptionItem, resourceGroupItem);
+    }
   }
 
-  private async getNewConsortiumItems(
+  private async getConsortiumItems(
     subscriptionItem: SubscriptionItem,
     resourceGroupItem: ResourceGroupItem,
-    childrenFilters?: string[])
-    : Promise<AzureConsortium[]> {
-    const consortiumItems = await this.loadConsortiumItems(subscriptionItem, resourceGroupItem);
+    excludedItems?: string[],
+  ): Promise<QuickPickItem[]> {
+    const items: QuickPickItem[] = [];
+    const createConsortiumItem: QuickPickItem = { label: '$(plus) Create Consortium' };
+    const consortiumItems = await this.loadConsortiumItems(subscriptionItem, resourceGroupItem, excludedItems);
 
-    if (childrenFilters) {
-      return  consortiumItems.filter((item) => !childrenFilters.includes(item.label));
-    }
+    items.push(createConsortiumItem, ...consortiumItems);
 
-    return consortiumItems;
+    return items;
   }
 
-  private async loadConsortiumItems(subscriptionItem: SubscriptionItem, resourceGroupItem: ResourceGroupItem)
-    : Promise<AzureConsortium[]> {
+  private async loadConsortiumItems(
+    subscriptionItem: SubscriptionItem,
+    resourceGroupItem: ResourceGroupItem,
+    excludedItems: string[] = [],
+  ): Promise<ConsortiumItem[]> {
     const client = await this.getClient(subscriptionItem, resourceGroupItem);
-
     const members: IAzureMemberDto[] = await client.memberResource.getListMember();
-    if (!members.length) {
-      throw new Error(`No members found in resource group ${resourceGroupItem.label}.`);
-    }
-
-    const consortiumItems = members
-      .map((member) => new AzureConsortium(
+    return members
+      .map((member) => new ConsortiumItem(
         member.properties.consortium,
         subscriptionItem.subscriptionId,
         resourceGroupItem.label,
         member.name,
         member.properties.dns,
       ))
+      .filter((item) => !excludedItems.includes(item.label))
       .sort((a, b) => a.label.localeCompare(b.label));
-
-    for (const consortium of consortiumItems) {
-      const filterMembers = members.filter((x: IAzureMemberDto) => x.properties.consortium === consortium.label);
-
-      for (const member of filterMembers) {
-        const transactionNodes = await client.transactionNodeResource.getListTransactionNode(member.name);
-        const memberItem = new Member(member.name);
-
-        await consortium.setChildren([
-          memberItem,
-          ...transactionNodes.map((transactionNode) => {
-            return new TransactionNode(transactionNode.name, transactionNode.properties.dns);
-          }),
-        ]);
-      }
-    }
-
-    return consortiumItems;
   }
 
-  private async createConsortiumItem(subscriptionItem: SubscriptionItem, resourceGroupItem: ResourceGroupItem)
+  private async getAzureConsortium(
+    consortiumItems: ConsortiumItem,
+    subscriptionItem: SubscriptionItem,
+    resourceGroupItem: ResourceGroupItem,
+  ): Promise<AzureConsortium> {
+    const client = await this.getClient(subscriptionItem, resourceGroupItem);
+    const transactionNodes = await client.transactionNodeResource.getListTransactionNode(consortiumItems.memberName);
+    const memberItem = new Member(consortiumItems.memberName);
+
+    const azureConsortium =  new AzureConsortium(
+      consortiumItems.consortiumName,
+      consortiumItems.subscriptionId,
+      consortiumItems.resourcesGroup,
+      consortiumItems.memberName,
+      consortiumItems.url,
+    );
+    await azureConsortium.setChildren([
+      memberItem,
+      ...transactionNodes.map((transactionNode) => {
+        return new TransactionNode(transactionNode.name, transactionNode.properties.dns);
+      }),
+    ]);
+
+    return azureConsortium;
+  }
+
+  private async createAzureConsortium(subscriptionItem: SubscriptionItem, resourceGroupItem: ResourceGroupItem)
     : Promise<AzureConsortium> {
     const client = await this.getClient(subscriptionItem, resourceGroupItem);
 
@@ -265,7 +158,7 @@ export class ConsortiumResourceExplorer {
     });
 
     const protocol = await showQuickPick(
-      [{label: 'Quorum'}],
+      [{ label: 'Quorum' }],
       {
         ignoreFocusOut: true,
         placeHolder: Constants.paletteWestlakeLabels.selectConsortiumProtocol,
@@ -287,7 +180,7 @@ export class ConsortiumResourceExplorer {
     });
 
     const region = await showQuickPick(
-      getAzureRegions(),
+      this.getLocationItems(subscriptionItem),
       { placeHolder: Constants.paletteWestlakeLabels.selectConsortiumRegion, ignoreFocusOut: true },
     );
 
@@ -296,24 +189,16 @@ export class ConsortiumResourceExplorer {
       consortiumName,
       consortiumPassword,
       protocol: protocol.label,
-      region: region.key,
+      region: region.description,
     };
 
-    await client.consortiumResource.createConsortium(memberName, bodyParams);
+    return window.withProgress({
+      location: ProgressLocation.Window,
+      title: Constants.statusBarMessages.creatingConsortium,
+    }, async () => {
+      await client.consortiumResource.createConsortium(memberName, bodyParams);
 
-    return new AzureConsortium(consortiumName, subscriptionItem.subscriptionId, resourceGroupItem.label, memberName);
-  }
-
-  private async waitForLogin(): Promise<boolean> {
-    let result = await this._accountApi.waitForLogin();
-    if (!result) {
-      await commands.executeCommand('azure-account.askForLogin');
-      result = await this._accountApi.waitForLogin();
-      if (!result) {
-        throw new Error(Constants.errorMessageStrings.WaitForLogin);
-      }
-    }
-
-    return true;
+      return new AzureConsortium(consortiumName, subscriptionItem.subscriptionId, resourceGroupItem.label, memberName);
+    });
   }
 }

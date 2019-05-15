@@ -53,7 +53,7 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
         Output.outputLine(Constants.outputChannel.azureBlockchainServiceClient, err.message);
       }
 
-      env.openExternal(Uri.parse(`${Constants.azurePortalBasUri}/resource/${urlDetailsOfConsortium}`));
+      env.openExternal(Uri.parse(`${Constants.azureResourceExplorer.portalBasUri}/resource/${urlDetailsOfConsortium}`));
     });
   }
 
@@ -98,7 +98,7 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     callback: (error: Error | null, result?: any) => void,
   ): Promise<void> {
     // @ts-ignore
-    return await this.pipeline(httpRequest, (err: ServiceError, response: IncomingMessage, responseBody: string) => {
+    return this.pipeline(httpRequest, (err: ServiceError, response: IncomingMessage, responseBody: string) => {
       if (err) {
         window.showErrorMessage(err.message);
         return callback(err);

@@ -20,13 +20,12 @@ export abstract class ProtectedConsortium extends Consortium {
     const network = await super.getTruffleNetwork();
 
     const targetURL = await this.getRPCAddress();
-    const accessKey = await this.getAccessKey();
     const mnemonic = await this.getMnemonic();
     await config.importFs();
 
     network.options.provider = {
       mnemonic: mnemonic.path,
-      url: `${targetURL}/${accessKey}`,
+      url: `${targetURL}`,
     };
 
     return network;

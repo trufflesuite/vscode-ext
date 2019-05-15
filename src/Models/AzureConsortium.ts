@@ -61,13 +61,9 @@ export class AzureConsortium extends ProtectedConsortium {
       url.port = `${Constants.defaultAzureBSPort}`;
     }
 
-    return url.origin;
-  }
-
-  public async getAccessKey(): Promise<string> {
     const consortiumResourceExplorer = new ConsortiumResourceExplorer();
     const keys = await consortiumResourceExplorer.getAccessKeys(this);
-    return keys ? keys[0] : '';
+    return keys ? `${url.origin}/${keys[0]}` : url.origin;
   }
 
   public toJSON(): { [p: string]: any } {
