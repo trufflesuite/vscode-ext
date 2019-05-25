@@ -18,12 +18,10 @@ const showConfirmPaidOperationDialog = userInteractionHelper.showConfirmPaidOper
 const getWorkspaceRoot = workspaceHelpers.getWorkspaceRoot;
 const isWorkspaceOpen = workspaceHelpers.isWorkspaceOpen;
 const TruffleConfig = TruffleConfiguration.TruffleConfig;
-const createTemporaryDir = workspaceHelpers.createTemporaryDir;
 const CommandContext = commandContext.CommandContext;
 const setCommandContext = commandContext.setCommandContext;
 
 export {
-  createTemporaryDir,
   CommandContext,
   getWorkspaceRoot,
   gitHelper,

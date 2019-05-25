@@ -4,6 +4,10 @@ export interface ICreateQuorumMember {
   consortiumPassword: string;
   consortiumManagementAccountPassword: string;
   protocol: string;
+  sku: {
+    name: string;
+    tier: string;
+  };
 }
 
 export class ConsortiumMapper {
@@ -15,10 +19,8 @@ export class ConsortiumMapper {
         consortiumManagementAccountPassword: params.consortiumManagementAccountPassword,
         password: params.consortiumPassword,
         protocol: params.protocol,
-        validatorNodesSku: {
-          capacity: 2,
-        },
       },
+      sku: params.sku,
     };
   }
 }

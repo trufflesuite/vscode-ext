@@ -5,7 +5,6 @@ import * as fs from 'fs-extra';
 import { ProgressLocation, Uri, window, workspace } from 'vscode';
 import { Constants } from '../Constants';
 import {
-  createTemporaryDir,
   gitHelper,
   outputCommandHelper,
   required,
@@ -13,6 +12,7 @@ import {
   showOpenFolderDialog,
   showQuickPick,
 } from '../helpers';
+import { CancellationEvent } from '../Models';
 import { Output } from '../Output';
 
 interface IProjectDestination {
@@ -42,11 +42,34 @@ export namespace ProjectCommands {
       { placeHolder: Constants.placeholders.selectTypeOfSolidityProject, ignoreFocusOut: true },
     );
 
-    const projectPath = await showOpenFolderDialog();
+    const projectPath = await chooseNewProjectDir();
 
     await command.cmd(projectPath);
     await gitHelper.gitInit(projectPath);
   }
+}
+
+async function chooseNewProjectDir(): Promise<string> {
+  const projectPath = await showOpenFolderDialog();
+
+  await fs.ensureDir(projectPath);
+  const arrayFiles =  await fs.readdir(projectPath);
+
+  if (arrayFiles.length) {
+    const answer = await window
+      .showErrorMessage(
+        Constants.errorMessageStrings.DirectoryIsNotEmpty,
+        Constants.informationMessage.openButton,
+        Constants.informationMessage.cancelButton);
+
+    if (answer === Constants.informationMessage.openButton) {
+      return chooseNewProjectDir();
+    } else {
+      throw new CancellationEvent();
+    }
+  }
+
+  return projectPath;
 }
 
 async function createNewEmptyProject(projectPath: string): Promise<void> {
@@ -64,23 +87,15 @@ async function createProjectFromTruffleBox(projectPath: string): Promise<void> {
 }
 
 async function createProject(projectPath: string, truffleBoxName: string): Promise<void> {
-  await fs.ensureDir(projectPath);
-
-  const arrayFiles =  await fs.readdir(projectPath);
-  const path = (arrayFiles.length) ? createTemporaryDir(projectPath) : projectPath;
-
   try {
     Output.show();
-    await outputCommandHelper.executeCommand(path, 'npx', Constants.truffleCommand, 'unbox', truffleBoxName);
-    if (arrayFiles.length) {
-      fs.moveSync(path, projectPath);
-    }
+    await outputCommandHelper.executeCommand(projectPath, 'npx', Constants.truffleCommand, 'unbox', truffleBoxName);
     workspace.updateWorkspaceFolders(
       0,
       workspace.workspaceFolders ? workspace.workspaceFolders.length : null,
       {uri: Uri.file(projectPath)});
   } catch (error) {
-    arrayFiles.length ? fs.removeSync(path) : fs.emptyDirSync(path);
+    fs.emptyDirSync(projectPath);
     throw Error([Constants.errorMessageStrings.NewProjectCreationFailed, error.message].join(' '));
   }
 }

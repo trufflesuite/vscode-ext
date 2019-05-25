@@ -5,7 +5,7 @@
   "publisher": "AzBlockchain",
   "preview": true,
   "icon": "images/blockchain-service-logo.png",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "repository": {
     "type": "git",
     "url": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum"
@@ -41,13 +41,10 @@
     "onCommand:truffle.newSolidityProject",
     "onCommand:truffle.buildContracts",
     "onCommand:truffle.deployContracts",
-    "onCommand:azureBlockchainService.pushLedgerEvents",
-    "onCommand:azureBlockchainService.pushCurrentLedgerEvents",
     "onCommand:azureBlockchainService.generateReportPublishingWorkflows",
     "onCommand:azureBlockchainService.generateMicroservicesWorkflows",
     "onCommand:azureBlockchainService.generateEventPublishingWorkflows",
     "onCommand:azureBlockchainService.generateDataPublishingWorkflows",
-    "onCommand:remix.viewGasEstimates",
     "onCommand:azureBlockchainService.connectConsortium",
     "onCommand:drizzle.generateSmartContractUI",
     "onCommand:azureBlockchainService.copyRPCEndpointAddress",
@@ -56,26 +53,6 @@
   ],
   "contributes": {
     "commands": [
-      {
-        "command": "azureBlockchainService.required.installNpm",
-        "title": "Install npm",
-        "category": "Azure Blockchain"
-      },
-      {
-        "command": "azureBlockchainService.required.installTruffle",
-        "title": "Install Truffle",
-        "category": "Azure Blockchain"
-      },
-      {
-        "command": "azureBlockchainService.required.installGanache",
-        "title": "Install Ganache CLI",
-        "category": "Azure Blockchain"
-      },
-      {
-        "command": "azureBlockchainService.required.getAllVersions",
-        "title": "Check required apps",
-        "category": "Azure Blockchain"
-      },
       {
         "command": "azureBlockchainService.generateMicroservicesWorkflows",
         "title": "Generate Microservices for Smart Contracts",
@@ -136,21 +113,6 @@
         "category": "Azure Blockchain"
       },
       {
-        "command": "azureBlockchainService.pushLedgerEvents",
-        "title": "Push Ledger Events",
-        "category": "Azure Blockchain"
-      },
-      {
-        "command": "azureBlockchainService.pushCurrentLedgerEvents",
-        "title": "Push Current Ledger Events",
-        "category": "Azure Blockchain"
-      },
-      {
-        "command": "remix.viewGasEstimates",
-        "title": "View Gas Estimates with Remix",
-        "category": "Azure Blockchain"
-      },
-      {
         "command": "azureBlockchainService.connectConsortium",
         "title": "Connect to Consortium",
         "category": "Azure Blockchain"
@@ -194,39 +156,7 @@
         },
         {
           "when": "false",
-          "command": "azureBlockchainService.required.installNpm"
-        },
-        {
-          "when": "false",
-          "command": "azureBlockchainService.required.installTruffle"
-        },
-        {
-          "when": "false",
-          "command": "azureBlockchainService.required.installGanache"
-        },
-        {
-          "when": "false",
-          "command": "azureBlockchainService.required.getAllVersions"
-        },
-        {
-          "when": "false",
-          "command": "azureBlockchainService.pushLedgerEvents"
-        },
-        {
-          "when": "false",
-          "command": "azureBlockchainService.pushCurrentLedgerEvents"
-        },
-        {
-          "when": "false",
-          "command": "azureBlockchainService.pushCurrentLedgerEvents"
-        },
-        {
-          "when": "false",
           "command": "azureBlockchainService.refresh"
-        },
-        {
-          "when": "false",
-          "command": "remix.viewGasEstimates"
         },
         {
           "when": "false",
@@ -389,12 +319,13 @@
   "scripts": {
     "package": "npx vsce package",
     "publish": "npx vsce publish",
-    "vscode:prepublish": "npm run webpack-prod",
+    "vscode:prepublish": "npm run webpack:prod",
     "compile": "tsc -p ./",
-    "webpack-prod": "webpack --mode production",
+    "webpack:prod": "webpack --mode production",
     "watch": "tsc -watch -p ./",
     "postinstall": "node ./node_modules/vscode/bin/install",
     "tslint": "tslint -t verbose src/**/*.ts test/**/*.ts --exclude src/**/*.d.ts",
+    "tslint:fix": "npm run tslint -- --fix",
     "version": "tsc -v",
     "test": "npm run compile && node ./node_modules/vscode/bin/test"
   },
@@ -407,6 +338,8 @@
     "@types/semver": "^6.0.0",
     "@types/uuid": "^3.4.4",
     "copy-webpack-plugin": "^5.0.3",
+    "husky": "^2.2.0",
+    "lint-staged": "^8.1.6",
     "ts-loader": "^5.4.3",
     "tslint": "^5.12.1",
     "tslint-microsoft-contrib": "^6.1.1",
@@ -432,5 +365,16 @@
   "extensionDependencies": [
     "JuanBlanco.solidity",
     "ms-vscode.azure-account"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && npm run compile"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "npx tslint -t verbose",
+      "git add"
+    ]
+  }
 }

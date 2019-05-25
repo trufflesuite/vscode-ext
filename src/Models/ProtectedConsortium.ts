@@ -15,7 +15,7 @@ export abstract class ProtectedConsortium extends Consortium {
   }
 
   public async getTruffleNetwork(): Promise<TruffleConfiguration.INetwork> {
-    const truffleConfigPath = (await TruffleConfiguration.getTruffleConfigUri())[0].fsPath;
+    const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
     const config = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
     const network = await super.getTruffleNetwork();
 

@@ -9,7 +9,6 @@ import { GanacheCommands } from './commands/GanacheCommands';
 import { LogicAppCommands } from './commands/LogicAppCommands';
 import { ProjectCommands } from './commands/ProjectCommands';
 import { TruffleCommands } from './commands/TruffleCommands';
-import { WestlakeCommands } from './commands/WestlakeCommands';
 import { Constants } from './Constants';
 import { CommandContext, isWorkspaceOpen, required, setCommandContext } from './helpers';
 import { MnemonicRepository } from './MnemonicService/MnemonicRepository';
@@ -51,18 +50,6 @@ export async function activate(context: ExtensionContext) {
   const copyRPCEndpointAddress = commands.registerCommand('azureBlockchainService.copyRPCEndpointAddress',
     async (viewItem: ConsortiumView) => {
     await tryExecute(() => AzureBlockchain.copyRPCEndpointAddress(viewItem));
-  });
-  const installNpm = commands.registerCommand('azureBlockchainService.required.installNpm', async () => {
-    await tryExecute(() => required.installNpm());
-  });
-  const installTruffle = commands.registerCommand('azureBlockchainService.required.installTruffle', async () => {
-    await tryExecute(() => required.installTruffle());
-  });
-  const installGanache = commands.registerCommand('azureBlockchainService.required.installGanache', async () => {
-    await tryExecute(() => required.installGanache());
-  });
-  const getAllVersions = commands.registerCommand('azureBlockchainService.required.getAllVersions', async () => {
-    await tryExecute(() => required.getAllVersions());
   });
   //#endregion
 
@@ -110,21 +97,8 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region remix commands
-  const viewGasEstimates = commands.registerCommand('remix.viewGasEstimates', async () => {
-    await tryExecute(() => AzureBlockchain.viewGasEstimates());
-  });
   const generateSmartContractUI = commands.registerCommand('drizzle.generateSmartContractUI', async () => {
     await tryExecute(() => ContractCommands.generateSmartContractUI());
-  });
-  //#endregion
-
-  //#region westlake commands
-  const pushCurrentLedgerEvents = commands.registerCommand('azureBlockchainService.pushCurrentLedgerEvents',
-    async () => {
-    await tryExecute(() => runWithCurrentOpenFile(WestlakeCommands.showLedgerEventsDialog));
-  });
-  const pushLedgerEvents = commands.registerCommand('azureBlockchainService.pushLedgerEvents', async (uri: Uri) => {
-    await tryExecute(() => WestlakeCommands.showLedgerEventsDialog(uri));
   });
   //#endregion
 
@@ -153,18 +127,11 @@ export async function activate(context: ExtensionContext) {
 
   context.subscriptions.push(showWelcomePage);
   context.subscriptions.push(showRequirementsPage);
-  context.subscriptions.push(installNpm);
-  context.subscriptions.push(installTruffle);
-  context.subscriptions.push(installGanache);
-  context.subscriptions.push(getAllVersions);
   context.subscriptions.push(generateSmartContractUI);
   context.subscriptions.push(refresh);
   context.subscriptions.push(newSolidityProject);
   context.subscriptions.push(buildContracts);
   context.subscriptions.push(deployContracts);
-  context.subscriptions.push(pushLedgerEvents);
-  context.subscriptions.push(pushCurrentLedgerEvents);
-  context.subscriptions.push(viewGasEstimates);
   context.subscriptions.push(createConsortium);
   context.subscriptions.push(connectConsortium);
   context.subscriptions.push(disconnectConsortium);
@@ -197,13 +164,4 @@ async function tryExecute(func: () => Promise<any>, errorMessage: string | null 
     }
     window.showErrorMessage(errorMessage ? errorMessage : error.message);
   }
-}
-
-async function runWithCurrentOpenFile(func: (uri: Uri) => {}): Promise<void> {
-  const currentTextEditor = window.activeTextEditor;
-  if (currentTextEditor === undefined) {
-    throw new Error('There is no open file.');
-  }
-
-  await func(currentTextEditor.document.uri);
 }

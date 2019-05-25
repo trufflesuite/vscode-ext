@@ -25,6 +25,7 @@ import { Member } from './Member';
 import { Network } from './Network';
 import { NetworkConsortium } from './NetworkConsortium';
 import { ResourceGroupItem } from './ResourceGroupItem';
+import { SkuItem } from './SkuItem';
 import { SubscriptionItem } from './SubscriptionItem';
 import { TestNetworkConsortium } from './TestNetworkConsortium';
 import { TransactionNode } from './TransactionNode';
@@ -59,6 +60,7 @@ export {
   Member,
   Network,
   ResourceGroupItem,
+  SkuItem,
   SubscriptionItem,
   TestNetworkConsortium,
   TransactionNode,

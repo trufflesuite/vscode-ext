@@ -38,7 +38,10 @@ export class Constants {
   public static defaultAzureBSPort = 3200;
 
   public static requiredVersions: {[key: string]: string | { min: string, max: string }} = {
-    ganache: '6.0.0',
+    ganache: {
+      max: '7.0.0',
+      min: '6.0.0',
+    },
     git: '2.10.0',
     node: '10.15.0',
     npm: '6.4.1',
@@ -46,7 +49,10 @@ export class Constants {
       max: '3.0.0',
       min: '2.7.15',
     },
-    truffle: '5.0.0',
+    truffle: {
+      max: '6.0.0',
+      min: '5.0.0',
+    },
   };
 
   public static webViewPages = {
@@ -120,8 +126,17 @@ export class Constants {
     provideResourceGroupName: 'Provide a resource group name',
     selectConsortiumProtocol: 'Select protocol',
     selectConsortiumRegion: 'Select region',
+    selectConsortiumSku: 'Select SKU',
     selectResourceGroup: 'Select resource group',
     selectSubscription: 'Select subscription.',
+  };
+
+  public static validationRegexps = {
+    specialChars: /[!@$^&()+=?\/<>|[\]{}_:.\\~]/g,
+    unallowedChars: /[#`*"'\-%;,]/g,
+    digits: /(?=.*\d)/g,
+    lowerCaseLetter: /(?=.*[a-z])/g,
+    upperCaseLetter: /(?=.*[A-Z])/g,
   };
 
   public static validationMessages = {
@@ -133,8 +148,14 @@ export class Constants {
       'The value must be between 12 and 72 characters long.',
     incorrectPortNumber: 'Incorrect port number',
     invalidConfirmationResult: '\'yes\' or \'no\'',
+    lengthRange: 'Length must be between 12 and 72 characters',
+    noDigits: 'Password should have at least one digit.',
+    noLowerCaseLetter: 'Password should have at least one lowercase letter from a to z.',
+    noSpecialChars: 'Password must have 1 special character.',
+    noUpperCaseLetter: 'Password should have at least one uppercase letter from A to Z.',
     onlyNumberAllowed: 'Value after \':\' should be a number.',
     projectAlreadyExist: Constants.getMessageProjectAlreadyExist,
+    unallowedChars: "Password must not have '#', '`', '*', '\"', ''', '-', '%', ',' or ';' chars.",
     unallowedSymbols: 'Provided name has unallowed symbols.',
     undefinedVariable: Constants.getMessageUndefinedVariable,
     valueCannotBeEmpty: 'Value cannot be empty.',
@@ -242,6 +263,7 @@ export class Constants {
 
   public static errorMessageStrings = {
     ActionAborted: 'Action aborted',
+    DirectoryIsNotEmpty: 'Directory is not empty. Open another one?',
     GitIsNotInstalled: 'Git is not installed',
     NewProjectCreationFailed: 'Command createProject has failed.',
     NoSubscriptionFound: 'No subscription found.',
@@ -252,11 +274,13 @@ export class Constants {
   };
 
   public static informationMessage = {
+    cancelButton: 'Cancel',
     consortiumDoesNotHaveMemberWithUrl: 'Consortium does not have member with url',
     detailsButton: 'Details',
     invalidRequiredVersion: 'Required app is not installed or has an old version.',
     newProjectCreationFinished: 'New project was created successfully',
     newProjectCreationStarted: 'New project creation is started',
+    openButton: 'Open',
     seeDetailsRequirementsPage: 'Please see details on the Requirements Page',
   };
 

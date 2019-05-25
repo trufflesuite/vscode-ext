@@ -31,7 +31,7 @@ ${[commands, ...args].join(' ')}`,
 
   if (result.code !== 0) {
     Output.show();
-    throw Error(Constants.executeCommandMessage.failedToRunCommand(commands.concat(...args)));
+    throw Error(Constants.executeCommandMessage.failedToRunCommand(commands.concat(' ', ...args.join(' '))));
   }
 
   return result.cmdOutput;

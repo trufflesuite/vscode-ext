@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 import * as acorn from 'acorn';
 // @ts-ignore
 import * as walk from 'acorn-walk';
@@ -6,25 +9,13 @@ import * as bip39 from 'bip39';
 import * as crypto from 'crypto';
 import * as ESTree from 'estree';
 import * as fs from 'fs-extra';
-import { RelativePattern, Uri, workspace } from 'vscode';
+import * as path from 'path';
 import { getWorkspaceRoot } from './workspace';
 
 export namespace TruffleConfiguration {
   const notAllowedSymbols = new RegExp(
     /`|~|!|@|#|\$|%|\^|&|\*|\(|\)|\+|-|=|\[|{|]|}|\||\\|'|<|,|>|\?|\/|""|;|:|"|№|\s/g,
   );
-
-  const ignore = [
-    'build/**/*',
-    'out/**/*',
-    'dist/**/*',
-    'test/**/*',
-  ];
-
-  const ignoreWorkspace = [
-    ...ignore,
-    'node_modules/**/*',
-  ];
 
   interface IFound {
     node: ESTree.Node;
@@ -88,18 +79,14 @@ export namespace TruffleConfiguration {
     options: INetworkOption;
   }
 
-  export async function getTruffleConfigUri(): Promise<Uri[]> {
-    const workspaceRoot = getWorkspaceRoot();
-    const configFiles = await workspace.findFiles(
-      new RelativePattern(workspaceRoot, '{**/truffle-config.js}'),
-      new RelativePattern(workspaceRoot, `{${ignoreWorkspace.join(',')}}`),
-    );
+  export function getTruffleConfigUri(): string {
+    const configFilePath = path.join(getWorkspaceRoot(), 'truffle-config.js');
 
-    if (configFiles.length < 1) {
-      throw new Error('Configuration does not found');
+    if (!fs.pathExistsSync(configFilePath)) {
+      throw new Error('Truffle configuration file not found');
     }
 
-    return configFiles;
+    return configFilePath;
   }
 
   export function generateMnemonic(): string {

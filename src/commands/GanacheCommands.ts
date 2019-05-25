@@ -39,7 +39,11 @@ export namespace GanacheCommands {
   }
 
   export async function startGanacheServer(): Promise<void> {
-    if (!server && await required.checkRequiredApps()) {
+    if (!server) {
+      if (!await required.checkAppsSilent(required.Apps.ganache)) {
+        await required.installGanache(required.Scope.locally);
+      }
+
       server = spawn('npx', ['ganache-cli'], { shell: true });
       server.stdout.on('data', (data: string | Buffer) => {
         ganacheOutputChannel.appendLine(data.toString());

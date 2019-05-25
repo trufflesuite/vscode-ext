@@ -4,6 +4,10 @@ All notable changes to the "azureblockchain" extension will be documented in thi
 
 
 
+## 0.1.4
+
+- bug fixes
+
 ## 0.1.3
 
 - various bug fixes

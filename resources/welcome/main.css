@@ -308,6 +308,7 @@ footer {
   background-color: #0062A3;
   align-self: stretch;
   margin-top: 10px;
+  cursor: pointer;
 }
 
 .required-app.disabled a {

@@ -4,6 +4,7 @@ import { Constants } from '../Constants';
 import { Output } from '../Output';
 import { executeCommand, tryExecuteCommand } from './command';
 import { CommandContext, setCommandContext } from './commandContext';
+import { getWorkspaceRoot } from './workspace';
 
 export namespace required {
   export interface IRequiredVersion {
@@ -13,8 +14,25 @@ export namespace required {
     requiredVersion: string | { min: string, max: string };
   }
 
+  export enum Apps {
+    node = 'node',
+    npm = 'npm',
+    git = 'git',
+    python = 'python',
+    truffle = 'truffle',
+    ganache = 'ganache',
+    hdwalletProvider = 'truffle-hdwallet-provider',
+  }
+
+  export enum Scope {
+    locally = 1,
+    global = 0,
+  }
+
   const currentState: {[key: string]: IRequiredVersion} = {};
-  const requiredApps = [ 'node', 'npm', 'git' ];
+
+  const requiredApps = [ Apps.node, Apps.npm, Apps.git ];
+  const auxiliaryApps = [ Apps.python, Apps.truffle, Apps.ganache, Apps.hdwalletProvider ];
 
   export function isValid(version: string, minVersion: string, maxVersion?: string): boolean {
     return !!semver.valid(version) &&
@@ -27,10 +45,9 @@ export namespace required {
    * Show Requirements Page with checking showOnStartup flag
    */
   export async function checkAllApps(): Promise<boolean> {
-    const versions = await getAllVersions();
-    const invalid = versions.some((version) => !version.isValid);
+    const valid = await checkAppsSilent(...requiredApps, ...auxiliaryApps);
 
-    if (invalid) {
+    if (!valid) {
       const message = Constants.informationMessage.invalidRequiredVersion;
       const details = Constants.informationMessage.seeDetailsRequirementsPage;
       window
@@ -43,7 +60,7 @@ export namespace required {
       commands.executeCommand('azureBlockchainService.showRequirementsPage', true);
     }
 
-    return !invalid;
+    return valid;
   }
 
   /**
@@ -51,17 +68,27 @@ export namespace required {
    * Show Requirements Page
    */
   export async function checkRequiredApps(): Promise<boolean> {
-    const versions = await getAllVersions();
-    const invalid = versions
-      .filter((version) => requiredApps.includes(version.app))
-      .some((version) => !version.isValid);
+    return checkApps(...requiredApps);
+  }
 
-    if (invalid) {
+  export async function checkApps(...apps: Apps[]): Promise<boolean> {
+    const valid = await checkAppsSilent(...apps);
+
+    if (!valid) {
       const message = Constants.errorMessageStrings.RequiredAppsAreNotInstalled;
       const details = Constants.informationMessage.seeDetailsRequirementsPage;
       window.showErrorMessage(`${message}. ${details}`);
       commands.executeCommand('azureBlockchainService.showRequirementsPage');
     }
+
+    return valid;
+  }
+
+  export async function checkAppsSilent(...apps: Apps[]): Promise<boolean> {
+    const versions = await getAllVersions();
+    const invalid = versions
+      .filter((version) => apps.includes(version.app as Apps))
+      .some((version) => !version.isValid);
 
     return !invalid;
   }
@@ -102,11 +129,31 @@ export namespace required {
   }
 
   export async function getTruffleVersion(): Promise<string> {
-    return getVersion('truffle', 'version', /(?<=Truffle v)(\d+.\d+.\d+)/);
+    const majorVersion = (Constants.requiredVersions.truffle as { max: string, min: string }).min.split('.')[0];
+    let localVersion;
+
+    try {
+      localVersion = (await executeCommand(getWorkspaceRoot(), `npm list --depth 0 truffle@${majorVersion}`))
+        .match(/truffle@(\d+.\d+.\d+)/);
+    } catch (e) {
+      // ignore
+    }
+
+    return (localVersion && localVersion[1]) || getVersion('truffle', 'version', /(?<=Truffle v)(\d+.\d+.\d+)/);
   }
 
   export async function getGanacheVersion(): Promise<string> {
-    return getVersion('ganache-cli', '--version', /v(\d+.\d+.\d+)/);
+    const majorVersion = (Constants.requiredVersions.ganache as { max: string, min: string }).min.split('.')[0];
+    let localVersion;
+
+    try {
+      localVersion = (await executeCommand(getWorkspaceRoot(), `npm list --depth 0 ganache-cli@${majorVersion}`))
+        .match(/ganache-cli@(\d+.\d+.\d+)/);
+    } catch (e) {
+      console.log(e);
+    }
+
+    return (localVersion && localVersion[1]) || getVersion('ganache-cli', '--version', /v(\d+.\d+.\d+)/);
   }
 
   export async function installNpm(): Promise<void> {
@@ -119,21 +166,23 @@ export namespace required {
     currentState.npm = await createRequiredVersion('npm', getNpmVersion, CommandContext.NpmIsAvailable);
   }
 
-  export async function installTruffle(): Promise<void> {
+  export async function installTruffle(scope?: Scope): Promise<void> {
     try {
-      await installUsingNpm('truffle', Constants.requiredVersions.truffle);
+      await installUsingNpm('truffle', Constants.requiredVersions.truffle, scope);
     } catch (error) {
       // ignore
     }
+
     currentState.truffle = await createRequiredVersion('truffle', getTruffleVersion, CommandContext.TruffleIsAvailable);
   }
 
-  export async function installGanache(): Promise<void> {
+  export async function installGanache(scope?: Scope): Promise<void> {
     try {
-      await installUsingNpm('ganache-cli', Constants.requiredVersions.ganache);
+      await installUsingNpm('ganache-cli', Constants.requiredVersions.ganache, scope);
     } catch (error) {
       // ignore
     }
+
     currentState.ganache = await createRequiredVersion('ganache', getGanacheVersion, CommandContext.GanacheIsAvailable);
   }
 
@@ -161,11 +210,15 @@ export namespace required {
   async function installUsingNpm(
     packageName: string,
     packageVersion: string | { min: string, max: string },
+    scope?: Scope,
   ): Promise<void> {
     Output.show();
-    const version = typeof packageVersion === 'string' ? packageVersion : packageVersion.min;
-    const majorVersion = version.split('.')[0];
-    await executeCommand(undefined, 'npm', 'i', '-g', ` ${packageName}@^${majorVersion}`);
+
+    const versionString = typeof packageVersion === 'string' ?
+    `^${packageVersion}` :
+    `>=${packageVersion.min} <${packageVersion.max}`;
+
+    await executeCommand(getWorkspaceRoot(), 'npm', 'i', scope ? '' : '-g', ` ${packageName}@"${versionString}"`);
   }
 
   async function getVersion(program: string, command: string, matcher: RegExp): Promise<string> {

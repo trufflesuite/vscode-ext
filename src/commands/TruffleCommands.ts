@@ -39,9 +39,9 @@ export namespace TruffleCommands {
       location: ProgressLocation.Window,
       title: Constants.statusBarMessages.buildingContracts,
     }, async () => {
-      if (!await required.checkRequiredApps()) {
-        return;
-      }
+		if (!await required.checkAppsSilent(required.Apps.truffle)) {
+		  await required.installTruffle(required.Scope.locally);
+		}
 
       try {
         Output.show();
@@ -53,15 +53,15 @@ export namespace TruffleCommands {
   }
 
   export async function deployContracts(consortiumTreeManager: ConsortiumTreeManager): Promise<void> {
-    if (!await required.checkRequiredApps()) {
-      return;
+    if (!await required.checkAppsSilent(required.Apps.truffle)) {
+      await required.installTruffle(required.Scope.locally);
     }
 
-    const truffleConfigsUris = await TruffleConfiguration.getTruffleConfigUri();
-    const defaultDeployDestinations = await getDefaultDeployDestinations(truffleConfigsUris, consortiumTreeManager);
-    const truffleDeployDestinations = await getTruffleDeployDestinations(truffleConfigsUris);
+    const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
+    const defaultDeployDestinations = await getDefaultDeployDestinations(truffleConfigsUri, consortiumTreeManager);
+    const truffleDeployDestinations = await getTruffleDeployDestinations(truffleConfigsUri);
     const consortiumDeployDestinations = await getConsortiumDeployDestinations(
-      truffleConfigsUris,
+      truffleConfigsUri,
       consortiumTreeManager,
     );
 
@@ -99,45 +99,43 @@ export namespace TruffleCommands {
   }
 }
 
-async function getDefaultDeployDestinations(truffleConfigsUris: Uri[], consortiumTreeManager: ConsortiumTreeManager)
+async function getDefaultDeployDestinations(truffleConfigsUri: string, consortiumTreeManager: ConsortiumTreeManager)
   : Promise<IDeployDestination[]> {
   return [
     {
-      cmd: createNewDeploymentNetwork.bind(undefined, consortiumTreeManager, truffleConfigsUris[0].fsPath),
+      cmd: createNewDeploymentNetwork.bind(undefined, consortiumTreeManager, truffleConfigsUri),
       label: Constants.uiCommandStrings.CreateNewNetwork,
       networkId: '*',
     },
   ];
 }
 
-async function getTruffleDeployDestinations(truffleConfigsUris: Uri[]): Promise<IDeployDestination[]> {
+async function getTruffleDeployDestinations(truffleConfigsUri: string): Promise<IDeployDestination[]> {
   const deployDestination: IDeployDestination[] = [];
 
-  for (const uri of truffleConfigsUris) {
-    const truffleConfig = new TruffleConfig(uri.fsPath);
-    const networksFromConfig = await truffleConfig.getNetworks();
+  const truffleConfig = new TruffleConfig(truffleConfigsUri);
+  const networksFromConfig = await truffleConfig.getNetworks();
 
-    networksFromConfig.forEach((network: TruffleConfiguration.INetwork) => {
-      const options = network.options;
-      const url = `${options.provider ? options.provider.url : ''}` ||
-        `${options.host ? options.host : ''}${options.port ? ':' + options.port : ''}`;
+  networksFromConfig.forEach((network: TruffleConfiguration.INetwork) => {
+    const options = network.options;
+    const url = `${options.provider ? options.provider.url : ''}` ||
+      `${options.host ? options.host : ''}${options.port ? ':' + options.port : ''}`;
 
-      deployDestination.push({
-        cmd: getTruffleDeployFunction(url, network.name, uri.fsPath, network.options.network_id),
-        consortiumId: options.consortium_id,
-        cwd: path.dirname(uri.fsPath),
-        description: url,
-        detail: 'From truffle-config.js',
-        label: network.name,
-        networkId: options.network_id,
-      });
+    deployDestination.push({
+      cmd: getTruffleDeployFunction(url, network.name, truffleConfigsUri, network.options.network_id),
+      consortiumId: options.consortium_id,
+      cwd: path.dirname(truffleConfigsUri),
+      description: url,
+      detail: 'From truffle-config.js',
+      label: network.name,
+      networkId: options.network_id,
     });
-  }
+  });
 
   return deployDestination;
 }
 
-async function getConsortiumDeployDestinations(truffleConfigsUris: Uri[], consortiumTreeManager: ConsortiumTreeManager)
+async function getConsortiumDeployDestinations(truffleConfigsUri: string, consortiumTreeManager: ConsortiumTreeManager)
   : Promise<IDeployDestination[]> {
   const deployDestination: IDeployDestination[] = [];
   const networks = consortiumTreeManager.getItems(true);
@@ -148,7 +146,7 @@ async function getConsortiumDeployDestinations(truffleConfigsUris: Uri[], consor
       const urls = consortium.getUrls().map((url) => format(url)).join(', ');
 
       deployDestination.push({
-        cmd: getConsortiumCreateFunction(urls, consortium, truffleConfigsUris[0].fsPath),
+        cmd: getConsortiumCreateFunction(urls, consortium, truffleConfigsUri),
         consortiumId: consortium.getConsortiumId(),
         description: urls,
         detail: 'Consortium',

@@ -2,13 +2,13 @@
 // Licensed under the MIT license.
 
 import { ProgressLocation, QuickPickItem, window } from 'vscode';
-import { AzureBlockchainServiceClient, IAzureMemberDto, ICreateQuorumMember } from './ARMBlockchain';
+import { AzureBlockchainServiceClient, IAzureMemberDto, ICreateQuorumMember, ISkuDto } from './ARMBlockchain';
 import { Constants } from './Constants';
 import { showInputBox, showQuickPick } from './helpers';
-import { AzureConsortium, Member, ResourceGroupItem, SubscriptionItem, TransactionNode } from './Models';
+import { AzureConsortium, Member, ResourceGroupItem, SkuItem, SubscriptionItem, TransactionNode, LocationItem } from './Models';
 import { ConsortiumItem } from './Models/ConsortiumItem';
 import { ResourceExplorerAndGenerator } from './ResourceExplorerAndGenerator';
-import { WestlakeInputValidator } from './validators/WestlakeInputValidator';
+import { AzureBlockchainServiceValidator } from './validators/AzureBlockchainServiceValidator';
 
 export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
   public async selectOrCreateConsortium(childrenFilters?: string[]): Promise<AzureConsortium> {
@@ -141,6 +141,23 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
     return azureConsortium;
   }
 
+  private async getSkus(
+    client: AzureBlockchainServiceClient,
+    location: LocationItem)
+  : Promise<SkuItem[]> {
+    const skus: ISkuDto[] = await client.skuResource.getListSkus();
+
+    const skuItems: SkuItem[] = [];
+
+    for (const sku of skus) {
+      if (sku.locations.find((element) => element.toLowerCase() === location.description.toLowerCase())) {
+        skuItems.push(new SkuItem(sku.tier, sku.name));
+      }
+    }
+
+    return skuItems;
+  }
+
   private async createAzureConsortium(subscriptionItem: SubscriptionItem, resourceGroupItem: ResourceGroupItem)
     : Promise<AzureConsortium> {
     const client = await this.getClient(subscriptionItem, resourceGroupItem);
@@ -148,13 +165,13 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
     const consortiumName = await showInputBox({
       ignoreFocusOut: true,
       prompt: Constants.paletteWestlakeLabels.enterConsortiumName,
-      validateInput: WestlakeInputValidator.validateNames,
+      validateInput: AzureBlockchainServiceValidator.validateNames,
     });
 
     const memberName = await showInputBox({
       ignoreFocusOut: true,
       prompt: Constants.paletteWestlakeLabels.enterConsortiumMemberName,
-      validateInput: WestlakeInputValidator.validateNames,
+      validateInput: AzureBlockchainServiceValidator.validateNames,
     });
 
     const protocol = await showQuickPick(
@@ -169,19 +186,24 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
       ignoreFocusOut: true,
       password: true,
       prompt: Constants.paletteWestlakeLabels.enterMemberPassword,
-      validateInput: WestlakeInputValidator.validateAccessPassword,
+      validateInput: AzureBlockchainServiceValidator.validateAccessPassword,
     });
 
     const consortiumPassword = await showInputBox({
       ignoreFocusOut: true,
       password: true,
       prompt: Constants.paletteWestlakeLabels.enterConsortiumManagementPassword,
-      validateInput: WestlakeInputValidator.validateAccessPassword,
+      validateInput: AzureBlockchainServiceValidator.validateAccessPassword,
     });
 
     const region = await showQuickPick(
       this.getLocationItems(subscriptionItem),
       { placeHolder: Constants.paletteWestlakeLabels.selectConsortiumRegion, ignoreFocusOut: true },
+    );
+
+    const sku = await showQuickPick(
+      this.getSkus(client, region),
+      { placeHolder: Constants.paletteWestlakeLabels.selectConsortiumSku, ignoreFocusOut: true },
     );
 
     const bodyParams: ICreateQuorumMember = {
@@ -190,6 +212,10 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
       consortiumPassword,
       protocol: protocol.label,
       region: region.description,
+      sku: {
+        name: sku.description,
+        tier: sku.label,
+      },
     };
 
     return window.withProgress({

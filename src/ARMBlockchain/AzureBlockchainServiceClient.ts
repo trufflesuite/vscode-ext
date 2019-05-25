@@ -10,11 +10,13 @@ import { Output } from '../Output';
 import { ConsortiumResource } from './Operations/ConsortiumResource';
 import { MemberResource } from './Operations/MemberResource';
 import { TransactionNodeResource } from './Operations/TransactionNodeResource';
+import { SkuResource } from './Operations/SkuResources';
 
 export class AzureBlockchainServiceClient extends AzureServiceClient {
   public memberResource: MemberResource;
   public transactionNodeResource: TransactionNodeResource;
   public consortiumResource: ConsortiumResource;
+  public skuResource: SkuResource;
 
   constructor(
     credentials: ServiceClientCredentials | UserTokenCredentials,
@@ -39,6 +41,7 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     this.memberResource = new MemberResource(this);
     this.transactionNodeResource = new TransactionNodeResource(this);
     this.consortiumResource = new ConsortiumResource(this);
+    this.skuResource = new SkuResource(this);
   }
 
   public async createConsortium(memberName: string, body: string): Promise<void> {
@@ -89,6 +92,16 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
       `providers/Microsoft.Blockchain/blockchainMembers/${memberName}/listApikeys?api-version=${this.apiVersion}`;
 
     const httpRequest = this._getHttpRequest(url, 'POST');
+
+    return this._sendRequestToAzure(httpRequest, callback);
+  }
+
+  public getSkus(callback: (error: Error | null, result?: any) => void,
+  ): Promise<void> {
+    const url = `${this.baseUri}/subscriptions/${this.subscriptionId}` +
+      `/providers/Microsoft.Blockchain/skus?api-version=${this.apiVersion}`;
+
+    const httpRequest = this._getHttpRequest(url, 'GET');
 
     return this._sendRequestToAzure(httpRequest, callback);
   }

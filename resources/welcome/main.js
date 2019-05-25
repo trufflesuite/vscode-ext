@@ -4,13 +4,17 @@ $(function () {
 
 function main() {
   const vscode = acquireVsCodeApi();
-  $("a").click((event) => {
-    vscode.postMessage({
-      href: event.target.href
-    });
+  $("a").click(function() {
+    if (this.href) {
+      vscode.postMessage({
+        href: this.href
+      });
+    } else {
+      vscode.postMessage({ command: this.id});
+    }
 
-    if ($(event.target.closest('.action'))) {
-      $(event.target.closest('.required-app')).toggleClass('disabled');
+    if ($(this).hasClass('action')) {
+      $(this.closest('.required-app')).toggleClass('disabled');
     }
   });
 
