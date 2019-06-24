@@ -8,7 +8,7 @@ import { Output } from '../Output';
 
 export class ConsortiumTreeManager {
   private readonly items: IExtensionItem[];
-  private readonly resourceKey: string = 'treeContent';
+  private readonly resourceKey: string = Constants.consortiumTreeResourceKey;
 
   constructor(private readonly context: ExtensionContext) {
     this.items = this.loadState();

@@ -4,6 +4,18 @@ All notable changes to the "azureblockchain" extension will be documented in thi
 
 
 
+## 0.1.5
+
+- Backend test coverage 	
+- Cleanup of packaging output, optimization 	
+- Truffle installation fails on new installs fix 	
+- Improved support for multiple ganache instances 	
+- Preflight validation for ABS deployments 	
+- Cleanup of code generation output 	
+- Ganache commands cleanup 	
+- Add command to export private key from mnemonic 	
+- Better error handling ABS deployments
+
 ## 0.1.4
 
 - bug fixes

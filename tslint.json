@@ -37,7 +37,8 @@
       "avoid-template"
     ],
     "exclude": [
-      "node_modules/**"
+      "node_modules/**",
+      "src/**/*.d.ts"
     ]
   },
   "defaultSeverity": "warning"

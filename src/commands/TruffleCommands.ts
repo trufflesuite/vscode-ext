@@ -1,11 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import * as bip39 from 'bip39';
 import * as fs from 'fs-extra';
+// @ts-ignore
+import * as hdkey from 'hdkey';
 import * as path from 'path';
 import { format } from 'url';
-import { env, ProgressLocation, Uri, window } from 'vscode';
+import { ProgressLocation, QuickPickItem, Uri, window } from 'vscode';
 import { Constants } from '../Constants';
+import { GanacheService } from '../GanacheService/GanacheService';
 import {
   getWorkspaceRoot,
   outputCommandHelper,
@@ -14,12 +18,17 @@ import {
   showQuickPick,
   TruffleConfig,
   TruffleConfiguration,
+  vscodeEnvironment,
 } from '../helpers';
-import { Consortium, MainNetworkConsortium } from '../Models';
+import { MnemonicRepository } from '../MnemonicService/MnemonicRepository';
+import {
+  Consortium,
+  LocalNetworkConsortium,
+  MainNetworkConsortium,
+} from '../Models';
 import { Output } from '../Output';
 import { ConsortiumTreeManager } from '../treeService/ConsortiumTreeManager';
 import { ConsortiumCommands } from './ConsortiumCommands';
-import { GanacheCommands } from './GanacheCommands';
 
 interface IDeployDestination {
   cmd: () => Promise<void>;
@@ -31,6 +40,13 @@ interface IDeployDestination {
   consortiumId?: number;
 }
 
+interface IExtendedQuickPickItem extends QuickPickItem {
+  /**
+   * Additional field for storing non-displayed information
+   */
+  extended: string;
+}
+
 const localGanacheRegexp = new RegExp(`127\.0\.0\.1\:${Constants.defaultLocalhostPort}`, 'g');
 
 export namespace TruffleCommands {
@@ -39,16 +55,16 @@ export namespace TruffleCommands {
       location: ProgressLocation.Window,
       title: Constants.statusBarMessages.buildingContracts,
     }, async () => {
-		if (!await required.checkAppsSilent(required.Apps.truffle)) {
-		  await required.installTruffle(required.Scope.locally);
-		}
+      if (!await required.checkAppsSilent(required.Apps.truffle)) {
+        await required.installTruffle(required.Scope.locally);
+      }
 
       try {
-        Output.show();
-        await outputCommandHelper.executeCommand(getWorkspaceRoot(), 'npx', 'truffle', 'compile');
-      } catch (error) {
-        throw Error(error);
-      }
+          Output.show();
+          await outputCommandHelper.executeCommand(getWorkspaceRoot(), 'npx', 'truffle', 'compile');
+        } catch (error) {
+          throw Error(error);
+        }
     });
   }
 
@@ -58,12 +74,9 @@ export namespace TruffleCommands {
     }
 
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
-    const defaultDeployDestinations = await getDefaultDeployDestinations(truffleConfigsUri, consortiumTreeManager);
-    const truffleDeployDestinations = await getTruffleDeployDestinations(truffleConfigsUri);
-    const consortiumDeployDestinations = await getConsortiumDeployDestinations(
-      truffleConfigsUri,
-      consortiumTreeManager,
-    );
+    const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri, consortiumTreeManager);
+    const truffleDeployDestinations = getTruffleDeployDestinations(truffleConfigsUri);
+    const consortiumDeployDestinations = getConsortiumDeployDestinations(truffleConfigsUri, consortiumTreeManager);
 
     const deployDestinations: IDeployDestination[] = [];
     deployDestinations.push(...defaultDeployDestinations);
@@ -81,26 +94,66 @@ export namespace TruffleCommands {
   export async function writeAbiToBuffer(uri: Uri): Promise<void> {
     const contract = await readCompiledContract(uri);
 
-    env.clipboard.writeText(JSON.stringify(contract[Constants.contractProperties.abi]));
+    vscodeEnvironment.writeToClipboard(JSON.stringify(contract[Constants.contractProperties.abi]));
   }
 
   export async function writeBytecodeToBuffer(uri: Uri): Promise<void> {
     const contract = await readCompiledContract(uri);
 
-    env.clipboard.writeText(contract[Constants.contractProperties.bytecode]);
+    vscodeEnvironment.writeToClipboard(contract[Constants.contractProperties.bytecode]);
   }
 
   export async function acquireCompiledContractUri(uri: Uri): Promise<Uri> {
     if (path.extname(uri.fsPath) === Constants.contractExtension.json) {
       return uri;
     } else {
-      throw new Error('This file is not a valid contract.');
+      throw new Error(Constants.errorMessageStrings.InvalidContract);
+    }
+  }
+
+  export async function getPrivateKeyFromMnemonic(): Promise<void> {
+    const mnemonicItems: IExtendedQuickPickItem[] = MnemonicRepository
+      .getExistedMnemonicPaths()
+      .map((mnemonicPath) => {
+        const savedMnemonic = MnemonicRepository.getMnemonic(mnemonicPath);
+        return {
+          detail: mnemonicPath,
+          extended: savedMnemonic,
+          label: MnemonicRepository.MaskMnemonic(savedMnemonic),
+        };
+      });
+
+    if (mnemonicItems.length === 0) {
+      window.showErrorMessage(Constants.errorMessageStrings.ThereAreNoMnemonics);
+      return;
+    }
+
+    const mnemonicItem = await showQuickPick(
+      mnemonicItems,
+      { placeHolder: Constants.placeholders.selectMnemonicExtractKey, ignoreFocusOut: true },
+    );
+
+    const mnemonic = mnemonicItem.extended;
+    if (!mnemonic) {
+      window.showErrorMessage(Constants.errorMessageStrings.MnemonicFileHaveNoText);
+      return;
+    }
+
+    try {
+      const buffer = await bip39.mnemonicToSeed(mnemonic);
+      const key = hdkey.fromMasterSeed(buffer);
+      const childKey = key.derive('m/44\'/60\'/0\'/0/0');
+      const privateKey = childKey.privateKey.toString('hex');
+      await vscodeEnvironment.writeToClipboard(privateKey);
+      window.showInformationMessage(Constants.informationMessage.privateKeyWasCopiedToClipboard);
+    } catch (error) {
+      window.showErrorMessage(Constants.errorMessageStrings.InvalidMnemonic);
     }
   }
 }
 
-async function getDefaultDeployDestinations(truffleConfigsUri: string, consortiumTreeManager: ConsortiumTreeManager)
-  : Promise<IDeployDestination[]> {
+function getDefaultDeployDestinations(truffleConfigsUri: string, consortiumTreeManager: ConsortiumTreeManager)
+  : IDeployDestination[] {
   return [
     {
       cmd: createNewDeploymentNetwork.bind(undefined, consortiumTreeManager, truffleConfigsUri),
@@ -110,11 +163,10 @@ async function getDefaultDeployDestinations(truffleConfigsUri: string, consortiu
   ];
 }
 
-async function getTruffleDeployDestinations(truffleConfigsUri: string): Promise<IDeployDestination[]> {
+function getTruffleDeployDestinations(truffleConfigsUri: string): IDeployDestination[] {
   const deployDestination: IDeployDestination[] = [];
-
   const truffleConfig = new TruffleConfig(truffleConfigsUri);
-  const networksFromConfig = await truffleConfig.getNetworks();
+  const networksFromConfig = truffleConfig.getNetworks();
 
   networksFromConfig.forEach((network: TruffleConfiguration.INetwork) => {
     const options = network.options;
@@ -135,8 +187,8 @@ async function getTruffleDeployDestinations(truffleConfigsUri: string): Promise<
   return deployDestination;
 }
 
-async function getConsortiumDeployDestinations(truffleConfigsUri: string, consortiumTreeManager: ConsortiumTreeManager)
-  : Promise<IDeployDestination[]> {
+function getConsortiumDeployDestinations(truffleConfigsUri: string, consortiumTreeManager: ConsortiumTreeManager)
+  : IDeployDestination[] {
   const deployDestination: IDeployDestination[] = [];
   const networks = consortiumTreeManager.getItems(true);
 
@@ -164,7 +216,7 @@ function getTruffleDeployFunction(url: string, name: string, truffleConfigPath: 
   // At this moment ganache-cli start only on port 8545.
   // Refactor this after the build
   if (url.match(localGanacheRegexp)) {
-    return deployToLocalGanache.bind(undefined, name, truffleConfigPath);
+    return deployToLocalGanache.bind(undefined, name, truffleConfigPath, url);
   }
   // 1 - is the marker of main network
   if (networkId === 1 || networkId === '1') {
@@ -178,7 +230,7 @@ function getConsortiumCreateFunction(url: string, consortium: Consortium, truffl
   // At this moment ganache-cli start only on port 8545.
   // Refactor this after the build
   if (url.match(localGanacheRegexp)) {
-    return createLocalGanacheNetwork.bind(undefined, consortium, truffleConfigPath);
+    return createLocalGanacheNetwork.bind(undefined, consortium as LocalNetworkConsortium, truffleConfigPath);
   }
   if (consortium instanceof MainNetworkConsortium) {
     return createMainNetwork.bind(undefined, consortium, truffleConfigPath);
@@ -207,7 +259,7 @@ async function createNewDeploymentNetwork(consortiumTreeManager: ConsortiumTreeM
 async function createNetwork(consortium: Consortium, truffleConfigPath: string): Promise<void> {
   const network = await consortium.getTruffleNetwork();
   const truffleConfig = new TruffleConfig(truffleConfigPath);
-  await truffleConfig.setNetworks(network);
+  truffleConfig.setNetworks(network);
 
   await deployToNetwork(network.name, truffleConfigPath);
 }
@@ -234,14 +286,17 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
   });
 }
 
-async function createLocalGanacheNetwork(consortium: Consortium, truffleConfigPath: string): Promise<void> {
-  await GanacheCommands.startGanacheServer();
+async function createLocalGanacheNetwork(consortium: LocalNetworkConsortium, truffleConfigPath: string): Promise<void> {
+  const port = await consortium.getPort();
+
+  await GanacheService.startGanacheServer(port!);
 
   await createNetwork(consortium, truffleConfigPath);
 }
 
-async function deployToLocalGanache(networkName: string, truffleConfigPath: string): Promise<void> {
-  await GanacheCommands.startGanacheServer();
+async function deployToLocalGanache(networkName: string, truffleConfigPath: string, url: string): Promise<void> {
+  const port = GanacheService.getPortFromUrl(url);
+  await GanacheService.startGanacheServer(port!);
 
   await deployToNetwork(networkName, truffleConfigPath);
 }

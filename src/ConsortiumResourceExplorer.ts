@@ -5,7 +5,15 @@ import { ProgressLocation, QuickPickItem, window } from 'vscode';
 import { AzureBlockchainServiceClient, IAzureMemberDto, ICreateQuorumMember, ISkuDto } from './ARMBlockchain';
 import { Constants } from './Constants';
 import { showInputBox, showQuickPick } from './helpers';
-import { AzureConsortium, Member, ResourceGroupItem, SkuItem, SubscriptionItem, TransactionNode, LocationItem } from './Models';
+import {
+  AzureConsortium,
+  LocationItem,
+  Member,
+  ResourceGroupItem,
+  SkuItem,
+  SubscriptionItem,
+  TransactionNode,
+} from './Models';
 import { ConsortiumItem } from './Models/ConsortiumItem';
 import { ResourceExplorerAndGenerator } from './ResourceExplorerAndGenerator';
 import { AzureBlockchainServiceValidator } from './validators/AzureBlockchainServiceValidator';
@@ -34,22 +42,23 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
       throw new Error(Constants.errorMessageStrings.NoSubscriptionFoundClick);
     }
 
-    const client = await this.getClient(
+    const azureClient = await this.getAzureClient(
       new SubscriptionItem(consortium.label, subscriptionId, subscription.session),
       new ResourceGroupItem(resourceGroup),
     );
 
-    const accessKeys = await client.memberResource.getMemberAccessKeys(consortium.getMemberName());
+    const accessKeys = await azureClient.memberResource.getMemberAccessKeys(consortium.getMemberName());
 
     return accessKeys.keys.map((key) => key.value);
   }
 
-  private async getClient(subscriptionItem: SubscriptionItem, resourceGroupItem: ResourceGroupItem)
+  private async getAzureClient(subscriptionItem: SubscriptionItem, resourceGroupItem: ResourceGroupItem)
     : Promise<AzureBlockchainServiceClient> {
     return new AzureBlockchainServiceClient(
       subscriptionItem.session.credentials,
       subscriptionItem.subscriptionId,
       resourceGroupItem.label,
+      resourceGroupItem.description,
       Constants.azureResourceExplorer.requestBaseUri,
       Constants.azureResourceExplorer.requestApiVersion,
       {
@@ -101,8 +110,8 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
     resourceGroupItem: ResourceGroupItem,
     excludedItems: string[] = [],
   ): Promise<ConsortiumItem[]> {
-    const client = await this.getClient(subscriptionItem, resourceGroupItem);
-    const members: IAzureMemberDto[] = await client.memberResource.getListMember();
+    const azureClient = await this.getAzureClient(subscriptionItem, resourceGroupItem);
+    const members: IAzureMemberDto[] = await azureClient.memberResource.getListMember();
     return members
       .map((member) => new ConsortiumItem(
         member.properties.consortium,
@@ -120,11 +129,13 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
     subscriptionItem: SubscriptionItem,
     resourceGroupItem: ResourceGroupItem,
   ): Promise<AzureConsortium> {
-    const client = await this.getClient(subscriptionItem, resourceGroupItem);
-    const transactionNodes = await client.transactionNodeResource.getListTransactionNode(consortiumItems.memberName);
+    const azureClient = await this.getAzureClient(subscriptionItem, resourceGroupItem);
+    const transactionNodes = await azureClient
+      .transactionNodeResource
+      .getListTransactionNode(consortiumItems.memberName);
     const memberItem = new Member(consortiumItems.memberName);
 
-    const azureConsortium =  new AzureConsortium(
+    const azureConsortium = new AzureConsortium(
       consortiumItems.consortiumName,
       consortiumItems.subscriptionId,
       consortiumItems.resourcesGroup,
@@ -144,7 +155,7 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
   private async getSkus(
     client: AzureBlockchainServiceClient,
     location: LocationItem)
-  : Promise<SkuItem[]> {
+    : Promise<SkuItem[]> {
     const skus: ISkuDto[] = await client.skuResource.getListSkus();
 
     const skuItems: SkuItem[] = [];
@@ -160,18 +171,32 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
 
   private async createAzureConsortium(subscriptionItem: SubscriptionItem, resourceGroupItem: ResourceGroupItem)
     : Promise<AzureConsortium> {
-    const client = await this.getClient(subscriptionItem, resourceGroupItem);
+    const azureClient = await this.getAzureClient(subscriptionItem, resourceGroupItem);
+    const { consortiumResource, memberResource } = azureClient;
 
     const consortiumName = await showInputBox({
       ignoreFocusOut: true,
       prompt: Constants.paletteWestlakeLabels.enterConsortiumName,
-      validateInput: AzureBlockchainServiceValidator.validateNames,
+      validateInput: async (name) => {
+        return await window.withProgress({
+          location: ProgressLocation.Notification,
+          title: Constants.informationMessage.consortiumNameValidating,
+        }, async () => {
+          return await AzureBlockchainServiceValidator.validateConsortiumName(name, consortiumResource);
+        });
+        },
     });
 
     const memberName = await showInputBox({
       ignoreFocusOut: true,
       prompt: Constants.paletteWestlakeLabels.enterConsortiumMemberName,
-      validateInput: AzureBlockchainServiceValidator.validateNames,
+      validateInput: async (name) => {
+        return await window.withProgress({
+          location: ProgressLocation.Notification,
+          title: Constants.informationMessage.memberNameValidating,
+        },
+          async () => await AzureBlockchainServiceValidator.validateMemberName(name, memberResource));
+      },
     });
 
     const protocol = await showQuickPick(
@@ -202,7 +227,7 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
     );
 
     const sku = await showQuickPick(
-      this.getSkus(client, region),
+      this.getSkus(azureClient, region),
       { placeHolder: Constants.paletteWestlakeLabels.selectConsortiumSku, ignoreFocusOut: true },
     );
 
@@ -222,7 +247,7 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
       location: ProgressLocation.Window,
       title: Constants.statusBarMessages.creatingConsortium,
     }, async () => {
-      await client.consortiumResource.createConsortium(memberName, bodyParams);
+      await azureClient.consortiumResource.createConsortium(memberName, bodyParams);
 
       return new AzureConsortium(consortiumName, subscriptionItem.subscriptionId, resourceGroupItem.label, memberName);
     });

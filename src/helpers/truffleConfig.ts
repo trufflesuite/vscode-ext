@@ -10,6 +10,7 @@ import * as crypto from 'crypto';
 import * as ESTree from 'estree';
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import { Constants } from '../Constants';
 import { getWorkspaceRoot } from './workspace';
 
 export namespace TruffleConfiguration {
@@ -18,8 +19,8 @@ export namespace TruffleConfiguration {
   );
 
   interface IFound {
-    node: ESTree.Node;
-    state: string | undefined;
+    node?: ESTree.Node;
+    state?: string;
   }
 
   export interface IProvider {
@@ -79,11 +80,52 @@ export namespace TruffleConfiguration {
     options: INetworkOption;
   }
 
+  export interface ISolCompiler {
+    /**
+     * A version or constraint - Ex. "^0.5.0" . Can also be set to "native" to use a native solc
+     */
+    version: string;
+    /**
+     * Use a version obtained through docker
+     */
+    docker?: boolean;
+    settings?: {
+      optimizer?: {
+        enabled: boolean,
+        /**
+         * Optimize for how many times you intend to run the code
+         */
+        runs: number,
+      },
+      /**
+       * Default: "byzantium"
+       */
+      evmVersion?: string,
+    };
+  }
+
+  export interface IExternalCompiler {
+    command: string;
+    workingDirectory: string;
+    targets: object[];
+  }
+
+  export interface IConfiguration {
+    contracts_directory: string;
+    contracts_build_directory: string;
+    migrations_directory: string;
+    networks?: INetwork[];
+    compilers?: {
+      solc?: ISolCompiler;
+      external?: IExternalCompiler;
+    };
+  }
+
   export function getTruffleConfigUri(): string {
-    const configFilePath = path.join(getWorkspaceRoot(), 'truffle-config.js');
+    const configFilePath = path.join(getWorkspaceRoot()!, 'truffle-config.js');
 
     if (!fs.pathExistsSync(configFilePath)) {
-      throw new Error('Truffle configuration file not found');
+      throw new Error(Constants.errorMessageStrings.TruffleConfigIsNotExist);
     }
 
     return configFilePath;
@@ -98,9 +140,9 @@ export namespace TruffleConfiguration {
 
     constructor(private readonly filePath: string) {  }
 
-    public async getAST(): Promise<ESTree.BaseNode> {
+    public getAST(): ESTree.BaseNode {
       if (!this.ast) {
-        const file = await fs.readFile(this.filePath, 'utf8');
+        const file = fs.readFileSync(this.filePath, 'utf8');
         this.ast = acorn.parse(file, {
           allowHashBang: true,
           allowReserved: true,
@@ -111,86 +153,94 @@ export namespace TruffleConfiguration {
       return this.ast;
     }
 
-    public async writeAST(): Promise<void> {
-      return fs.writeFile(this.filePath, generate(this.ast as ESTree.Node, {comments: true}));
+    public writeAST(): void {
+      return fs.writeFileSync(this.filePath, generate(this.ast as ESTree.Node, {comments: true}));
     }
 
-    public async getNetworks(): Promise<INetwork[]> {
-      const ast = await this.getAST();
-      const networks: INetwork[] = [];
-      const moduleExports: IFound = walk.findNodeAt(ast as ESTree.Node, null, null, isModuleExportsExpression);
+    public getNetworks(): INetwork[] {
+      const ast = this.getAST();
+      const moduleExports = getModuleExportsObjectExpression(ast as ESTree.Node);
 
-      if (moduleExports.node) {
-        const node = moduleExports.node as ESTree.ExpressionStatement;
-        const rightExpression = (node.expression as ESTree.AssignmentExpression).right;
-
-        if (rightExpression.type === 'ObjectExpression') {
-          const networksNode = findProperty(rightExpression, 'networks');
-          if (networksNode && networksNode.value.type === 'ObjectExpression') {
-            networksNode.value.properties.forEach((property: ESTree.Property) => {
-              if (property.key.type === 'Identifier') {
-                networks.push({
-                  name: property.key.name,
-                  options: astToNetworkOptions(property.value as ESTree.ObjectExpression),
-                });
-              }
-              if (property.key.type === 'Literal') {
-                networks.push({
-                  name: '' + property.key.value,
-                  options: astToNetworkOptions(property.value as ESTree.ObjectExpression),
-                });
-              }
-            });
-          }
+      if (moduleExports) {
+        const networksNode = findProperty(moduleExports, 'networks');
+        if (networksNode && networksNode.value.type === 'ObjectExpression') {
+          return astToNetworks(networksNode.value);
         }
       }
 
-      return networks;
+      return [];
     }
 
-    public async setNetworks(network: INetwork): Promise<void> {
-      const ast = await this.getAST();
-      const moduleExports: IFound = walk.findNodeAt(ast as ESTree.Node, null, null, isModuleExportsExpression);
+    public setNetworks(network: INetwork): void {
+      const ast = this.getAST();
+      const moduleExports = getModuleExportsObjectExpression(ast as ESTree.Node);
 
-      if (moduleExports.node) {
-        const node = moduleExports.node as ESTree.ExpressionStatement;
-        const rightExpression = (node.expression as ESTree.AssignmentExpression).right;
+      if (moduleExports) {
+        let networksNode = findProperty(moduleExports, 'networks');
+        if (!networksNode) {
+          networksNode = generateProperty('networks', generateObjectExpression());
+          moduleExports.properties.push(networksNode);
+        }
 
-        if (rightExpression.type === 'ObjectExpression') {
-          let networksNode = findProperty(rightExpression, 'networks');
-          if (!networksNode) {
-            networksNode = generateProperty('networks', generateObjectExpression());
-            rightExpression.properties.push(networksNode);
-          }
-
-          if (networksNode.value.type === 'ObjectExpression') {
-            const isExist = findProperty(networksNode.value, network.name);
-            if (isExist) {
-              throw Error(`Network with name ${network.name} already existed in truffle-config.js`);
-            } else {
-              const networkNode = generateProperty(network.name, generateObjectExpression());
-              networkNode.value = networkOptionsToAst(network);
-              networksNode.value.properties.push(networkNode);
-            }
+        if (networksNode.value.type === 'ObjectExpression') {
+          const isExist = findProperty(networksNode.value, network.name);
+          if (isExist) {
+            throw new Error(Constants.errorMessageStrings.NetworkAlreadyExist(network.name));
+          } else {
+            const networkNode = generateProperty(network.name, generateObjectExpression());
+            networkNode.value = networkOptionsToAst(network);
+            networksNode.value.properties.push(networkNode);
           }
         }
       }
 
       this.ast = ast;
-      return this.writeAST();
+      this.writeAST();
     }
 
-    public async importFs(): Promise<void> {
-      const ast = await this.getAST();
+    public importFs(): void {
+      const ast = this.getAST();
       const fsRequired: IFound = walk.findNodeAt(ast as ESTree.Node, null, null, isVarDeclaration('fs'));
-      if (!fsRequired) {
+      if (!fsRequired.node) {
         const declaration = generateVariableDeclaration('fs', 'require', 'fs');
         (ast as ESTree.Program).body.unshift(declaration);
       }
 
       this.ast = ast;
-      await this.writeAST();
+      this.writeAST();
     }
+
+    public getConfiguration(): IConfiguration {
+      const ast = this.getAST();
+      const moduleExports = getModuleExportsObjectExpression(ast as ESTree.Node);
+
+      if (moduleExports) {
+         return astToConfiguration(moduleExports);
+      }
+
+      return getDefaultConfiguration();
+    }
+  }
+
+  function getModuleExportsObjectExpression(ast: ESTree.Node): ESTree.ObjectExpression | void {
+    const moduleExports: IFound = walk.findNodeAt(ast as ESTree.Node, null, null, isModuleExportsExpression);
+
+    if (moduleExports.node) {
+      const node = moduleExports.node as ESTree.ExpressionStatement;
+      const rightExpression = (node.expression as ESTree.AssignmentExpression).right;
+
+      if (rightExpression.type === 'ObjectExpression') {
+        return rightExpression;
+      }
+    }
+  }
+
+  function getDefaultConfiguration(): IConfiguration {
+    return {
+      contracts_build_directory: path.join('./', 'build', 'contracts'),
+      contracts_directory: path.join('./', 'contracts'),
+      migrations_directory: path.join('./', 'migrations'),
+    };
   }
 
   function isModuleExportsExpression(nodeType: string, node: ESTree.Node): boolean {
@@ -410,6 +460,59 @@ export namespace TruffleConfiguration {
       },
       type: 'NewExpression',
     };
+  }
+
+  function astToConfiguration(node: ESTree.ObjectExpression): IConfiguration {
+    const configuration = getDefaultConfiguration();
+
+    const contractsDir = findProperty(node, 'contracts_directory');
+    if (contractsDir && contractsDir.value.type === 'Literal' &&
+      typeof contractsDir.value.value === 'string' && contractsDir.value.value) {
+      configuration.contracts_directory = contractsDir.value.value;
+    }
+
+    const contractsBuildDir = findProperty(node, 'contracts_build_directory');
+    if (contractsBuildDir && contractsBuildDir.value.type === 'Literal' &&
+      typeof contractsBuildDir.value.value === 'string' && contractsBuildDir.value.value) {
+      configuration.contracts_build_directory = contractsBuildDir.value.value;
+    }
+
+    const migrationsDir = findProperty(node, 'migrations_directory');
+    if (migrationsDir && migrationsDir.value.type === 'Literal' &&
+      typeof migrationsDir.value.value === 'string' && migrationsDir.value.value) {
+      configuration.migrations_directory = migrationsDir.value.value;
+    }
+
+    const networks = findProperty(node, 'networks');
+    if (networks && networks.value.type === 'ObjectExpression') {
+      configuration.networks = astToNetworks(networks.value);
+    }
+
+    // TODO: compilers
+
+    return configuration;
+  }
+
+  function astToNetworks(node: ESTree.ObjectExpression): INetwork[] {
+    const networks: INetwork[] = [];
+
+    node.properties.forEach((property: ESTree.Property) => {
+      if (property.key.type === 'Identifier') {
+        networks.push({
+          name: property.key.name,
+          options: astToNetworkOptions(property.value as ESTree.ObjectExpression),
+        });
+      }
+
+      if (property.key.type === 'Literal') {
+        networks.push({
+          name: '' + property.key.value,
+          options: astToNetworkOptions(property.value as ESTree.ObjectExpression),
+        });
+      }
+    });
+
+    return networks;
   }
 
   function generateProperty(name: string, value: ESTree.Expression): ESTree.Property {

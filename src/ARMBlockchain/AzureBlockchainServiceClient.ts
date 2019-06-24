@@ -4,13 +4,14 @@
 import { HttpMethods, IncomingMessage, ServiceClientCredentials, ServiceError, WebResource } from 'ms-rest';
 import { AzureServiceClient, AzureServiceClientOptions, UserTokenCredentials } from 'ms-rest-azure';
 import * as uuid from 'uuid';
-import { env, Uri, window } from 'vscode';
+import { Uri, window } from 'vscode';
 import { Constants } from '../Constants';
+import { vscodeEnvironment} from '../helpers';
 import { Output } from '../Output';
 import { ConsortiumResource } from './Operations/ConsortiumResource';
 import { MemberResource } from './Operations/MemberResource';
-import { TransactionNodeResource } from './Operations/TransactionNodeResource';
 import { SkuResource } from './Operations/SkuResources';
+import { TransactionNodeResource } from './Operations/TransactionNodeResource';
 
 export class AzureBlockchainServiceClient extends AzureServiceClient {
   public memberResource: MemberResource;
@@ -20,19 +21,21 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
 
   constructor(
     credentials: ServiceClientCredentials | UserTokenCredentials,
-    private readonly subscriptionId: string,
-    private readonly resourceGroup: string,
-    private readonly baseUri: string,
-    private readonly apiVersion: string,
-    private readonly options: AzureServiceClientOptions,
+    public readonly subscriptionId: string,
+    public readonly resourceGroup: string,
+    public readonly location: string,
+    public readonly baseUri: string,
+    public readonly apiVersion: string,
+    public readonly options: AzureServiceClientOptions,
   ) {
     super(credentials, options);
 
-    if (credentials === null || credentials === undefined) {
-      throw new Error('\'credentials\' cannot be null.');
+    if (!credentials) {
+      throw new Error(Constants.errorMessageStrings.VariableDoesNotExist(Constants.serviceClientVariables.credentials));
     }
-    if (subscriptionId === null || subscriptionId === undefined) {
-      throw new Error('\'subscriptionId\' cannot be null.');
+    if (!subscriptionId) {
+      throw new Error(
+        Constants.errorMessageStrings.VariableDoesNotExist(Constants.serviceClientVariables.subscriptionId));
     }
 
     const packageInfo = this.getPackageJsonInfo(__dirname);
@@ -48,15 +51,24 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     const urlDetailsOfConsortium = `subscriptions/${this.subscriptionId}/resourceGroups/${this.resourceGroup}/` +
     `providers/Microsoft.Blockchain/blockchainMembers/${memberName}`;
     const url = `${this.baseUri}/${urlDetailsOfConsortium}?api-version=${this.apiVersion}`;
-    const httpRequest = this._getHttpRequest(url, 'PUT', body);
+    const httpRequest = this.getHttpRequest(url, 'PUT', body);
 
     // @ts-ignore
-    await this.pipeline(httpRequest, (err: ServiceError) => {
+    await this.pipeline(httpRequest, (err: ServiceError, response: IncomingMessage, responseBody: string) => {
       if (err) {
         Output.outputLine(Constants.outputChannel.azureBlockchainServiceClient, err.message);
-      }
+      } else if (response.statusCode! < 200 || response.statusCode! > 299) {
+        Output.outputLine(
+          Constants.outputChannel.azureBlockchainServiceClient,
+          `${response.statusMessage}(${response.statusCode}): ${responseBody}`,
+        );
 
-      env.openExternal(Uri.parse(`${Constants.azureResourceExplorer.portalBasUri}/resource/${urlDetailsOfConsortium}`));
+        window.showErrorMessage(Constants.executeCommandMessage.failedToRunCommand('CreateConsortium'));
+      } else {
+        vscodeEnvironment.openExternal(
+          Uri.parse(`${Constants.azureResourceExplorer.portalBasUri}/resource/${urlDetailsOfConsortium}`),
+        );
+      }
     });
   }
 
@@ -66,9 +78,9 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     const url = `${this.baseUri}/subscriptions/${this.subscriptionId}/resourceGroups/${this.resourceGroup}` +
       `/providers/Microsoft.Blockchain/blockchainMembers?api-version=${this.apiVersion}`;
 
-    const httpRequest = this._getHttpRequest(url, 'GET');
+    const httpRequest = this.getHttpRequest(url, 'GET');
 
-    return this._sendRequestToAzure(httpRequest, callback);
+    return this.sendRequestToAzure(httpRequest, callback);
   }
 
   public getTransactionNodes(
@@ -79,9 +91,9 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     const url = `${this.baseUri}/subscriptions/${this.subscriptionId}/resourceGroups/${this.resourceGroup}/` +
       `providers/Microsoft.Blockchain/blockchainMembers/${memberName}/transactionNodes?api-version=${this.apiVersion}`;
 
-    const httpRequest = this._getHttpRequest(url, 'GET');
+    const httpRequest = this.getHttpRequest(url, 'GET');
 
-    return this._sendRequestToAzure(httpRequest, callback);
+    return this.sendRequestToAzure(httpRequest, callback);
   }
 
   public getMemberAccessKeys(
@@ -91,9 +103,9 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     const url = `${this.baseUri}/subscriptions/${this.subscriptionId}/resourceGroups/${this.resourceGroup}/` +
       `providers/Microsoft.Blockchain/blockchainMembers/${memberName}/listApikeys?api-version=${this.apiVersion}`;
 
-    const httpRequest = this._getHttpRequest(url, 'POST');
+    const httpRequest = this.getHttpRequest(url, 'POST');
 
-    return this._sendRequestToAzure(httpRequest, callback);
+    return this.sendRequestToAzure(httpRequest, callback);
   }
 
   public getSkus(callback: (error: Error | null, result?: any) => void,
@@ -101,17 +113,17 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     const url = `${this.baseUri}/subscriptions/${this.subscriptionId}` +
       `/providers/Microsoft.Blockchain/skus?api-version=${this.apiVersion}`;
 
-    const httpRequest = this._getHttpRequest(url, 'GET');
+    const httpRequest = this.getHttpRequest(url, 'GET');
 
-    return this._sendRequestToAzure(httpRequest, callback);
+    return this.sendRequestToAzure(httpRequest, callback);
   }
 
-  private async _sendRequestToAzure(
+  public async sendRequestToAzure(
     httpRequest: WebResource,
     callback: (error: Error | null, result?: any) => void,
   ): Promise<void> {
     // @ts-ignore
-    return this.pipeline(httpRequest, (err: ServiceError, response: IncomingMessage, responseBody: string) => {
+    return this.pipeline(httpRequest, (err: ServiceError | null, response: IncomingMessage, responseBody: string) => {
       if (err) {
         window.showErrorMessage(err.message);
         return callback(err);
@@ -131,23 +143,52 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     });
   }
 
-  private _getHttpRequest(url: string, method: HttpMethods, body?: string): WebResource {
+  public getHttpRequest(url: string, method: HttpMethods, body?: string): WebResource {
     const httpRequest = new WebResource();
 
     httpRequest.method = method;
     httpRequest.url = url;
     httpRequest.headers = {};
 
-    httpRequest.headers['Content-Type'] = 'application/json';
-    if (this.options.generateClientRequestId) {
+    httpRequest.headers['Content-Type'] = Constants.azureResourceExplorer.contentType;
+    if (this.options && this.options.generateClientRequestId) {
       httpRequest.headers['x-ms-client-request-id'] = uuid.v4();
     }
-    if (this.options.acceptLanguage) {
+    if (this.options && this.options.acceptLanguage) {
       httpRequest.headers['accept-language'] = this.options.acceptLanguage;
     }
 
     httpRequest.body = body;
 
     return httpRequest;
+  }
+
+  public async checkExistence(name: string, type: string): Promise<{
+    message: string | null,
+    nameAvailable: boolean,
+    reason: string,
+  }> {
+    const requestUrl = `${this.baseUri}/subscriptions/${this.subscriptionId}` +
+      `/providers/Microsoft.Blockchain/locations/${this.location}` +
+      `/checkNameAvailability?api-version=${this.apiVersion}`;
+
+    const request = this.getHttpRequest(
+      requestUrl,
+      'POST',
+      JSON.stringify({
+        name,
+        type,
+      }),
+    );
+
+    return new Promise((resolve, reject) => {
+      this.sendRequestToAzure(request, (err, result) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      });
+    });
   }
 }

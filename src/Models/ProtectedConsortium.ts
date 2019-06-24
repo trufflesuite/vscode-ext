@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from 'fs';
 import { Constants } from '../Constants';
 import { saveTextInFile, showInputBox, showQuickPick, TruffleConfiguration } from '../helpers';
 import { MnemonicRepository } from '../MnemonicService/MnemonicRepository';
@@ -18,10 +17,10 @@ export abstract class ProtectedConsortium extends Consortium {
     const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
     const config = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
     const network = await super.getTruffleNetwork();
-
     const targetURL = await this.getRPCAddress();
     const mnemonic = await this.getMnemonic();
-    await config.importFs();
+
+    config.importFs();
 
     network.options.provider = {
       mnemonic: mnemonic.path,
@@ -55,11 +54,10 @@ export abstract class ProtectedConsortium extends Consortium {
       },
     ];
 
-    const savedMnemonics =  MnemonicRepository.getAllMnemonicPaths()
-    .filter((path) => fs.existsSync(path))
+    const savedMnemonics =  MnemonicRepository.getExistedMnemonicPaths()
     .map((path) => {
       const mnemonic = MnemonicRepository.getMnemonic(path);
-      const label = `${mnemonic.split(' ')[0].slice(0, 3)} ... ${mnemonic.split(' ')[11].slice(-3)}`;
+      const label = MnemonicRepository.MaskMnemonic(mnemonic);
       return {
         cmd: async () => ({mnemonic, path}),
         detail: path,

@@ -4,10 +4,10 @@
 import { workspace } from 'vscode';
 import { Constants } from '../Constants';
 
-export function getWorkspaceRoot(): string {
+export function getWorkspaceRoot(ignoreException: boolean = false): string | undefined {
   const workspaceRoot = workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
-  if (workspaceRoot === undefined) {
+  if (workspaceRoot === undefined && !ignoreException) {
     throw Error(Constants.validationMessages.undefinedVariable('Workspace root'));
   }
 
@@ -15,7 +15,5 @@ export function getWorkspaceRoot(): string {
 }
 
 export function isWorkspaceOpen(): boolean {
-  const workspaceRoot = workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
-
-  return workspaceRoot ? true : false;
+  return !!(workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath);
 }

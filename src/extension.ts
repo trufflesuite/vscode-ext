@@ -10,6 +10,7 @@ import { LogicAppCommands } from './commands/LogicAppCommands';
 import { ProjectCommands } from './commands/ProjectCommands';
 import { TruffleCommands } from './commands/TruffleCommands';
 import { Constants } from './Constants';
+import { GanacheService } from './GanacheService/GanacheService';
 import { CommandContext, isWorkspaceOpen, required, setCommandContext } from './helpers';
 import { MnemonicRepository } from './MnemonicService/MnemonicRepository';
 import { CancellationEvent } from './Models';
@@ -45,24 +46,24 @@ export async function activate(context: ExtensionContext) {
   });
   const showRequirementsPage = commands.registerCommand('azureBlockchainService.showRequirementsPage',
     async (checkShowOnStartup: boolean) => {
-    return checkShowOnStartup ? requirementsPage.checkAndShow() : requirementsPage.show();
-  });
+      return checkShowOnStartup ? requirementsPage.checkAndShow() : requirementsPage.show();
+    });
   const copyRPCEndpointAddress = commands.registerCommand('azureBlockchainService.copyRPCEndpointAddress',
     async (viewItem: ConsortiumView) => {
-    await tryExecute(() => AzureBlockchain.copyRPCEndpointAddress(viewItem));
-  });
+      await tryExecute(() => AzureBlockchain.copyRPCEndpointAddress(viewItem));
+    });
   //#endregion
 
   //#region Ganache extension commands
   const startGanacheServer = commands.registerCommand('azureBlockchainService.startGanacheServer',
-    async () => {
-    await tryExecute(() => GanacheCommands.startGanacheCmd());
-  });
+    async (viewItem?: ConsortiumView) => {
+      await tryExecute(() => GanacheCommands.startGanacheCmd(consortiumTreeManager, viewItem));
+    });
 
   const stopGanacheServer = commands.registerCommand('azureBlockchainService.stopGanacheServer',
-  async () => {
-    await tryExecute(() => GanacheCommands.stopGanacheCmd());
-  });
+    async (viewItem?: ConsortiumView) => {
+      await tryExecute(() => GanacheCommands.stopGanacheCmd(consortiumTreeManager, viewItem));
+    });
   //#endregion
 
   //#region truffle commands
@@ -81,6 +82,9 @@ export async function activate(context: ExtensionContext) {
   const copyABI = commands.registerCommand('contract.copyABI', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeAbiToBuffer(uri));
   });
+  const getPrivateKeyFromMnemonic = commands.registerCommand('azureBlockchainService.getPrivateKey', async () => {
+    await tryExecute(() => TruffleCommands.getPrivateKeyFromMnemonic());
+  });
   //#endregion
 
   //#region commands with dialog
@@ -91,9 +95,9 @@ export async function activate(context: ExtensionContext) {
     await tryExecute(() => ConsortiumCommands.connectConsortium(consortiumTreeManager));
   });
   const disconnectConsortium = commands.registerCommand('azureBlockchainService.disconnectConsortium',
-  async (viewItem: ConsortiumView) => {
-    await tryExecute(() => ConsortiumCommands.disconnectConsortium(consortiumTreeManager, viewItem));
-  });
+    async (viewItem: ConsortiumView) => {
+      await tryExecute(() => ConsortiumCommands.disconnectConsortium(consortiumTreeManager, viewItem));
+    });
   //#endregion
 
   //#region remix commands
@@ -106,23 +110,23 @@ export async function activate(context: ExtensionContext) {
   const generateMicroservicesWorkflows = commands.registerCommand(
     'azureBlockchainService.generateMicroservicesWorkflows',
     async (filePath: Uri | undefined) => {
-    await tryExecute(() => LogicAppCommands.generateMicroservicesWorkflows(filePath));
-  });
+      await tryExecute(() => LogicAppCommands.generateMicroservicesWorkflows(filePath));
+    });
   const generateDataPublishingWorkflows = commands.registerCommand(
     'azureBlockchainService.generateDataPublishingWorkflows',
-  async (filePath: Uri | undefined) => {
-    await tryExecute(() => LogicAppCommands.generateDataPublishingWorkflows(filePath));
-  });
+    async (filePath: Uri | undefined) => {
+      await tryExecute(() => LogicAppCommands.generateDataPublishingWorkflows(filePath));
+    });
   const generateEventPublishingWorkflows = commands.registerCommand(
     'azureBlockchainService.generateEventPublishingWorkflows',
-  async (filePath: Uri | undefined) => {
-    await tryExecute(() => LogicAppCommands.generateEventPublishingWorkflows(filePath));
-  });
+    async (filePath: Uri | undefined) => {
+      await tryExecute(() => LogicAppCommands.generateEventPublishingWorkflows(filePath));
+    });
   const generateReportPublishingWorkflows = commands.registerCommand(
     'azureBlockchainService.generateReportPublishingWorkflows',
     async (filePath: Uri | undefined) => {
-    await tryExecute(() => LogicAppCommands.generateReportPublishingWorkflows(filePath));
-  });
+      await tryExecute(() => LogicAppCommands.generateReportPublishingWorkflows(filePath));
+    });
   //#endregion
 
   context.subscriptions.push(showWelcomePage);
@@ -144,6 +148,7 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(generateDataPublishingWorkflows);
   context.subscriptions.push(generateEventPublishingWorkflows);
   context.subscriptions.push(generateReportPublishingWorkflows);
+  context.subscriptions.push(getPrivateKeyFromMnemonic);
 
   return required.checkAllApps();
 }
@@ -152,7 +157,7 @@ export async function deactivate(): Promise<void> {
   // this method is called when your extension is deactivated
   await Output.dispose();
 
-  return GanacheCommands.dispose();
+  await GanacheService.dispose();
 }
 
 async function tryExecute(func: () => Promise<any>, errorMessage: string | null = null): Promise<void> {

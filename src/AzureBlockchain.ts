@@ -1,8 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import { env, window } from 'vscode';
+import { window } from 'vscode';
 import { Constants } from './Constants';
+import { vscodeEnvironment } from './helpers';
 import { ConsortiumView } from './ViewItems';
 
 export namespace AzureBlockchain {
@@ -13,7 +14,7 @@ export namespace AzureBlockchain {
 
   export async function addDataInClipboard(typeOfData: string, data?: string | null) {
     if (data) {
-      await env.clipboard.writeText(data);
+      await vscodeEnvironment.writeToClipboard(data);
       window.showInformationMessage(typeOfData + Constants.dataCopied);
     }
   }

@@ -12,15 +12,18 @@ export interface ICommandResult {
   cmdOutputIncludingStderr: string;
 }
 
-export async function executeCommand(workingDirectory: string | undefined, commands: string, ...args: string[])
-  : Promise<string> {
+export async function executeCommand(
+  workingDirectory: string | undefined,
+  commands: string,
+  ...args: string[]
+): Promise<string> {
   Output.outputLine(
     Constants.outputChannel.executeCommand,
-    `
-Working dir: ${workingDirectory}
-${Constants.executeCommandMessage.runningCommand}
-${[commands, ...args].join(' ')}`,
-    );
+    '\n' +
+    `Working dir: ${workingDirectory}\n` +
+    `${Constants.executeCommandMessage.runningCommand}\n` +
+    `${[commands, ...args].join(' ')}`,
+  );
 
   const result: ICommandResult = await tryExecuteCommand(workingDirectory, commands, ...args);
 
@@ -37,13 +40,24 @@ ${[commands, ...args].join(' ')}`,
   return result.cmdOutput;
 }
 
+export function startProcess(
+  workingDirectory: string | undefined,
+  commands: string,
+  args: string[],
+): cp.ChildProcess {
+  const options: cp.SpawnOptions = { cwd: workingDirectory || os.tmpdir(), shell: true };
+  const process = cp.spawn(commands, args, options);
+
+  return process;
+}
+
 export async function tryExecuteCommand(workingDirectory: string | undefined, commands: string, ...args: string[])
   : Promise<ICommandResult> {
-  return await new Promise((resolve: (res: any) => void, reject: (error: Error) => void): void => {
+  return new Promise((resolve: (res: any) => void, reject: (error: Error) => void): void => {
     let cmdOutput: string = '';
     let cmdOutputIncludingStderr: string = '';
 
-    const options: cp.SpawnOptions = { cwd: workingDirectory || os.tmpdir(), shell: true};
+    const options: cp.SpawnOptions = { cwd: workingDirectory || os.tmpdir(), shell: true };
     const childProcess: cp.ChildProcess = cp.spawn(commands, args, options);
 
     childProcess.stdout.on('data', (data: string | Buffer) => {

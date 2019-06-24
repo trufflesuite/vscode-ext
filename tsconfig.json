@@ -8,7 +8,8 @@
       "dom"
     ],
     "sourceMap": true,
-    "rootDir": "src",
+    "resolveJsonModule": true,
+    "rootDir": ".",
     "strict": true,
     /* enable all strict type-checking options */
     /* Additional Checks */
@@ -21,8 +22,12 @@
     "strictNullChecks": true,
     "noUnusedParameters": true,
     "allowJs": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/@machinomy"
+    ],
   },
-  "include": ["src/**/*.js", "src/**/*.ts"],
+  "include": ["src/**/*.js", "src/**/*.ts", "test/**/*.js", "test/**/*.ts", "test/**/*.json"],
   "exclude": [
     "node_modules",
     ".vscode-test"

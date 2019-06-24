@@ -3,6 +3,7 @@
 
 ### Common
 out/
+coverage/
 
 ### Node template
 package-lock.json

@@ -27,6 +27,12 @@ export class LocalNetworkConsortium extends Consortium {
     return network;
   }
 
+  public async getPort(): Promise<number | undefined> {
+    const network = await this.getTruffleNetwork();
+
+    return network.options.port;
+  }
+
   protected defaultProtocol(): string {
     return Constants.networkProtocols.http;
   }

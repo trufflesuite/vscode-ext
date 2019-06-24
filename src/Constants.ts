@@ -21,8 +21,9 @@ export class Constants {
     azureBlockchainServiceClient: 'Azure Blockchain Service Client',
     consortiumTreeManager: 'Consortium Tree Manager',
     executeCommand: 'Execute command',
-    ganacheCommands: 'Ganache Commands',
+    ganacheCommands: 'Ganache Server',
     logicAppGenerator: 'Logic App Generator',
+    requirements: 'Requirements',
     telemetryClient: 'Telemetry Client',
   };
 
@@ -32,10 +33,15 @@ export class Constants {
   public static defaultTruffleBox = 'Azure-Samples/Blockchain-Ethereum-Template';
   public static tempPath = 'tempPath';
   public static defaultCounter = 10;
+  public static defaultDebounceTimeout = 300;
 
   public static localhost = '127.0.0.1';
+  public static localhostName = 'localhost';
   public static defaultLocalhostPort = 8545;
   public static defaultAzureBSPort = 3200;
+
+  public static ganacheRetryTimeout = 2000; // milliseconds
+  public static ganacheRetryAttempts = 5;
 
   public static requiredVersions: {[key: string]: string | { min: string, max: string }} = {
     ganache: {
@@ -97,6 +103,8 @@ export class Constants {
     gasPrice: 100000000000,
   };
 
+  public static consortiumTreeResourceKey = 'treeContent';
+
   public static networkName = {
     azure: 'Azure Blockchain Service',
     local: 'Local Network',
@@ -132,30 +140,37 @@ export class Constants {
   };
 
   public static validationRegexps = {
+    digits: /(?=.*\d)/g,
+    isLowerCase: /^[a-z0-9_\-!@$^&()+=?\/<>|[\]{}:.\\~ #`*"'%;,]+$/g,
+    isUrl: /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/gm,
+    lowerCaseLetter: /(?=.*[a-z])/g,
+    // tslint:disable-next-line: max-line-length
+    port: /^([1-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/,
     specialChars: /[!@$^&()+=?\/<>|[\]{}_:.\\~]/g,
     unallowedChars: /[#`*"'\-%;,]/g,
-    digits: /(?=.*\d)/g,
-    lowerCaseLetter: /(?=.*[a-z])/g,
     upperCaseLetter: /(?=.*[A-Z])/g,
   };
 
   public static validationMessages = {
-    incorrectHostAddress: 'Incorrect host address',
-    incorrectName: 'Incorrect name. Name can contain only lowercase letters and numbers. ' +
+    invalidAzureName: 'Invalid name. Name can contain only lowercase letters and numbers. ' +
       'The first character must be a letter. The value must be between 2 and 20 characters long.',
-    incorrectPassword: 'Incorrect password. Password should contain 1 lower case character, ' +
-      '1 upper case character, 1 number, 1 special character that is NOT #, `, *, ", \', -, % or ;. ' +
-      'The value must be between 12 and 72 characters long.',
-    incorrectPortNumber: 'Incorrect port number',
     invalidConfirmationResult: '\'yes\' or \'no\'',
-    lengthRange: 'Length must be between 12 and 72 characters',
+    invalidHostAddress: 'Invalid host address',
+    invalidPortNumber: 'Invalid port number',
+    invalidPort: 'Invalid port.',
+    invalidResourceGroupName: 'Resource group names only allow alphanumeric characters, periods,' +
+      'underscores, hyphens and parenthesis and cannot end in a period.',
+    lengthRange: Constants.getMessageLengthRange,
+    networkAlreadyExists: 'Network already exists.',
     noDigits: 'Password should have at least one digit.',
     noLowerCaseLetter: 'Password should have at least one lowercase letter from a to z.',
     noSpecialChars: 'Password must have 1 special character.',
     noUpperCaseLetter: 'Password should have at least one uppercase letter from A to Z.',
+    onlyLowerCaseAllowed: 'Only lower case allowed.',
     onlyNumberAllowed: 'Value after \':\' should be a number.',
-    projectAlreadyExist: Constants.getMessageProjectAlreadyExist,
-    unallowedChars: "Password must not have '#', '`', '*', '\"', ''', '-', '%', ',' or ';' chars.",
+    portAlreadyInUse: 'This port is already in use. Choose another one.',
+    resourceGroupAlreadyExists: Constants.getMessageResourceGroupAlreadyExist,
+    unallowedChars: "Input value must not have '#', '`', '*', '\"', ''', '-', '%', ',', ';' or others chars.",
     unallowedSymbols: 'Provided name has unallowed symbols.',
     undefinedVariable: Constants.getMessageUndefinedVariable,
     valueCannotBeEmpty: 'Value cannot be empty.',
@@ -165,12 +180,15 @@ export class Constants {
   public static placeholders = {
     confirmPaidOperation: 'This operation will cost Ether, type \'yes\' to continue',
     deployedUrlStructure: 'host:port',
+    emptyLineText: '<empty line>',
     generateMnemonic: 'Generate mnemonic',
     pasteMnemonic: 'Paste mnemonic',
     resourceGroupName: 'Resource Group Name',
     selectConsortium: 'Select consortium',
     selectDeployDestination: 'Select deploy destination',
+    selectGanacheServer: 'Select Ganache server',
     selectLedgerEventsDestination: 'Select ledger events destination',
+    selectMnemonicExtractKey: 'Select mnemonic to extract key',
     selectNewProjectPath: 'Select new project path',
     selectResourceGroup: 'Select a resource group',
     selectRgLocation: 'Select a location to create your Resource Group in...',
@@ -242,11 +260,17 @@ export class Constants {
   public static dataCopied = ' copied to clipboard';
   public static rpcEndpointAddress = 'RPCEndpointAddress';
 
+  public static rpcGanacheMethod = 'net_listening';
+
   public static ganacheCommandStrings = {
+    cannotStartServer: 'Cannot start ganache server',
+    invalidGanachePort: 'Couldn\'t start Ganache server. Invalid port',
     serverAlreadyRunning: 'Ganache server already running',
     serverCanNotRunWithoutGanache: 'To start a local server, installed ganache-cli is required',
-    serverCanNotStop: 'Ganache stop server was failed because it was started from another application',
-    serverSuccessfullyRunning: 'Ganache server successfully running',
+    serverCanNotStop: 'Ganache stop server was failed because is not ganache application',
+    serverNoGanacheAvailable: 'No Ganache network settings available',
+    serverNoGanacheInstance: 'No Ganache instance running',
+    serverSuccessfullyStarted: 'Ganache server successfully started',
     serverSuccessfullyStopped: 'Ganache server successfully stopped',
   };
 
@@ -262,25 +286,43 @@ export class Constants {
   };
 
   public static errorMessageStrings = {
+    // TODO names to lower case
     ActionAborted: 'Action aborted',
+    BuildContractsBeforeGenerating: 'Please build contracts before generating',
+    BuildContractsDirIsEmpty: Constants.getMessageContractsBuildDirectoryIsEmpty,
+    BuildContractsDirIsNotExist: Constants.getMessageContractsBuildDirectoryIsNotExist,
     DirectoryIsNotEmpty: 'Directory is not empty. Open another one?',
     GitIsNotInstalled: 'Git is not installed',
+    InvalidContract: 'This file is not a valid contract.',
+    InvalidMnemonic: 'Invalid mnemonic',
+    InvalidServiceType: 'Invalid service type.',
+    MnemonicFileHaveNoText: 'Mnemonic file have no text',
+    NetworkAlreadyExist: Constants.getMessageNetworkAlreadyExist,
     NewProjectCreationFailed: 'Command createProject has failed.',
     NoSubscriptionFound: 'No subscription found.',
     NoSubscriptionFoundClick: 'No subscription found, click an Azure account ' +
       'at the bottom left corner and choose Select All',
     RequiredAppsAreNotInstalled: 'To run command you should install required apps',
+    ThereAreNoMnemonics: 'There are no mnemonics',
+    TruffleConfigIsNotExist: 'Truffle configuration file not found',
+    VariableDoesNotExist: Constants.getMessageVariableDoesNotExist,
     WaitForLogin: 'You should sign-in on Azure Portal',
+    WorkflowTypeDoesNotMatch: 'workflowType does not match any available workflows',
+    WorkspaceShouldBeOpened: 'Workspace should be opened',
   };
 
   public static informationMessage = {
     cancelButton: 'Cancel',
     consortiumDoesNotHaveMemberWithUrl: 'Consortium does not have member with url',
+    consortiumNameValidating: 'Consortium name validating...',
     detailsButton: 'Details',
+    generatedLogicApp: 'Generated the logic app!',
     invalidRequiredVersion: 'Required app is not installed or has an old version.',
+    memberNameValidating: 'Consortium Member name validating...',
     newProjectCreationFinished: 'New project was created successfully',
     newProjectCreationStarted: 'New project creation is started',
     openButton: 'Open',
+    privateKeyWasCopiedToClipboard: 'Private key was copied to clipboard',
     seeDetailsRequirementsPage: 'Please see details on the Requirements Page',
   };
 
@@ -300,7 +342,13 @@ export class Constants {
   public static gitCommand = 'git';
   public static truffleCommand = 'truffle';
 
+  public static serviceClientVariables = {
+    credentials: 'credentials',
+    subscriptionId: 'subscriptionId',
+  };
+
   public static azureResourceExplorer = {
+    contentType: 'application/json',
     portalBasUri: 'https://portal.azure.com/#@microsoft.onmicrosoft.com',
     providerName: 'Microsoft.Blockchain',
     requestAcceptLanguage: 'en-US',
@@ -344,15 +392,35 @@ export class Constants {
     + 'Press Enter for default.';
   }
 
-  private static getMessageProjectAlreadyExist(projectName: string): string {
-    return `A project with the same name: ${projectName} already exists. Please select other name`;
+  private static getMessageResourceGroupAlreadyExist(resourceGroupName: string): string {
+    return `A resource group with the same name: ${resourceGroupName} already exists. Please select other name`;
+  }
+
+  private static getMessageContractsBuildDirectoryIsEmpty(buildDirPath: string): string {
+    return `Contracts build directory "${buildDirPath}" is empty.`;
+  }
+
+  private static getMessageContractsBuildDirectoryIsNotExist(buildDirPath: string): string {
+    return `Contracts build directory "${buildDirPath}" is not exist.`;
+  }
+
+  private static getMessageNetworkAlreadyExist(networkName: string): string {
+    return `Network with name "${networkName}" already existed in truffle-config.js`;
   }
 
   private static getMessageUndefinedVariable(variable: string): string {
     return `${variable} cannot be undefined`;
   }
 
+  private static getMessageLengthRange(min: number, max: number): string {
+    return `Length must be between ${min} and ${max} characters`;
+  }
+
   private static getMessageFailedCommand(command: string): string {
     return `Failed to run command - ${command}. More details in output`;
+  }
+
+  private static getMessageVariableDoesNotExist(variable: string): string {
+    return `${variable} cannot be null.`;
   }
 }

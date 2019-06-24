@@ -2,24 +2,18 @@
 // Licensed under the MIT license.
 
 import { Constants } from '../Constants';
+import { Validator } from './validator';
 
 export namespace UrlValidator {
-
-  export const urlValidationExpression = new RegExp(
-    /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/gm,
-  );
-
   export function validateHostUrl(url: string): string | null {
-    const matches = url.match(UrlValidator.urlValidationExpression);
-    if (matches === null || matches.length > 1) {
-      return Constants.validationMessages.incorrectHostAddress;
-    }
+    const validator = new Validator(url)
+      .isNotEmpty()
+      .isUrl();
 
-    return null;
+    return validator.getErrors();
   }
 
-  export function splitUrl(url: string): string[] {
-    const address = url.replace(/(^\w+:|^)\/\//, '');
-    return address.split(':');
+  export function validatePort(port: string | number): string | null {
+    return `${port}`.match(Constants.validationRegexps.port) ? null : Constants.validationMessages.invalidPort;
   }
 }

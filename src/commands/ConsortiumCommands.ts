@@ -3,7 +3,9 @@
 
 import { ConsortiumResourceExplorer } from '../ConsortiumResourceExplorer';
 import { Constants } from '../Constants';
+import { GanacheService } from '../GanacheService/GanacheService';
 import { showInputBox, showQuickPick } from '../helpers';
+import { findPid } from '../helpers/shell';
 import {
   AzureConsortium,
   Consortium,
@@ -16,10 +18,9 @@ import {
 import { ConsortiumTreeManager } from '../treeService/ConsortiumTreeManager';
 import { UrlValidator } from '../validators/UrlValidator';
 import { ConsortiumView } from '../ViewItems';
-import { GanacheCommands } from './GanacheCommands';
 
 interface IConsortiumDestination {
-  cmd: (excludedItems?: string[]) => Promise<Consortium>;
+  cmd: (network?: Network) => Promise<Consortium>;
   itemType: ItemType;
   label: string;
 }
@@ -36,9 +37,8 @@ export namespace ConsortiumCommands {
 
     const destination = await selectDestination(createConsortiumDestination);
     const networkItem = await getNetwork(consortiumTreeManager, destination.itemType);
-    const childrenFilters = await getChildrenFilters(networkItem);
 
-    return destination.cmd(childrenFilters);
+    return destination.cmd(networkItem);
   }
 
   export async function connectConsortium(consortiumTreeManager: ConsortiumTreeManager): Promise<Consortium> {
@@ -71,7 +71,11 @@ export namespace ConsortiumCommands {
   export async function disconnectConsortium(consortiumTreeManager: ConsortiumTreeManager, viewItem: ConsortiumView)
     : Promise<void> {
       if (viewItem.extensionItem instanceof LocalNetworkConsortium) {
-        await GanacheCommands.stopGanacheServer();
+        const port = await viewItem.extensionItem.getPort();
+
+        if (port) {
+          await GanacheService.stopGanacheServer(port);
+        }
       }
       return consortiumTreeManager.removeItem(viewItem.extensionItem);
   }
@@ -83,15 +87,14 @@ async function execute(
 ): Promise<Consortium> {
   const destination = await selectDestination(consortiumDestination);
   const networkItem = await getNetwork(consortiumTreeManager, destination.itemType);
-  const childrenFilters = await getChildrenFilters(networkItem);
-  const consortiumItem = await destination.cmd(childrenFilters);
+  const consortiumItem = await destination.cmd(networkItem);
 
   await networkItem.addChild(consortiumItem);
 
   return consortiumItem;
 }
 
-function getChildrenFilters(networkItem: Network): string[] {
+function getConnectedAbsConsortiums(networkItem: Network): string[] {
   return networkItem
     .getChildren()
     .filter((e) => e.label)
@@ -118,31 +121,41 @@ async function getNetwork(consortiumTreeManager: ConsortiumTreeManager, itemType
   return networkItem;
 }
 
-async function selectOrCreateConsortium(excludedItems?: string[]): Promise<AzureConsortium> {
+async function selectOrCreateConsortium(network?: Network): Promise<AzureConsortium> {
+  const excludedItems = network ? getConnectedAbsConsortiums(network) : [];
   const azureResourceExplorer = new ConsortiumResourceExplorer();
   return azureResourceExplorer.selectOrCreateConsortium(excludedItems);
 }
 
-async function connectLocalNetwork(): Promise<LocalNetworkConsortium> {
-  await GanacheCommands.startGanacheServer();
+async function connectLocalNetwork(network?: Network): Promise<LocalNetworkConsortium> {
+
+  const ports = await getExistingLocalPorts(network);
 
   const port = await showInputBox({
     ignoreFocusOut: true,
     prompt: Constants.paletteWestlakeLabels.enterLocalNetworkLocation,
-    validateInput: (value: string) => {
-      if (!value) {
-        return Constants.validationMessages.valueCannotBeEmpty;
+    validateInput: async (value: string) => {
+
+      const validationError = UrlValidator.validatePort(value);
+      if (validationError) {
+        return validationError;
       }
 
-      if (value.match(new RegExp(/^\d+$/g))) {
-        value = `${Constants.networkProtocols.http}${Constants.localhost}:${value}`;
-        return UrlValidator.validateHostUrl(value);
+      if (ports.some( (existPort) => existPort === value)) {
+        return Constants.validationMessages.networkAlreadyExists;
       }
 
-      return;
-    }});
+      if (!isNaN(await findPid(value))) {
+        return Constants.validationMessages.portAlreadyInUse;
+      }
 
-  const label = `localhost:${port}`;
+      return null;
+    },
+  });
+
+  await GanacheService.startGanacheServer(port);
+
+  const label = `${Constants.localhostName}:${port}`;
   const url = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
   return new LocalNetworkConsortium(label, url);
 }
@@ -169,6 +182,7 @@ async function getConsortiumName() {
       if (!value) {
         return Constants.validationMessages.valueCannotBeEmpty;
       }
+
       return;
     },
   });
@@ -181,4 +195,10 @@ async function getConsortiumUrl() {
     validateInput: (value: string) => {
       return UrlValidator.validateHostUrl(value);
     }});
+}
+
+async function getExistingLocalPorts(network?: Network): Promise<string[]> {
+  const localNetworks = network ? await network.getChildren() : [];
+  return await Promise.all((localNetworks as LocalNetworkConsortium[])
+    .map(async (item) => `${await item.getPort()}`));
 }

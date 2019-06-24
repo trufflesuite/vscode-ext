@@ -6,7 +6,7 @@ import { AzureBlockchainServiceClient } from '../AzureBlockchainServiceClient';
 import { IAzureMemberAccessKeysDto } from '../AzureDto/AccessKeysDto';
 
 export class MemberResource {
-  constructor(public readonly client: AzureBlockchainServiceClient) {}
+  constructor(private readonly client: AzureBlockchainServiceClient) {}
 
   public getListMember(): Promise<IAzureMemberDto[]> {
     return new Promise((resolve, reject) => {
@@ -33,5 +33,13 @@ export class MemberResource {
         }
       });
     });
+  }
+
+  public async checkExistence(name: string): Promise<{
+    message: string | null,
+    nameAvailable: boolean,
+    reason: string,
+  }> {
+    return await this.client.checkExistence(name, 'Microsoft.Blockchain/blockchainMembers');
   }
 }

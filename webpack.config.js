@@ -4,7 +4,7 @@ const config = {
   target: 'node',
   entry: './src/extension.ts',
   output: {
-    path: path.join(__dirname, 'out'),
+    path: path.join(__dirname, 'out', 'src'),
     filename: 'extension.js',
     libraryTarget: 'commonjs2'
   },

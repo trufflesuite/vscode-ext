@@ -8,6 +8,7 @@ import { required } from './required';
 import * as shell from './shell';
 import { TruffleConfiguration } from './truffleConfig';
 import * as userInteractionHelper from './userInteraction';
+import * as vscodeEnvironment from './vscodeEnvironment';
 import * as workspaceHelpers from './workspace';
 
 const saveTextInFile = userInteractionHelper.saveTextInFile;
@@ -37,4 +38,5 @@ export {
   showConfirmPaidOperationDialog,
   TruffleConfig,
   TruffleConfiguration,
+  vscodeEnvironment,
 };
