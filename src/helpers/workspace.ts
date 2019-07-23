@@ -3,12 +3,15 @@
 
 import { workspace } from 'vscode';
 import { Constants } from '../Constants';
+import { Telemetry } from '../TelemetryClient';
 
 export function getWorkspaceRoot(ignoreException: boolean = false): string | undefined {
   const workspaceRoot = workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
   if (workspaceRoot === undefined && !ignoreException) {
-    throw Error(Constants.validationMessages.undefinedVariable('Workspace root'));
+    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root'));
+    Telemetry.sendException(error);
+    throw error;
   }
 
   return workspaceRoot;

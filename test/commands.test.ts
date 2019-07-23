@@ -34,9 +34,9 @@ describe('Commands helper', () => {
         await outputCommandHelper.startProcess(testCase.workingDirectory, command, ['']);
 
         // Assert
-        assert.strictEqual(tmpdirStub.calledOnce, testCase.tmpdirExecuted);
-        assert.strictEqual(spawnStub.calledOnce, true);
-        assert.strictEqual(spawnStub.getCall(0).args[0], command);
+        assert.strictEqual(tmpdirStub.calledOnce, testCase.tmpdirExecuted, 'tmpdir should (not) called once');
+        assert.strictEqual(spawnStub.calledOnce, true, 'spawn should called once');
+        assert.strictEqual(spawnStub.getCall(0).args[0], command, 'spawn should called with correct arguments');
       });
   });
 
@@ -76,8 +76,11 @@ describe('Commands helper', () => {
         const commandResult = await commandResultPromise;
 
         // Assert
-        assert.strictEqual(commandResult.cmdOutput, 'test stdout');
-        assert.strictEqual(spawnMock.calledOnce, true);
+        assert.strictEqual(
+          commandResult.cmdOutput,
+          'test stdout',
+          'commandResult.cmdOutput should be equal to test data');
+        assert.strictEqual(spawnMock.calledOnce, true, 'spawn should called once');
       });
 
     it('tryExecuteCommand should return correct result when there is message in error output',
@@ -99,8 +102,11 @@ describe('Commands helper', () => {
         const commandResult = await commandResultProms;
 
         // Assert
-        assert.strictEqual(spawnMock.calledOnce, true);
-        assert.strictEqual(commandResult.cmdOutputIncludingStderr, 'test stdout');
+        assert.strictEqual(spawnMock.calledOnce, true, 'spawn should called once');
+        assert.strictEqual(
+          commandResult.cmdOutputIncludingStderr,
+          'test stdout',
+          'commandResult.cmdOutput should be equal to test data');
       });
 
     it('tryExecuteCommand should rejected on error',
@@ -153,7 +159,7 @@ describe('Commands helper', () => {
       const res = await commandRewire.executeCommand('workingDirectory', command, '');
 
       // Assert
-      assert.strictEqual(res, commandResult.cmdOutput);
+      assert.strictEqual(res, commandResult.cmdOutput, `result should be equal to ${commandResult.cmdOutput}`);
     });
 
   it('executeCommand throw error when tryExecuteCommand rejected',

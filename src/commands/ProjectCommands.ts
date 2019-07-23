@@ -3,7 +3,7 @@
 
 import * as fs from 'fs-extra';
 import { ProgressLocation, Uri, window, workspace } from 'vscode';
-import { Constants } from '../Constants';
+import { Constants, RequiredApps } from '../Constants';
 import {
   gitHelper,
   outputCommandHelper,
@@ -11,9 +11,11 @@ import {
   showInputBox,
   showOpenFolderDialog,
   showQuickPick,
+  TruffleConfiguration,
 } from '../helpers';
 import { CancellationEvent } from '../Models';
 import { Output } from '../Output';
+import { Telemetry } from '../TelemetryClient';
 
 interface IProjectDestination {
   cmd: (projectPath: string) => Promise<void>;
@@ -22,6 +24,7 @@ interface IProjectDestination {
 
 export namespace ProjectCommands {
   export async function newSolidityProject(): Promise<void> {
+    Telemetry.sendEvent('ProjectCommands.newSolidityProject.started');
     if (!await required.checkRequiredApps()) {
       return;
     }
@@ -44,6 +47,7 @@ export namespace ProjectCommands {
 
     const projectPath = await chooseNewProjectDir();
 
+    Telemetry.sendEvent('ProjectCommands.newSolidityProject.initialization');
     await command.cmd(projectPath);
     await gitHelper.gitInit(projectPath);
   }
@@ -56,6 +60,7 @@ async function chooseNewProjectDir(): Promise<string> {
   const arrayFiles =  await fs.readdir(projectPath);
 
   if (arrayFiles.length) {
+    Telemetry.sendEvent('ProjectCommands.chooseNewProjectDir.directoryNotEmpty');
     const answer = await window
       .showErrorMessage(
         Constants.errorMessageStrings.DirectoryIsNotEmpty,
@@ -65,6 +70,7 @@ async function chooseNewProjectDir(): Promise<string> {
     if (answer === Constants.informationMessage.openButton) {
       return chooseNewProjectDir();
     } else {
+      Telemetry.sendEvent('ProjectCommands.chooseNewProjectDir.userCancellation');
       throw new CancellationEvent();
     }
   }
@@ -73,6 +79,7 @@ async function chooseNewProjectDir(): Promise<string> {
 }
 
 async function createNewEmptyProject(projectPath: string): Promise<void> {
+  Telemetry.sendEvent('ProjectCommands.createNewEmptyProject.baseProject');
   return window.withProgress({
     location: ProgressLocation.Window,
     title: Constants.statusBarMessages.creatingProject,
@@ -82,6 +89,7 @@ async function createNewEmptyProject(projectPath: string): Promise<void> {
 }
 
 async function createProjectFromTruffleBox(projectPath: string): Promise<void> {
+  Telemetry.sendEvent('ProjectCommands.createNewEmptyProject.customProject');
   const truffleBoxName = await getTruffleBoxName();
   await createProject(projectPath, truffleBoxName);
 }
@@ -89,24 +97,29 @@ async function createProjectFromTruffleBox(projectPath: string): Promise<void> {
 async function createProject(projectPath: string, truffleBoxName: string): Promise<void> {
   try {
     Output.show();
-    await outputCommandHelper.executeCommand(projectPath, 'npx', Constants.truffleCommand, 'unbox', truffleBoxName);
+    Telemetry.sendEvent('ProjectCommands.createProject.unbox', { truffleBoxName });
+    await outputCommandHelper.executeCommand(projectPath, 'npx', RequiredApps.truffle, 'unbox', truffleBoxName);
+
+    TruffleConfiguration.checkTruffleConfigNaming(projectPath);
     workspace.updateWorkspaceFolders(
       0,
       workspace.workspaceFolders ? workspace.workspaceFolders.length : null,
-      {uri: Uri.file(projectPath)});
+      { uri: Uri.file(projectPath) });
+
   } catch (error) {
     fs.emptyDirSync(projectPath);
-    throw Error([Constants.errorMessageStrings.NewProjectCreationFailed, error.message].join(' '));
+    Telemetry.sendException(new Error(Constants.errorMessageStrings.NewProjectCreationFailed));
+    throw new Error(`${Constants.errorMessageStrings.NewProjectCreationFailed} ${error.message}`);
   }
 }
 
 async function getTruffleBoxName(): Promise<string> {
   return await showInputBox({
     ignoreFocusOut: true,
-    prompt: Constants.paletteWestlakeLabels.enterTruffleBoxName,
+    prompt: Constants.paletteABSLabels.enterTruffleBoxName,
     validateInput: (value: string) => {
       if (value.indexOf('://') !== -1 || value.indexOf('git@') !== -1 || value.split('/').length === 2) {
-        return Constants.validationMessages.unallowedSymbols;
+        return Constants.validationMessages.forbiddenSymbols;
       }
 
       return;

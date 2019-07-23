@@ -4,11 +4,17 @@
 import { window } from 'vscode';
 import { Constants } from './Constants';
 import { vscodeEnvironment } from './helpers';
+import { Telemetry } from './TelemetryClient';
 import { ConsortiumView } from './ViewItems';
 
 export namespace AzureBlockchain {
   export async function copyRPCEndpointAddress(consortiumNode: ConsortiumView): Promise<void> {
+    Telemetry.sendEvent('AzureBlockchain.copyRPCEndpointAddress.commandStarted');
     const rpcEndpointAddress = await consortiumNode.getRPCAddress();
+    Telemetry.sendEvent(
+      'AzureBlockchain.copyRPCEndpointAddress.getRPCAddress',
+      { data: Telemetry.obfuscate(rpcEndpointAddress) },
+    );
     await AzureBlockchain.addDataInClipboard(Constants.rpcEndpointAddress, rpcEndpointAddress);
   }
 

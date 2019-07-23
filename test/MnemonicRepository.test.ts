@@ -51,8 +51,8 @@ describe('MnemonicRepository', () => {
         const result = MnemonicRepository.getMnemonic(filePath);
 
         // Assert
-        assert.strictEqual(result, trimmedString);
-        assert.strictEqual(readFileSyncMock.calledOnce, true);
+        assert.strictEqual(result, trimmedString, 'result should be trimmed string');
+        assert.strictEqual(readFileSyncMock.calledOnce, true, 'readFileSync should called once');
       });
     });
 
@@ -61,14 +61,8 @@ describe('MnemonicRepository', () => {
       const filePath = uuid.v4();
       readFileSyncMock.throws(TestConstants.testError);
 
-      // Act
-      try {
-        MnemonicRepository.getMnemonic(filePath);
-        assert.fail(TestConstants.testShouldThrowError);
-      } catch (error) {
-        // Assert
-        assert.strictEqual(error.name, TestConstants.testError);
-      }
+      // Act and assert
+      assert.throws(() => MnemonicRepository.getMnemonic(filePath), Error, TestConstants.testError);
     });
 
     it('GetAllMnemonicPaths should return correct paths', () => {
@@ -80,8 +74,8 @@ describe('MnemonicRepository', () => {
       const result = MnemonicRepository.getAllMnemonicPaths();
 
       // Assert
-      assert.strictEqual(result.length, storage.length);
-      assert.deepEqual(result, storage);
+      assert.strictEqual(result.length, storage.length, 'result length should be equal to storage length');
+      assert.deepEqual(result, storage, 'result should be equal to test storage');
     });
 
     it('getExistedMnemonicPaths should return existing paths', () => {
@@ -96,9 +90,9 @@ describe('MnemonicRepository', () => {
       const result = MnemonicRepository.getExistedMnemonicPaths();
 
       // Assert
-      assert.strictEqual(result.length, 2);
-      assert.strictEqual(result[0], storage[0]);
-      assert.strictEqual(result[1], storage[2]);
+      assert.strictEqual(result.length, 2, 'result should store only existing mnemonic');
+      assert.strictEqual(result[0], storage[0], 'result should store only existing mnemonic');
+      assert.strictEqual(result[1], storage[2], 'result should store only existing mnemonic');
     });
 
     it('saveMnemonicPath should update global state', () => {
@@ -111,8 +105,8 @@ describe('MnemonicRepository', () => {
       const result = globalState.get<string[]>(Constants.mnemonicConstants.mnemonicStorage) as string[];
 
       // Assert
-      assert.strictEqual(result.length, 1);
-      assert.strictEqual(result[0], filePath);
+      assert.strictEqual(result.length, 1, 'result length should be equal to storage length');
+      assert.strictEqual(result[0], filePath, 'result should be equal to test data');
     });
 
     it('MaskMnemonic should return short label', () => {
@@ -123,8 +117,8 @@ describe('MnemonicRepository', () => {
       const result = MnemonicRepository.MaskMnemonic(TestConstants.testMnemonic);
 
       // Assert
-      assert.notStrictEqual(result, TestConstants.testMnemonic);
-      assert.strictEqual(result, expectedResult);
+      assert.notStrictEqual(result, TestConstants.testMnemonic, 'result should not be equal to test mnemonic');
+      assert.strictEqual(result, expectedResult, 'result should be equal to mask test mnemonic');
     });
 
     it('MaskMnemonic should return default place holder', () => {
@@ -132,7 +126,7 @@ describe('MnemonicRepository', () => {
       const result = MnemonicRepository.MaskMnemonic('');
 
       // Assert
-      assert.strictEqual(result, Constants.placeholders.emptyLineText);
+      assert.strictEqual(result, Constants.placeholders.emptyLineText, 'result should be equal to empty line');
     });
 
     it('MaskMnemonic should return short label when mnemonic is short', () => {
@@ -143,7 +137,7 @@ describe('MnemonicRepository', () => {
       const result = MnemonicRepository.MaskMnemonic('abc');
 
       // Assert
-      assert.strictEqual(result, expectedResult);
+      assert.strictEqual(result, expectedResult, 'result should be equal to test expected result');
     });
   });
 });

@@ -18,8 +18,14 @@ describe('DialogResultValidator', () => {
         const result = DialogResultValidator.validateConfirmationResult(testString) as string;
 
         // Assert
-        assert.strictEqual(result.includes(Constants.validationMessages.valueCannotBeEmpty), true);
-        assert.strictEqual(result.includes(Constants.validationMessages.invalidConfirmationResult), true);
+        assert.strictEqual(
+          result.includes(Constants.validationMessages.valueCannotBeEmpty),
+          true,
+          `validation result should include message "${Constants.validationMessages.valueCannotBeEmpty}"`);
+        assert.strictEqual(
+          result.includes(Constants.validationMessages.invalidConfirmationResult),
+          true,
+          `validation result should include message "${Constants.validationMessages.invalidConfirmationResult}"`);
       });
 
       it('should fail when result different from yes or no', () => {
@@ -30,7 +36,10 @@ describe('DialogResultValidator', () => {
         const result = DialogResultValidator.validateConfirmationResult(testString) as string;
 
         // Assert
-        assert.strictEqual(result.includes(Constants.validationMessages.invalidConfirmationResult), true);
+        assert.strictEqual(
+          result.includes(Constants.validationMessages.invalidConfirmationResult),
+          true,
+          `validation result should include message "${Constants.validationMessages.invalidConfirmationResult}"`);
       });
 
       TestConstants.testDialogAnswers.forEach((answer) => {
@@ -39,7 +48,7 @@ describe('DialogResultValidator', () => {
           const result = DialogResultValidator.validateConfirmationResult(answer);
 
           // Assert
-          assert.strictEqual(result, null);
+          assert.strictEqual(result, null, 'validation result should be null');
         });
       });
     });

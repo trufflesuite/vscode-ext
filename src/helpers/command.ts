@@ -5,6 +5,7 @@ import * as cp from 'child_process';
 import * as os from 'os';
 import { Constants } from '../Constants';
 import { Output } from '../Output';
+import { Telemetry } from '../TelemetryClient';
 
 export interface ICommandResult {
   code: number;
@@ -25,6 +26,7 @@ export async function executeCommand(
     `${[commands, ...args].join(' ')}`,
   );
 
+  Telemetry.sendEvent('command.executeCommand.tryExecuteCommandWasStarted');
   const result: ICommandResult = await tryExecuteCommand(workingDirectory, commands, ...args);
 
   Output.outputLine(
@@ -34,7 +36,8 @@ export async function executeCommand(
 
   if (result.code !== 0) {
     Output.show();
-    throw Error(Constants.executeCommandMessage.failedToRunCommand(commands.concat(' ', ...args.join(' '))));
+    Telemetry.sendException(new Error('commands.executeCommand.resultWithIncorrectCode'));
+    throw new Error(Constants.executeCommandMessage.failedToRunCommand(commands.concat(' ', ...args.join(' '))));
   }
 
   return result.cmdOutput;

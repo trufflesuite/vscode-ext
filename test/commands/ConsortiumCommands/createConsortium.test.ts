@@ -7,12 +7,7 @@ import * as sinon from 'sinon';
 import { QuickPickOptions } from 'vscode';
 import { Constants } from '../../../src/Constants';
 import * as helpers from '../../../src/helpers';
-import {
-  IExtensionItem,
-  Info,
-  ItemType,
-  Network,
-} from '../../../src/Models';
+import { IExtensionItem, ItemType, LocalNetworkConsortium, Network } from '../../../src/Models';
 import { ConsortiumTreeManager } from '../../../src/treeService/ConsortiumTreeManager';
 
 describe('Create Consortium', () => {
@@ -21,19 +16,21 @@ describe('Create Consortium', () => {
     sinon.restore();
   });
 
-  it('showQuickPick should be executed with Constants.placeholders.selectConsortium placeholder',
+  it('showQuickPick should be executed with Constants.placeholders.selectDestination placeholder',
     async () => {
       // Arrange
       const consortiumCommandsRewire = rewire('../../../src/commands/ConsortiumCommands');
       const showQuickPickStub = sinon.stub();
       showQuickPickStub
         .returns({
-          cmd: sinon.mock().returns(''),
+          cmd: sinon.mock().returns(new LocalNetworkConsortium('label')),
           itemType: ItemType.AZURE_BLOCKCHAIN,
           label: Constants.uiCommandStrings.CreateConsortiumAzureBlockchainService,
         });
-      consortiumCommandsRewire.__set__('getNetwork', sinon.mock().returns(new Info('label')));
-      consortiumCommandsRewire.__set__('getConnectedAbsConsortiums', sinon.mock().returns([]));
+      consortiumCommandsRewire.__set__('getNetwork', sinon.mock().returns(
+        new Network('local', ItemType.LOCAL_NETWORK),
+      ));
+      consortiumCommandsRewire.__set__('getConnectedAbsConsortia', sinon.mock().returns([]));
       sinon.replace(helpers, 'showQuickPick', showQuickPickStub);
 
       // Act
@@ -42,7 +39,8 @@ describe('Create Consortium', () => {
       // Assert
       assert.strictEqual(
         (showQuickPickStub.getCall(0).args[1] as QuickPickOptions).placeHolder,
-        Constants.placeholders.selectConsortium,
+        Constants.placeholders.selectDestination,
+        'showQuickPick should be called with given arguments',
       );
     });
 
@@ -66,7 +64,7 @@ describe('Create Consortium', () => {
         await assert.rejects(
           getNetwork(
             consortiumTreeManagerStub as ConsortiumTreeManager,
-            new Object() as ItemType,
+            {} as ItemType,
           ));
       });
 
@@ -83,7 +81,7 @@ describe('Create Consortium', () => {
         await assert.doesNotReject(
           getNetwork(
             consortiumTreeManagerStub as ConsortiumTreeManager,
-            new Object() as ItemType,
+            {} as ItemType,
           ));
       });
   });

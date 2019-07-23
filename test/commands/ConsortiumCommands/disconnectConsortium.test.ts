@@ -11,7 +11,7 @@ import {
   MainNetworkConsortium,
 } from '../../../src/Models';
 import { ConsortiumTreeManager } from '../../../src/treeService/ConsortiumTreeManager';
-import { ConsortiumView } from '../../../src/ViewItems/ConsortiumView';
+import { ConsortiumView } from '../../../src/ViewItems';
 
 describe('Disconnect Consortium', () => {
   const consortiumTreeManagerStub = {
@@ -43,7 +43,10 @@ describe('Disconnect Consortium', () => {
           );
 
           // Assert
-          assert.strictEqual(stopGanacheServerStub.calledOnce, consortium.executed);
+          assert.strictEqual(
+            stopGanacheServerStub.calledOnce,
+            consortium.executed,
+            'stopGanacheServer should be called once when consortium.executed');
         });
     });
   });
@@ -63,7 +66,7 @@ describe('Disconnect Consortium', () => {
           );
 
           // Assert
-          assert.strictEqual(spy.calledOnce, true);
+          assert.strictEqual(spy.calledOnce, true, 'removeItem should be called once');
         });
       });
 });

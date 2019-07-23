@@ -4,9 +4,9 @@
 import { Memento } from 'vscode';
 
 export class FakeExtensionState implements Memento {
-  constructor(private dict: { [id: string]: any} ) {
-    dict = {};
+  constructor(private dict: { [id: string]: any} = {} ) {
   }
+
   public get<T>(key: string): T | undefined {
     return this.dict[key] as T;
   }

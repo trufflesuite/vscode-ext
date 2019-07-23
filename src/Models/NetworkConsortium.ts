@@ -24,7 +24,7 @@ export abstract class NetworkConsortium extends ProtectedConsortium {
   protected async getGasPrice(): Promise<number> {
     const value = await showInputBox({
       ignoreFocusOut: true,
-      prompt: Constants.getMessageValueOrDefault(
+      prompt: Constants.paletteABSLabels.valueOrDefault(
         Constants.propertyLabels.gasPrice,
         Constants.defaultContractSettings.gasPrice),
       validateInput: this.validation,
@@ -40,7 +40,7 @@ export abstract class NetworkConsortium extends ProtectedConsortium {
   protected async getGasLimit(): Promise<number> {
     const value = await showInputBox({
       ignoreFocusOut: true,
-      prompt: Constants.getMessageValueOrDefault(
+      prompt: Constants.paletteABSLabels.valueOrDefault(
         Constants.propertyLabels.gasLimit,
         Constants.defaultContractSettings.gasLimit),
       validateInput: this.validation,
@@ -54,7 +54,7 @@ export abstract class NetworkConsortium extends ProtectedConsortium {
   }
 
   private validation(value: string): string | undefined {
-  return value && !value.match(new RegExp(/^\d+$/g)) ?
+    return value && !value.match(new RegExp(/^\d+$/g)) ?
       Constants.validationMessages.valueShouldBeNumberOrEmpty :
       undefined;
   }

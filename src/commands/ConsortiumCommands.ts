@@ -15,6 +15,7 @@ import {
   Network,
   TestNetworkConsortium,
 } from '../Models';
+import { Telemetry } from '../TelemetryClient';
 import { ConsortiumTreeManager } from '../treeService/ConsortiumTreeManager';
 import { UrlValidator } from '../validators/UrlValidator';
 import { ConsortiumView } from '../ViewItems';
@@ -27,6 +28,7 @@ interface IConsortiumDestination {
 
 export namespace ConsortiumCommands {
   export async function createConsortium(consortiumTreeManager: ConsortiumTreeManager): Promise<Consortium> {
+    Telemetry.sendEvent('ConsortiumCommands.createConsortium.commandStarted');
     const createConsortiumDestination: IConsortiumDestination[] = [
       {
         cmd: selectOrCreateConsortium,
@@ -35,13 +37,13 @@ export namespace ConsortiumCommands {
       },
     ];
 
-    const destination = await selectDestination(createConsortiumDestination);
-    const networkItem = await getNetwork(consortiumTreeManager, destination.itemType);
-
-    return destination.cmd(networkItem);
+    const consortium = await execute(createConsortiumDestination, consortiumTreeManager, false);
+    Telemetry.sendEvent('ConsortiumCommands.createConsortium.commandFinished');
+    return consortium;
   }
 
   export async function connectConsortium(consortiumTreeManager: ConsortiumTreeManager): Promise<Consortium> {
+    Telemetry.sendEvent('ConsortiumCommands.connectConsortium.commandStarted');
     const connectConsortiumDestination: IConsortiumDestination[] = [
       {
         cmd: connectLocalNetwork,
@@ -65,36 +67,55 @@ export namespace ConsortiumCommands {
       },
     ];
 
-    return execute(connectConsortiumDestination, consortiumTreeManager);
+    const consortium = await execute(connectConsortiumDestination, consortiumTreeManager);
+    Telemetry.sendEvent('ConsortiumCommands.connectConsortium.commandFinished');
+    return consortium;
   }
 
   export async function disconnectConsortium(consortiumTreeManager: ConsortiumTreeManager, viewItem: ConsortiumView)
     : Promise<void> {
-      if (viewItem.extensionItem instanceof LocalNetworkConsortium) {
-        const port = await viewItem.extensionItem.getPort();
+    Telemetry.sendEvent('ConsortiumCommands.disconnectConsortium.commandStarted');
+    if (viewItem.extensionItem instanceof LocalNetworkConsortium) {
+      Telemetry.sendEvent('ConsortiumCommands.disconnectConsortium.localNetworkConsortiumSelected');
+      const port = await viewItem.extensionItem.getPort();
 
-        if (port) {
-          await GanacheService.stopGanacheServer(port);
-        }
+      if (port) {
+        Telemetry.sendEvent('ConsortiumCommands.disconnectConsortium.portDefined');
+        await GanacheService.stopGanacheServer(port);
       }
-      return consortiumTreeManager.removeItem(viewItem.extensionItem);
+    }
+
+    const consortiumView = await consortiumTreeManager.removeItem(viewItem.extensionItem);
+    Telemetry.sendEvent('ConsortiumCommands.disconnectConsortium.commandFinished');
+    return consortiumView;
   }
 }
 
 async function execute(
   consortiumDestination: IConsortiumDestination[],
   consortiumTreeManager: ConsortiumTreeManager,
+  addChild: boolean = true,
 ): Promise<Consortium> {
   const destination = await selectDestination(consortiumDestination);
   const networkItem = await getNetwork(consortiumTreeManager, destination.itemType);
   const consortiumItem = await destination.cmd(networkItem);
 
-  await networkItem.addChild(consortiumItem);
+  if (addChild) {
+    Telemetry.sendEvent('ConsortiumCommands.execute.addChild');
+    await networkItem.addChild(consortiumItem);
+  }
 
+  Telemetry.sendEvent(
+    'ConsortiumCommands.execute.newConsortiumItem',
+    {
+      ruri: Telemetry.obfuscate((consortiumItem.resourceUri || '').toString()),
+      type: Telemetry.obfuscate(consortiumItem.itemType.toString()),
+      urls: Telemetry.obfuscate(JSON.stringify(consortiumItem.getUrls())),
+    });
   return consortiumItem;
 }
 
-function getConnectedAbsConsortiums(networkItem: Network): string[] {
+function getConnectedAbsConsortia(networkItem: Network): string[] {
   return networkItem
     .getChildren()
     .filter((e) => e.label)
@@ -106,7 +127,7 @@ async function selectDestination(consortiumDestination: IConsortiumDestination[]
     consortiumDestination,
     {
       ignoreFocusOut: true,
-      placeHolder: Constants.placeholders.selectConsortium,
+      placeHolder: Constants.placeholders.selectDestination,
     },
   );
 }
@@ -115,14 +136,16 @@ async function getNetwork(consortiumTreeManager: ConsortiumTreeManager, itemType
   const networkItem = consortiumTreeManager.getItem(itemType) as Network;
 
   if (networkItem === undefined) {
-    throw new Error(Constants.errorMessageStrings.ActionAborted);
+    const error = new Error(Constants.errorMessageStrings.ActionAborted);
+    Telemetry.sendException(error);
+    throw error;
   }
 
   return networkItem;
 }
 
 async function selectOrCreateConsortium(network?: Network): Promise<AzureConsortium> {
-  const excludedItems = network ? getConnectedAbsConsortiums(network) : [];
+  const excludedItems = network ? getConnectedAbsConsortia(network) : [];
   const azureResourceExplorer = new ConsortiumResourceExplorer();
   return azureResourceExplorer.selectOrCreateConsortium(excludedItems);
 }
@@ -133,7 +156,7 @@ async function connectLocalNetwork(network?: Network): Promise<LocalNetworkConso
 
   const port = await showInputBox({
     ignoreFocusOut: true,
-    prompt: Constants.paletteWestlakeLabels.enterLocalNetworkLocation,
+    prompt: Constants.paletteABSLabels.enterLocalNetworkLocation,
     validateInput: async (value: string) => {
 
       const validationError = UrlValidator.validatePort(value);
@@ -141,7 +164,7 @@ async function connectLocalNetwork(network?: Network): Promise<LocalNetworkConso
         return validationError;
       }
 
-      if (ports.some( (existPort) => existPort === value)) {
+      if (ports.some((existPort) => existPort === value)) {
         return Constants.validationMessages.networkAlreadyExists;
       }
 
@@ -177,7 +200,7 @@ async function connectToPublicNetwork(): Promise<MainNetworkConsortium> {
 async function getConsortiumName() {
   return showInputBox({
     ignoreFocusOut: true,
-    prompt: Constants.paletteWestlakeLabels.enterConsortiumName,
+    prompt: Constants.paletteABSLabels.enterConsortiumName,
     validateInput: (value: string) => {
       if (!value) {
         return Constants.validationMessages.valueCannotBeEmpty;
@@ -191,10 +214,11 @@ async function getConsortiumName() {
 async function getConsortiumUrl() {
   return showInputBox({
     ignoreFocusOut: true,
-    prompt: Constants.paletteWestlakeLabels.enterNetworkLocation,
+    prompt: Constants.paletteABSLabels.enterNetworkLocation,
     validateInput: (value: string) => {
       return UrlValidator.validateHostUrl(value);
-    }});
+    },
+  });
 }
 
 async function getExistingLocalPorts(network?: Network): Promise<string[]> {

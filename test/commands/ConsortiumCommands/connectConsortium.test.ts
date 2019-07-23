@@ -67,10 +67,10 @@ describe('Consortium Commands', () => {
         itemType: number,
         contextValue: string) {
 
-        assert.strictEqual(executeMock.calledOnce, true);
-        assert.strictEqual(result.label, defaultConsortiumName);
-        assert.strictEqual(result.itemType, itemType);
-        assert.strictEqual(result.contextValue, contextValue);
+        assert.strictEqual(executeMock.calledOnce, true, 'function should be called once');
+        assert.strictEqual(result.label, defaultConsortiumName, 'returned result should store correct label');
+        assert.strictEqual(result.itemType, itemType, 'returned result should store correct itemType');
+        assert.strictEqual(result.contextValue, contextValue, 'returned result should store correct contextValue');
       }
 
       before(() => {
@@ -172,7 +172,7 @@ describe('Consortium Commands', () => {
         getItemStub = sinon.stub(consortiumTreeManager.ConsortiumTreeManager.prototype, 'getItem');
         showQuickPickMock = vscodeWindowMock.expects('showQuickPick');
         showQuickPickMock.callsFake(async (..._args: any[]) => {
-          return { cmd: () => undefined };
+          return { cmd: () => new LocalNetworkConsortium('label') };
         });
       });
 
@@ -194,7 +194,7 @@ describe('Consortium Commands', () => {
           .connectConsortium(new consortiumTreeManager.ConsortiumTreeManager());
 
         // Assert
-        assert.strictEqual(getItemStub.calledOnce, true);
+        assert.strictEqual(getItemStub.calledOnce, true, 'getItem should be called once');
       });
 
       it('throws error', async () => {
@@ -292,7 +292,10 @@ describe('Consortium Commands', () => {
 
           // Assert
           await assert.rejects(action, CancellationEvent);
-          assert.strictEqual(validationMessage, invalidPort.validationMessage);
+          assert.strictEqual(
+            validationMessage,
+            invalidPort.validationMessage,
+            'validationMessage should be equal to expected message');
         });
       });
 
@@ -333,7 +336,10 @@ describe('Consortium Commands', () => {
 
           // Assert
           await assert.rejects(action, CancellationEvent);
-          assert.strictEqual(validationMessage, existingPort.validationMessage);
+          assert.strictEqual(
+            validationMessage,
+            existingPort.validationMessage,
+            'validationMessage should be equal to expected message');
 
           commandMock.restore();
         });
@@ -359,7 +365,7 @@ describe('Consortium Commands', () => {
             .connectConsortium(new consortiumTreeManager.ConsortiumTreeManager());
 
           // Assert
-          assert.strictEqual(validationMessage, null);
+          assert.strictEqual(validationMessage, null, 'validationMessage should be null');
 
           commandMock.restore();
         });
@@ -425,7 +431,10 @@ describe('Consortium Commands', () => {
 
           // Assert
           await assert.rejects(action, CancellationEvent);
-          assert.strictEqual(validationMessage, Constants.validationMessages.valueCannotBeEmpty);
+          assert.strictEqual(
+            validationMessage,
+            Constants.validationMessages.valueCannotBeEmpty,
+            'validationMessage should be equal to expected message');
         });
 
         const invalidConsortiumUrlList = [
@@ -476,7 +485,10 @@ describe('Consortium Commands', () => {
             // Assert
             await assert.rejects(action, CancellationEvent);
             invalidConsortiumUrl.expectedErrors.forEach((error) => {
-              assert.strictEqual(validationMessage.includes(error), true);
+              assert.strictEqual(
+                validationMessage.includes(error),
+                true,
+                'validationMessage should include expected error');
             });
           });
         });
@@ -505,7 +517,7 @@ describe('Consortium Commands', () => {
               .connectConsortium(new consortiumTreeManager.ConsortiumTreeManager());
 
             // Assert
-            assert.strictEqual(validationMessage, undefined);
+            assert.strictEqual(validationMessage, undefined, 'validationMessage should be null');
           });
         });
 
@@ -533,7 +545,7 @@ describe('Consortium Commands', () => {
               .connectConsortium(new consortiumTreeManager.ConsortiumTreeManager());
 
             // Assert
-            assert.strictEqual(validationMessage, null);
+            assert.strictEqual(validationMessage, null, 'validationMessage should be null');
           });
         });
       });

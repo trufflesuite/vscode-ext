@@ -4,6 +4,10 @@ All notable changes to the "azureblockchain" extension will be documented in thi
 
 
 
+## 0.1.6
+
+- Added telemetry reporting capabilities
+
 ## 0.1.5
 
 - Backend test coverage 	

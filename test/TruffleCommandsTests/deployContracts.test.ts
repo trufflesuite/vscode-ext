@@ -37,6 +37,9 @@ describe('TruffleCommands', () => {
       let requiredMock: sinon.SinonMock;
       let checkAppsSilent: sinon.SinonExpectation;
       let installTruffle: sinon.SinonExpectation;
+      let isHdWalletProviderRequired: sinon.SinonExpectation;
+      let checkHdWalletProviderVersion: sinon.SinonExpectation;
+      let installTruffleHdWalletProvider: sinon.SinonExpectation;
 
       let getWorkspaceRootMock: any;
 
@@ -44,7 +47,6 @@ describe('TruffleCommands', () => {
       let showQuickPickMock: any;
       let showInputBoxMock: any;
       let showSaveDialogMock: sinon.SinonExpectation;
-      let showTextDocumentMock: sinon.SinonExpectation;
 
       let ganacheServiceMock: sinon.SinonMock;
       let startGanacheServer: sinon.SinonExpectation;
@@ -66,8 +68,6 @@ describe('TruffleCommands', () => {
       let getAllMnemonicPathsMock: sinon.SinonStub<any[], any>;
       let saveMnemonicPathMock: sinon.SinonExpectation;
 
-      let openTextDocumentMock: any;
-
       let writeFileSyncMock: any;
 
       let getAccessKeysMock: any;
@@ -80,12 +80,16 @@ describe('TruffleCommands', () => {
         requiredMock = sinon.mock(helpers.required);
         checkAppsSilent = requiredMock.expects('checkAppsSilent');
         installTruffle = requiredMock.expects('installTruffle');
+        isHdWalletProviderRequired = requiredMock.expects('isHdWalletProviderRequired');
+        checkHdWalletProviderVersion = requiredMock.expects('checkHdWalletProviderVersion');
+        installTruffleHdWalletProvider = requiredMock.expects('installTruffleHdWalletProvider');
+        isHdWalletProviderRequired.returns(false);
+        checkHdWalletProviderVersion.returns(false);
 
         windowMock = sinon.mock(vscode.window);
         showQuickPickMock = sinon.stub(vscode.window, 'showQuickPick');
         showInputBoxMock = sinon.stub(vscode.window, 'showInputBox');
         showSaveDialogMock = windowMock.expects('showSaveDialog');
-        showTextDocumentMock = windowMock.expects('showTextDocument');
 
         ganacheServiceMock = sinon.mock(GanacheService);
         startGanacheServer = ganacheServiceMock.expects('startGanacheServer');
@@ -112,8 +116,6 @@ describe('TruffleCommands', () => {
         getAllMnemonicPathsMock = mnemonicRepositoryMock.expects('getAllMnemonicPaths').returns([] as string []);
         saveMnemonicPathMock = mnemonicRepositoryMock.expects('saveMnemonicPath');
 
-        openTextDocumentMock = sinon.stub(vscode.workspace, 'openTextDocument');
-
         writeFileSyncMock = sinon.stub(fs, 'writeFileSync');
 
         getAccessKeysMock = sinon.stub(ConsortiumResourceExplorer.prototype, 'getAccessKeys');
@@ -123,12 +125,10 @@ describe('TruffleCommands', () => {
 
       afterEach(() => {
         sinon.restore();
-        getWorkspaceRootMock.restore();
       });
 
       it('should throw exception when config file not found', async () => {
         // Arrange
-        checkAppsSilent.returns(true);
         getWorkspaceRootMock.returns(__dirname);
         executeCommandMock.returns(uuid.v4());
 
@@ -140,13 +140,84 @@ describe('TruffleCommands', () => {
 
       it('should throw cancellationEvent when showQuickPick return undefined', async () => {
         // Arrange
-        checkAppsSilent.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
         showQuickPickMock.returns(undefined);
 
         // Act and assert
         await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager), CancellationEvent);
+      });
+
+      it('should install TruffleHdWalletProvider when it required', async () => {
+        // Arrange
+        checkAppsSilent.returns(true);
+        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
+        isHdWalletProviderRequired.returns(true);
+        executeCommandMock.returns(uuid.v4());
+
+        showQuickPickMock.onCall(0).callsFake((items: any) => {
+          return items.find((item: any) => item.label === TestConstants.networksNames.development);
+        });
+
+        // Act
+        await TruffleCommands.deployContracts(consortiumTreeManager);
+
+        // Assert
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
+        assert.strictEqual(
+          isHdWalletProviderRequired.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          true,
+          'checkHdWalletProviderVersion should be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          true,
+          'installTruffleHdWalletProvider should be called');
+      });
+
+      it('should not install TruffleHdWalletProvider when it version correct', async () => {
+        // Arrange
+        checkAppsSilent.returns(true);
+        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
+        isHdWalletProviderRequired.returns(true);
+        checkHdWalletProviderVersion.returns(true);
+        executeCommandMock.returns(uuid.v4());
+
+        showQuickPickMock.onCall(0).callsFake((items: any) => {
+          return items.find((item: any) => item.label === TestConstants.networksNames.development);
+        });
+
+        // Act
+        await TruffleCommands.deployContracts(consortiumTreeManager);
+
+        // Assert
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
+        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          true,
+          'checkHdWalletProviderVersion should be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to development should complete successfully', async () => {
@@ -163,14 +234,23 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.calledOnce, true);
-        assert.strictEqual(showInputBoxMock.called, false);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, true);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, false);
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
+        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to development should throw exception when there is an error on command execution', async () => {
@@ -186,14 +266,23 @@ describe('TruffleCommands', () => {
         // Act and assert
         await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager), Error);
 
-        assert.strictEqual(showQuickPickMock.calledOnce, true);
-        assert.strictEqual(showInputBoxMock.called, false);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, true);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, false);
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
+        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to mainNetwork should throw cancellationEvent when showInputBox return undefined', async () => {
@@ -209,14 +298,23 @@ describe('TruffleCommands', () => {
 
         // Act and assert
         await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager), CancellationEvent);
-        assert.strictEqual(showQuickPickMock.calledOnce, true);
-        assert.strictEqual(showInputBoxMock.called, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.called, false);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, false);
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, false, 'executeCommand should not be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
+        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to mainNetwork should throw cancellationEvent when showInputBox return not "yes"', async () => {
@@ -232,14 +330,22 @@ describe('TruffleCommands', () => {
 
         // Act and assert
         await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager), CancellationEvent);
-        assert.strictEqual(showQuickPickMock.calledOnce, true);
-        assert.strictEqual(showInputBoxMock.called, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.called, false);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, false);
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, false, 'executeCommand should not be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
+        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to mainNetwork should complete successfully', async () => {
@@ -257,14 +363,23 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.calledOnce, true);
-        assert.strictEqual(showInputBoxMock.calledOnce, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, false);
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.calledOnce, true, 'showInputBox should be called once');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
+        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to mainNetwork should throw exception when there is an error on command execution', async () => {
@@ -280,14 +395,23 @@ describe('TruffleCommands', () => {
 
         // Act and assert
         await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager));
-        assert.strictEqual(showQuickPickMock.calledOnce, true);
-        assert.strictEqual(showInputBoxMock.calledOnce, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, false);
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.calledOnce, true, 'showInputBox should be called once');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
+        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to network should complete successfully', async () => {
@@ -304,14 +428,23 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.calledOnce, true);
-        assert.strictEqual(showInputBoxMock.calledOnce, false);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, false);
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
+        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to network should throw exception when there is an error on command execution', async () => {
@@ -326,14 +459,23 @@ describe('TruffleCommands', () => {
 
         // Act and assert
         await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager));
-        assert.strictEqual(showQuickPickMock.calledOnce, true);
-        assert.strictEqual(showInputBoxMock.calledOnce, false);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, false);
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
+        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to local consortium should complete successfully', async () => {
@@ -350,14 +492,26 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.calledOnce, true);
-        assert.strictEqual(showInputBoxMock.calledOnce, false);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, true);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true);
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
+        assert.strictEqual(
+          isHdWalletProviderRequired.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to local consortium should throw exception when there is an error on command execution', async () => {
@@ -372,14 +526,26 @@ describe('TruffleCommands', () => {
 
         // Act and assert
         await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager));
-        assert.strictEqual(showQuickPickMock.calledOnce, true);
-        assert.strictEqual(showInputBoxMock.calledOnce, false);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, true);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true);
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
+        assert.strictEqual(
+          isHdWalletProviderRequired.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to EthereumNetwork should generate mnemonic and complete successfully', async () => {
@@ -406,22 +572,32 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.called, true);
-        assert.strictEqual(showQuickPickMock.callCount, 2);
-        assert.strictEqual(showInputBoxMock.called, true);
-        assert.strictEqual(showInputBoxMock.callCount, 3);
-        assert.strictEqual(getMnemonicMock.called, false);
-        assert.strictEqual(getAllMnemonicPathsMock.called, true);
-        assert.strictEqual(saveMnemonicPathMock.called, true);
-        assert.strictEqual(openTextDocumentMock.called, true);
-        assert.strictEqual(writeFileSyncMock.called, true);
-        assert.strictEqual(showTextDocumentMock.called, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.called, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true);
+        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
+        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
+        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
+        assert.strictEqual(showInputBoxMock.callCount, 3, 'showInputBox should be called tree times');
+        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
+        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
+        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
+        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
+        assert.strictEqual(
+          isHdWalletProviderRequired.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to EthereumNetwork should generate mnemonic and complete successfully with default params', async () => {
@@ -448,22 +624,32 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.called, true);
-        assert.strictEqual(showQuickPickMock.callCount, 2);
-        assert.strictEqual(showInputBoxMock.called, true);
-        assert.strictEqual(showInputBoxMock.callCount, 3);
-        assert.strictEqual(getMnemonicMock.called, false);
-        assert.strictEqual(getAllMnemonicPathsMock.called, true);
-        assert.strictEqual(saveMnemonicPathMock.called, true);
-        assert.strictEqual(openTextDocumentMock.called, true);
-        assert.strictEqual(writeFileSyncMock.called, true);
-        assert.strictEqual(showTextDocumentMock.called, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.called, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true);
+        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
+        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
+        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
+        assert.strictEqual(showInputBoxMock.callCount, 3, 'showInputBox should be called tree times');
+        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
+        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
+        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
+        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
+        assert.strictEqual(
+          isHdWalletProviderRequired.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to EthereumNetwork should complete successfully when user paste mnemonic', async () => {
@@ -491,22 +677,32 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.called, true);
-        assert.strictEqual(showQuickPickMock.callCount, 2);
-        assert.strictEqual(showInputBoxMock.called, true);
-        assert.strictEqual(showInputBoxMock.callCount, 4);
-        assert.strictEqual(getMnemonicMock.called, false);
-        assert.strictEqual(getAllMnemonicPathsMock.called, true);
-        assert.strictEqual(saveMnemonicPathMock.called, true);
-        assert.strictEqual(openTextDocumentMock.called, true);
-        assert.strictEqual(writeFileSyncMock.called, true);
-        assert.strictEqual(showTextDocumentMock.called, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.called, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true);
+        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
+        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
+        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
+        assert.strictEqual(showInputBoxMock.callCount, 4, 'showInputBox should be called four times');
+        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
+        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
+        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
+        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
+        assert.strictEqual(
+          isHdWalletProviderRequired.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to EthereumNetwork should complete successfully with default params when user paste mnemonic', async () => {
@@ -534,22 +730,32 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.called, true);
-        assert.strictEqual(showQuickPickMock.callCount, 2);
-        assert.strictEqual(showInputBoxMock.called, true);
-        assert.strictEqual(showInputBoxMock.callCount, 4);
-        assert.strictEqual(getMnemonicMock.called, false);
-        assert.strictEqual(getAllMnemonicPathsMock.called, true);
-        assert.strictEqual(saveMnemonicPathMock.called, true);
-        assert.strictEqual(openTextDocumentMock.called, true);
-        assert.strictEqual(writeFileSyncMock.called, true);
-        assert.strictEqual(showTextDocumentMock.called, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.called, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true);
+        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
+        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
+        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
+        assert.strictEqual(showInputBoxMock.callCount, 4, 'showInputBox should be called four times');
+        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
+        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
+        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
+        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
+        assert.strictEqual(
+          isHdWalletProviderRequired.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to EthereumTestnet should generate mnemonic and complete successfully', async () => {
@@ -575,22 +781,32 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.called, true);
-        assert.strictEqual(showQuickPickMock.callCount, 2);
-        assert.strictEqual(showInputBoxMock.called, true);
-        assert.strictEqual(showInputBoxMock.callCount, 2);
-        assert.strictEqual(getMnemonicMock.called, false);
-        assert.strictEqual(getAllMnemonicPathsMock.called, true);
-        assert.strictEqual(saveMnemonicPathMock.called, true);
-        assert.strictEqual(openTextDocumentMock.called, true);
-        assert.strictEqual(writeFileSyncMock.called, true);
-        assert.strictEqual(showTextDocumentMock.called, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.called, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true);
+        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
+        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
+        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
+        assert.strictEqual(showInputBoxMock.callCount, 2, 'showInputBox should be called twice');
+        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
+        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
+        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
+        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
+        assert.strictEqual(
+          isHdWalletProviderRequired.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to EthereumTestnet should generate mnemonic and complete successfully with default params', async () => {
@@ -616,22 +832,32 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.called, true);
-        assert.strictEqual(showQuickPickMock.callCount, 2);
-        assert.strictEqual(showInputBoxMock.called, true);
-        assert.strictEqual(showInputBoxMock.callCount, 2);
-        assert.strictEqual(getMnemonicMock.called, false);
-        assert.strictEqual(getAllMnemonicPathsMock.called, true);
-        assert.strictEqual(saveMnemonicPathMock.called, true);
-        assert.strictEqual(openTextDocumentMock.called, true);
-        assert.strictEqual(writeFileSyncMock.called, true);
-        assert.strictEqual(showTextDocumentMock.called, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.called, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true);
+        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
+        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
+        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
+        assert.strictEqual(showInputBoxMock.callCount, 2, 'showInputBox should be called twice');
+        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
+        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
+        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
+        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
+        assert.strictEqual(
+          isHdWalletProviderRequired.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to EthereumTestnet should complete successfully when user paste mnemonic', async () => {
@@ -658,22 +884,32 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.called, true);
-        assert.strictEqual(showQuickPickMock.callCount, 2);
-        assert.strictEqual(showInputBoxMock.called, true);
-        assert.strictEqual(showInputBoxMock.callCount, 3);
-        assert.strictEqual(getMnemonicMock.called, false);
-        assert.strictEqual(getAllMnemonicPathsMock.called, true);
-        assert.strictEqual(saveMnemonicPathMock.called, true);
-        assert.strictEqual(openTextDocumentMock.called, true);
-        assert.strictEqual(writeFileSyncMock.called, true);
-        assert.strictEqual(showTextDocumentMock.called, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.called, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true);
+        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
+        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
+        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
+        assert.strictEqual(showInputBoxMock.callCount, 3, 'showInputBox should be called tree times');
+        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
+        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
+        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
+        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
+        assert.strictEqual(
+          isHdWalletProviderRequired.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to EthereumTestnet should complete successfully with default params when user paste mnemonic', async () => {
@@ -700,22 +936,32 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.called, true);
-        assert.strictEqual(showQuickPickMock.callCount, 2);
-        assert.strictEqual(showInputBoxMock.called, true);
-        assert.strictEqual(showInputBoxMock.callCount, 3);
-        assert.strictEqual(getMnemonicMock.called, false);
-        assert.strictEqual(getAllMnemonicPathsMock.called, true);
-        assert.strictEqual(saveMnemonicPathMock.called, true);
-        assert.strictEqual(openTextDocumentMock.called, true);
-        assert.strictEqual(writeFileSyncMock.called, true);
-        assert.strictEqual(showTextDocumentMock.called, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.called, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true);
+        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
+        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
+        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
+        assert.strictEqual(showInputBoxMock.callCount, 3, 'showInputBox should be called tree times');
+        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
+        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
+        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
+        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
+        assert.strictEqual(
+          isHdWalletProviderRequired.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to AzureBlockchainService should generate mnemonic and complete successfully', async () => {
@@ -739,23 +985,33 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.called, true);
-        assert.strictEqual(showQuickPickMock.callCount, 2);
-        assert.strictEqual(getAccessKeysMock.called, true);
-        assert.strictEqual(showInputBoxMock.called, false);
-        assert.strictEqual(getMnemonicMock.called, false);
-        assert.strictEqual(getAllMnemonicPathsMock.called, true);
-        assert.strictEqual(saveMnemonicPathMock.called, true);
-        assert.strictEqual(openTextDocumentMock.called, true);
-        assert.strictEqual(writeFileSyncMock.called, true);
-        assert.strictEqual(showTextDocumentMock.called, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.called, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true);
-        assert.strictEqual(getExtensionMock.called, true);
+        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
+        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
+        assert.strictEqual(getAccessKeysMock.called, true, 'getAccessKeys should be called');
+        assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
+        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
+        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
+        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
+        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
+        assert.strictEqual(getExtensionMock.called, true, 'getExtension should be called');
+        assert.strictEqual(
+          isHdWalletProviderRequired.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
 
       it('to AzureBlockchainService should complete successfully when user paste mnemonic', async () => {
@@ -781,23 +1037,33 @@ describe('TruffleCommands', () => {
         await TruffleCommands.deployContracts(consortiumTreeManager);
 
         // Assert
-        assert.strictEqual(showQuickPickMock.called, true);
-        assert.strictEqual(showQuickPickMock.callCount, 2);
-        assert.strictEqual(getAccessKeysMock.called, true);
-        assert.strictEqual(showInputBoxMock.calledOnce, true);
-        assert.strictEqual(getMnemonicMock.called, false);
-        assert.strictEqual(getAllMnemonicPathsMock.called, true);
-        assert.strictEqual(saveMnemonicPathMock.called, true);
-        assert.strictEqual(openTextDocumentMock.called, true);
-        assert.strictEqual(writeFileSyncMock.called, true);
-        assert.strictEqual(showTextDocumentMock.called, true);
-        assert.strictEqual(checkAppsSilent.calledOnce, true);
-        assert.strictEqual(installTruffle.called, false);
-        assert.strictEqual(getWorkspaceRootMock.called, true);
-        assert.strictEqual(executeCommandMock.called, true);
-        assert.strictEqual(startGanacheServer.called, false);
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true);
-        assert.strictEqual(getExtensionMock.called, true);
+        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
+        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
+        assert.strictEqual(getAccessKeysMock.called, true, 'getAccessKeys should be called');
+        assert.strictEqual(showInputBoxMock.calledOnce, true, 'showInputBox should be called once');
+        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
+        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
+        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
+        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
+        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
+        assert.strictEqual(getExtensionMock.called, true, 'getExtension should be called');
+        assert.strictEqual(
+          isHdWalletProviderRequired.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called');
+        assert.strictEqual(
+          checkHdWalletProviderVersion.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called');
+        assert.strictEqual(
+          installTruffleHdWalletProvider.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called');
       });
     });
   });

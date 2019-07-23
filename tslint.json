@@ -35,7 +35,9 @@
       "single",
       "avoid-escape",
       "avoid-template"
-    ],
+    ]
+  },
+  "linterOptions": {
     "exclude": [
       "node_modules/**",
       "src/**/*.d.ts"

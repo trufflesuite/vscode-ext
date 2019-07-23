@@ -16,6 +16,7 @@ import {
 } from './Models';
 import { ConsortiumItem } from './Models/ConsortiumItem';
 import { ResourceExplorerAndGenerator } from './ResourceExplorerAndGenerator';
+import { Telemetry } from './TelemetryClient';
 import { AzureBlockchainServiceValidator } from './validators/AzureBlockchainServiceValidator';
 
 export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
@@ -39,7 +40,9 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
       .find((filter) => filter.subscription.subscriptionId === subscriptionId);
 
     if (!subscription) {
-      throw new Error(Constants.errorMessageStrings.NoSubscriptionFoundClick);
+      const error = new Error(Constants.errorMessageStrings.NoSubscriptionFoundClick);
+      Telemetry.sendException(error);
+      throw error;
     }
 
     const azureClient = await this.getAzureClient(
@@ -85,8 +88,10 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
       { placeHolder: Constants.placeholders.selectConsortium, ignoreFocusOut: true });
 
     if (pick instanceof ConsortiumItem) {
+      Telemetry.sendEvent('ConsortiumResourceExplorer.getOrCreateConsortiumItem.consortiumItemIsSelected');
       return this.getAzureConsortium(pick, subscriptionItem, resourceGroupItem);
     } else {
+      Telemetry.sendEvent('ConsortiumResourceExplorer.getOrCreateConsortiumItem.createConsortiumItemIsSelected');
       return this.createAzureConsortium(subscriptionItem, resourceGroupItem);
     }
   }
@@ -176,7 +181,7 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
 
     const consortiumName = await showInputBox({
       ignoreFocusOut: true,
-      prompt: Constants.paletteWestlakeLabels.enterConsortiumName,
+      prompt: Constants.paletteABSLabels.enterConsortiumName,
       validateInput: async (name) => {
         return await window.withProgress({
           location: ProgressLocation.Notification,
@@ -189,7 +194,7 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
 
     const memberName = await showInputBox({
       ignoreFocusOut: true,
-      prompt: Constants.paletteWestlakeLabels.enterConsortiumMemberName,
+      prompt: Constants.paletteABSLabels.enterMemberName,
       validateInput: async (name) => {
         return await window.withProgress({
           location: ProgressLocation.Notification,
@@ -203,32 +208,32 @@ export class ConsortiumResourceExplorer extends ResourceExplorerAndGenerator {
       [{ label: 'Quorum' }],
       {
         ignoreFocusOut: true,
-        placeHolder: Constants.paletteWestlakeLabels.selectConsortiumProtocol,
+        placeHolder: Constants.paletteABSLabels.selectConsortiumProtocol,
       },
     );
 
     const memberPassword = await showInputBox({
       ignoreFocusOut: true,
       password: true,
-      prompt: Constants.paletteWestlakeLabels.enterMemberPassword,
+      prompt: Constants.paletteABSLabels.enterMemberPassword,
       validateInput: AzureBlockchainServiceValidator.validateAccessPassword,
     });
 
     const consortiumPassword = await showInputBox({
       ignoreFocusOut: true,
       password: true,
-      prompt: Constants.paletteWestlakeLabels.enterConsortiumManagementPassword,
+      prompt: Constants.paletteABSLabels.enterConsortiumManagementPassword,
       validateInput: AzureBlockchainServiceValidator.validateAccessPassword,
     });
 
     const region = await showQuickPick(
       this.getLocationItems(subscriptionItem),
-      { placeHolder: Constants.paletteWestlakeLabels.selectConsortiumRegion, ignoreFocusOut: true },
+      { placeHolder: Constants.paletteABSLabels.selectConsortiumRegion, ignoreFocusOut: true },
     );
 
     const sku = await showQuickPick(
       this.getSkus(azureClient, region),
-      { placeHolder: Constants.paletteWestlakeLabels.selectConsortiumSku, ignoreFocusOut: true },
+      { placeHolder: Constants.paletteABSLabels.selectConsortiumSku, ignoreFocusOut: true },
     );
 
     const bodyParams: ICreateQuorumMember = {

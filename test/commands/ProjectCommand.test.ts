@@ -6,12 +6,12 @@ import * as fs from 'fs-extra';
 import rewire = require('rewire');
 import * as sinon from 'sinon';
 import * as vscode from 'vscode';
-import { Constants } from '../../src/Constants';
+import { Constants, RequiredApps } from '../../src/Constants';
 import * as helpers from '../../src/helpers';
 import { CancellationEvent } from '../../src/Models';
 import { Output } from '../../src/Output';
 
-describe('ProjectСommands', () => {
+describe('ProjectCommands', () => {
   describe('Unit tests', () => {
     let helpersMock: sinon.SinonMock;
     const projectPath = 'projectPath';
@@ -62,10 +62,10 @@ describe('ProjectСommands', () => {
         await projectCommandsRewire.ProjectCommands.newSolidityProject();
 
         // Assert
-        assert.strictEqual(checkRequiredAppsMock.calledOnce, true);
-        assert.strictEqual(showQuickPickMock.notCalled, true);
-        assert.strictEqual(chooseNewProjectDirMock.notCalled, true);
-        assert.strictEqual(gitInitMock.notCalled, true);
+        assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
+        assert.strictEqual(showQuickPickMock.notCalled, true, 'showQuickPick should not be called');
+        assert.strictEqual(chooseNewProjectDirMock.notCalled, true, 'chooseNewProjectDir should not be called');
+        assert.strictEqual(gitInitMock.notCalled, true, 'gitInit should not be called');
       });
 
       it('Method newSolidityProject provide type of new project, because we have all required apps.', async () => {
@@ -79,11 +79,11 @@ describe('ProjectСommands', () => {
         await projectCommandsRewire.ProjectCommands.newSolidityProject();
 
         // Assert
-        assert.strictEqual(checkRequiredAppsMock.calledOnce, true);
-        assert.strictEqual(showQuickPickMock.calledOnce, true);
-        assert.strictEqual(chooseNewProjectDirMock.calledOnce, true);
-        assert.strictEqual(gitInitMock.calledOnce, true);
-        assert.strictEqual(gitInitMock.args[0][0], projectPath);
+        assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
+        assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
+        assert.strictEqual(gitInitMock.args[0][0], projectPath, 'git init should be called with correct arguments');
       });
     });
 
@@ -128,13 +128,16 @@ describe('ProjectСommands', () => {
         const newProjectPath = await chooseNewProjectDir();
 
         // Assert
-        assert.strictEqual(showOpenFolderDialogMock.calledOnce, true);
-        assert.strictEqual(ensureDirMock.calledOnce, true);
-        assert.strictEqual(ensureDirMock.args[0][0], firstProjectPath);
-        assert.strictEqual(readdirMock.calledOnce, true);
-        assert.strictEqual(readdirMock.args[0][0], firstProjectPath);
-        assert.strictEqual(newProjectPath, firstProjectPath);
-        assert.strictEqual(showErrorMessageMock.notCalled, true);
+        assert.strictEqual(showOpenFolderDialogMock.calledOnce, true, 'showOpenFolderDialog should be called once');
+        assert.strictEqual(ensureDirMock.calledOnce, true, 'ensureDir should be called once');
+        assert.strictEqual(
+          ensureDirMock.args[0][0],
+          firstProjectPath,
+          'ensureDir should be called with correct arguments');
+        assert.strictEqual(readdirMock.calledOnce, true, 'readdir should be called once');
+        assert.strictEqual(readdirMock.args[0][0], firstProjectPath, 'readdir should be called with correct arguments');
+        assert.strictEqual(newProjectPath, firstProjectPath, 'newProjectPath should be equal to firstProjectPath');
+        assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not be called');
       });
 
       it('Method chooseNewProjectDir returns projectPath at second time, because we selected not empty dir ' +
@@ -153,15 +156,27 @@ describe('ProjectСommands', () => {
         const newProjectPath = await chooseNewProjectDir();
 
         // Assert
-        assert.strictEqual(showOpenFolderDialogMock.calledTwice, true);
-        assert.strictEqual(ensureDirMock.calledTwice, true);
-        assert.strictEqual(ensureDirMock.firstCall.args[0], firstProjectPath);
-        assert.strictEqual(ensureDirMock.secondCall.args[0], secondProjectPath);
-        assert.strictEqual(readdirMock.calledTwice, true);
-        assert.strictEqual(readdirMock.firstCall.args[0], firstProjectPath);
-        assert.strictEqual(readdirMock.secondCall.args[0], secondProjectPath);
-        assert.strictEqual(newProjectPath, secondProjectPath);
-        assert.strictEqual(showErrorMessageMock.calledOnce, true);
+        assert.strictEqual(showOpenFolderDialogMock.calledTwice, true, 'showOpenFolderDialog should be called twice');
+        assert.strictEqual(ensureDirMock.calledTwice, true, 'ensureDir should be called twice');
+        assert.strictEqual(
+          ensureDirMock.firstCall.args[0],
+          firstProjectPath,
+          'ensureDir should be called with correct arguments');
+        assert.strictEqual(
+          ensureDirMock.secondCall.args[0],
+          secondProjectPath,
+          'ensureDir should be called with correct arguments');
+        assert.strictEqual(readdirMock.calledTwice, true, 'readdir should be called once');
+        assert.strictEqual(
+          readdirMock.firstCall.args[0],
+          firstProjectPath,
+          'readdir should be called with correct arguments');
+        assert.strictEqual(
+          readdirMock.secondCall.args[0],
+          secondProjectPath,
+          'readdir should be called with correct arguments');
+        assert.strictEqual(newProjectPath, secondProjectPath, 'newProjectPath should be equal to secondProjectPath');
+        assert.strictEqual(showErrorMessageMock.calledOnce, true, 'showErrorMessage should be called once');
       });
 
       it('Method chooseNewProjectDir throws CancellationEvent, because user click on Cancel button', async () => {
@@ -178,12 +193,15 @@ describe('ProjectСommands', () => {
 
         // Assert
         await assert.rejects(action, CancellationEvent);
-        assert.strictEqual(showOpenFolderDialogMock.calledOnce, true);
-        assert.strictEqual(ensureDirMock.calledOnce, true);
-        assert.strictEqual(ensureDirMock.args[0][0], firstProjectPath);
-        assert.strictEqual(readdirMock.calledOnce, true);
-        assert.strictEqual(readdirMock.args[0][0], firstProjectPath);
-        assert.strictEqual(showErrorMessageMock.calledOnce, true);
+        assert.strictEqual(showOpenFolderDialogMock.calledOnce, true, 'showOpenFolderDialog should be called once');
+        assert.strictEqual(ensureDirMock.calledOnce, true, 'ensureDir should be called once');
+        assert.strictEqual(
+          ensureDirMock.args[0][0],
+          firstProjectPath,
+          'ensureDir should be called with correct arguments');
+        assert.strictEqual(readdirMock.calledOnce, true, 'readdir should be called once');
+        assert.strictEqual(readdirMock.args[0][0], firstProjectPath, 'readdir should be called with correct arguments');
+        assert.strictEqual(showErrorMessageMock.calledOnce, true, 'showErrorMessage should be called once');
       });
     });
 
@@ -209,7 +227,7 @@ describe('ProjectСommands', () => {
         await createNewEmptyProject(projectPath);
 
         // Assert
-        assert.strictEqual(withProgressMock.calledOnce, true);
+        assert.strictEqual(withProgressMock.calledOnce, true, 'withProgress should be called once');
       });
     });
 
@@ -226,10 +244,15 @@ describe('ProjectСommands', () => {
       await createProjectFromTruffleBox(projectPath);
 
       // Assert
-      assert.strictEqual(getTruffleBoxNameMock.calledOnce, true);
-      assert.strictEqual(createProjectMock.calledOnce, true);
-      assert.strictEqual(createProjectMock.args[0][0], projectPath);
-      assert.strictEqual(createProjectMock.args[0][1], truffleBoxName);
+      assert.strictEqual(getTruffleBoxNameMock.calledOnce, true, 'getTruffleBoxName should be called once');
+      assert.strictEqual(createProjectMock.calledOnce, true, 'createProject should be called once');
+      assert.strictEqual(createProjectMock.args[0][0],
+        projectPath,
+        'createProject should be called with correct arguments');
+      assert.strictEqual(
+        createProjectMock.args[0][1],
+        truffleBoxName,
+        'createProject should be called with correct arguments');
     });
 
     describe('createProject', () => {
@@ -271,18 +294,42 @@ describe('ProjectСommands', () => {
         await createProject(projectPath, truffleBoxName);
 
         // Assert
-        assert.strictEqual(showMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.args[0][0], projectPath);
-        assert.strictEqual(executeCommandMock.args[0][1], 'npx');
-        assert.strictEqual(executeCommandMock.args[0][2], Constants.truffleCommand);
-        assert.strictEqual(executeCommandMock.args[0][3], 'unbox');
-        assert.strictEqual(executeCommandMock.args[0][4], truffleBoxName);
-        assert.strictEqual(updateWorkspaceFoldersMock.calledOnce, true);
-        assert.strictEqual(updateWorkspaceFoldersMock.args[0][0], 0);
-        assert.strictEqual(updateWorkspaceFoldersMock.args[0][1], 1);
-        assert.strictEqual(updateWorkspaceFoldersMock.args[0][2].uri.path, `/${projectPath}`);
-        assert.strictEqual(emptyDirSyncMock.notCalled, true);
+        assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
+        assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
+        assert.strictEqual(
+          executeCommandMock.args[0][0],
+          projectPath,
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(
+          executeCommandMock.args[0][1],
+          'npx',
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(
+          executeCommandMock.args[0][2],
+          RequiredApps.truffle,
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(
+          executeCommandMock.args[0][3],
+          'unbox',
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(
+          executeCommandMock.args[0][4],
+          truffleBoxName,
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(updateWorkspaceFoldersMock.calledOnce, true, 'updateWorkspaceFolders should be called once');
+        assert.strictEqual(
+          updateWorkspaceFoldersMock.args[0][0],
+          0,
+          'updateWorkspaceFolders should be called with correct arguments');
+        assert.strictEqual(
+          updateWorkspaceFoldersMock.args[0][1],
+          1,
+          'updateWorkspaceFolders should be called with correct arguments');
+        assert.strictEqual(
+          updateWorkspaceFoldersMock.args[0][2].uri.path,
+          `/${projectPath}`,
+          'updateWorkspaceFolders should be called with correct arguments');
+        assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
       });
 
       it('Method createProject run command for create new project and project was created successfully. ' +
@@ -296,18 +343,42 @@ describe('ProjectСommands', () => {
         await createProject(projectPath, truffleBoxName);
 
         // Assert
-        assert.strictEqual(showMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.args[0][0], projectPath);
-        assert.strictEqual(executeCommandMock.args[0][1], 'npx');
-        assert.strictEqual(executeCommandMock.args[0][2], Constants.truffleCommand);
-        assert.strictEqual(executeCommandMock.args[0][3], 'unbox');
-        assert.strictEqual(executeCommandMock.args[0][4], truffleBoxName);
-        assert.strictEqual(updateWorkspaceFoldersMock.calledOnce, true);
-        assert.strictEqual(updateWorkspaceFoldersMock.args[0][0], 0);
-        assert.strictEqual(updateWorkspaceFoldersMock.args[0][1], null);
-        assert.strictEqual(updateWorkspaceFoldersMock.args[0][2].uri.path, `/${projectPath}`);
-        assert.strictEqual(emptyDirSyncMock.notCalled, true);
+        assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
+        assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
+        assert.strictEqual(
+          executeCommandMock.args[0][0],
+          projectPath,
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(
+          executeCommandMock.args[0][1],
+          'npx',
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(
+          executeCommandMock.args[0][2],
+          RequiredApps.truffle,
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(
+          executeCommandMock.args[0][3],
+          'unbox',
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(
+          executeCommandMock.args[0][4],
+          truffleBoxName,
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(updateWorkspaceFoldersMock.calledOnce, true, 'updateWorkspaceFolders should be called once');
+        assert.strictEqual(
+          updateWorkspaceFoldersMock.args[0][0],
+          0,
+          'updateWorkspaceFolders should be called with correct arguments');
+        assert.strictEqual(
+          updateWorkspaceFoldersMock.args[0][1],
+          null,
+          'updateWorkspaceFolders should be called with correct arguments');
+        assert.strictEqual(
+          updateWorkspaceFoldersMock.args[0][2].uri.path,
+          `/${projectPath}`,
+          'updateWorkspaceFolders should be called with correct arguments');
+        assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
       });
 
       it('Method createProject run command for create new project and creation was fell of project.', async () => {
@@ -326,16 +397,34 @@ describe('ProjectСommands', () => {
           action,
           Error,
           Constants.errorMessageStrings.NewProjectCreationFailed);
-        assert.strictEqual(showMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.calledOnce, true);
-        assert.strictEqual(executeCommandMock.args[0][0], projectPath);
-        assert.strictEqual(executeCommandMock.args[0][1], 'npx');
-        assert.strictEqual(executeCommandMock.args[0][2], Constants.truffleCommand);
-        assert.strictEqual(executeCommandMock.args[0][3], 'unbox');
-        assert.strictEqual(executeCommandMock.args[0][4], truffleBoxName);
-        assert.strictEqual(updateWorkspaceFoldersMock.notCalled, true);
-        assert.strictEqual(emptyDirSyncMock.calledOnce, true);
-        assert.strictEqual(emptyDirSyncMock.args[0][0], projectPath);
+        assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
+        assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
+        assert.strictEqual(
+          executeCommandMock.args[0][0],
+          projectPath,
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(
+          executeCommandMock.args[0][1],
+          'npx',
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(
+          executeCommandMock.args[0][2],
+          RequiredApps.truffle,
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(
+          executeCommandMock.args[0][3],
+          'unbox',
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(
+          executeCommandMock.args[0][4],
+          truffleBoxName,
+          'executeCommand should be called with correct arguments');
+        assert.strictEqual(updateWorkspaceFoldersMock.notCalled, true, 'updateWorkspaceFolders should not be called');
+        assert.strictEqual(emptyDirSyncMock.calledOnce, true, 'emptyDirSync should be called once');
+        assert.strictEqual(
+          emptyDirSyncMock.args[0][0],
+          projectPath,
+          'emptyDirSync should be called with correct arguments');
       });
     });
 
@@ -352,8 +441,8 @@ describe('ProjectСommands', () => {
       const result = await getTruffleBoxName();
 
       // Assert
-      assert.strictEqual(result, testName);
-      assert.strictEqual(showInputBoxMock.calledOnce, true);
+      assert.strictEqual(result, testName, 'result should be equal to expected string');
+      assert.strictEqual(showInputBoxMock.calledOnce, true, 'showInputBox should be called once');
     });
   });
 
@@ -448,18 +537,30 @@ describe('ProjectСommands', () => {
       await projectCommandsRewire.ProjectCommands.newSolidityProject();
 
       // Assert
-      assert.strictEqual(checkRequiredAppsMock.calledOnce, true);
-      assert.strictEqual(showQuickPickMock.calledOnce, true);
-      assert.strictEqual(gitInitMock.calledOnce, true);
-      assert.strictEqual(gitInitMock.args[0][0], secondProjectPath);
-      assert.strictEqual(showOpenFolderDialogMock.calledTwice, true);
-      assert.strictEqual(ensureDirMock.calledTwice, true);
-      assert.strictEqual(ensureDirMock.firstCall.args[0], firstProjectPath);
-      assert.strictEqual(ensureDirMock.secondCall.args[0], secondProjectPath);
-      assert.strictEqual(readdirMock.calledTwice, true);
-      assert.strictEqual(readdirMock.firstCall.args[0], firstProjectPath);
-      assert.strictEqual(readdirMock.secondCall.args[0], secondProjectPath);
-      assert.strictEqual(showErrorMessageMock.calledOnce, true);
+      assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
+      assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+      assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
+      assert.strictEqual(gitInitMock.args[0][0], secondProjectPath, 'gitInit should be called with correct arguments');
+      assert.strictEqual(showOpenFolderDialogMock.calledTwice, true, 'showOpenFolderDialog should be called twice');
+      assert.strictEqual(ensureDirMock.calledTwice, true, 'ensureDir should be called twice');
+      assert.strictEqual(
+        ensureDirMock.firstCall.args[0],
+        firstProjectPath,
+        'ensureDir should be called with correct arguments');
+      assert.strictEqual(
+        ensureDirMock.secondCall.args[0],
+        secondProjectPath,
+        'ensureDir should be called with correct arguments');
+      assert.strictEqual(readdirMock.calledTwice, true, 'readdir should be called once');
+      assert.strictEqual(
+        readdirMock.firstCall.args[0],
+        firstProjectPath,
+        'readdir should be called with correct arguments');
+      assert.strictEqual(
+        readdirMock.secondCall.args[0],
+        secondProjectPath,
+        'readdir should be called with correct arguments');
+      assert.strictEqual(showErrorMessageMock.calledOnce, true, 'showErrorMessage should be called once');
     });
 
     it('Method chooseNewProjectDir returns projectPath which we selected at first time.', async () => {
@@ -477,16 +578,19 @@ describe('ProjectСommands', () => {
       await projectCommandsRewire.ProjectCommands.newSolidityProject();
 
       // Assert
-      assert.strictEqual(checkRequiredAppsMock.calledOnce, true);
-      assert.strictEqual(showQuickPickMock.calledOnce, true);
-      assert.strictEqual(gitInitMock.calledOnce, true);
-      assert.strictEqual(gitInitMock.args[0][0], firstProjectPath);
-      assert.strictEqual(showOpenFolderDialogMock.calledOnce, true);
-      assert.strictEqual(ensureDirMock.calledOnce, true);
-      assert.strictEqual(ensureDirMock.args[0][0], firstProjectPath);
-      assert.strictEqual(readdirMock.calledOnce, true);
-      assert.strictEqual(readdirMock.args[0][0], firstProjectPath);
-      assert.strictEqual(showErrorMessageMock.notCalled, true);
+      assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
+      assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+      assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
+      assert.strictEqual(gitInitMock.args[0][0], firstProjectPath, 'gitInit should be called with correct arguments');
+      assert.strictEqual(showOpenFolderDialogMock.calledOnce, true, 'showOpenFolderDialog should be called once');
+      assert.strictEqual(ensureDirMock.calledOnce, true, 'ensureDir should be called once');
+      assert.strictEqual(
+        ensureDirMock.args[0][0],
+        firstProjectPath,
+        'ensureDir should be called with correct arguments');
+      assert.strictEqual(readdirMock.calledOnce, true, 'readdir should be called once');
+      assert.strictEqual(readdirMock.args[0][0], firstProjectPath, 'readdir should be called with correct arguments');
+      assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not be called');
     });
 
     it('Method createNewEmptyProject runs method createProject, and new empty project was created successfully.',
@@ -509,28 +613,55 @@ describe('ProjectСommands', () => {
       await projectCommandsRewire.ProjectCommands.newSolidityProject();
 
       // Assert
-      assert.strictEqual(checkRequiredAppsMock.calledOnce, true);
-      assert.strictEqual(showQuickPickMock.calledOnce, true);
-      assert.strictEqual(gitInitMock.calledOnce, true);
-      assert.strictEqual(gitInitMock.args[0][0], firstProjectPath);
-      assert.strictEqual(showOpenFolderDialogMock.calledOnce, true);
-      assert.strictEqual(ensureDirMock.calledOnce, true);
-      assert.strictEqual(ensureDirMock.args[0][0], firstProjectPath);
-      assert.strictEqual(readdirMock.calledOnce, true);
-      assert.strictEqual(readdirMock.args[0][0], firstProjectPath);
-      assert.strictEqual(showErrorMessageMock.notCalled, true);
-      assert.strictEqual(showMock.calledOnce, true);
-      assert.strictEqual(executeCommandMock.calledOnce, true);
-      assert.strictEqual(executeCommandMock.args[0][0], firstProjectPath);
-      assert.strictEqual(executeCommandMock.args[0][1], 'npx');
-      assert.strictEqual(executeCommandMock.args[0][2], Constants.truffleCommand);
-      assert.strictEqual(executeCommandMock.args[0][3], 'unbox');
-      assert.strictEqual(executeCommandMock.args[0][4], Constants.defaultTruffleBox);
-      assert.strictEqual(updateWorkspaceFoldersMock.calledOnce, true);
-      assert.strictEqual(updateWorkspaceFoldersMock.args[0][0], 0);
-      assert.strictEqual(updateWorkspaceFoldersMock.args[0][1], 1);
-      assert.strictEqual(updateWorkspaceFoldersMock.args[0][2].uri.path, `/${firstProjectPath}`);
-      assert.strictEqual(emptyDirSyncMock.notCalled, true);
+      assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
+      assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+      assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
+      assert.strictEqual(gitInitMock.args[0][0], firstProjectPath, 'gitInit should be called with correct arguments');
+      assert.strictEqual(showOpenFolderDialogMock.calledOnce, true, 'showOpenFolderDialog should be called once');
+      assert.strictEqual(ensureDirMock.calledOnce, true, 'ensureDir should be called once');
+      assert.strictEqual(
+        ensureDirMock.args[0][0],
+        firstProjectPath,
+        'ensureDir should be called with correct arguments');
+      assert.strictEqual(readdirMock.calledOnce, true, 'readdir should be called once');
+      assert.strictEqual(readdirMock.args[0][0], firstProjectPath, 'readdir should be called with correct arguments');
+      assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not be called');
+      assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
+      assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
+      assert.strictEqual(
+        executeCommandMock.args[0][0],
+        firstProjectPath,
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][1],
+        'npx',
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][2],
+        RequiredApps.truffle,
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][3],
+        'unbox',
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][4],
+        Constants.defaultTruffleBox,
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(updateWorkspaceFoldersMock.calledOnce, true, 'updateWorkspaceFolders should be called once');
+      assert.strictEqual(
+        updateWorkspaceFoldersMock.args[0][0],
+        0,
+        'updateWorkspaceFolders should be called with correct arguments');
+      assert.strictEqual(
+        updateWorkspaceFoldersMock.args[0][1],
+        1,
+        'updateWorkspaceFolders should be called with correct arguments');
+      assert.strictEqual(
+        updateWorkspaceFoldersMock.args[0][2].uri.path,
+        `/${firstProjectPath}`,
+        'updateWorkspaceFolders should be called with correct arguments');
+      assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
     });
 
     it('Method createNewEmptyProject runs method createProject, and method createProject throws error.',
@@ -558,25 +689,46 @@ describe('ProjectСommands', () => {
         action,
         Error,
         Constants.errorMessageStrings.NewProjectCreationFailed);
-      assert.strictEqual(checkRequiredAppsMock.calledOnce, true);
-      assert.strictEqual(showQuickPickMock.calledOnce, true);
-      assert.strictEqual(gitInitMock.notCalled, true);
-      assert.strictEqual(showOpenFolderDialogMock.calledOnce, true);
-      assert.strictEqual(ensureDirMock.calledOnce, true);
-      assert.strictEqual(ensureDirMock.args[0][0], firstProjectPath);
-      assert.strictEqual(readdirMock.calledOnce, true);
-      assert.strictEqual(readdirMock.args[0][0], firstProjectPath);
-      assert.strictEqual(showErrorMessageMock.notCalled, true);
-      assert.strictEqual(showMock.calledOnce, true);
-      assert.strictEqual(executeCommandMock.calledOnce, true);
-      assert.strictEqual(executeCommandMock.args[0][0], firstProjectPath);
-      assert.strictEqual(executeCommandMock.args[0][1], 'npx');
-      assert.strictEqual(executeCommandMock.args[0][2], Constants.truffleCommand);
-      assert.strictEqual(executeCommandMock.args[0][3], 'unbox');
-      assert.strictEqual(executeCommandMock.args[0][4], Constants.defaultTruffleBox);
-      assert.strictEqual(updateWorkspaceFoldersMock.notCalled, true);
-      assert.strictEqual(emptyDirSyncMock.calledOnce, true);
-      assert.strictEqual(emptyDirSyncMock.args[0][0], firstProjectPath);
+      assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
+      assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+      assert.strictEqual(gitInitMock.notCalled, true, 'gitInit should not be called');
+      assert.strictEqual(showOpenFolderDialogMock.calledOnce, true, 'showOpenFolderDialog should be called once');
+      assert.strictEqual(ensureDirMock.calledOnce, true, 'ensureDir should be called once');
+      assert.strictEqual(
+        ensureDirMock.args[0][0],
+        firstProjectPath,
+        'ensureDir should be called with correct arguments');
+      assert.strictEqual(readdirMock.calledOnce, true, 'readdir should be called once');
+      assert.strictEqual(readdirMock.args[0][0], firstProjectPath, 'readdir should be called with correct arguments');
+      assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not be called');
+      assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
+      assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
+      assert.strictEqual(
+        executeCommandMock.args[0][0],
+        firstProjectPath,
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][1],
+        'npx',
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][2],
+        RequiredApps.truffle,
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][3],
+        'unbox',
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][4],
+        Constants.defaultTruffleBox,
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(updateWorkspaceFoldersMock.notCalled, true, 'updateWorkspaceFolders should not be called');
+      assert.strictEqual(emptyDirSyncMock.calledOnce, true, 'emptyDirSync should be called once');
+      assert.strictEqual(
+        emptyDirSyncMock.args[0][0],
+        firstProjectPath,
+        'emptyDirSync should be called with correct arguments');
     });
 
     it('Method createProjectFromTruffleBox get truffleBoxName and create new project with this name.',
@@ -601,29 +753,56 @@ describe('ProjectСommands', () => {
       await projectCommandsRewire.ProjectCommands.newSolidityProject();
 
       // Assert
-      assert.strictEqual(checkRequiredAppsMock.calledOnce, true);
-      assert.strictEqual(showQuickPickMock.calledOnce, true);
-      assert.strictEqual(gitInitMock.calledOnce, true);
-      assert.strictEqual(getTruffleBoxNameMock.calledOnce, true);
+      assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
+      assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+      assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
+      assert.strictEqual(getTruffleBoxNameMock.calledOnce, true, 'getTruffleBoxName should be called once');
       assert.strictEqual(gitInitMock.args[0][0], firstProjectPath);
-      assert.strictEqual(showOpenFolderDialogMock.calledOnce, true);
-      assert.strictEqual(ensureDirMock.calledOnce, true);
-      assert.strictEqual(ensureDirMock.args[0][0], firstProjectPath);
-      assert.strictEqual(readdirMock.calledOnce, true);
-      assert.strictEqual(readdirMock.args[0][0], firstProjectPath);
-      assert.strictEqual(showErrorMessageMock.notCalled, true);
-      assert.strictEqual(showMock.calledOnce, true);
-      assert.strictEqual(executeCommandMock.calledOnce, true);
-      assert.strictEqual(executeCommandMock.args[0][0], firstProjectPath);
-      assert.strictEqual(executeCommandMock.args[0][1], 'npx');
-      assert.strictEqual(executeCommandMock.args[0][2], Constants.truffleCommand);
-      assert.strictEqual(executeCommandMock.args[0][3], 'unbox');
-      assert.strictEqual(executeCommandMock.args[0][4], truffleBoxName);
-      assert.strictEqual(updateWorkspaceFoldersMock.calledOnce, true);
-      assert.strictEqual(updateWorkspaceFoldersMock.args[0][0], 0);
-      assert.strictEqual(updateWorkspaceFoldersMock.args[0][1], 1);
-      assert.strictEqual(updateWorkspaceFoldersMock.args[0][2].uri.path, `/${firstProjectPath}`);
-      assert.strictEqual(emptyDirSyncMock.notCalled, true);
+      assert.strictEqual(showOpenFolderDialogMock.calledOnce, true, 'showOpenFolderDialog should be called once');
+      assert.strictEqual(ensureDirMock.calledOnce, true, 'ensureDir should be called once');
+      assert.strictEqual(
+        ensureDirMock.args[0][0],
+        firstProjectPath,
+        'ensureDir should be called with correct arguments');
+      assert.strictEqual(readdirMock.calledOnce, true, 'readdir should be called once');
+      assert.strictEqual(readdirMock.args[0][0], firstProjectPath, 'readdir should be called with correct arguments');
+      assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not be called');
+      assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
+      assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
+      assert.strictEqual(
+        executeCommandMock.args[0][0],
+        firstProjectPath,
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][1],
+        'npx',
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][2],
+        RequiredApps.truffle,
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][3],
+        'unbox',
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][4],
+        truffleBoxName,
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(updateWorkspaceFoldersMock.calledOnce, true, 'updateWorkspaceFolders should be called once');
+      assert.strictEqual(
+        updateWorkspaceFoldersMock.args[0][0],
+        0,
+        'updateWorkspaceFolders should be called with correct arguments');
+      assert.strictEqual(
+        updateWorkspaceFoldersMock.args[0][1],
+        1,
+        'updateWorkspaceFolders should be called with correct arguments');
+      assert.strictEqual(
+        updateWorkspaceFoldersMock.args[0][2].uri.path,
+        `/${firstProjectPath}`,
+        'updateWorkspaceFolders should be called with correct arguments');
+      assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
     });
 
     it('Method createProjectFromTruffleBox get truffleBoxName and create new project with this name. ' +
@@ -653,26 +832,47 @@ describe('ProjectСommands', () => {
         action,
         Error,
         Constants.errorMessageStrings.NewProjectCreationFailed);
-      assert.strictEqual(checkRequiredAppsMock.calledOnce, true);
-      assert.strictEqual(showQuickPickMock.calledOnce, true);
-      assert.strictEqual(gitInitMock.notCalled, true);
-      assert.strictEqual(getTruffleBoxNameMock.calledOnce, true);
-      assert.strictEqual(showOpenFolderDialogMock.calledOnce, true);
-      assert.strictEqual(ensureDirMock.calledOnce, true);
-      assert.strictEqual(ensureDirMock.args[0][0], firstProjectPath);
-      assert.strictEqual(readdirMock.calledOnce, true);
-      assert.strictEqual(readdirMock.args[0][0], firstProjectPath);
-      assert.strictEqual(showErrorMessageMock.notCalled, true);
-      assert.strictEqual(showMock.calledOnce, true);
-      assert.strictEqual(executeCommandMock.calledOnce, true);
-      assert.strictEqual(executeCommandMock.args[0][0], firstProjectPath);
-      assert.strictEqual(executeCommandMock.args[0][1], 'npx');
-      assert.strictEqual(executeCommandMock.args[0][2], Constants.truffleCommand);
-      assert.strictEqual(executeCommandMock.args[0][3], 'unbox');
-      assert.strictEqual(executeCommandMock.args[0][4], truffleBoxName);
-      assert.strictEqual(updateWorkspaceFoldersMock.notCalled, true);
-      assert.strictEqual(emptyDirSyncMock.calledOnce, true);
-      assert.strictEqual(emptyDirSyncMock.args[0][0], firstProjectPath);
+      assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
+      assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+      assert.strictEqual(gitInitMock.notCalled, true, 'gitInit should not be called');
+      assert.strictEqual(getTruffleBoxNameMock.calledOnce, true, 'getTruffleBoxName should be called once');
+      assert.strictEqual(showOpenFolderDialogMock.calledOnce, true, 'showOpenFolderDialog should be called once');
+      assert.strictEqual(ensureDirMock.calledOnce, true, 'ensureDir should be called once');
+      assert.strictEqual(
+        ensureDirMock.args[0][0],
+        firstProjectPath,
+        'ensureDir should be called with correct arguments');
+      assert.strictEqual(readdirMock.calledOnce, true, 'readdir should be called once');
+      assert.strictEqual(readdirMock.args[0][0], firstProjectPath, 'readdir should be called with correct arguments');
+      assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not be called');
+      assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
+      assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
+      assert.strictEqual(
+        executeCommandMock.args[0][0],
+        firstProjectPath,
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][1],
+        'npx',
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][2],
+        RequiredApps.truffle,
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][3],
+        'unbox',
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(
+        executeCommandMock.args[0][4],
+        truffleBoxName,
+        'executeCommand should be called with correct arguments');
+      assert.strictEqual(updateWorkspaceFoldersMock.notCalled, true, 'updateWorkspaceFolders should not be called');
+      assert.strictEqual(emptyDirSyncMock.calledOnce, true, 'emptyDirSync should be called once');
+      assert.strictEqual(
+        emptyDirSyncMock.args[0][0],
+        firstProjectPath,
+        'emptyDirSync should be called with correct arguments');
     });
   });
 });

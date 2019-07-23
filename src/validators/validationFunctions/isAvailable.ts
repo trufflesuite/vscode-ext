@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import { Constants } from '../../Constants';
 import { IRule } from '../validator';
 
 export class IsAvailable implements IRule {
@@ -14,18 +15,14 @@ export class IsAvailable implements IRule {
   ) {}
 
   public async validate(name: string): Promise<string | null> {
-    let nameAvailable: boolean;
-    let message: string = '';
-
-    if (this.errorMessage) {
-      nameAvailable = !await this.checkAvailable(name) as boolean;
-    } else {
-      const response = await this.checkAvailable(name) as { message: string, nameAvailable: boolean };
-
-      nameAvailable = response.nameAvailable;
-      message = response.message;
+    if (!!name) {
+      const response
+        = await this.checkAvailable(name) as { message: string, nameAvailable: boolean, reason: string };
+      if (response && !response.nameAvailable && response.reason === Constants.responseReason.alreadyExists) {
+        return (this.errorMessage && this.errorMessage(name)) || response.message;
+      }
     }
 
-    return nameAvailable ? null : (this.errorMessage && this.errorMessage(name)) || message;
+    return null;
   }
 }

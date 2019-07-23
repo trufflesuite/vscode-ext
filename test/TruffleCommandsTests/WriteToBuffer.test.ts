@@ -26,7 +26,10 @@ describe('TruffleCommands', () => {
         await TruffleCommands.writeBytecodeToBuffer(fileUri);
 
         // Assert
-        assert.strictEqual(await vscode.env.clipboard.readText(), testBytecode);
+        assert.strictEqual(
+          await vscode.env.clipboard.readText(),
+          testBytecode,
+          'clipboard should store correct bytecode');
       });
 
       it('writeAbiToBuffer should write correct aby to clipboard', async () => {
@@ -37,7 +40,10 @@ describe('TruffleCommands', () => {
         await TruffleCommands.writeAbiToBuffer(fileUri);
 
         // Assert
-        assert.strictEqual(await vscode.env.clipboard.readText(), testAbi);
+        assert.strictEqual(
+          await vscode.env.clipboard.readText(),
+          testAbi,
+          'clipboard should store correct aby');
       });
     });
 

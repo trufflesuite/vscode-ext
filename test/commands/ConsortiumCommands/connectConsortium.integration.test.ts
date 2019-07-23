@@ -49,7 +49,7 @@ describe('Consortium Commands', () => {
 
   describe('Integration tests', () => {
     let consortiumCommandsRewire: any;
-    let consortiumTreeManager: { __proto__: any; ConsortiumTreeManager: { new(): void; prototype: any; }; };
+    let consortiumTreeManager: { __proto__: any; ConsortiumTreeManager: { prototype: any; new(): void; }; };
 
     before(() => {
       consortiumTreeManager = require('../../../src/treeService/ConsortiumTreeManager');
@@ -65,10 +65,10 @@ describe('Consortium Commands', () => {
       const defaultConsortiumUrl = 'http://127.0.0.1:2345';
       let selectedDestination: any;
       let getItemStub: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], {}>;
-      let addChildStub: sinon.SinonStub<any[], any>;
+      let addChildStub: sinon.SinonStub<any, any>;
       let showQuickPickMock: sinon.SinonStub<any[], any>;
       let showInputBoxMock: sinon.SinonExpectation;
-      let selectOrCreateConsortiumMock: sinon.SinonStub<any[], any>;
+      let selectOrCreateConsortiumMock: any;
       let startGanacheCmdStub: any;
 
       beforeEach(() => {
@@ -83,7 +83,7 @@ describe('Consortium Commands', () => {
             const network = new Network(defaultNetworkName, args[0]);
             addChildStub = sinon.stub(network, 'addChild');
             return network;
-        });
+          });
 
         selectOrCreateConsortiumMock = sinon.stub(ConsortiumResourceExplorer.prototype,
           'selectOrCreateConsortium').returns(Promise.resolve(
@@ -101,11 +101,15 @@ describe('Consortium Commands', () => {
       });
 
       function assertAfterEachTest(result: Consortium, itemType: number, contextValue: string, labelName: string) {
-        assert.strictEqual(selectedDestination.cmd.calledOnce, true);
-        assert.strictEqual(addChildStub.calledOnce, true);
-        assert.strictEqual(result.itemType, itemType);
-        assert.strictEqual(result.contextValue, contextValue);
-        assert.strictEqual(result.label, labelName);
+        assert.strictEqual(
+          selectedDestination.cmd.calledOnce,
+          true,
+          'selectedDestination command should be called once',
+        );
+        assert.strictEqual(addChildStub.calledOnce, true, 'addChild should be called once');
+        assert.strictEqual(result.itemType, itemType, 'returned result should store correct itemType');
+        assert.strictEqual(result.contextValue, contextValue, 'returned result should store correct contextValue');
+        assert.strictEqual(result.label, labelName, 'returned result should store correct label');
       }
 
       it('for Local Network destination.', async () => {
@@ -132,9 +136,9 @@ describe('Consortium Commands', () => {
 
         // Assert
         assertAfterEachTest(result, ItemType.LOCAL_CONSORTIUM, Constants.contextValue.localConsortium, defaultLabel);
-        assert.strictEqual(startGanacheCmdStub.calledOnce, true);
-        assert.strictEqual(result.urls[0].origin, defaultUrl);
-        assert.notStrictEqual(validationMessage, undefined);
+        assert.strictEqual(startGanacheCmdStub.calledOnce, true, 'startGanache command should called once');
+        assert.strictEqual(result.urls[0].origin, defaultUrl, 'returned result should store correct url');
+        assert.notStrictEqual(validationMessage, undefined, 'validationMessage should not be undefined');
       }).timeout(10000);
 
       it('for Azure Blockchain Network destination.', async () => {
@@ -157,8 +161,11 @@ describe('Consortium Commands', () => {
         // Assert
         assertAfterEachTest(
           result, ItemType.AZURE_CONSORTIUM, Constants.contextValue.consortium, defaultConsortiumName);
-        assert.strictEqual(startGanacheCmdStub.notCalled, true);
-        assert.strictEqual(selectOrCreateConsortiumMock.calledOnce, true);
+        assert.strictEqual(startGanacheCmdStub.notCalled, true, 'startGanache command should not be called');
+        assert.strictEqual(
+          selectOrCreateConsortiumMock.calledOnce,
+          true,
+          'selectOrCreateConsortium should be called once');
 
         getExtensionMock.restore();
       }).timeout(10000);
@@ -193,10 +200,16 @@ describe('Consortium Commands', () => {
         // Assert
         assertAfterEachTest(
           result, ItemType.ETHEREUM_TEST_CONSORTIUM, Constants.contextValue.consortium, defaultConsortiumName);
-        assert.strictEqual(startGanacheCmdStub.notCalled, true);
-        assert.strictEqual(result.urls[0].origin, defaultConsortiumUrl);
-        assert.strictEqual(validationMessageConsortiumName, undefined);
-        assert.strictEqual(validationMessageConsortiumUrl, null);
+        assert.strictEqual(startGanacheCmdStub.notCalled, true, 'startGanache command should not be called');
+        assert.strictEqual(result.urls[0].origin, defaultConsortiumUrl, 'returned result should store correct url');
+        assert.strictEqual(
+          validationMessageConsortiumName,
+          undefined,
+          'validationMessage for ConsortiumName should be undefined');
+        assert.strictEqual(
+          validationMessageConsortiumUrl,
+          null,
+          'validationMessage for ConsortiumUrl should be null');
       }).timeout(10000);
 
       it('for Ethereum Main Network destination.', async () => {
@@ -229,10 +242,16 @@ describe('Consortium Commands', () => {
         // Assert
         assertAfterEachTest(
           result, ItemType.ETHEREUM_MAIN_CONSORTIUM, Constants.contextValue.consortium, defaultConsortiumName);
-        assert.strictEqual(startGanacheCmdStub.notCalled, true);
-        assert.strictEqual(result.urls[0].origin, defaultConsortiumUrl);
-        assert.strictEqual(validationMessageConsortiumName, undefined);
-        assert.strictEqual(validationMessageConsortiumUrl, null);
+        assert.strictEqual(startGanacheCmdStub.notCalled, true, 'startGanache command should not be called');
+        assert.strictEqual(result.urls[0].origin, defaultConsortiumUrl, 'returned result should store correct url');
+        assert.strictEqual(
+          validationMessageConsortiumName,
+          undefined,
+          'validationMessage for ConsortiumName should be undefined');
+        assert.strictEqual(
+          validationMessageConsortiumUrl,
+          null,
+          'validationMessage for ConsortiumUrl should be null');
       }).timeout(10000);
     });
   });

@@ -3,18 +3,28 @@
 
 import * as os from 'os';
 import * as path from 'path';
-import { ExtensionContext } from 'vscode';
+import { ExtensionContext, extensions } from 'vscode';
+
+const extensionId = 'AzBlockchain.azure-blockchain';
+const packageJSON = extensions.getExtension(extensionId)!.packageJSON;
+
+export enum RequiredApps {
+  node = 'node',
+  npm = 'npm',
+  git = 'git',
+  python = 'python',
+  truffle = 'truffle',
+  ganache = 'ganache-cli',
+  hdwalletProvider = 'truffle-hdwallet-provider',
+}
 
 export class Constants {
   public static extensionContext: ExtensionContext;
   public static temporaryDirectory = '';
-  public static logicAppOutputDir = 'generatedLogicApp';
-  public static flowAppOutputDir = 'generatedFlowApp';
-  public static azureFunctionOutputDir = 'generatedAzureFunction';
 
-  public static extensionId = '';
-  public static extensionVersion = '';
-  public static extensionKey = '';
+  public static extensionName = packageJSON.name;
+  public static extensionVersion = packageJSON.version;
+  public static extensionKey = packageJSON.aiKey;
 
   public static outputChannel = {
     azureBlockchain: 'Azure Blockchain',
@@ -27,12 +37,7 @@ export class Constants {
     telemetryClient: 'Telemetry Client',
   };
 
-  public static showOnStartupWelcomePage = 'showOnStartupWelcomePage';
-  public static showOnStartupRequirementsPage = 'showOnStartupRequirementsPage';
-
   public static defaultTruffleBox = 'Azure-Samples/Blockchain-Ethereum-Template';
-  public static tempPath = 'tempPath';
-  public static defaultCounter = 10;
   public static defaultDebounceTimeout = 300;
 
   public static localhost = '127.0.0.1';
@@ -43,27 +48,58 @@ export class Constants {
   public static ganacheRetryTimeout = 2000; // milliseconds
   public static ganacheRetryAttempts = 5;
 
-  public static requiredVersions: {[key: string]: string | { min: string, max: string }} = {
-    ganache: {
+  public static minPasswordLength = 12;
+  public static maxPasswordLength = 72;
+  public static minResourceGroupLength = 1;
+  public static maxResourceGroupLength = 90;
+  public static minConsortiumAndMemberLength = 2;
+  public static maxConsortiumAndMemberLength = 20;
+
+  public static requiredVersions: { [key: string]: string | { min: string, max: string } } = {
+    [RequiredApps.ganache]: {
       max: '7.0.0',
       min: '6.0.0',
     },
-    git: '2.10.0',
-    node: '10.15.0',
-    npm: '6.4.1',
-    python: {
+    [RequiredApps.git]: '2.10.0',
+    [RequiredApps.hdwalletProvider]: {
+      max: '1.0.7',
+      min: '1.0.6',
+    },
+    [RequiredApps.node]: '10.15.0',
+    [RequiredApps.npm]: '6.4.1',
+    [RequiredApps.python]: {
       max: '3.0.0',
       min: '2.7.15',
     },
-    truffle: {
+    [RequiredApps.truffle]: {
       max: '6.0.0',
       min: '5.0.0',
     },
   };
 
+  public static telemetryEvents = {
+    extensionActivated: 'Extension.Activated',
+    failedToCheckRequiredApps: 'Requirements.FailedToCheckRequiredApps',
+    webPages: {
+      action: 'WebPages.action',
+      disposeWebPage: 'WebPages.DisposeWebPage',
+      showWebPage: 'WebPages.ShowWebPage',
+    },
+  };
+
   public static webViewPages = {
-    requirements: 'Azure Blockchain Development Kit - Preview',
-    welcome: 'Welcome to Azure Blockchain',
+    requirements: {
+      path: '',
+      showOnStartup: 'showOnStartupRequirementsPage',
+      title: 'Azure Blockchain Development Kit - Preview',
+      viewType: 'requirementsPage',
+    },
+    welcome: {
+      path: '',
+      showOnStartup: 'showOnStartupWelcomePage',
+      title: 'Welcome to Azure Blockchain',
+      viewType: 'welcomePage',
+    },
   };
 
   public static contractExtension = {
@@ -84,8 +120,8 @@ export class Constants {
   };
 
   public static propertyLabels = {
-    gasLimit : 'gas limit',
-    gasPrice : 'gas price',
+    gasLimit: 'gas limit',
+    gasPrice: 'gas price',
   };
 
   public static confirmationDialogResult = {
@@ -112,15 +148,16 @@ export class Constants {
     testnet: 'Ethereum Testnet',
   };
 
-  public static paletteWestlakeLabels = {
+  public static paletteABSLabels = {
+    enterABSUrl: 'Enter Azure Blockchain Service url',
     enterAccessKey: 'Enter access key',
     enterAccountPassword: 'Enter accounts password',
     enterAccountsNumber: 'Enter accounts number',
     enterConsortiumManagementPassword: 'Enter consortium management password',
-    enterConsortiumMemberName: 'Enter consortium member name',
     enterConsortiumName: 'Enter consortium name',
     enterEtherAmount: 'Enter amount of ether to assign each test account',
     enterLocalNetworkLocation: 'Enter local port number',
+    enterMemberName: 'Enter member name',
     enterMemberPassword: 'Enter member password',
     enterMnemonic: 'Enter mnemonic',
     enterNetworkLocation: 'Enter network location',
@@ -129,7 +166,6 @@ export class Constants {
     enterPublicNetworkUrl: 'Enter public network url',
     enterPublicTestnetUrl: 'Enter public testnet url',
     enterTruffleBoxName: 'Enter pre-built Truffle project',
-    enterWestlakeUrl: 'Enter Westlake url',
     enterYourGanacheUrl: 'Enter your Ganache url',
     provideResourceGroupName: 'Provide a resource group name',
     selectConsortiumProtocol: 'Select protocol',
@@ -137,29 +173,53 @@ export class Constants {
     selectConsortiumSku: 'Select SKU',
     selectResourceGroup: 'Select resource group',
     selectSubscription: 'Select subscription.',
+    valueOrDefault: Constants.getMessageValueOrDefault,
   };
 
   public static validationRegexps = {
-    digits: /(?=.*\d)/g,
+    forbiddenChars: {
+      dotAtTheEnd: /^(?=.*[.]$).*$/g,
+      password: /[#`*"'\-%;,]/g,
+      resourceGroupName: /[#`*"'%;,!@$^&+=?\/<>|[\]{}:\\~]/g,
+    },
+    hasDigits: /(?=.*\d)/g,
     isLowerCase: /^[a-z0-9_\-!@$^&()+=?\/<>|[\]{}:.\\~ #`*"'%;,]+$/g,
-    isUrl: /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/gm,
-    lowerCaseLetter: /(?=.*[a-z])/g,
+    isUrl: /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/igm,
+    lowerCaseLetter: /(?=.*[a-z]).*/g,
     // tslint:disable-next-line: max-line-length
     port: /^([1-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/,
-    specialChars: /[!@$^&()+=?\/<>|[\]{}_:.\\~]/g,
-    unallowedChars: /[#`*"'\-%;,]/g,
-    upperCaseLetter: /(?=.*[A-Z])/g,
+    specialChars: {
+      consortiumMemberName: /^(?=^[a-z])[a-z0-9]+$/g,
+      password: /[!@$^&()+=?\/<>|[\]{}_:.\\~]/g,
+      resourceGroupName: /[-\w.()]/g,
+    },
+    specialCharsConsortiumMemberName: /^(?=^[a-z])[a-z0-9]+$/g,
+    specialCharsPassword: /[!@$^&()+=?\/<>|[\]{}_:.\\~]/g,
+    specialCharsResourceGroup: /[-\w.()]/g,
+    upperCaseLetter: /(?=.*[A-Z]).*/g,
+  };
+
+  public static responseReason = {
+    alreadyExists: 'AlreadyExists',
   };
 
   public static validationMessages = {
+    forbiddenChars: {
+      dotAtTheEnd: "Input value must not have '.' at the end.",
+      password: "'#', '`', '*', '\"', ''', '-', '%', ',', ';'",
+      // tslint:disable-next-line: max-line-length
+      resourceGroupName: "'#', '`', '*', '\"', ''', '\%', ';', ',', '!', '@', '$', '^', '&', '+', '=', '?', '\/', '<', '>', '|', '[', '\]', '{', '}', ':', '\\', '~'",
+    },
+    forbiddenSymbols: 'Provided name has forbidden symbols.',
     invalidAzureName: 'Invalid name. Name can contain only lowercase letters and numbers. ' +
-      'The first character must be a letter. The value must be between 2 and 20 characters long.',
+      `The first character must be a letter. Length must be between ${Constants.minConsortiumAndMemberLength} ` +
+      `and ${Constants.maxConsortiumAndMemberLength} characters.`,
     invalidConfirmationResult: '\'yes\' or \'no\'',
     invalidHostAddress: 'Invalid host address',
-    invalidPortNumber: 'Invalid port number',
     invalidPort: 'Invalid port.',
     invalidResourceGroupName: 'Resource group names only allow alphanumeric characters, periods,' +
-      'underscores, hyphens and parenthesis and cannot end in a period.',
+      'underscores, hyphens and parenthesis and cannot end in a period. ' +
+      `Length must be between ${Constants.minResourceGroupLength} and ${Constants.maxResourceGroupLength} characters.`,
     lengthRange: Constants.getMessageLengthRange,
     networkAlreadyExists: 'Network already exists.',
     noDigits: 'Password should have at least one digit.',
@@ -170,9 +230,7 @@ export class Constants {
     onlyNumberAllowed: 'Value after \':\' should be a number.',
     portAlreadyInUse: 'This port is already in use. Choose another one.',
     resourceGroupAlreadyExists: Constants.getMessageResourceGroupAlreadyExist,
-    unallowedChars: "Input value must not have '#', '`', '*', '\"', ''', '-', '%', ',', ';' or others chars.",
-    unallowedSymbols: 'Provided name has unallowed symbols.',
-    undefinedVariable: Constants.getMessageUndefinedVariable,
+    unresolvedSymbols: Constants.getMessageInputHasUnresolvedSymbols,
     valueCannotBeEmpty: 'Value cannot be empty.',
     valueShouldBeNumberOrEmpty: 'Value should be a number or empty.',
   };
@@ -186,9 +244,10 @@ export class Constants {
     resourceGroupName: 'Resource Group Name',
     selectConsortium: 'Select consortium',
     selectDeployDestination: 'Select deploy destination',
+    selectDestination: 'Select destination',
     selectGanacheServer: 'Select Ganache server',
-    selectLedgerEventsDestination: 'Select ledger events destination',
     selectMnemonicExtractKey: 'Select mnemonic to extract key',
+    selectMnemonicStorage: 'Select mnemonic storage',
     selectNewProjectPath: 'Select new project path',
     selectResourceGroup: 'Select a resource group',
     selectRgLocation: 'Select a location to create your Resource Group in...',
@@ -230,19 +289,6 @@ export class Constants {
     },
   };
 
-  public static ledgerEvents = {
-    action: {
-      azureEventGrid: 'azureEventGrid',
-      azureServiceBus: 'azureServiceBus',
-      sql: 'sql',
-    },
-    text: {
-      azureEventGridWithFlow: 'Azure Event Grid with Flow',
-      azureServiceBusWithFlow: 'Azure Service Bus with Flow',
-      sqlWithLogicApps: 'SQL with Logic Apps',
-    },
-  };
-
   public static statusBarMessages = {
     buildingContracts: 'Building contracts',
     checkingRequirementDependencies: 'Checking requirement dependencies version',
@@ -253,8 +299,6 @@ export class Constants {
     },
   };
 
-  public static welcomePagePath = '';
-  public static requirementsPagePath = '';
   public static nodeModulesPath = '';
 
   public static dataCopied = ' copied to clipboard';
@@ -292,20 +336,23 @@ export class Constants {
     BuildContractsDirIsEmpty: Constants.getMessageContractsBuildDirectoryIsEmpty,
     BuildContractsDirIsNotExist: Constants.getMessageContractsBuildDirectoryIsNotExist,
     DirectoryIsNotEmpty: 'Directory is not empty. Open another one?',
+    GetMessageChildAlreadyConnected: Constants.getMessageChildAlreadyConnected,
     GitIsNotInstalled: 'Git is not installed',
     InvalidContract: 'This file is not a valid contract.',
     InvalidMnemonic: 'Invalid mnemonic',
     InvalidServiceType: 'Invalid service type.',
+    LoadConsortiumTreeFailed: 'Load consortium tree has failed.',
     MnemonicFileHaveNoText: 'Mnemonic file have no text',
     NetworkAlreadyExist: Constants.getMessageNetworkAlreadyExist,
     NewProjectCreationFailed: 'Command createProject has failed.',
     NoSubscriptionFound: 'No subscription found.',
     NoSubscriptionFoundClick: 'No subscription found, click an Azure account ' +
       'at the bottom left corner and choose Select All',
+    PleaseRenameOldStyleTruffleConfig: 'Please rename file "truffle.js" to "truffle-config.js"',
     RequiredAppsAreNotInstalled: 'To run command you should install required apps',
     ThereAreNoMnemonics: 'There are no mnemonics',
     TruffleConfigIsNotExist: 'Truffle configuration file not found',
-    VariableDoesNotExist: Constants.getMessageVariableDoesNotExist,
+    VariableShouldBeDefined: Constants.getMessageVariableShouldBeDefined,
     WaitForLogin: 'You should sign-in on Azure Portal',
     WorkflowTypeDoesNotMatch: 'workflowType does not match any available workflows',
     WorkspaceShouldBeOpened: 'Workspace should be opened',
@@ -318,7 +365,7 @@ export class Constants {
     detailsButton: 'Details',
     generatedLogicApp: 'Generated the logic app!',
     invalidRequiredVersion: 'Required app is not installed or has an old version.',
-    memberNameValidating: 'Consortium Member name validating...',
+    memberNameValidating: 'Member name validating...',
     newProjectCreationFinished: 'New project was created successfully',
     newProjectCreationStarted: 'New project creation is started',
     openButton: 'Open',
@@ -337,14 +384,11 @@ export class Constants {
     AzureFunction: 'Azure Function',
     FlowApp: 'Flow App',
     LogicApp: 'Logic App',
-  };
-
-  public static gitCommand = 'git';
-  public static truffleCommand = 'truffle';
-
-  public static serviceClientVariables = {
-    credentials: 'credentials',
-    subscriptionId: 'subscriptionId',
+    output: {
+      AzureFunction: 'generatedAzureFunction',
+      FlowApp: 'generatedFlowApp',
+      LogicApp: 'generatedLogicApp',
+    },
   };
 
   public static azureResourceExplorer = {
@@ -360,8 +404,8 @@ export class Constants {
   public static initialize(context: ExtensionContext) {
     this.extensionContext = context;
     this.temporaryDirectory = context.storagePath ? context.storagePath : os.tmpdir();
-    this.welcomePagePath = context.asAbsolutePath(path.join('resources', 'welcome', 'index.html'));
-    this.requirementsPagePath = context.asAbsolutePath(path.join('resources', 'welcome', 'prereqs.html'));
+    this.webViewPages.welcome.path = context.asAbsolutePath(path.join('resources', 'welcome', 'index.html'));
+    this.webViewPages.requirements.path = context.asAbsolutePath(path.join('resources', 'welcome', 'prereqs.html'));
     this.nodeModulesPath = context.asAbsolutePath('node_modules');
 
     this.icons.blockchainService = {
@@ -382,14 +426,14 @@ export class Constants {
     };
   }
 
-  public static getMessageChildAlreadyConnected(consortium: string): string {
+  private static getMessageChildAlreadyConnected(consortium: string): string {
     return `Connection to '${consortium}' already exists`;
   }
 
-  public static getMessageValueOrDefault(valueName: string, defaultValue: any): string {
+  private static getMessageValueOrDefault(valueName: string, defaultValue: any): string {
     return `Enter ${valueName}. Default value is `
-    + `${defaultValue}. `
-    + 'Press Enter for default.';
+      + `${defaultValue}. `
+      + 'Press Enter for default.';
   }
 
   private static getMessageResourceGroupAlreadyExist(resourceGroupName: string): string {
@@ -408,8 +452,8 @@ export class Constants {
     return `Network with name "${networkName}" already existed in truffle-config.js`;
   }
 
-  private static getMessageUndefinedVariable(variable: string): string {
-    return `${variable} cannot be undefined`;
+  private static getMessageVariableShouldBeDefined(variable: string): string {
+    return `${variable} should be defined`;
   }
 
   private static getMessageLengthRange(min: number, max: number): string {
@@ -420,7 +464,7 @@ export class Constants {
     return `Failed to run command - ${command}. More details in output`;
   }
 
-  private static getMessageVariableDoesNotExist(variable: string): string {
-    return `${variable} cannot be null.`;
+  private static getMessageInputHasUnresolvedSymbols(unresolvedSymbols: string): string {
+    return `Input value must not have '${unresolvedSymbols}'.`;
   }
 }

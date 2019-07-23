@@ -4,7 +4,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace } from 'vscode';
+import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window } from 'vscode';
 import { Constants } from '../src/Constants';
 import * as userInteraction from '../src/helpers/userInteraction';
 import { CancellationEvent } from '../src/Models';
@@ -24,33 +24,34 @@ describe('User interaction test', () => {
   });
 
   afterEach(() => {
-    windowMock.restore();
-    windowMock.verify();
+    sinon.restore();
   });
 
   it('showInputBox should return a value', async () => {
+    // Arrange
     const option: InputBoxOptions = {};
 
     windowMock.expects('showInputBox').withArgs(option).returns('test');
+
+    // Act
     const result = await userInteraction.showInputBox(option);
 
+    // Assert
     assert.strictEqual(result, 'test');
   });
 
   it('showInputBox should throw cancellation event', async () => {
+    // Arrange
     const option: InputBoxOptions = {};
 
     windowMock.expects('showInputBox').withArgs(option).returns(undefined);
 
-    try {
-      await userInteraction.showInputBox(option);
-      assert.fail();
-    } catch (error) {
-      assert.strictEqual(true, error instanceof CancellationEvent);
-    }
+    // Act and assert
+    await assert.rejects(userInteraction.showInputBox(option), CancellationEvent);
   });
 
   it('showQuickPick should return a value', async () => {
+    // Arrange
     const option: QuickPickOptions = {};
     const items: QuickPickItem[] = [
       {
@@ -64,12 +65,16 @@ describe('User interaction test', () => {
     ];
 
     windowMock.expects('showQuickPick').withArgs(items, option).returns(items[1]);
+
+    // Act
     const result = await userInteraction.showQuickPick(items, option);
 
+    // Assert
     assert.deepStrictEqual(result, items[1]);
   });
 
   it('showQuickPick with custom items should return a value', async () => {
+    // Arrange
     const option: QuickPickOptions = {};
     const items: ITestItems[] = [
       {
@@ -87,12 +92,16 @@ describe('User interaction test', () => {
     ];
 
     windowMock.expects('showQuickPick').withArgs(items, option).returns(items[1]);
+
+    // Act
     const result = await userInteraction.showQuickPick(items, option);
 
+    // Assert
     assert.deepStrictEqual(result, items[1]);
   });
 
   it('showQuickPick should throw cancellation event', async () => {
+    // Arrange
     const option: QuickPickOptions = {};
     const items: QuickPickItem[] = [
       {
@@ -107,123 +116,99 @@ describe('User interaction test', () => {
 
     windowMock.expects('showQuickPick').withArgs(items, option).returns(undefined);
 
-    try {
-      await userInteraction.showQuickPick(items, option);
-      assert.fail();
-    } catch (error) {
-      assert.strictEqual(true, error instanceof CancellationEvent);
-    }
+    // Act and assert
+    await assert.rejects(userInteraction.showQuickPick(items, option), CancellationEvent);
   });
 
   it('showConfirmPaidOperationDialog should throw cancellation event if answer not yes', async () => {
+    // Arrange
     const answer = 'test';
 
     windowMock.expects('showInputBox').returns(answer);
 
-    try {
-      await userInteraction.showConfirmPaidOperationDialog();
-      assert.fail();
-    } catch (error) {
-      assert.strictEqual(true, error instanceof CancellationEvent);
-    } finally {
-      windowMock.restore();
-      windowMock.verify();
-    }
+    // Act and assert
+    await assert.rejects(userInteraction.showConfirmPaidOperationDialog(), CancellationEvent);
   });
 
   it('showConfirmPaidOperationDialog should throw cancellation event if answer undefined', async () => {
+    // Arrange
     windowMock.expects('showInputBox').returns(undefined);
 
-    try {
-      await userInteraction.showConfirmPaidOperationDialog();
-      assert.fail();
-    } catch (error) {
-      assert.strictEqual(true, error instanceof CancellationEvent);
-    }
+    // Act and assert
+    await assert.rejects(userInteraction.showConfirmPaidOperationDialog(), CancellationEvent);
   });
 
   it('showConfirmPaidOperationDialog should not throw cancellation event if answer yes', async () => {
+    // Arrange
     const answer = Constants.confirmationDialogResult.yes;
 
     windowMock.expects('showInputBox').returns(answer);
 
-    try {
-      await userInteraction.showConfirmPaidOperationDialog();
-    } catch (error) {
-      assert.fail();
-    }
+    // Act and assert
+    await userInteraction.showConfirmPaidOperationDialog();
   });
 
   it('showOpenFolderDialog should return a folder path', async () => {
+    // Arrange
     const folderPath = 'test/test';
     const uris: Uri[] = [{ fsPath: folderPath} as Uri];
 
     windowMock.expects('showOpenDialog').returns(uris);
+
+    // Act
     const result = await userInteraction.showOpenFolderDialog();
 
+    // Assert
     assert.deepStrictEqual(result, folderPath);
   });
 
   it('showOpenFolderDialog should return path of first folder', async () => {
+    // Arrange
     const folderPath1 = 'test/test';
     const folderPath2 = 'test2/test2';
     const uris: Uri[] = [{ fsPath: folderPath1}, { fsPath: folderPath2}] as Uri[];
 
     windowMock.expects('showOpenDialog').returns(uris);
+
+    // Act
     const result = await userInteraction.showOpenFolderDialog();
 
+    // Assert
     assert.strictEqual(result, folderPath1);
   });
 
   it('showOpenFolderDialog should throw cancellation event if dialog canceled', async () => {
+    // Arrange
     windowMock.expects('showOpenDialog').returns(undefined);
 
-    try {
-      await userInteraction.showOpenFolderDialog();
-      assert.fail();
-    } catch (error) {
-      assert.strictEqual(true, error instanceof CancellationEvent);
-    }
+    // Act and assert
+    await assert.rejects(userInteraction.showOpenFolderDialog(), CancellationEvent);
   });
 
   it('saveTextInFile should return file path', async () => {
+    // Arrange
     const fsMock = sinon.mock(fs);
-    const workspaceMock = sinon.mock(workspace);
-    const filePathe = 'filePath';
+    const filePath = 'filePath';
     const text = 'test text';
 
-    workspaceMock.expects('openTextDocument');
-    windowMock.expects('showTextDocument');
-    windowMock.expects('showSaveDialog').returns({ fsPath: filePathe} as Uri);
+    windowMock.expects('showSaveDialog').returns({ fsPath: filePath} as Uri);
     fsMock.expects('writeFileSync');
 
-    const result = await userInteraction.saveTextInFile(text, filePathe);
+    // Act
+    const result = await userInteraction.saveTextInFile(text, filePath);
 
-    assert.strictEqual(result, filePathe);
-
-    fsMock.restore();
-    fsMock.verify();
-    workspaceMock.restore();
-    workspaceMock.verify();
+    // Assert
+    assert.strictEqual(result, filePath);
   });
 
   it('saveTextInFile should throw cancellation event if dialog canceled', async () => {
-    const workspaceMock = sinon.mock(workspace);
-    const filePathe = 'filePath';
+    // Arrange
+    const filePath = 'filePath';
     const text = 'test text';
 
-    workspaceMock.expects('openTextDocument');
-    windowMock.expects('showTextDocument');
     windowMock.expects('showSaveDialog').returns(undefined);
 
-    try {
-      await userInteraction.saveTextInFile(text, filePathe);
-      assert.fail();
-    } catch (error) {
-      assert.strictEqual(true, error instanceof CancellationEvent);
-    } finally {
-      workspaceMock.restore();
-      workspaceMock.verify();
-    }
+    // Act and assert
+    await assert.rejects(userInteraction.saveTextInFile(text, filePath), CancellationEvent);
   });
 });

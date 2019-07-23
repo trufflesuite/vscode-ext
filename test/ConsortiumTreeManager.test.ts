@@ -11,6 +11,6 @@ describe('ConsortiumTreeManager tests', () => {
 
     const result = defaultNetworksItems();
 
-    assert.strictEqual(result.length, 4);
+    assert.strictEqual(result.length, 4, 'defaultNetworksItems count should be equal to 4');
   });
 });

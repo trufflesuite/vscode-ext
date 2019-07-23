@@ -99,10 +99,12 @@ describe('Consortium Resource Explorer', () => {
         assert.strictEqual(
           (showQuickPickStub.getCall(0).args[1] as QuickPickOptions).placeHolder,
           Constants.placeholders.selectSubscription,
+          'showQuickPick should called with correct arguments',
         );
         assert.strictEqual(
           (showQuickPickStub.getCall(1).args[1] as QuickPickOptions).placeHolder,
           Constants.placeholders.selectResourceGroup,
+          'showQuickPick should called with correct arguments',
         );
       });
   });

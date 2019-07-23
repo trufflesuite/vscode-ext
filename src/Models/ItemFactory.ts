@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import { Telemetry } from '../TelemetryClient';
 import { IExtensionItem } from './IExtensionItem';
 import { ItemCreator } from './ItemCreators/ItemCreator';
 import { ItemType } from './ItemType';
@@ -10,7 +11,9 @@ export namespace ItemFactory {
 
   export function register(type: ItemType | number, value: ItemCreator): void {
     if (registeredTypes[type]) {
-      throw new Error(`Factory already has this item type: ${type}`);
+      const error = new Error(`Factory already has this item type: ${type}`);
+      Telemetry.sendException(error);
+      throw error;
     }
 
     registeredTypes[type] = value;
@@ -19,7 +22,9 @@ export namespace ItemFactory {
   export function create(obj: { [key: string]: any }): IExtensionItem {
     const creator = registeredTypes[obj.itemType];
     if (!creator) {
-      throw new Error(`Type ${obj.itemType} doesn't exist in factory`);
+      const error = new Error(`Type ${obj.itemType} doesn't exist in factory`);
+      Telemetry.sendException(error);
+      throw error;
     }
 
     const extensionItem = creator.create(obj);

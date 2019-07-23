@@ -9,7 +9,7 @@ export class Debounce {
     resolve?: (value: string | null) => void,
   } = {};
 
-  private timeout: number;
+  private readonly timeout: number;
 
   constructor(
     options: { timeout: number } = { timeout: Constants.defaultDebounceTimeout },

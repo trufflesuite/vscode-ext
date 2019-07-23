@@ -10,15 +10,26 @@ import { Validator } from './validator';
 const debounce = new Debounce();
 
 export namespace AzureBlockchainServiceValidator {
+  const {
+    specialChars,
+    forbiddenChars,
+  } = Constants.validationRegexps;
+
+  const {
+    unresolvedSymbols,
+  } = Constants.validationMessages;
+
   export async function validateAccessPassword(password: string): Promise<string | null> {
     return new Validator(password)
       .isNotEmpty()
       .hasLowerCase()
       .hasUpperCase()
       .hasDigit()
-      .hasSpecialChar(Constants.validationRegexps.specialChars)
-      .hasNotUnallowedChar(Constants.validationRegexps.unallowedChars)
-      .inLengthRange(12, 72)
+      .hasSpecialChar(specialChars.password)
+      .hasNoForbiddenChar(
+        forbiddenChars.password,
+        unresolvedSymbols(Constants.validationMessages.forbiddenChars.password))
+      .inLengthRange(Constants.minPasswordLength, Constants.maxPasswordLength)
       .getErrors();
   }
 
@@ -27,9 +38,22 @@ export namespace AzureBlockchainServiceValidator {
     resourceGroups: ResourceGroups,
   ): Promise<string | null> {
 
-    if (!name.match(new RegExp(/^[-\w\._\(\)]+$/))) {
+    const errors = new Validator(name)
+      .isNotEmpty()
+      .hasSpecialChar(specialChars.resourceGroupName)
+      .hasNoForbiddenChar(
+        forbiddenChars.dotAtTheEnd,
+        unresolvedSymbols(Constants.validationMessages.forbiddenChars.dotAtTheEnd))
+      .hasNoForbiddenChar(
+        forbiddenChars.resourceGroupName,
+        unresolvedSymbols(Constants.validationMessages.forbiddenChars.resourceGroupName))
+      .inLengthRange(Constants.minResourceGroupLength, Constants.maxResourceGroupLength)
+      .getErrors();
+
+    if (errors) {
       return Constants.validationMessages.invalidResourceGroupName;
     }
+
     const timeOverFunction = buildTimeOverFunction(
       name,
       resourceGroups.checkExistence.bind(resourceGroups),
@@ -43,6 +67,16 @@ export namespace AzureBlockchainServiceValidator {
     name: string,
     consortiumResource: ConsortiumResource,
   ): Promise<string | null> {
+    const errors = new Validator(name)
+      .isNotEmpty()
+      .hasSpecialChar(specialChars.consortiumMemberName)
+      .inLengthRange(Constants.minConsortiumAndMemberLength, Constants.maxConsortiumAndMemberLength)
+      .getErrors();
+
+    if (errors) {
+      return Constants.validationMessages.invalidAzureName;
+    }
+
     const timeOverFunction = buildTimeOverFunction(
       name,
       consortiumResource.checkExistence.bind(consortiumResource),
@@ -55,6 +89,16 @@ export namespace AzureBlockchainServiceValidator {
     name: string,
     memberResource: MemberResource,
   ) {
+    const errors = new Validator(name)
+      .isNotEmpty()
+      .hasSpecialChar(specialChars.consortiumMemberName)
+      .inLengthRange(Constants.minConsortiumAndMemberLength, Constants.maxConsortiumAndMemberLength)
+      .getErrors();
+
+    if (errors) {
+      return Constants.validationMessages.invalidAzureName;
+    }
+
     const timeOverFunction = buildTimeOverFunction(
       name,
       memberResource.checkExistence.bind(memberResource),

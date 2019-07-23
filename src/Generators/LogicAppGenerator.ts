@@ -10,6 +10,7 @@ import { showInputBox, showQuickPick } from '../helpers/userInteraction';
 import { ResourceGroupItem, SubscriptionItem } from '../Models';
 import { Output } from '../Output';
 import { ResourceExplorerAndGenerator } from '../ResourceExplorerAndGenerator';
+import { Telemetry } from '../TelemetryClient';
 import { buildContract } from './AbiDeserialiser';
 import './Nethereum.Generators.DuoCode';
 
@@ -26,37 +27,38 @@ interface ILogicAppData {
 
 export class LogicAppGenerator extends ResourceExplorerAndGenerator {
   public async generateMicroservicesWorkflows(filePath?: Uri): Promise<void> {
+    Telemetry.sendEvent('LogicAppGenerator.microservicesWorkflows');
     return this.generateWorkflows(Constants.microservicesWorkflows.Service, filePath);
   }
 
   public async generateDataPublishingWorkflows(filePath?: Uri): Promise<void> {
+    Telemetry.sendEvent('LogicAppGenerator.dataPublishingWorkflows');
     return this.generateWorkflows(Constants.microservicesWorkflows.Data, filePath);
   }
 
   public async generateEventPublishingWorkflows(filePath?: Uri): Promise<void> {
+    Telemetry.sendEvent('LogicAppGenerator.eventPublishingWorkflows');
     return this.generateWorkflows(Constants.microservicesWorkflows.Messaging, filePath);
   }
 
   public async generateReportPublishingWorkflows(filePath?: Uri): Promise<void> {
+    Telemetry.sendEvent('LogicAppGenerator.reportPublishingWorkflows');
     return this.generateWorkflows(Constants.microservicesWorkflows.Reporting, filePath);
   }
 
   private async generateWorkflows(workflowType: string, filePath?: Uri): Promise<void> {
-    try {
-      const filePaths = await this.getContractsPath(filePath);
-      const logicAppData = await this.getLogicAppData(workflowType);
-      for (const file of filePaths) {
-        const contract = await fs.readJson(file, { encoding: 'utf8' });
-        const generatedFiles: any[] = this.getGenerator(contract, logicAppData).GenerateAll();
-        for (const generatedFile of generatedFiles) {
-          await this.writeFile(generatedFile);
-        }
+    const filePaths = await this.getContractsPath(filePath);
+    const logicAppData = await this.getLogicAppData(workflowType);
+    for (const file of filePaths) {
+      const contract = await fs.readJson(file, { encoding: 'utf8' });
+      const generatedFiles: any[] = this.getGenerator(contract, logicAppData).GenerateAll();
+      for (const generatedFile of generatedFiles) {
+        await this.writeFile(generatedFile);
       }
-
-      window.showInformationMessage(Constants.informationMessage.generatedLogicApp);
-    } catch (err) {
-      window.showErrorMessage(err.toString());
     }
+
+    window.showInformationMessage(Constants.informationMessage.generatedLogicApp);
+    Telemetry.sendEvent('LogicAppGenerator.generateWorkflows.commandFinished');
   }
 
   private async getContractsPath(filePath?: Uri): Promise<string[]> {
@@ -67,6 +69,9 @@ export class LogicAppGenerator extends ResourceExplorerAndGenerator {
     const files: string[] = [];
 
     if (!fs.pathExistsSync(buildDir)) {
+      Telemetry.sendException(new Error(Constants.errorMessageStrings.BuildContractsDirIsNotExist(
+        Telemetry.obfuscate(buildDir),
+      )));
       throw new Error(Constants.errorMessageStrings.BuildContractsDirIsNotExist(buildDir));
     }
 
@@ -83,6 +88,10 @@ export class LogicAppGenerator extends ResourceExplorerAndGenerator {
       .filter((file) => fs.lstatSync(file).isFile());
 
     if (files.length === 0) {
+      Telemetry.sendException(new Error(
+        Constants.errorMessageStrings.BuildContractsDirIsEmpty(Telemetry.obfuscate(buildDir)) + ' ' +
+        Constants.errorMessageStrings.BuildContractsBeforeGenerating,
+      ));
       throw new Error(
         Constants.errorMessageStrings.BuildContractsDirIsEmpty(buildDir) + ' ' +
         Constants.errorMessageStrings.BuildContractsBeforeGenerating,
@@ -107,6 +116,7 @@ export class LogicAppGenerator extends ResourceExplorerAndGenerator {
     };
 
     if (workflowType === Constants.microservicesWorkflows.Messaging) {
+      Telemetry.sendEvent('LogicAppGenerator.getLogicAppData.workflowTypeIsMessaging');
       logicAppData.topicName = await showInputBox({ ignoreFocusOut: true, value: 'topic name' });
       logicAppData.messagingType = await this.getMessagingType();
     }
@@ -119,15 +129,21 @@ export class LogicAppGenerator extends ResourceExplorerAndGenerator {
 
     switch (logicAppData.workflowType) {
       case Service:
+        Telemetry.sendEvent('LogicAppGenerator.getGenerator.Service');
         return this.getServiceWorkflowProjectGenerator(contract, logicAppData);
       case Data:
+        Telemetry.sendEvent('LogicAppGenerator.getGenerator.Data');
         return this.getDataWorkflowProjectGenerator(contract, logicAppData);
       case Messaging:
+        Telemetry.sendEvent('LogicAppGenerator.getGenerator.Messaging');
         return this.getMessagingWorkflowProjectGenerator(contract, logicAppData);
       case Reporting:
+        Telemetry.sendEvent('LogicAppGenerator.getGenerator.Reporting');
         return this.getReportingWorkflowProjectGenerator(contract, logicAppData);
       default:
-        throw new Error(Constants.errorMessageStrings.WorkflowTypeDoesNotMatch);
+        const error = new Error(Constants.errorMessageStrings.WorkflowTypeDoesNotMatch);
+        Telemetry.sendException(error);
+        throw error;
     }
   }
 
@@ -157,13 +173,16 @@ export class LogicAppGenerator extends ResourceExplorerAndGenerator {
   private getOutputDir(serviceType: int): string {
     switch (serviceType) {
       case 0:
-        return path.join(getWorkspaceRoot()!, Constants.flowAppOutputDir);
+        return path.join(getWorkspaceRoot()!, Constants.logicApp.output.FlowApp);
       case 1:
-        return path.join(getWorkspaceRoot()!, Constants.logicAppOutputDir);
+        return path.join(getWorkspaceRoot()!, Constants.logicApp.output.LogicApp);
       case 2:
-        return path.join(getWorkspaceRoot()!, Constants.azureFunctionOutputDir);
-      default:
-        throw new Error(Constants.errorMessageStrings.InvalidServiceType);
+        return path.join(getWorkspaceRoot()!, Constants.logicApp.output.AzureFunction);
+      default: {
+        const error = new Error(Constants.errorMessageStrings.InvalidServiceType);
+        Telemetry.sendException(error);
+        throw error;
+      }
     }
   }
 

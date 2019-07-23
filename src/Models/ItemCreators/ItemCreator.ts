@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import { Telemetry } from '../../TelemetryClient';
 import { IExtensionItem } from '../IExtensionItem';
 
 export abstract class ItemCreator {
@@ -28,6 +29,7 @@ export abstract class ItemCreator {
     requiredFields.forEach((item) => {
       const field = obj[item.fieldName];
       if (field === undefined || field === null) {
+        Telemetry.sendException(new Error(`Missed required field ${item.fieldName}.`));
         throw new Error(`Missed required field ${item.fieldName}. JSON: ${JSON.stringify(obj)}`);
       }
 
@@ -35,6 +37,7 @@ export abstract class ItemCreator {
         return;
       }
 
+      Telemetry.sendException(new Error(`Required field ${item.fieldName} should be type ${item.type}`));
       throw new Error(`Required field ${item.fieldName} should be type ${item.type}. JSON: ${JSON.stringify(obj)}`);
     });
   }

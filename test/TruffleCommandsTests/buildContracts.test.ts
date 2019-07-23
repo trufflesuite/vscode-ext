@@ -44,10 +44,10 @@ describe('BuildContracts Command', () => {
       await TruffleCommands.buildContracts();
 
       // Assert
-      assert.strictEqual(checkAppsSilent.calledOnce, true);
-      assert.strictEqual(getWorkspaceRootMock.calledOnce, true);
-      assert.strictEqual(installTruffle.called, false);
-      assert.strictEqual(executeCommandMock.called, true);
+      assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+      assert.strictEqual(getWorkspaceRootMock.calledOnce, true, 'getWorkspaceRoot should be called once');
+      assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+      assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
     });
 
     it('should not throw exception when truffle not installed', async () => {
@@ -59,10 +59,10 @@ describe('BuildContracts Command', () => {
       await TruffleCommands.buildContracts();
 
       // Assert
-      assert.strictEqual(checkAppsSilent.calledOnce, true);
-      assert.strictEqual(getWorkspaceRootMock.calledOnce, true);
-      assert.strictEqual(installTruffle.calledOnce, true);
-      assert.strictEqual(executeCommandMock.called, true);
+      assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+      assert.strictEqual(getWorkspaceRootMock.calledOnce, true, 'getWorkspaceRoot be should called once');
+      assert.strictEqual(installTruffle.calledOnce, true, 'installTruffle should be called once');
+      assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
     });
 
     it('should throw exception when truffle build failed', async () => {
@@ -72,10 +72,10 @@ describe('BuildContracts Command', () => {
 
       // Act and assert
       await assert.rejects(TruffleCommands.buildContracts(), Error, TestConstants.testError);
-      assert.strictEqual(checkAppsSilent.calledOnce, true);
-      assert.strictEqual(getWorkspaceRootMock.calledOnce, true);
-      assert.strictEqual(installTruffle.called, false);
-      assert.strictEqual(executeCommandMock.called, true);
+      assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+      assert.strictEqual(getWorkspaceRootMock.calledOnce, true, 'getWorkspaceRoot should be called once');
+      assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+      assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
     });
 
     it('should throw exception when truffle install failed', async () => {
@@ -86,10 +86,10 @@ describe('BuildContracts Command', () => {
 
       // Act and assert
       await assert.rejects(TruffleCommands.buildContracts(), Error, TestConstants.testError);
-      assert.strictEqual(checkAppsSilent.calledOnce, true);
-      assert.strictEqual(getWorkspaceRootMock.called, false);
-      assert.strictEqual(installTruffle.called, true);
-      assert.strictEqual(executeCommandMock.called, false);
+      assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+      assert.strictEqual(getWorkspaceRootMock.called, false, 'getWorkspaceRoot should not be called');
+      assert.strictEqual(installTruffle.called, true, 'installTruffle should be called');
+      assert.strictEqual(executeCommandMock.called, false, 'executeCommand should not be called');
     });
   });
 });

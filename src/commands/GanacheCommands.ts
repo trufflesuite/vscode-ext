@@ -2,12 +2,13 @@
 // Licensed under the MIT license.
 
 import { commands, QuickPickItem, window } from 'vscode';
-import { Constants } from '../Constants';
+import { Constants, RequiredApps } from '../Constants';
 import { GanacheService } from '../GanacheService/GanacheService';
 import { isGanacheServer } from '../GanacheService/GanacheServiceClient';
 import { required, showQuickPick } from '../helpers';
 import { ItemType, LocalNetworkConsortium } from '../Models';
 import { Output } from '../Output';
+import { Telemetry } from '../TelemetryClient';
 import { ConsortiumTreeManager } from '../treeService/ConsortiumTreeManager';
 import { ConsortiumView } from '../ViewItems';
 
@@ -16,8 +17,10 @@ export namespace GanacheCommands {
   export async function startGanacheCmd(
     consortiumTreeManager: ConsortiumTreeManager,
     viewItem?: ConsortiumView): Promise<void> {
+    Telemetry.sendEvent('GanacheCommands.startGanacheCmd.commandStarted');
 
-    if (!await required.checkApps(required.Apps.node)) {
+    if (!await required.checkApps(RequiredApps.node)) {
+      Telemetry.sendEvent('GanacheCommands.startGanacheCmd.nodeIsNotInstalled');
       commands.executeCommand('azureBlockchainService.showRequirementsPage');
       return;
     }
@@ -27,26 +30,32 @@ export namespace GanacheCommands {
     const ganacheProcess = await GanacheService.startGanacheServer(port);
 
     if (!ganacheProcess) {
+      Telemetry.sendEvent('GanacheCommands.startGanacheCmd.serverAlreadyRunning');
       window.showInformationMessage(Constants.ganacheCommandStrings.serverAlreadyRunning);
       return;
     }
 
     window.showInformationMessage(Constants.ganacheCommandStrings.serverSuccessfullyStarted);
+    Telemetry.sendEvent('GanacheCommands.startGanacheCmd.commandFinished');
   }
 
   // Command to bind to UI commands
   export async function stopGanacheCmd(
     consortiumTreeManager: ConsortiumTreeManager,
     viewItem?: ConsortiumView): Promise<void> {
+    Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.commandStarted');
     const port = await getGanachePort(consortiumTreeManager, viewItem);
 
-    if (isGanacheServer(port)) {
+    if (await isGanacheServer(port)) {
+      Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.isGanacheServer');
       await GanacheService.stopGanacheServer(port);
       window.showInformationMessage(Constants.ganacheCommandStrings.serverSuccessfullyStopped);
     } else {
+      Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.noGanacheServer');
       window.showWarningMessage(Constants.ganacheCommandStrings.serverCanNotStop);
     }
     Output.show();
+    Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.commandFinished');
   }
 
   export async function getGanachePort(
@@ -59,7 +68,9 @@ export namespace GanacheCommands {
       const hosts = consortiumTreeManager.getItem(ItemType.LOCAL_NETWORK);
 
       if (!hosts || !hosts.getChildren()) {
-        throw new Error(Constants.ganacheCommandStrings.serverNoGanacheAvailable);
+        const error = new Error(Constants.ganacheCommandStrings.serverNoGanacheAvailable);
+        Telemetry.sendException(error);
+        throw error;
       }
 
       const options = hosts.getChildren();

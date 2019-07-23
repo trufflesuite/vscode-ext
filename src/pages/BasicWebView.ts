@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import * as fs from 'fs-extra';
 import {
   Disposable,
   ExtensionContext,
@@ -11,6 +12,15 @@ import {
   WebviewPanelOptions,
   window,
 } from 'vscode';
+import { Constants } from '../Constants';
+import { Telemetry } from '../TelemetryClient';
+
+export interface IWebViewConfig {
+  path: string;
+  showOnStartup: string;
+  title: string;
+  viewType: string;
+}
 
 export abstract class BasicWebView {
   protected panel?: WebviewPanel;
@@ -18,12 +28,14 @@ export abstract class BasicWebView {
   protected readonly disposables: Disposable[];
   protected readonly options: WebviewPanelOptions & WebviewOptions;
   protected readonly rootPath: Uri;
-  protected abstract showOnStartup: string;
-  protected abstract title: string;
-  protected abstract viewType: string;
+
+  protected abstract config: IWebViewConfig;
+
+  private startShowDate: number;
 
   protected constructor(context: ExtensionContext) {
     this.context = context;
+    this.startShowDate = 0;
     this.disposables = [];
     this.rootPath = Uri.file(this.context.asAbsolutePath('.'));
     this.options = {
@@ -35,24 +47,43 @@ export abstract class BasicWebView {
   }
 
   public async checkAndShow(): Promise<void> {
-    const showOnStartup = this.context.globalState.get(this.showOnStartup);
+    const showOnStartup = this.context.globalState.get(this.config.showOnStartup);
     if (showOnStartup === false) {
       return;
     }
 
     if (showOnStartup === undefined) {
-      this.context.globalState.update(this.showOnStartup, await this.setShowOnStartupFlagAtFirstTime());
+      this.context.globalState.update(this.config.showOnStartup, await this.setShowOnStartupFlagAtFirstTime());
     }
 
-    return this.show();
+    Telemetry.sendEvent(
+      Constants.telemetryEvents.webPages.showWebPage,
+      {
+        trigger: 'auto',
+        viewType: this.config.viewType,
+      },
+    );
+    return this.createAndShow();
   }
 
-  public async show(): Promise<void> {
+  public async show() {
+    Telemetry.sendEvent(
+      Constants.telemetryEvents.webPages.showWebPage,
+      {
+        trigger: 'manual',
+        viewType: this.config.viewType,
+      },
+    );
+    return this.createAndShow();
+  }
+
+  protected async createAndShow(): Promise<void> {
     if (this.panel) {
       return this.panel.reveal(ViewColumn.One);
     }
 
-    this.panel = window.createWebviewPanel(this.viewType, this.title, ViewColumn.One, this.options);
+    this.panel = window.createWebviewPanel(this.config.viewType, this.config.title, ViewColumn.One, this.options);
+    this.startShowDate = new Date().getTime();
 
     this.panel.webview.html = await this.getHtmlForWebview();
 
@@ -62,7 +93,12 @@ export abstract class BasicWebView {
 
   protected abstract async setShowOnStartupFlagAtFirstTime(): Promise<boolean>;
 
-  protected abstract async getHtmlForWebview(): Promise<string>;
+  protected async getHtmlForWebview(): Promise<string> {
+    const rootPath = this.rootPath.with({scheme: 'vscode-resource'}).toString();
+    const html = await fs.readFile(this.config.path, 'utf8');
+
+    return html.replace(/{{root}}/g, rootPath);
+  }
 
   protected async receiveMessage(message: {[key: string]: any}): Promise<void> {
     if (!this.panel) {
@@ -72,18 +108,30 @@ export abstract class BasicWebView {
     if (message.command === 'documentReady') {
       this.panel.webview.postMessage({
         command: 'showOnStartup',
-        value: this.context.globalState.get(this.showOnStartup),
+        value: this.context.globalState.get(this.config.showOnStartup),
       });
     }
 
     if (message.command === 'toggleShowPage') {
-      this.context.globalState.update(this.showOnStartup, message.value);
+      this.context.globalState.update(this.config.showOnStartup, message.value);
+    }
+
+    if (message.command === 'executeCommand' || message.command === 'openLink') {
+      Telemetry.sendEvent(Constants.telemetryEvents.webPages.action, message);
     }
   }
 
-  private dispose(): void {
+  protected dispose(): void {
     if (this.panel) {
       this.panel.dispose();
+
+      const duration = (new Date().getTime() - this.startShowDate) / 1000;
+      this.startShowDate = 0;
+      Telemetry.sendEvent(
+        Constants.telemetryEvents.webPages.disposeWebPage,
+        { viewType: this.config.viewType },
+        { duration },
+      );
     }
 
     while (this.disposables.length) {

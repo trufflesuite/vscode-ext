@@ -9,12 +9,6 @@ export enum VSCommands {
 
 export enum CommandContext {
   Enabled = 'azureBlockchainService:enabled',
-  NodeIsAvailable = 'azureBlockchainService:nodeIsAvailable',
-  NpmIsAvailable = 'azureBlockchainService:npmIsAvailable',
-  GitIsAvailable = 'azureBlockchainService:gitIsAvailable',
-  PythonIsAvailable = 'azureBlockchainService:pythonIsAvailable',
-  TruffleIsAvailable = 'azureBlockchainService:truffleIsAvailable',
-  GanacheIsAvailable = 'azureBlockchainService:ganacheIsAvailable',
   IsGanacheRunning = 'azureBlockchainService:isGanacheRunning',
   IsWorkspaceOpen = 'azureBlockchainService:isWorkspaceOpen',
 }

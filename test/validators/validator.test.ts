@@ -40,9 +40,10 @@ describe('Validator', () => {
           testString: 'String123',
         },
         {
-          errorMessage: Constants.validationMessages.unallowedChars,
+          errorMessage: Constants.validationMessages.unresolvedSymbols(
+            Constants.validationMessages.forbiddenChars.password),
           maxLength: 20,
-          message: 'has not unallowed chars',
+          message: 'has not forbidden chars',
           minLength: 5,
           testString: 'Str!ng#/123',
         },
@@ -76,12 +77,17 @@ describe('Validator', () => {
             .hasLowerCase()
             .hasUpperCase()
             .hasDigit()
-            .hasSpecialChar(Constants.validationRegexps.specialChars)
-            .hasNotUnallowedChar(Constants.validationRegexps.unallowedChars)
+            .hasSpecialChar(Constants.validationRegexps.specialCharsPassword)
+            .hasNoForbiddenChar(
+              Constants.validationRegexps.forbiddenChars.password,
+              Constants.validationMessages.unresolvedSymbols(Constants.validationMessages.forbiddenChars.password))
             .inLengthRange(element.minLength, element.maxLength);
 
           // Assert
-          assert.strictEqual(result.getErrors(), element.errorMessage);
+          assert.strictEqual(
+            result.getErrors(),
+            element.errorMessage,
+            `validation result should be equal to "${element.errorMessage}"`);
         });
       });
     });
@@ -95,13 +101,22 @@ describe('Validator', () => {
         const result = new Validator(testString)
           .hasDigit()
           .hasUpperCase()
-          .hasSpecialChar(Constants.validationRegexps.specialChars)
+          .hasSpecialChar(Constants.validationRegexps.specialCharsPassword)
           .getErrors() as string;
 
         // Assert
-        assert.strictEqual(result.includes(Constants.validationMessages.noDigits), true);
-        assert.strictEqual(result.includes(Constants.validationMessages.noUpperCaseLetter), true);
-        assert.strictEqual(result.includes(Constants.validationMessages.noSpecialChars), true);
+        assert.strictEqual(
+          result.includes(Constants.validationMessages.noDigits),
+          true,
+          `validation result should include message "${Constants.validationMessages.noDigits}"`);
+        assert.strictEqual(
+          result.includes(Constants.validationMessages.noUpperCaseLetter),
+          true,
+          `validation result should include message "${Constants.validationMessages.noUpperCaseLetter}"`);
+        assert.strictEqual(
+          result.includes(Constants.validationMessages.noSpecialChars),
+          true,
+          `validation result should include message "${Constants.validationMessages.noSpecialChars}"`);
       });
     });
 
@@ -114,7 +129,10 @@ describe('Validator', () => {
         const result = new Validator(testString).isConfirmationValue();
 
         // Assert
-        assert.strictEqual(result.getErrors(), Constants.validationMessages.invalidConfirmationResult);
+        assert.strictEqual(
+          result.getErrors(),
+          Constants.validationMessages.invalidConfirmationResult,
+          `validation result should be equal to "${Constants.validationMessages.invalidConfirmationResult}"`);
       });
 
       TestConstants.testDialogAnswers.forEach((answer) => {
@@ -123,7 +141,7 @@ describe('Validator', () => {
           const result = new Validator(answer).isConfirmationValue();
 
           // Assert
-          assert.strictEqual(result.getErrors(), null);
+          assert.strictEqual(result.getErrors(), null, 'validation result should be null');
         });
       });
     });
@@ -137,7 +155,10 @@ describe('Validator', () => {
         const result = new Validator(testString).isLowerCase();
 
         // Assert
-        assert.strictEqual(result.getErrors(), Constants.validationMessages.onlyLowerCaseAllowed);
+        assert.strictEqual(
+          result.getErrors(),
+          Constants.validationMessages.onlyLowerCaseAllowed,
+          `validation result should be equal to "${Constants.validationMessages.onlyLowerCaseAllowed}"`);
       });
 
       it('should pass when there are not upper case letters', () => {
@@ -148,7 +169,7 @@ describe('Validator', () => {
         const result = new Validator(testString).isLowerCase();
 
         // Assert
-        assert.strictEqual(result.getErrors(), null);
+        assert.strictEqual(result.getErrors(), null, 'validation result should be null');
       });
     });
 
@@ -161,7 +182,10 @@ describe('Validator', () => {
         const result = new Validator(testString).isNotEmpty();
 
         // Assert
-        assert.strictEqual(result.getErrors(), Constants.validationMessages.valueCannotBeEmpty);
+        assert.strictEqual(
+          result.getErrors(),
+          Constants.validationMessages.valueCannotBeEmpty,
+          `validation result should be equal to "${Constants.validationMessages.valueCannotBeEmpty}"`);
       });
 
       it('should fail when string is white space', () => {
@@ -172,7 +196,10 @@ describe('Validator', () => {
         const result = new Validator(testString).isNotEmpty();
 
         // Assert
-        assert.strictEqual(result.getErrors(), Constants.validationMessages.valueCannotBeEmpty);
+        assert.strictEqual(
+          result.getErrors(),
+          Constants.validationMessages.valueCannotBeEmpty,
+          `validation result should be equal to "${Constants.validationMessages.valueCannotBeEmpty}"`);
       });
 
       it('should pass when string is not empty', () => {
@@ -183,7 +210,7 @@ describe('Validator', () => {
         const result = new Validator(testString).isNotEmpty();
 
         // Assert
-        assert.strictEqual(result.getErrors(), null);
+        assert.strictEqual(result.getErrors(), null, 'validation result should be null');
       });
     });
 
@@ -196,7 +223,10 @@ describe('Validator', () => {
         const result = new Validator(testString).isUrl();
 
         // Assert
-        assert.strictEqual(result.getErrors(), Constants.validationMessages.invalidHostAddress);
+        assert.strictEqual(
+          result.getErrors(),
+          Constants.validationMessages.invalidHostAddress,
+          `validation result should be equal to "${Constants.validationMessages.invalidHostAddress}"`);
       });
 
       const validUrls = [
@@ -214,7 +244,7 @@ describe('Validator', () => {
           const result = new Validator(element).isUrl();
 
           // Assert
-          assert.strictEqual(result.getErrors(), null);
+          assert.strictEqual(result.getErrors(), null, 'validation result should be null');
         });
       });
     });

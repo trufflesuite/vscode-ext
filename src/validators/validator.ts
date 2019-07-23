@@ -4,7 +4,7 @@
 import {
   HasDigit,
   HasLowerCase,
-  HasNotUnallowedChar,
+  HasNoForbiddenChar,
   HasSpecialChar,
   HasUpperCase,
   IsAvailable,
@@ -63,8 +63,8 @@ export class Validator {
     return this;
   }
 
-  public hasNotUnallowedChar(unallowedChars: RegExp): Validator {
-    this.validateSync(new HasNotUnallowedChar(unallowedChars));
+  public hasNoForbiddenChar(forbiddenChars: RegExp, errorMessage: string): Validator {
+    this.validateSync(new HasNoForbiddenChar(forbiddenChars, errorMessage));
     return this;
   }
 

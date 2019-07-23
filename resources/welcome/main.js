@@ -1,16 +1,15 @@
-$(function () {
+$(function() {
   main();
 });
 
 function main() {
   const vscode = acquireVsCodeApi();
-  $("a").click(function() {
+
+  $('a').click(function() {
     if (this.href) {
-      vscode.postMessage({
-        href: this.href
-      });
+      vscode.postMessage({ command: 'openLink', value: this.href });
     } else {
-      vscode.postMessage({ command: this.id});
+      vscode.postMessage({ command: 'executeCommand', value: this.id });
     }
 
     if ($(this).hasClass('action')) {
@@ -18,18 +17,23 @@ function main() {
     }
   });
 
-  $(".interactive").click((event) => {
-    if (!$(event.target).is("a") && !$(event.target).is(".detail") &&
-      $(event.target).parents(".detail").length === 0) {
-      $(event.currentTarget).find(".detail").toggle(1000);
-      $(event.currentTarget).find(".arrow").toggleClass("arrow-up");
+  $('.interactive').click(function(event) {
+    if (
+      !$(event.target).is('a') &&
+      !$(event.target).is('.detail') &&
+      $(event.target).parents('.detail').length === 0
+    ) {
+      $(event.currentTarget).find('.detail').toggle(1000);
+      $(event.currentTarget).find('.arrow').toggleClass('arrow-up');
+
       vscode.postMessage({
-        href: `toggle:${$(event.currentTarget).attr("id")}`
+        command: 'toggleInteractive',
+        value: `toggle:${$(event.currentTarget).attr('id')}`,
       });
     }
   });
 
-  $(window).scroll(() => {
+  $(window).scroll(function() {
     let offset = 250;
     let duration = 600;
     if ($(this).scrollTop() >= offset) {
@@ -47,7 +51,7 @@ function main() {
     vscode.postMessage({ command: 'toggleShowPage', value: this.checked});
   });
 
-  window.addEventListener('message', (event) => {
+  window.addEventListener('message', function(event) {
     const message = event.data; // The JSON data our extension sent
 
     if (message.command === 'versions') {

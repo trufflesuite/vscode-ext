@@ -7,6 +7,7 @@ import { AzureAccount } from './azure-account.api';
 import { Constants } from './Constants';
 import { showInputBox, showQuickPick } from './helpers';
 import { LocationItem, ResourceGroupItem, SubscriptionItem } from './Models';
+import { Telemetry } from './TelemetryClient';
 import { AzureBlockchainServiceValidator } from './validators/AzureBlockchainServiceValidator';
 
 interface ICachedLocationItems {
@@ -37,8 +38,10 @@ export class ResourceExplorerAndGenerator {
     );
 
     if (pick instanceof ResourceGroupItem) {
+      Telemetry.sendEvent('ResourceExplorerAndGenerator.getOrCreateResourceGroupItem.itemIsResourceGroupItem');
       return pick;
     } else {
+      Telemetry.sendEvent('ResourceExplorerAndGenerator.getOrCreateResourceGroupItem.createResourceGroupItemSelected');
       return this.createResourceGroup(subscriptionItem);
     }
   }
@@ -56,7 +59,9 @@ export class ResourceExplorerAndGenerator {
       await commands.executeCommand('azure-account.askForLogin');
       result = await this._accountApi.waitForLogin();
       if (!result) {
-        throw new Error(Constants.errorMessageStrings.WaitForLogin);
+        const error = new Error(Constants.errorMessageStrings.WaitForLogin);
+        Telemetry.sendException(error);
+        throw error;
       }
     }
 
@@ -74,7 +79,9 @@ export class ResourceExplorerAndGenerator {
       ));
 
     if (subscriptionItems.length === 0) {
-      throw new Error(Constants.errorMessageStrings.NoSubscriptionFoundClick);
+      const error = new Error(Constants.errorMessageStrings.NoSubscriptionFoundClick);
+      Telemetry.sendException(error);
+      throw error;
     }
 
     return subscriptionItems;
@@ -123,7 +130,7 @@ export class ResourceExplorerAndGenerator {
     const resourceGroupName = await showInputBox({
       ignoreFocusOut: true,
       placeHolder: Constants.placeholders.resourceGroupName,
-      prompt: Constants.paletteWestlakeLabels.provideResourceGroupName,
+      prompt: Constants.paletteABSLabels.provideResourceGroupName,
       validateInput: (name) => AzureBlockchainServiceValidator.validateResourceGroupName(name, resourceGroups),
     });
 
@@ -137,8 +144,11 @@ export class ResourceExplorerAndGenerator {
       title: `Creating resource group '${resourceGroupName}'`,
     }, async () => {
       if (subscriptionItem.subscriptionId === undefined) {
-        throw new Error(Constants.errorMessageStrings.NoSubscriptionFound);
+        const error = new Error(Constants.errorMessageStrings.NoSubscriptionFound);
+        Telemetry.sendException(error);
+        throw error;
       } else {
+        Telemetry.sendEvent('ResourceExplorerAndGenerator.createResourceGroup.withProgress.subscriptionIdIsDefined');
         const resourceManagementClient = await this.getResourceClient(subscriptionItem);
         const resourceGroup = await resourceManagementClient.resourceGroups.createOrUpdate(
           resourceGroupName,

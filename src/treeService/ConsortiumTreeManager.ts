@@ -5,6 +5,7 @@ import { ExtensionContext } from 'vscode';
 import { Constants } from '../Constants';
 import { Command, IExtensionItem, ItemFactory, ItemType, Network } from '../Models';
 import { Output } from '../Output';
+import { Telemetry } from '../TelemetryClient';
 
 export class ConsortiumTreeManager {
   private readonly items: IExtensionItem[];
@@ -24,9 +25,10 @@ export class ConsortiumTreeManager {
           return obj.map((child) => ItemFactory.create(child));
         }
       } catch (error) {
+        Telemetry.sendException(error);
         Output.outputLine(
           Constants.outputChannel.consortiumTreeManager,
-          `Load consortium tree error: ${error.message}`);
+          `${Constants.errorMessageStrings.LoadConsortiumTreeFailed} ${error.message}`);
       }
     }
 
@@ -45,8 +47,10 @@ export class ConsortiumTreeManager {
     let result = this.items;
 
     if (ignoreItemWithoutChildren) {
+      Telemetry.sendEvent('ConsortiumTreeManager.getItems.ignoreItemWithoutChildren');
       result = this.items.filter((item) => item.getChildren().length !== 0);
       if (result.length === 0) {
+        Telemetry.sendEvent('ConsortiumTreeManager.getItems.returnDefaultCommandsItems');
         result = defaultCommandsItems();
       }
     }

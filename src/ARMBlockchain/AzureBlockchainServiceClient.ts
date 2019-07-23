@@ -6,8 +6,9 @@ import { AzureServiceClient, AzureServiceClientOptions, UserTokenCredentials } f
 import * as uuid from 'uuid';
 import { Uri, window } from 'vscode';
 import { Constants } from '../Constants';
-import { vscodeEnvironment} from '../helpers';
+import { vscodeEnvironment } from '../helpers';
 import { Output } from '../Output';
+import { Telemetry } from '../TelemetryClient';
 import { ConsortiumResource } from './Operations/ConsortiumResource';
 import { MemberResource } from './Operations/MemberResource';
 import { SkuResource } from './Operations/SkuResources';
@@ -31,11 +32,14 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     super(credentials, options);
 
     if (!credentials) {
-      throw new Error(Constants.errorMessageStrings.VariableDoesNotExist(Constants.serviceClientVariables.credentials));
+      const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Credentials'));
+      Telemetry.sendException(error);
+      throw error;
     }
     if (!subscriptionId) {
-      throw new Error(
-        Constants.errorMessageStrings.VariableDoesNotExist(Constants.serviceClientVariables.subscriptionId));
+      const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('SubscriptionId'));
+      Telemetry.sendException(error);
+      throw error;
     }
 
     const packageInfo = this.getPackageJsonInfo(__dirname);
@@ -56,8 +60,10 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     // @ts-ignore
     await this.pipeline(httpRequest, (err: ServiceError, response: IncomingMessage, responseBody: string) => {
       if (err) {
+        Telemetry.sendException(new Error('AzureBlockchainServiceClient.createConsortium.pipeline.error'));
         Output.outputLine(Constants.outputChannel.azureBlockchainServiceClient, err.message);
       } else if (response.statusCode! < 200 || response.statusCode! > 299) {
+        Telemetry.sendException(new Error('AzureBlockchainServiceClient.createConsortium.pipeline.invalidStatus'));
         Output.outputLine(
           Constants.outputChannel.azureBlockchainServiceClient,
           `${response.statusMessage}(${response.statusCode}): ${responseBody}`,
@@ -125,20 +131,26 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     // @ts-ignore
     return this.pipeline(httpRequest, (err: ServiceError | null, response: IncomingMessage, responseBody: string) => {
       if (err) {
+        Telemetry.sendException(new Error('AzureBlockchainServiceClient.sendRequestToAzure.pipeline.error'));
         window.showErrorMessage(err.message);
         return callback(err);
       }
+
       const statusCode = response.statusCode;
       if (statusCode !== 200) {
         const error = new Error(responseBody);
+        Telemetry.sendException(
+          new Error('AzureBlockchainServiceClient.sendRequestToAzure.pipeline.statusCodeNotSuccess'));
         return callback(error);
       }
+
       // Deserialize Response
       try {
         const parsedResult = JSON.parse(responseBody);
         return callback(null, parsedResult);
       } catch (error) {
-        return callback(new Error(`Error ${error} occurred in deserialize the responseBody - ${responseBody}`));
+        Telemetry.sendException(new Error('Unexpected token in JSON at position 1'));
+        return callback(new Error(`Error ${error.message} occurred in deserialize the responseBody`));
       }
     });
   }

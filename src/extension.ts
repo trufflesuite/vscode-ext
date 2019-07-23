@@ -16,7 +16,7 @@ import { MnemonicRepository } from './MnemonicService/MnemonicRepository';
 import { CancellationEvent } from './Models';
 import { Output } from './Output';
 import { RequirementsPage, WelcomePage } from './pages';
-import { TelemetryClient } from './TelemetryClient';
+import { Telemetry } from './TelemetryClient';
 import { ConsortiumTree } from './treeService/ConsortiumTree';
 import { ConsortiumTreeManager } from './treeService/ConsortiumTreeManager';
 import { ConsortiumView } from './ViewItems';
@@ -24,7 +24,6 @@ import { ConsortiumView } from './ViewItems';
 export async function activate(context: ExtensionContext) {
   Constants.initialize(context);
   MnemonicRepository.initialize(context.globalState);
-  TelemetryClient.initialize();
 
   setCommandContext(CommandContext.Enabled, true);
   setCommandContext(CommandContext.IsWorkspaceOpen, isWorkspaceOpen());
@@ -150,13 +149,14 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(generateReportPublishingWorkflows);
   context.subscriptions.push(getPrivateKeyFromMnemonic);
 
+  Telemetry.sendEvent(Constants.telemetryEvents.extensionActivated);
   return required.checkAllApps();
 }
 
 export async function deactivate(): Promise<void> {
   // this method is called when your extension is deactivated
   await Output.dispose();
-
+  await Telemetry.dispose();
   await GanacheService.dispose();
 }
 
@@ -167,6 +167,6 @@ async function tryExecute(func: () => Promise<any>, errorMessage: string | null 
     if (error instanceof CancellationEvent) {
       return;
     }
-    window.showErrorMessage(errorMessage ? errorMessage : error.message);
+    window.showErrorMessage(errorMessage || error.message);
   }
 }
