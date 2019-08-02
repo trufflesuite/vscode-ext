@@ -4,6 +4,11 @@ All notable changes to the "azureblockchain" extension will be documented in thi
 
 
 
+## 0.1.7
+
+- Added contract UI/interaction feature
+- Added Solidity debugging feature
+
 ## 0.1.6
 
 - Added telemetry reporting capabilities

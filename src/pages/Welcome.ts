@@ -10,7 +10,7 @@ export class WelcomePage extends BasicWebView {
 
   constructor(context: ExtensionContext) {
     super(context);
-    this.config =  Constants.webViewPages.welcome;
+    this.config = Object.assign({}, Constants.webViewPages.welcome);
   }
 
   protected async setShowOnStartupFlagAtFirstTime(): Promise<boolean> {

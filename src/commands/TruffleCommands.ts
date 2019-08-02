@@ -27,8 +27,10 @@ import {
   MainNetworkConsortium,
 } from '../Models';
 import { Output } from '../Output';
+import { ContractDB } from '../services';
 import { Telemetry } from '../TelemetryClient';
 import { ConsortiumTreeManager } from '../treeService/ConsortiumTreeManager';
+import { ConsortiumView } from '../ViewItems';
 import { ConsortiumCommands } from './ConsortiumCommands';
 
 interface IDeployDestination {
@@ -93,22 +95,27 @@ export namespace TruffleCommands {
         placeHolder: Constants.placeholders.selectDeployDestination,
       },
     );
+
     Telemetry.sendEvent('TruffleCommands.deployContracts.selectedDestination',
       {
         cid: Telemetry.obfuscate((command.consortiumId || '').toString()),
         url: Telemetry.obfuscate((command.description || '').toString()),
       });
+
     // this code should be below showQuickPick because it takes time and it affects on responsiveness
     if (!await required.checkAppsSilent(RequiredApps.truffle)) {
       Telemetry.sendEvent('TruffleCommands.deployContracts.installTruffle');
       await required.installTruffle(required.Scope.locally);
     }
+
     if (await required.isHdWalletProviderRequired()
       && !(await required.checkHdWalletProviderVersion())) {
       Telemetry.sendEvent('TruffleCommands.deployContracts.installTruffleHdWalletProvider');
       await required.installTruffleHdWalletProvider();
     }
+
     await command.cmd();
+
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandFinished');
   }
 
@@ -128,15 +135,15 @@ export namespace TruffleCommands {
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
   }
 
-  export async function acquireCompiledContractUri(uri: Uri): Promise<Uri> {
-    if (path.extname(uri.fsPath) === Constants.contractExtension.json) {
-      Telemetry.sendEvent('TruffleCommands.acquireCompiledContractUri.jsonExtension');
-      return uri;
-    } else {
-      const error = new Error(Constants.errorMessageStrings.InvalidContract);
-      Telemetry.sendException(error);
-      throw error;
-    }
+  export async function writeRPCEndpointAddressToBuffer(consortiumNode: ConsortiumView): Promise<void> {
+    Telemetry.sendEvent('TruffleCommands.writeRPCEndpointAddressToBuffer.commandStarted');
+    const rpcEndpointAddress = await consortiumNode.getRPCAddress();
+    Telemetry.sendEvent('TruffleCommands.writeRPCEndpointAddressToBuffer.getRPCAddress',
+      { data: Telemetry.obfuscate(rpcEndpointAddress) },
+    );
+
+    await vscodeEnvironment.writeToClipboard(rpcEndpointAddress);
+    window.showInformationMessage(Constants.informationMessage.rpcEndpointCopiedToClipboard);
   }
 
   export async function getPrivateKeyFromMnemonic(): Promise<void> {
@@ -312,6 +319,8 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
       'npx',
       RequiredApps.truffle, 'migrate', '--reset', '--network', networkName,
     );
+
+    await ContractDB.updateContracts();
   });
 }
 
@@ -336,8 +345,19 @@ async function deployToMainNetwork(networkName: string, truffleConfigPath: strin
   await deployToNetwork(networkName, truffleConfigPath);
 }
 
+async function acquireCompiledContractUri(uri: Uri): Promise<Uri> {
+  if (path.extname(uri.fsPath) !== Constants.contractExtension.json) {
+    const error = new Error(Constants.errorMessageStrings.InvalidContract);
+    Telemetry.sendException(error);
+    throw error;
+  }
+
+  Telemetry.sendEvent('TruffleCommands.acquireCompiledContractUri.jsonExtension');
+  return uri;
+}
+
 async function readCompiledContract(uri: Uri): Promise<any> {
-  const contractUri = await TruffleCommands.acquireCompiledContractUri(uri);
+  const contractUri = await acquireCompiledContractUri(uri);
   const data = fs.readFileSync(contractUri.fsPath, null);
 
   return JSON.parse(data.toString());

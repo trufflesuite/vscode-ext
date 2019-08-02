@@ -88,6 +88,12 @@ export class Constants {
   };
 
   public static webViewPages = {
+    contractUI: {
+      path: '',
+      showOnStartup: 'showOnStartupContractUI',
+      title: 'Smart Contract UI',
+      viewType: 'contractUIPage',
+    },
     requirements: {
       path: '',
       showOnStartup: 'showOnStartupRequirementsPage',
@@ -299,12 +305,10 @@ export class Constants {
     },
   };
 
-  public static nodeModulesPath = '';
-
-  public static dataCopied = ' copied to clipboard';
-  public static rpcEndpointAddress = 'RPCEndpointAddress';
-
-  public static rpcGanacheMethod = 'net_listening';
+  public static rpcMethods = {
+    netListening: 'net_listening',
+    netVersion: 'net_version',
+  };
 
   public static ganacheCommandStrings = {
     cannotStartServer: 'Cannot start ganache server',
@@ -335,6 +339,7 @@ export class Constants {
     BuildContractsBeforeGenerating: 'Please build contracts before generating',
     BuildContractsDirIsEmpty: Constants.getMessageContractsBuildDirectoryIsEmpty,
     BuildContractsDirIsNotExist: Constants.getMessageContractsBuildDirectoryIsNotExist,
+    CompiledContractIsMissing: 'Compiled contract is missing for solidity file.',
     DirectoryIsNotEmpty: 'Directory is not empty. Open another one?',
     GetMessageChildAlreadyConnected: Constants.getMessageChildAlreadyConnected,
     GitIsNotInstalled: 'Git is not installed',
@@ -344,6 +349,7 @@ export class Constants {
     LoadConsortiumTreeFailed: 'Load consortium tree has failed.',
     MnemonicFileHaveNoText: 'Mnemonic file have no text',
     NetworkAlreadyExist: Constants.getMessageNetworkAlreadyExist,
+    NetworkNotFound: Constants.getMessageNetworkNotFound,
     NewProjectCreationFailed: 'Command createProject has failed.',
     NoSubscriptionFound: 'No subscription found.',
     NoSubscriptionFoundClick: 'No subscription found, click an Azure account ' +
@@ -362,6 +368,8 @@ export class Constants {
     cancelButton: 'Cancel',
     consortiumDoesNotHaveMemberWithUrl: 'Consortium does not have member with url',
     consortiumNameValidating: 'Consortium name validating...',
+    contractNotDeployed: 'Contract not deployed yet.',
+    deployButton: 'Deploy',
     detailsButton: 'Details',
     generatedLogicApp: 'Generated the logic app!',
     invalidRequiredVersion: 'Required app is not installed or has an old version.',
@@ -370,6 +378,7 @@ export class Constants {
     newProjectCreationStarted: 'New project creation is started',
     openButton: 'Open',
     privateKeyWasCopiedToClipboard: 'Private key was copied to clipboard',
+    rpcEndpointCopiedToClipboard: 'RPCEndpointAddress copied to clipboard',
     seeDetailsRequirementsPage: 'Please see details on the Requirements Page',
   };
 
@@ -404,9 +413,9 @@ export class Constants {
   public static initialize(context: ExtensionContext) {
     this.extensionContext = context;
     this.temporaryDirectory = context.storagePath ? context.storagePath : os.tmpdir();
+    this.webViewPages.contractUI.path = context.asAbsolutePath(path.join('resources', 'drizzle', 'index.html'));
     this.webViewPages.welcome.path = context.asAbsolutePath(path.join('resources', 'welcome', 'index.html'));
     this.webViewPages.requirements.path = context.asAbsolutePath(path.join('resources', 'welcome', 'prereqs.html'));
-    this.nodeModulesPath = context.asAbsolutePath('node_modules');
 
     this.icons.blockchainService = {
       dark: context.asAbsolutePath(path.join('resources/dark', 'blockchainService.svg')),
@@ -450,6 +459,10 @@ export class Constants {
 
   private static getMessageNetworkAlreadyExist(networkName: string): string {
     return `Network with name "${networkName}" already existed in truffle-config.js`;
+  }
+
+  private static getMessageNetworkNotFound(networkName: string): string {
+    return `Network with name "${networkName}" not found in truffle-config.js`;
   }
 
   private static getMessageVariableShouldBeDefined(variable: string): string {

@@ -1,10 +1,15 @@
-import * as rp from 'request-promise';
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 import { Constants } from '../Constants';
+import { HttpService } from '../services';
 import { Telemetry } from '../TelemetryClient';
 
 export async function isGanacheServer(port: number | string): Promise<boolean> {
   try {
-    const response = await sendRPCRequest(port, Constants.rpcGanacheMethod);
+    const response = await HttpService.sendRPCRequest(
+      `http://${Constants.localhost}:${port}`,
+      Constants.rpcMethods.netListening);
     return response && !!response.result || false;
   } catch (error) {
     Telemetry.sendException(error);
@@ -27,22 +32,4 @@ export async function waitGanacheStarted(port: number | string, maxRetries: numb
     }
   };
   await retry(0);
-}
-
-export async function sendRPCRequest(
-  port: number | string,
-  methodName: string,
-): Promise<{ result?: any } | undefined> {
-  return rp.post(
-    `http://${Constants.localhost}:${port}`,
-    {
-      body: {
-        jsonrpc: '2.0',
-        method: methodName,
-        params: [],
-      },
-      json: true,
-    })
-    .then((result) => result)
-    .catch(() => undefined);
 }

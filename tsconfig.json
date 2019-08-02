@@ -24,12 +24,14 @@
     "allowJs": true,
     "typeRoots": [
       "./node_modules/@types",
-      "./node_modules/@machinomy"
+      "./node_modules/@machinomy",
+      "./src/debugger/types",
     ],
   },
   "include": ["src/**/*.js", "src/**/*.ts", "test/**/*.js", "test/**/*.ts", "test/**/*.json"],
   "exclude": [
     "node_modules",
-    ".vscode-test"
+    ".vscode-test",
+    "drizzleUI"
   ]
 }

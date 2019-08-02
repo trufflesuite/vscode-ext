@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
+
 import { ChildProcess, spawn } from 'child_process';
 import { OutputChannel, window } from 'vscode';
 import { Constants, RequiredApps } from '../Constants';

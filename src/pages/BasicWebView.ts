@@ -22,6 +22,11 @@ export interface IWebViewConfig {
   viewType: string;
 }
 
+export interface IWebViewMessage {
+  command: string;
+  value: any;
+}
+
 export abstract class BasicWebView {
   protected panel?: WebviewPanel;
   protected readonly context: ExtensionContext;
@@ -77,6 +82,13 @@ export abstract class BasicWebView {
     return this.createAndShow();
   }
 
+  public async postMessage(message: IWebViewMessage): Promise<void> {
+    if (!this.panel || !this.panel.webview) {
+      return;
+    }
+    await this.panel.webview.postMessage(message);
+  }
+
   protected async createAndShow(): Promise<void> {
     if (this.panel) {
       return this.panel.reveal(ViewColumn.One);
@@ -106,7 +118,7 @@ export abstract class BasicWebView {
     }
 
     if (message.command === 'documentReady') {
-      this.panel.webview.postMessage({
+      await this.postMessage({
         command: 'showOnStartup',
         value: this.context.globalState.get(this.config.showOnStartup),
       });

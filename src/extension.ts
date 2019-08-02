@@ -1,29 +1,36 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+// workaround to load native modules
+// (since https://github.com/Microsoft/vscode/issues/658 doesn't work on win10)
+import nativeModulesLoader from './debugAdapter/nativeModules/loader';
+nativeModulesLoader();
+
 import { commands, ExtensionContext, Uri, window } from 'vscode';
-import { AzureBlockchain } from './AzureBlockchain';
 import { ConsortiumCommands } from './commands/ConsortiumCommands';
 import { ContractCommands } from './commands/ContractCommands';
+import { startSolidityDebugger } from './commands/DebuggerCommands';
 import { GanacheCommands } from './commands/GanacheCommands';
 import { LogicAppCommands } from './commands/LogicAppCommands';
 import { ProjectCommands } from './commands/ProjectCommands';
 import { TruffleCommands } from './commands/TruffleCommands';
 import { Constants } from './Constants';
-import { GanacheService } from './GanacheService/GanacheService';
 import { CommandContext, isWorkspaceOpen, required, setCommandContext } from './helpers';
-import { MnemonicRepository } from './MnemonicService/MnemonicRepository';
 import { CancellationEvent } from './Models';
 import { Output } from './Output';
 import { RequirementsPage, WelcomePage } from './pages';
+import { AdapterType, ContractDB, GanacheService, MnemonicRepository } from './services';
 import { Telemetry } from './TelemetryClient';
 import { ConsortiumTree } from './treeService/ConsortiumTree';
 import { ConsortiumTreeManager } from './treeService/ConsortiumTreeManager';
 import { ConsortiumView } from './ViewItems';
 
+import { DebuggerConfiguration } from './debugAdapter/configuration/debuggerConfiguration';
+
 export async function activate(context: ExtensionContext) {
   Constants.initialize(context);
   MnemonicRepository.initialize(context.globalState);
+  DebuggerConfiguration.initialize(context);
 
   setCommandContext(CommandContext.Enabled, true);
   setCommandContext(CommandContext.IsWorkspaceOpen, isWorkspaceOpen());
@@ -34,6 +41,7 @@ export async function activate(context: ExtensionContext) {
   const consortiumTree = new ConsortiumTree(consortiumTreeManager);
 
   await welcomePage.checkAndShow();
+  await ContractDB.initialize(AdapterType.IN_MEMORY);
   window.registerTreeDataProvider('AzureBlockchain', consortiumTree);
 
   //#region azureBlockchain extension commands
@@ -46,10 +54,6 @@ export async function activate(context: ExtensionContext) {
   const showRequirementsPage = commands.registerCommand('azureBlockchainService.showRequirementsPage',
     async (checkShowOnStartup: boolean) => {
       return checkShowOnStartup ? requirementsPage.checkAndShow() : requirementsPage.show();
-    });
-  const copyRPCEndpointAddress = commands.registerCommand('azureBlockchainService.copyRPCEndpointAddress',
-    async (viewItem: ConsortiumView) => {
-      await tryExecute(() => AzureBlockchain.copyRPCEndpointAddress(viewItem));
     });
   //#endregion
 
@@ -81,6 +85,10 @@ export async function activate(context: ExtensionContext) {
   const copyABI = commands.registerCommand('contract.copyABI', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeAbiToBuffer(uri));
   });
+  const copyRPCEndpointAddress = commands.registerCommand('azureBlockchainService.copyRPCEndpointAddress',
+    async (viewItem: ConsortiumView) => {
+      await tryExecute(() => TruffleCommands.writeRPCEndpointAddressToBuffer(viewItem));
+    });
   const getPrivateKeyFromMnemonic = commands.registerCommand('azureBlockchainService.getPrivateKey', async () => {
     await tryExecute(() => TruffleCommands.getPrivateKeyFromMnemonic());
   });
@@ -99,10 +107,12 @@ export async function activate(context: ExtensionContext) {
     });
   //#endregion
 
-  //#region remix commands
-  const generateSmartContractUI = commands.registerCommand('drizzle.generateSmartContractUI', async () => {
-    await tryExecute(() => ContractCommands.generateSmartContractUI());
-  });
+  //#region contract commands
+  const showSmartContractPage = commands.registerCommand(
+    'azureBlockchainService.showSmartContractPage',
+    async (contractPath: Uri) => {
+      await tryExecute(() => ContractCommands.showSmartContractPage(context, contractPath));
+    });
   //#endregion
 
   //#region logic app commands
@@ -128,9 +138,12 @@ export async function activate(context: ExtensionContext) {
     });
   //#endregion
 
+  const startDebugger = commands.registerCommand(
+    'extension.truffle.debugTransaction', startSolidityDebugger);
+
   context.subscriptions.push(showWelcomePage);
   context.subscriptions.push(showRequirementsPage);
-  context.subscriptions.push(generateSmartContractUI);
+  context.subscriptions.push(showSmartContractPage);
   context.subscriptions.push(refresh);
   context.subscriptions.push(newSolidityProject);
   context.subscriptions.push(buildContracts);
@@ -148,6 +161,7 @@ export async function activate(context: ExtensionContext) {
   context.subscriptions.push(generateEventPublishingWorkflows);
   context.subscriptions.push(generateReportPublishingWorkflows);
   context.subscriptions.push(getPrivateKeyFromMnemonic);
+  context.subscriptions.push(startDebugger);
 
   Telemetry.sendEvent(Constants.telemetryEvents.extensionActivated);
   return required.checkAllApps();
@@ -158,6 +172,7 @@ export async function deactivate(): Promise<void> {
   await Output.dispose();
   await Telemetry.dispose();
   await GanacheService.dispose();
+  await ContractDB.dispose();
 }
 
 async function tryExecute(func: () => Promise<any>, errorMessage: string | null = null): Promise<void> {

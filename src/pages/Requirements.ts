@@ -11,7 +11,7 @@ export class RequirementsPage extends BasicWebView {
 
   constructor(context: ExtensionContext) {
     super(context);
-    this.config =  Constants.webViewPages.requirements;
+    this.config = Object.assign({}, Constants.webViewPages.requirements);
   }
 
   protected async setShowOnStartupFlagAtFirstTime(): Promise<boolean> {
@@ -26,7 +26,7 @@ export class RequirementsPage extends BasicWebView {
     }
 
     if (message.command === 'documentReady') {
-      this.panel.webview.postMessage({
+      await this.postMessage({
         command: 'versions',
         value: await required.getAllVersions(),
       });
