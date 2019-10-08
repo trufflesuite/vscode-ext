@@ -20,10 +20,11 @@ export class MemberResource {
     });
   }
 
-  public getMemberAccessKeys(memberName: string): Promise<IAzureMemberAccessKeysDto> {
+  public getTransactionNodeAccessKeys(memberName: string, nodeName: string): Promise<IAzureMemberAccessKeysDto> {
     return new Promise((resolve, reject) => {
-      return this.client.getMemberAccessKeys(
+      return this.client.getTransactionNodeAccessKeys(
         memberName,
+        nodeName,
         (error: Error | null, result?: any,
       ) => {
         if (error) {

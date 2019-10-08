@@ -89,7 +89,7 @@ async function createNewEmptyProject(projectPath: string): Promise<void> {
 }
 
 async function createProjectFromTruffleBox(projectPath: string): Promise<void> {
-  Telemetry.sendEvent('ProjectCommands.createNewEmptyProject.customProject');
+  Telemetry.sendEvent('ProjectCommands.createProjectFromTruffleBox.customProject');
   const truffleBoxName = await getTruffleBoxName();
   await createProject(projectPath, truffleBoxName);
 }
@@ -116,7 +116,7 @@ async function createProject(projectPath: string, truffleBoxName: string): Promi
 async function getTruffleBoxName(): Promise<string> {
   return await showInputBox({
     ignoreFocusOut: true,
-    prompt: Constants.paletteABSLabels.enterTruffleBoxName,
+    prompt: Constants.paletteLabels.enterTruffleBoxName,
     validateInput: (value: string) => {
       if (value.indexOf('://') !== -1 || value.indexOf('git@') !== -1 || value.split('/').length === 2) {
         return Constants.validationMessages.forbiddenSymbols;

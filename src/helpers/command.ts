@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import * as cp from 'child_process';
-import * as os from 'os';
+import { ChildProcess, spawn, SpawnOptions } from 'child_process';
+import { tmpdir } from 'os';
 import { Constants } from '../Constants';
 import { Output } from '../Output';
 import { Telemetry } from '../TelemetryClient';
@@ -13,11 +13,13 @@ export interface ICommandResult {
   cmdOutputIncludingStderr: string;
 }
 
-export async function executeCommand(
-  workingDirectory: string | undefined,
-  commands: string,
-  ...args: string[]
-): Promise<string> {
+export interface ICommandExecute {
+  childProcess: ChildProcess;
+  result: Promise<ICommandResult>;
+}
+
+export async function executeCommand(workingDirectory: string | undefined, commands: string, ...args: string[])
+  : Promise<string> {
   Output.outputLine(
     Constants.outputChannel.executeCommand,
     '\n' +
@@ -43,48 +45,55 @@ export async function executeCommand(
   return result.cmdOutput;
 }
 
-export function startProcess(
-  workingDirectory: string | undefined,
-  commands: string,
-  args: string[],
-): cp.ChildProcess {
-  const options: cp.SpawnOptions = { cwd: workingDirectory || os.tmpdir(), shell: true };
-  const process = cp.spawn(commands, args, options);
-
-  return process;
+export function spawnProcess(workingDirectory: string | undefined, commands: string, args: string[]): ChildProcess {
+  const options: SpawnOptions = { cwd: workingDirectory || tmpdir(), shell: true };
+  return spawn(commands, args, options);
 }
 
 export async function tryExecuteCommand(workingDirectory: string | undefined, commands: string, ...args: string[])
   : Promise<ICommandResult> {
-  return new Promise((resolve: (res: any) => void, reject: (error: Error) => void): void => {
-    let cmdOutput: string = '';
-    let cmdOutputIncludingStderr: string = '';
+  const { result } = tryExecuteCommandAsync(workingDirectory, true, commands, ...args);
 
-    const options: cp.SpawnOptions = { cwd: workingDirectory || os.tmpdir(), shell: true };
-    const childProcess: cp.ChildProcess = cp.spawn(commands, args, options);
+  return result;
+}
 
+export function tryExecuteCommandAsync(workingDirectory: string | undefined,
+                                       writeToOutputChannel: boolean,
+                                       commands: string,
+                                       ...args: string[])
+  : ICommandExecute {
+  let cmdOutput: string = '';
+  let cmdOutputIncludingStderr: string = '';
+
+  const childProcess = spawnProcess(workingDirectory, commands, args);
+  const result = new Promise((resolve: (res: any) => void, reject: (error: Error) => void): void => {
     childProcess.stdout.on('data', (data: string | Buffer) => {
       data = data.toString();
       cmdOutput = cmdOutput.concat(data);
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
 
-      Output.output(Constants.outputChannel.executeCommand, data);
+      if (writeToOutputChannel) {
+        Output.output(Constants.outputChannel.executeCommand, data);
+      }
     });
 
     childProcess.stderr.on('data', (data: string | Buffer) => {
       data = data.toString();
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
 
-      Output.output(Constants.outputChannel.executeCommand, data);
+      if (writeToOutputChannel) {
+        Output.output(Constants.outputChannel.executeCommand, data);
+      }
     });
 
     childProcess.on('error', reject);
-    childProcess.on('close', (code: number) => {
-      resolve({
-        cmdOutput,
-        cmdOutputIncludingStderr,
-        code,
-      });
+    childProcess.on('exit', (code: number) => {
+      resolve({ cmdOutput, cmdOutputIncludingStderr, code });
     });
   });
+
+  return {
+    childProcess,
+    result,
+  };
 }

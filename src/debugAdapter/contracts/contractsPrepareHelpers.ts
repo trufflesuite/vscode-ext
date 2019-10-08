@@ -1,4 +1,6 @@
 import { DebugNetwork } from '../debugNetwork';
+import { sortFilePaths } from '../helpers';
+import { IContractJsonModel } from '../models/IContractJsonModel';
 import { IContractModel } from '../models/IContractModel';
 import { Web3Wrapper } from '../web3Wrapper';
 import { ContractJsonsProvider } from './contractJsonsProvider';
@@ -10,27 +12,24 @@ export async function prepareContracts(workingDirectory: any) {
   const contractBuildDir = debugNetwork.getTruffleConfiguration()!.contracts_build_directory;
   const debugNetworkOptions = debugNetwork.getNetwork()!.options;
   const web3 = new Web3Wrapper(debugNetworkOptions);
-  const provider = await web3.getProvider();
+  const provider = web3.getProvider();
   const debugNetworkId = await web3.getNetworkId();
 
-  const contracts: IContractModel[] = [];
   const contractBuildsProvider = new ContractJsonsProvider(contractBuildDir);
   const contractJsons = await contractBuildsProvider.getJsonsContents();
-  Object.keys(contractJsons).forEach((fileName) => {
-    const contractJson = contractJsons[fileName];
-    const contractModel = {
-      address: contractJson.networks
-        && contractJson.networks[debugNetworkId]
-        && contractJson.networks[debugNetworkId].address,
-      binary: contractJson.bytecode,
-      deployedBinary: contractJson.deployedBytecode,
-      ...contractJson,
-    } as IContractModel;
-    contracts.push(contractModel);
-  });
+  const contractJsonValues = Object.values(contractJsons);
+  const contracts = contractJsonValues.map((contractJson) =>
+    (mapToContractModel(contractJson, debugNetworkId)));
+
+  const onlyUniqueElements = (value: any, index: number, self: any[]) => (self.indexOf(value) === index);
+  const uniqueSourcePaths = contractJsonValues
+    .map((contractJson) => (contractJson.sourcePath))
+    .filter(onlyUniqueElements);
+  const sortedSourcePaths = sortFilePaths(uniqueSourcePaths);
 
   return {
     contracts,
+    files: sortedSourcePaths,
     provider,
   };
 }
@@ -39,7 +38,12 @@ export function filterContractsWithAddress(contracts: IContractModel[]): IContra
   return contracts.filter((c) => c.address);
 }
 
-// Base contracts are not deployed as particular contract that's why they don't have address
-export function filterBaseContracts(contracts: IContractModel[]): IContractModel[] {
-  return contracts.filter((c) => !c.address);
+function mapToContractModel(contractJson: IContractJsonModel, networkId: number) {
+  return {
+    address: contractJson.networks[networkId]
+      && contractJson.networks[networkId].address,
+    binary: contractJson.bytecode,
+    deployedBinary: contractJson.deployedBytecode,
+    ...contractJson,
+  } as IContractModel;
 }

@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { Telemetry } from '../../TelemetryClient';
-import { IExtensionItem } from '../IExtensionItem';
+import { IExtensionItem } from '../TreeItems';
 
 export abstract class ItemCreator {
   public create(obj: { [key: string]: any }): IExtensionItem {
@@ -10,22 +10,25 @@ export abstract class ItemCreator {
 
     this.checkRequiredFields(obj, requiredFields);
 
-    return this.createFromObject(obj);
+    const args = this.getAdditionalConstructorArguments(obj);
+
+    return this.createFromObject(...args);
   }
 
-  protected abstract createFromObject(obj: { [key: string]: any }): IExtensionItem;
+  protected abstract createFromObject(...args: any[]): IExtensionItem;
 
   protected getRequiredFields(): Array<{ fieldName: string, type: string }> {
     return [
       { fieldName: 'itemType', type: 'number' },
-      { fieldName: 'label', type: 'string' },
     ];
   }
 
-  private checkRequiredFields(
-    obj: { [key: string]: any },
-    requiredFields: Array<{ fieldName: string, type: string }>,
-  ): void {
+  protected getAdditionalConstructorArguments(_obj: { [key: string]: any }): any[] {
+    return [];
+  }
+
+  private checkRequiredFields(obj: { [key: string]: any }, requiredFields: Array<{ fieldName: string, type: string }>)
+  : void {
     requiredFields.forEach((item) => {
       const field = obj[item.fieldName];
       if (field === undefined || field === null) {

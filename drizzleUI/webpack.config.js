@@ -36,6 +36,7 @@ module.exports = () => {
     resolve: {
       alias: {
         components: path.join(__dirname, './src/components'),
+        constants: path.join(__dirname, './src/constants'),
         helpers: path.join(__dirname, './src/helpers'),
         polyfills: path.join(__dirname, './src/polyfills'),
         views: path.join(__dirname, './src/views')

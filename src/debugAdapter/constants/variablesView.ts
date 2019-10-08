@@ -12,3 +12,5 @@ export const SCOPES = {
         ref: VARIABLE_REFERANCE.dynamicVariables,
     },
 };
+
+export const OBJECT_VARIABLE_DISPLAY_NAME = 'Object';

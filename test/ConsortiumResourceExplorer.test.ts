@@ -7,14 +7,10 @@ import * as uuid from 'uuid';
 import { extensions, QuickPickOptions } from 'vscode';
 import { IAzureMemberDto, IAzureTransactionNodeDto, MemberResource } from '../src/ARMBlockchain';
 import { TransactionNodeResource } from '../src/ARMBlockchain/Operations/TransactionNodeResource';
-import { ConsortiumResourceExplorer } from '../src/ConsortiumResourceExplorer';
 import { Constants } from '../src/Constants';
 import * as helpers from '../src/helpers';
-import {
-  ResourceGroupItem,
-  SubscriptionItem,
-} from '../src/Models';
-import { ConsortiumItem } from '../src/Models/ConsortiumItem';
+import { ConsortiumItem, ResourceGroupItem, SubscriptionItem } from '../src/Models/QuickPickItems';
+import { ConsortiumResourceExplorer } from '../src/resourceExplorers';
 
 describe('Consortium Resource Explorer', () => {
 
@@ -79,21 +75,22 @@ describe('Consortium Resource Explorer', () => {
     .onCall(2)
     .returns(consortiumItem as ConsortiumItem);
 
-  describe('ConsortiumResourceExplorer.SelectOrCreateConsortium', () => {
-    it('SelectOrCreateConsortium all method should be executed',
+  describe('ConsortiumResourceExplorer.selectProject', () => {
+    it('selectProject all method should be executed',
       async () => {
         // Arrange
-        sinon.stub(MemberResource.prototype, 'getListMember')
-          .returns(getListMemberStub());
-        sinon.stub(TransactionNodeResource.prototype, 'getListTransactionNode')
-          .returns(getListTransactionNodeStub());
+        sinon.stub(MemberResource.prototype, 'getListMember').returns(getListMemberStub());
+        sinon.stub(TransactionNodeResource.prototype, 'getListTransactionNode').returns(getListTransactionNodeStub());
         sinon.replace(helpers, 'showQuickPick', showQuickPickStub);
 
         const getExtensionFake = sinon.fake.returns({ exports: accountApi });
         sinon.replace(extensions, 'getExtension', getExtensionFake);
 
+        const consortiumResourceExplorer = new ConsortiumResourceExplorer();
+        sinon.stub(consortiumResourceExplorer, 'getAccessKeys').returns(Promise.resolve([uuid.v4()]));
+
         // Act
-        await (new ConsortiumResourceExplorer()).selectOrCreateConsortium();
+        await consortiumResourceExplorer.selectProject();
 
         // Assert
         assert.strictEqual(

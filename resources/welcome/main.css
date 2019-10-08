@@ -231,6 +231,10 @@ header p {
   margin: 0;
 }
 
+.quick-starts-blocks a {
+  cursor: pointer;
+}
+
 #tutorial h3 {
   font-family: "Segoe UI Light", sans-serif;
   font-size: 20px;
@@ -348,7 +352,7 @@ footer {
 /*#region partners*/
 .partners {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   flex-wrap: wrap;
   flex-direction: row;
   align-items: stretch;
@@ -357,11 +361,10 @@ footer {
 }
 
 .partners > a {
-  flex: 1;
-}
-
-.partners > a:not(:last-child) {
-  margin-right: 15px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 30%;
+  margin-top: 10px;
 }
 
 .specific-partner {

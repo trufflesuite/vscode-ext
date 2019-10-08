@@ -4,6 +4,16 @@ All notable changes to the "azureblockchain" extension will be documented in thi
 
 
 
+## 0.1.8
+
+- Added support for Open Zeppelin contract/library download and delployment
+- Contract UI/Interaction functionality updates
+  - Implement support for array types as function parameters
+  - Support Enum types
+- Bug fixes
+  - Ganache not properly shutting down on VS Code exit
+  - Closing open items raised in the extension VS Code public GitHub repo
+
 ## 0.1.7
 
 - Added contract UI/interaction feature

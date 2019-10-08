@@ -1,29 +1,22 @@
 import { EventEmitter } from 'events';
-import * as os from 'os';
+import { relative as pathRelative } from 'path';
 import * as truffleDebugUtils from 'truffle-debug-utils';
 import * as truffleDebugger from 'truffle-debugger';
 import {
-  filterBaseContracts,
   filterContractsWithAddress,
   prepareContracts,
 } from './contracts/contractsPrepareHelpers';
-import { toWindowsPath } from './helpers';
 import { DebuggerTypes } from './models/debuggerTypes';
+import { ICallInfo } from './models/ICallInfo';
 import { IContractModel } from './models/IContractModel';
 import { IInstruction } from './models/IInstruction';
 
-const WIN32 = 'win32';
-// this is a flag for the case when truffle-debugger lib is updated with custom stacktrace
-const CUSTOM_STACK_TRACE_IS_INJECTED = false;
-
 export default class RuntimeInterface extends EventEmitter {
-  public isDebuggerAttached: boolean;
+  private _isDebuggerAttached: boolean;
   private _session: truffleDebugger.Session | undefined;
   private _selectors: truffleDebugger.Selectors;
   private _numBreakpoints: number;
-  private _osPlatform: string;
-  private _contractsWithAddress: IContractModel[];
-  private _baseContracts: IContractModel[];
+  private _deployedContracts: IContractModel[];
   private _initialBreakPoints: Array<{ path: string, lines: number[] }>;
 
   constructor() {
@@ -31,11 +24,9 @@ export default class RuntimeInterface extends EventEmitter {
 
     this._selectors = truffleDebugger.selectors;
     this._numBreakpoints = 0;
-    this._osPlatform = os.platform();
-    this.isDebuggerAttached = false;
+    this._isDebuggerAttached = false;
     this._initialBreakPoints = [];
-    this._contractsWithAddress = [];
-    this._baseContracts = [];
+    this._deployedContracts = [];
   }
 
   public clearBreakpoints(): Promise<void> {
@@ -62,7 +53,7 @@ export default class RuntimeInterface extends EventEmitter {
     this._initialBreakPoints.length = 0; // remove them since they are no longer needed
   }
 
-  public async setBreakpoint(path: string, line: number): Promise<DebuggerTypes.IBreakpoint | null> {
+  public async setBreakpoint(filePath: string, line: number): Promise<DebuggerTypes.IBreakpoint | null> {
     if (!this._session) {
       return Promise.resolve(null);
     }
@@ -70,13 +61,9 @@ export default class RuntimeInterface extends EventEmitter {
 
     // we'll need the debugger-internal ID of this source
     const debuggerSources: any = this._session.view(this._selectors.solidity.info.sources);
-    const matchingSources: any = Object.values(debuggerSources).filter((sourceObject: any) => {
-      const formattedSourPath = this._osPlatform === WIN32
-        ? toWindowsPath(sourceObject.sourcePath)
-        : sourceObject.sourcePath;
-      return formattedSourPath.includes(path);
-    });
-    const sourceId = matchingSources[0].id;
+    const matchingSource: any = Object.values(debuggerSources).find((source: any) =>
+      (pathRelative(source.sourcePath, filePath) === ''));
+    const sourceId = matchingSource.id;
 
     breakpoint = {
       id: this._numBreakpoints,
@@ -90,39 +77,28 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   // Get stack trace (without method name)
-  public callStack(): any[] {
+  public callStack(): ICallInfo[] {
     this.validateSession();
-    const result: any[] = [];
     const callStack = this._session!.view(this._selectors.evm.current.callstack);
     const currentLine = this.currentLine();
-    const defaultLine = { line: 0, column: 0 };
-    for (const fn of callStack) {
-      // source is stored for previous call only
-      if (CUSTOM_STACK_TRACE_IS_INJECTED && fn.source) {
-        const { file, line, column } = fn.source;
-        result.push({ file, line, column, isCurrent: false });
-      } else {
-        let isCurrent: boolean;
-        let linesInfo: any;
-        // if currentLine from baseContract then consider this is current call
-        const isBaseContract = this._baseContracts.some((c) => c.sourcePath === currentLine.file);
-        if (isBaseContract) {
-          isCurrent = true;
-          linesInfo = currentLine;
-        } else {
-          const contract = this._contractsWithAddress
-            .find((c: any) => c.address === (fn.address || fn.storageAddress));
-          if (contract === undefined) {
-            throw new Error(`Coundn\'t find contract by address ${fn.address || fn.storageAddress}`);
-          }
-          isCurrent = contract.sourcePath === currentLine.file;
-          linesInfo = isCurrent ? currentLine : { file: contract.sourcePath, ...defaultLine };
-        }
-
-        result.push({ ...linesInfo, address: fn.address, isCurrent });
-      }
+    if (callStack.length === 1) {
+      return [{ ...currentLine, method: 'Current' }];
     }
 
+    const result: ICallInfo[] = [];
+    // There is no api to get line/collumn of previous call
+    // That's why set them as default
+    const defaultLine = { line: 0, column: 0 };
+    for (let i = 0; i < callStack.length - 1; i++) { // processing all previous calls
+      const contract = this._deployedContracts
+        .find((c: any) => c.address === (callStack[i].address || callStack[i].storageAddress));
+      if (contract === undefined) {
+        throw new Error(`Coundn\'t find contract by address ${callStack[i].address || callStack[i].storageAddress}`);
+      }
+      result.push({ file: contract.sourcePath, ...defaultLine, method: 'Previous' });
+    }
+
+    result.push({ ...currentLine, method: 'Current' });
     return result;
   }
 
@@ -167,16 +143,15 @@ export default class RuntimeInterface extends EventEmitter {
   public async attach(txHash: string, workingDirectory: string): Promise<void> {
     const result: any = await prepareContracts(workingDirectory);
 
-    this._contractsWithAddress = filterContractsWithAddress(result.contracts);
-    this._baseContracts = filterBaseContracts(result.contracts);
+    this._deployedContracts = filterContractsWithAddress(result.contracts);
 
     const debuggerOptions = {
       contracts: result.contracts,
+      files: result.files,
       provider: result.provider,
     };
-    const bugger = await truffleDebugger.forTx(txHash, debuggerOptions);
-    this._session = bugger.connect();
-    this.isDebuggerAttached = true;
+    this._session = await this.generateSession(txHash, debuggerOptions);
+    this._isDebuggerAttached = true;
   }
 
   public currentLine(): DebuggerTypes.IFrame {
@@ -211,6 +186,10 @@ export default class RuntimeInterface extends EventEmitter {
     });
   }
 
+  public isDebuggerAttached() {
+    return this._isDebuggerAttached;
+  }
+
   private processSteping(event: any) {
     const isEndOfTransactionTrace = this._session!.view(this._selectors.trace.finished);
     if (isEndOfTransactionTrace) {
@@ -218,6 +197,11 @@ export default class RuntimeInterface extends EventEmitter {
     } else {
       this.sendEvent(event);
     }
+  }
+
+  private async generateSession(txHash: string, debuggerOptions: any) {
+    const bugger = await truffleDebugger.forTx(txHash, debuggerOptions);
+    return bugger.connect();
   }
 
   private validateSession() {

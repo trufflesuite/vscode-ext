@@ -6,8 +6,8 @@ import DebuggerConfigurationProvider from './debugConfigurationProvider';
 
 export class DebuggerConfiguration {
     public static initialize(context: ExtensionContext) {
-        const debugConfiProvider = new DebuggerConfigurationProvider();
-        context.subscriptions.push(debug.registerDebugConfigurationProvider(DEBUG_TYPE, debugConfiProvider));
+        const debugConfigProvider = new DebuggerConfigurationProvider();
+        context.subscriptions.push(debug.registerDebugConfigurationProvider(DEBUG_TYPE, debugConfigProvider));
 
         if (EMBED_DEBUG_ADAPTER) {
           const factory = new DebugAdapterDescriptorFactory();

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import App from './app';
+import App from './App';
 import { Drizzle } from 'drizzle';
 import { DrizzleContext } from 'drizzle-react';
 import { LocalStorage } from 'polyfills/localStorage';

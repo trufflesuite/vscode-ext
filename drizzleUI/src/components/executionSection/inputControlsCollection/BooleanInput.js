@@ -15,10 +15,9 @@ class BooleanInput extends React.Component {
     super(props);
 
     this.state = { value: false };
-    this.onChange = this.onChange.bind(this);
   }
 
-  onChange(event) {
+  onChange = (event) => {
     this.setState({ value: event.target.value });
     this.props.handleInputChange(event);
   }
@@ -46,5 +45,5 @@ export default BooleanInput;
 
 BooleanInput.propTypes = {
   item: PropTypes.any.isRequired,
-  handleInputChange: PropTypes.any.isRequired,
+  handleInputChange: PropTypes.func.isRequired,
 };

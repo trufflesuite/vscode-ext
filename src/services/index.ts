@@ -3,9 +3,14 @@
 
 export * from './contract/ContractDB';
 export * from './contract/ContractInstance';
+export * from './contract/ContractInstanceWithMetadata';
 export * from './contract/ContractService';
 export * from './HttpService';
 export * from './NetworkService';
-export * from '../GanacheService/GanacheService';
-export * from '../GanacheService/GanacheServiceClient';
-export * from '../MnemonicService/MnemonicRepository';
+export * from './ganache/GanacheService';
+export * from './ganache/GanacheServiceClient';
+export * from './MnemonicRepository';
+export * from './tree/TreeManager';
+export * from './tree/TreeService';
+export * from './openZeppelin/OpenZeppelinService';
+export * from './openZeppelin/OpenZeppelinMigrationsService';

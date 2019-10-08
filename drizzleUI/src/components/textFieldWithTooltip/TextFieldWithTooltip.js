@@ -57,7 +57,7 @@ TextFieldWithTooltip.propTypes = {
   disabled: PropTypes.bool,
   fullWidth: PropTypes.bool,
   id: PropTypes.string,
-  label: PropTypes.string,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   value: PropTypes.any,
   placement: PropTypes.string
 };

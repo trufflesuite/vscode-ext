@@ -27,8 +27,6 @@ Nethereum.Generators.MessagingWorkflow = Nethereum.Generators.MessagingWorkflow 
 Nethereum.Generators.MessagingWorkflow.FlowApps = Nethereum.Generators.MessagingWorkflow.FlowApps || {};
 Nethereum.Generators.MessagingWorkflow.LogicApps = Nethereum.Generators.MessagingWorkflow.LogicApps || {};
 Nethereum.Generators.ReportingWorkflow = Nethereum.Generators.ReportingWorkflow || {};
-Nethereum.Generators.ReportingWorkflow.Csharp = Nethereum.Generators.ReportingWorkflow.Csharp || {};
-Nethereum.Generators.ReportingWorkflow.FlowApps = Nethereum.Generators.ReportingWorkflow.FlowApps || {};
 Nethereum.Generators.ReportingWorkflow.LogicApps = Nethereum.Generators.ReportingWorkflow.LogicApps || {};
 Nethereum.Generators.ServiceWorkflow = Nethereum.Generators.ServiceWorkflow || {};
 Nethereum.Generators.ServiceWorkflow.FlowApps = Nethereum.Generators.ServiceWorkflow.FlowApps || {};
@@ -212,25 +210,23 @@ Nethereum.Generators.MessagingWorkflow.LogicApps.MessagingWorkflowEventLogicAppM
     0, $asm);
 Nethereum.Generators.MessagingWorkflow.LogicApps.MessagingWorkflowEventLogicAppTemplate = $d.declare("Nethereum.Generators.MessagingWorkflow.LogicApps.MessagingWorkflowEventLogicAppTemplate", 
     0, $asm);
+Nethereum.Generators.ReportingWorkflow.ReportingWorkflowCSharpOutputLogicAppGenerator = $d.declare("Nethereum.Generators.ReportingWorkflow.ReportingWorkflowCSharpOutputLogicAppGenerator", 
+    0, $asm);
+Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventCSharpLogicAppModel = $d.declare("Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventCSharpLogicAppModel", 
+    0, $asm);
+Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventLogicAppModel = $d.declare("Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventLogicAppModel", 
+    0, $asm);
+Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventsOutputLogicAppGenerator = $d.declare("Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventsOutputLogicAppGenerator", 
+    0, $asm);
+Nethereum.Generators.ReportingWorkflow.ReportingWorkflowGenerator = $d.declare("Nethereum.Generators.ReportingWorkflow.ReportingWorkflowGenerator", 
+    0, $asm);
+Nethereum.Generators.ReportingWorkflow.ReportingWorkflowModel = $d.declare("Nethereum.Generators.ReportingWorkflow.ReportingWorkflowModel", 
+    0, $asm);
 Nethereum.Generators.ReportingWorkflow.ReportingWorkflowProjectGenerator = $d.declare("Nethereum.Generators.ReportingWorkflow.ReportingWorkflowProjectGenerator", 
     0, $asm);
-Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpOutputLogicAppGenerator = $d.declare("Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpOutputLogicAppGenerator", 
+Nethereum.Generators.ReportingWorkflow.ReportingWorkflowTemplate = $d.declare("Nethereum.Generators.ReportingWorkflow.ReportingWorkflowTemplate", 
     0, $asm);
-Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpOutputLogicAppTemplate = $d.declare("Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpOutputLogicAppTemplate", 
-    0, $asm);
-Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowEventCSharpLogicAppModel = $d.declare("Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowEventCSharpLogicAppModel", 
-    0, $asm);
-Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventFlowAppModel = $d.declare("Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventFlowAppModel", 
-    0, $asm);
-Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventsOutputFlowAppGenerator = $d.declare("Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventsOutputFlowAppGenerator", 
-    0, $asm);
-Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventsOutputFlowAppTemplate = $d.declare("Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventsOutputFlowAppTemplate", 
-    0, $asm);
-Nethereum.Generators.ReportingWorkflow.FlowApps.ParametersProvider = $d.declare("Nethereum.Generators.ReportingWorkflow.FlowApps.ParametersProvider", 
-    0, $asm);
-Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventLogicAppModel = $d.declare("Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventLogicAppModel", 
-    0, $asm);
-Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppGenerator = $d.declare("Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppGenerator", 
+Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowCSharpOutputLogicAppTemplate = $d.declare("Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowCSharpOutputLogicAppTemplate", 
     0, $asm);
 Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppTemplate = $d.declare("Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppTemplate", 
     0, $asm);
@@ -2536,7 +2532,7 @@ $d.define(Nethereum.Generators.DataWorkflow.FlowApps.DataWorkflowFunctionOutputF
         return clientData;
     };
     $p.GetConnections = function DataWorkflowFunctionOutputFlowAppTemplate_GetConnections() {
-        return "{\r\n        \"schemaVersion\":\"1.0.0.0\", \r\n        \"properties\": {     \r\n            \"connectionReferences\":{\r\n                \"shared_blockchainethereum\":{\r\n                    \"connectionName\":\"shared-blockchaineth-2af28ac9-9086-46d3-9eb9-f19e7bc4d766\",\r\n                    \"source\":\"Embedded\",\r\n                    \"id\":\"/providers/Microsoft.PowerApps/apis/shared_blockchainethereum\",\r\n                    \"tier\":\"NotSpecified\"},\r\n                \"shared_sql\":{\r\n                    \"connectionName\":\"shared-sql-d5123df4-ffee-48c1-a594-49b91a8e2450\",\r\n                    \"source\":\"Embedded\",\r\n                    \"id\":\"/providers/Microsoft.PowerApps/apis/shared_sql\",\r\n                    \"tier\":\"NotSpecified\"\r\n                }\r\n            },";
+        return "\r\n    {{\r\n        \"schemaVersion\":\"1.0.0.0\", \r\n        \"properties\": {{     \r\n            \"connectionReferences\":{{\r\n                \"shared_blockchainethereum\":{{\r\n                    \"connectionName\":\"shared-blockchaineth-2af28ac9-9086-46d3-9eb9-f19e7bc4d766\",\r\n                    \"source\":\"Embedded\",\r\n                    \"id\":\"/providers/Microsoft.PowerApps/apis/shared_blockchainethereum\",\r\n                    \"tier\":\"NotSpecified\"}},\r\n                \"shared_sql\":{{\r\n                    \"connectionName\":\"shared-sql-d5123df4-ffee-48c1-a594-49b91a8e2450\",\r\n                    \"source\":\"Embedded\",\r\n                    \"id\":\"/providers/Microsoft.PowerApps/apis/shared_sql\",\r\n                    \"tier\":\"NotSpecified\"\r\n                }}\r\n            }},";
     };
     $p.GetLogicAppStart = function DataWorkflowFunctionOutputFlowAppTemplate_GetLogicAppStart() {
         return "\r\n    \"definition\": {\r\n        \"$schema\": \"https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#\",\r\n        \"contentVersion\": \"1.0.0.0\",\r\n        \"parameters\": {\r\n                    \"$connections\": {\r\n                        \"defaultValue\": {\r\n                        },\r\n                \"type\": \"Object\"\r\n            }\r\n        },";
@@ -3598,12 +3594,10 @@ $d.define(Nethereum.Generators.MessagingWorkflow.LogicApps.MessagingWorkflowEven
         var beginActions = String.Format("\"actions\": {{\r\n            \"Publish_Event\": {{\r\n                \"inputs\": {{\r\n                    \"body\": [\r\n                        {{\r\n                            \"data\": \"@triggerBody()\",\r\n                            \"eventTime\": \"@{{utcNow()}}\",\r\n                            \"eventType\": \"{0}\",\r\n                            \"id\": \"@{{guid()}}\",\r\n                            \"subject\": \"{1}\"\r\n                        }}\r\n                    ]", 
             [this.get_Model().get_EventABI().get_Name(), this._topicName]);
 
-        var eventProperties = String.Concat(System.Linq.Enumerable.Select(Nethereum.Generators.Model.ParameterABI, 
-            String, this.get_Model().get_EventABI().get_InputParameters(), $d.delegate(function(p) {
-                return "'\\\"" + p.get_Name() + "\\\": ',triggerBody()?['" + p.get_Name() + "'],',','\\n',";
-            })));
+        var paths = "/eventGrid/api/events";
 
-        var endActions = ",\r\n                    \"host\": {{\r\n                        \"connection\": {{\r\n                            \"name\": \"@parameters('$connections')['azureeventgridpublish']['connectionId']\"\r\n                        }}\r\n                    }},\r\n                    \"method\": \"post\",\r\n                    \"path\": \"/eventGrid/api/events\"\r\n                }},\r\n                \"runAfter\": {{}},\r\n                \"type\": \"ApiConnection\"\r\n            }}\r\n        }}";
+        var endActions = String.Format(",\r\n                    \"host\": {{\r\n                        \"connection\": {{\r\n                            \"name\": \"@parameters('$connections')['azureeventgridpublish']['connectionId']\"\r\n                        }}\r\n                    }},\r\n                    \"method\": \"post\",\r\n                    \"path\": \"{0}\"\r\n                }},\r\n                \"runAfter\": {{}},\r\n                \"type\": \"ApiConnection\"\r\n            }}\r\n        }}", 
+            [paths]);
         return String.Concat$5(beginActions, endActions);
     };
     $p.GetServiceBusActions = function MessagingWorkflowEventLogicAppTemplate_GetServiceBusActions() {
@@ -3633,6 +3627,212 @@ $d.define(Nethereum.Generators.MessagingWorkflow.LogicApps.MessagingWorkflowEven
         return "    }\r\n}";
     };
     $p.Nethereum$Generators$Core$IWorkflowTemplate$GenerateWorkflow = $p.GenerateWorkflow;
+});
+$d.define(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowCSharpOutputLogicAppGenerator, Nethereum.Generators.Core.WorkflowGeneratorBase$2(Nethereum.Generators.Core.WorkflowTemplateBase$1(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventCSharpLogicAppModel, 
+    35693), Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventCSharpLogicAppModel, 27072), function($t, $p) {
+    $t.$intfs = [Nethereum.Generators.Core.IWorkflowFileGenerator, Nethereum.Generators.Core.IWFGenerator, Nethereum.Generators.Core.IWorkflowGenerator];
+    $t.$ator = function() {
+        this._powerbiDatasetId = null;
+        this._powerbiTable = null;
+    };
+    $t.ctor = function ReportingWorkflowCSharpOutputLogicAppGenerator(eventABI, namespace, codeGenLanguage, powerbiDatasetId, powerbiTable) {
+        $t.$baseType.ctor.call(this);
+        this._powerbiDatasetId = powerbiDatasetId;
+        this._powerbiTable = powerbiTable;
+
+        this.set_WorkflowModel((function() {
+            var $obj = new Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventCSharpLogicAppModel.ctor(eventABI, 
+                namespace);
+            $obj.set_CodeGenLanguage(codeGenLanguage);
+            return $obj;
+        }).call(this));
+        this.InitialiseTemplate(codeGenLanguage);
+    };
+    $p.InitialiseTemplate = function ReportingWorkflowCSharpOutputLogicAppGenerator_InitialiseTemplate(codeGenLanguage) {
+        switch (codeGenLanguage) {
+            case 0 /* CodeGenLanguage.CSharp */:
+                this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowCSharpOutputLogicAppTemplate.ctor(this.get_WorkflowModel(), 
+                    this._powerbiDatasetId, this._powerbiTable));
+                break;
+            case 1 /* CodeGenLanguage.Vb */:
+                //ClassTemplate = new FunctionOutputLogicAppVbTemplate(ClassModel);
+                this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowCSharpOutputLogicAppTemplate.ctor(this.get_WorkflowModel(), 
+                    this._powerbiDatasetId, this._powerbiTable));
+                break;
+            case 3 /* CodeGenLanguage.FSharp */:
+                //ClassTemplate = new FunctionOutputLogicAppFSharpTemplate(ClassModel);
+                this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowCSharpOutputLogicAppTemplate.ctor(this.get_WorkflowModel(), 
+                    this._powerbiDatasetId, this._powerbiTable));
+                break;
+            default:
+                throw new System.ArgumentOutOfRangeException.ctor$4("codeGenLanguage", $d.boxEnum(Nethereum.Generators.Core.CodeGenLanguage, 
+                    codeGenLanguage), "Code generation not implemented for this language");
+        }
+    };
+    $p.GenerateWorkflow = function ReportingWorkflowCSharpOutputLogicAppGenerator_GenerateWorkflow() {
+        return this.get_WorkflowModel().CanGenerateOutputLogicApp() ? this.get_WorkflowTemplate().GenerateWorkflow() : null;
+    };
+    $p.GenerateFileContent = function ReportingWorkflowCSharpOutputLogicAppGenerator_GenerateFileContent() {
+        return this.get_WorkflowModel().CanGenerateOutputLogicApp() ? this.get_WorkflowTemplate().GenerateFullWorkflow() : null;
+    };
+    $p.Nethereum$Generators$Core$IWorkflowFileGenerator$GenerateFileContent = $p.GenerateFileContent;
+    $p.Nethereum$Generators$Core$IWFGenerator$GenerateWorkflow = $p.GenerateWorkflow;
+    $p.Nethereum$Generators$Core$IWorkflowGenerator$GenerateWorkflow = $p.GenerateWorkflow;
+});
+$d.define(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventCSharpLogicAppModel, Nethereum.Generators.Core.WorkflowTypeMessageModel, function($t, $p) {
+    $t.$intfs = [Nethereum.Generators.Core.IWorkflowModel, Nethereum.Generators.Core.IFileModel];
+    $t.$ator = function() {
+        this.EventABI = null;
+    };
+    $p.get_EventABI = function ReportingWorkflowEventCSharpLogicAppModel_get_EventABI() { return this.EventABI; };
+    $t.ctor = function ReportingWorkflowEventCSharpLogicAppModel(eventABI, namespace) {
+        $t.$baseType.ctor.call(this, namespace, eventABI.get_Name(), ".logicapp");
+        this.EventABI = eventABI;
+        this.InitisialiseNamespaceDependencies();
+    };
+    $p.InitisialiseNamespaceDependencies = function ReportingWorkflowEventCSharpLogicAppModel_InitisialiseNamespaceDependencies() {
+        this.get_NamespaceDependencies().AddRange($d.array(String, ["System", "System.Threading.Tasks", 
+            "System.Collections.Generic", "System.Numerics", "Nethereum.Hex.HexTypes", "Nethereum.ABI.FunctionEncoding.Attributes"]));
+    };
+    $p.CanGenerateOutputLogicApp = function ReportingWorkflowEventCSharpLogicAppModel_CanGenerateOutputLogicApp() {
+        return this.get_EventABI().get_InputParameters() != null && this.get_EventABI().get_InputParameters().length > 0 && !System.Linq.Enumerable.Any$1(Nethereum.Generators.Model.ParameterABI, 
+            this.get_EventABI().get_InputParameters(), $d.delegate(function(p) {
+                return p.get_Indexed();
+            }));
+    };
+    $p.GetFileName$1 = function ReportingWorkflowEventCSharpLogicAppModel_GetFileName(name) {
+        return this.GetTypeName$1(name) + ".cs";
+    };
+});
+$d.define(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventLogicAppModel, Nethereum.Generators.Core.WorkflowTypeMessageModel, function($t, $p) {
+    $t.$intfs = [Nethereum.Generators.Core.IWorkflowModel, Nethereum.Generators.Core.IFileModel];
+    $t.$ator = function() {
+        this.EventABI = null;
+    };
+    $p.get_EventABI = function ReportingWorkflowEventLogicAppModel_get_EventABI() { return this.EventABI; };
+    $t.ctor = function ReportingWorkflowEventLogicAppModel(eventABI, namespace) {
+        $t.$baseType.ctor.call(this, namespace, eventABI.get_Name(), ".logicapp");
+        this.EventABI = eventABI;
+        this.InitisialiseNamespaceDependencies();
+    };
+    $p.InitisialiseNamespaceDependencies = function ReportingWorkflowEventLogicAppModel_InitisialiseNamespaceDependencies() {
+        this.get_NamespaceDependencies().AddRange($d.array(String, ["System", "System.Threading.Tasks", 
+            "System.Collections.Generic", "System.Numerics", "Nethereum.Hex.HexTypes", "Nethereum.ABI.FunctionEncoding.Attributes"]));
+    };
+    $p.CanGenerateOutputLogicApp = function ReportingWorkflowEventLogicAppModel_CanGenerateOutputLogicApp() {
+        return this.get_EventABI().get_InputParameters() != null && this.get_EventABI().get_InputParameters().length > 0 && !System.Linq.Enumerable.Any$1(Nethereum.Generators.Model.ParameterABI, 
+            this.get_EventABI().get_InputParameters(), $d.delegate(function(p) {
+                return p.get_Indexed();
+            }));
+    };
+    $p.GetFileName$1 = function ReportingWorkflowEventLogicAppModel_GetFileName(name) {
+        return String.Format("event.{0}.json", [this.GetTypeName$1(name)]);
+    };
+});
+$d.define(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventsOutputLogicAppGenerator, Nethereum.Generators.Core.WorkflowGeneratorBase$2(Nethereum.Generators.Core.WorkflowTemplateBase$1(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventLogicAppModel, 
+    4016), Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventLogicAppModel, 30625), function($t, $p) {
+    $t.$intfs = [Nethereum.Generators.Core.IWorkflowFileGenerator, Nethereum.Generators.Core.IWFGenerator, Nethereum.Generators.Core.IWorkflowGenerator];
+    $t.$ator = function() {
+        this._contractAddress = null;
+        this._subscriptionId = null;
+        this._escapedAbi = null;
+        this._location = null;
+        this._powerbiDatasetId = null;
+        this._powerbiTable = null;
+    };
+    $t.ctor = function ReportingWorkflowEventsOutputLogicAppGenerator(eventABI, namespace, codeGenLanguage, contractAddress, subscriptionId, escapedAbi, location, powerbiDatasetId, powerbiTable) {
+        $t.$baseType.ctor.call(this);
+        this._contractAddress = contractAddress;
+        this._subscriptionId = subscriptionId;
+        this._escapedAbi = escapedAbi;
+        this._location = location;
+        this._powerbiDatasetId = powerbiDatasetId;
+        this._powerbiTable = powerbiTable;
+
+        this.set_WorkflowModel((function() {
+            var $obj = new Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventLogicAppModel.ctor(eventABI, 
+                namespace);
+            $obj.set_CodeGenLanguage(codeGenLanguage);
+            return $obj;
+        }).call(this));
+        this.InitialiseTemplate(codeGenLanguage);
+    };
+    $p.InitialiseTemplate = function ReportingWorkflowEventsOutputLogicAppGenerator_InitialiseTemplate(codeGenLanguage) {
+        switch (codeGenLanguage) {
+            case 0 /* CodeGenLanguage.CSharp */:
+                this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppTemplate.ctor(this.get_WorkflowModel(), 
+                    this._contractAddress, this._escapedAbi, this._subscriptionId, this._location, this._powerbiDatasetId, 
+                    this._powerbiTable));
+                break;
+            case 1 /* CodeGenLanguage.Vb */:
+                //ClassTemplate = new FunctionOutputLogicAppVbTemplate(ClassModel);
+                this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppTemplate.ctor(this.get_WorkflowModel(), 
+                    this._contractAddress, this._escapedAbi, this._subscriptionId, this._location, this._powerbiDatasetId, 
+                    this._powerbiTable));
+                break;
+            case 3 /* CodeGenLanguage.FSharp */:
+                //ClassTemplate = new FunctionOutputLogicAppFSharpTemplate(ClassModel);
+                this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppTemplate.ctor(this.get_WorkflowModel(), 
+                    this._contractAddress, this._escapedAbi, this._subscriptionId, this._location, this._powerbiDatasetId, 
+                    this._powerbiTable));
+                break;
+            default:
+                throw new System.ArgumentOutOfRangeException.ctor$4("codeGenLanguage", $d.boxEnum(Nethereum.Generators.Core.CodeGenLanguage, 
+                    codeGenLanguage), "Code generation not implemented for this language");
+        }
+    };
+    $p.GenerateWorkflow = function ReportingWorkflowEventsOutputLogicAppGenerator_GenerateWorkflow() {
+        return this.get_WorkflowModel().CanGenerateOutputLogicApp() ? this.get_WorkflowTemplate().GenerateWorkflow() : null;
+    };
+    $p.GenerateFileContent = function ReportingWorkflowEventsOutputLogicAppGenerator_GenerateFileContent() {
+        return this.get_WorkflowModel().CanGenerateOutputLogicApp() ? this.get_WorkflowTemplate().GenerateFullWorkflow() : null;
+    };
+    $p.Nethereum$Generators$Core$IWorkflowFileGenerator$GenerateFileContent = $p.GenerateFileContent;
+    $p.Nethereum$Generators$Core$IWFGenerator$GenerateWorkflow = $p.GenerateWorkflow;
+    $p.Nethereum$Generators$Core$IWorkflowGenerator$GenerateWorkflow = $p.GenerateWorkflow;
+});
+$d.define(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowGenerator, Nethereum.Generators.Core.WorkflowGeneratorBase$2(Nethereum.Generators.Core.WorkflowTemplateBase$1(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowModel, 
+    28352), Nethereum.Generators.ReportingWorkflow.ReportingWorkflowModel, 60316), function($t, $p) {
+    $t.$intfs = [Nethereum.Generators.Core.IWorkflowFileGenerator, Nethereum.Generators.Core.IWFGenerator, Nethereum.Generators.Core.IWorkflowGenerator];
+    $t.$ator = function() {
+        this.ContractABI = null;
+    };
+    $p.get_ContractABI = function ReportingWorkflowGenerator_get_ContractABI() { return this.ContractABI; };
+    $t.ctor = function ReportingWorkflowGenerator(contractABI, contractName, byteCode, serviceType, codeGenLanguage) {
+        $t.$baseType.ctor.call(this);
+        this.ContractABI = contractABI;
+        this.set_WorkflowModel(new Nethereum.Generators.ReportingWorkflow.ReportingWorkflowModel.ctor(contractABI, 
+            contractName, byteCode));
+        this.get_WorkflowModel().set_CodeGenLanguage(codeGenLanguage);
+        this.InitialiseTemplate(serviceType, codeGenLanguage);
+    };
+    $p.InitialiseTemplate = function ReportingWorkflowGenerator_InitialiseTemplate(serviceType, codeGenLanguage) {
+        switch (serviceType) {
+            case 1 /* ServiceType.LogicApp */:
+                this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.ReportingWorkflowTemplate.ctor(this.get_WorkflowModel()));
+                break;
+            default:
+                throw new System.ArgumentOutOfRangeException.ctor$4("serviceType", $d.boxEnum(Nethereum.Generators.Core.ServiceType, 
+                    serviceType), "Code generation not implemented for this type");
+        }
+    };
+});
+$d.define(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowModel, Nethereum.Generators.Core.WorkflowTypeMessageModel, function($t, $p) {
+    $t.$intfs = [Nethereum.Generators.Core.IWorkflowModel, Nethereum.Generators.Core.IFileModel];
+    $t.$ator = function() {
+        this.ContractABI = null;
+    };
+    $p.get_ContractABI = function ReportingWorkflowModel_get_ContractABI() { return this.ContractABI; };
+    $t.ctor = function ReportingWorkflowModel(contractABI, contractName, byteCode) {
+        $t.$baseType.ctor.call(this, "EmptyNameSpace", contractName, ".logicapp");
+        this.ContractABI = contractABI;
+    };
+    $p.InitialiseNamespaceDependencies = function ReportingWorkflowModel_InitialiseNamespaceDependencies() {
+        this.get_NamespaceDependencies().AddRange($d.array(String, ["System", "System.Threading.Tasks", 
+            "System.Collections.Generic", "System.Numerics", "Nethereum.Hex.HexTypes", "Nethereum.ABI.FunctionEncoding.Attributes", 
+            "Nethereum.Web3", "Nethereum.RPC.Eth.DTOs", "Nethereum.Contracts.CQS", "Nethereum.Contracts.ContractHandlers", 
+            "Nethereum.Contracts", "System.Threading"]));
+    };
 });
 $d.define(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowProjectGenerator, null, function($t, $p) {
     $t.$ator = function() {
@@ -3713,11 +3913,11 @@ $d.define(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowProjectGenerat
         return generated;
     };
     $p.GetAllCSharpGenerators = function ReportingWorkflowProjectGenerator_GetAllCSharpGenerators() {
-        var generators = new (System.Collections.Generic.List$1(Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpOutputLogicAppGenerator, 
-            36266).ctor)();
+        var generators = new (System.Collections.Generic.List$1(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowCSharpOutputLogicAppGenerator, 
+            23164).ctor)();
         for (var $i = 0, $a = this.get_ContractABI().get_Events(), $length = $a.length; $i < $length; $i++) {
             var eventABI = $a[$i];
-            var functionLogicAppGenerator = new Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpOutputLogicAppGenerator.ctor(eventABI, 
+            var functionLogicAppGenerator = new Nethereum.Generators.ReportingWorkflow.ReportingWorkflowCSharpOutputLogicAppGenerator.ctor(eventABI, 
                 "", this.get_CodeGenLanguage(), this.get_ContractName(), eventABI.get_Name());
             generators.Add(functionLogicAppGenerator);
         }
@@ -3740,42 +3940,24 @@ $d.define(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowProjectGenerat
             (function() {
                 var generator = $enumerator.System$Collections$IEnumerator$get_Current();
                 this.GenerateAndAdd(generated, $d.delegate(function() {
-                    return generator.Nethereum$Generators$Core$IWorkflowFileGenerator$GenerateFileContent$1(laFullPath);
+                    return generator.GenerateFileContent$1(laFullPath);
                 }, this));
             }).call(this);
         return generated;
     };
     $p.GetAllLogicAppGenerators = function ReportingWorkflowProjectGenerator_GetAllLogicAppGenerators() {
         var laFullNamespace = this.GetFullNamespace(this.get_ServiceNamespace());
-        var generators = new (System.Collections.Generic.List$1(Nethereum.Generators.Core.IWorkflowFileGenerator, 
-            14219).ctor)();
+        var generators = new (System.Collections.Generic.List$1(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventsOutputLogicAppGenerator, 
+            17915).ctor)();
         for (var $i = 0, $a = this.get_ContractABI().get_Events(), $length = $a.length; $i < $length; $i++) {
             var eventABI = $a[$i];
-            var generator = this.CreateFunctionAppGenerator(eventABI, laFullNamespace);
-            generators.Add(generator);
+            var functionLogicAppGenerator = new Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventsOutputLogicAppGenerator.ctor(eventABI, 
+                laFullNamespace, this.get_CodeGenLanguage(), this.get_ContractAddress(), this.get_SubscriptionId(), 
+                Nethereum.Generators.Core.JavascriptEscapeUtility.JavaScriptEscape(this.get_ContractAbiString()), 
+                this.get_Location(), this.get_ContractName(), eventABI.get_Name());
+            generators.Add(functionLogicAppGenerator);
         }
         return generators;
-    };
-    $p.CreateFunctionAppGenerator = function ReportingWorkflowProjectGenerator_CreateFunctionAppGenerator(eventAbi, laFullNamespace) {
-        var generator = null;
-        switch (this.get_ServiceType()) {
-            case 0 /* ServiceType.Flow */:
-                generator = new Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventsOutputFlowAppGenerator.ctor(eventAbi, 
-                    laFullNamespace, this.get_CodeGenLanguage(), this.get_ContractAddress(), this.get_SubscriptionId(), 
-                    Nethereum.Generators.Core.JavascriptEscapeUtility.JavaScriptEscape(this.get_ContractAbiString()), 
-                    this.get_Location(), this.get_ContractName(), eventAbi.get_Name());
-                break;
-            case 1 /* ServiceType.LogicApp */:
-                generator = new Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppGenerator.ctor(eventAbi, 
-                    laFullNamespace, this.get_CodeGenLanguage(), this.get_ContractAddress(), this.get_SubscriptionId(), 
-                    Nethereum.Generators.Core.JavascriptEscapeUtility.JavaScriptEscape(this.get_ContractAbiString()), 
-                    this.get_Location(), this.get_ContractName(), eventAbi.get_Name());
-                break;
-            default:
-                throw new System.ArgumentOutOfRangeException.ctor();
-        }
-
-        return generator;
     };
     $p.GetFullNamespace = function ReportingWorkflowProjectGenerator_GetFullNamespace(namespace) {
         if (String.IsNullOrEmpty(this.get_BaseNamespace()))
@@ -3792,60 +3974,27 @@ $d.define(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowProjectGenerat
         }
     };
 });
-$d.define(Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpOutputLogicAppGenerator, Nethereum.Generators.Core.WorkflowGeneratorBase$2(Nethereum.Generators.Core.WorkflowTemplateBase$1(Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowEventCSharpLogicAppModel, 
-    12761), Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowEventCSharpLogicAppModel, 
-    21790), function($t, $p) {
-    $t.$intfs = [Nethereum.Generators.Core.IWorkflowFileGenerator, Nethereum.Generators.Core.IWFGenerator, Nethereum.Generators.Core.IWorkflowGenerator];
+$d.define(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowTemplate, Nethereum.Generators.Core.WorkflowTemplateBase$1(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowModel, 
+    28352), function($t, $p) {
+    $t.$intfs = [Nethereum.Generators.Core.IWorkflowTemplate];
     $t.$ator = function() {
-        this._powerbiDatasetId = null;
-        this._powerbiTable = null;
+        this._functionServiceMethodCSharpTemplate = null;
+        this._deploymentServiceMethodsCSharpTemplate = null;
     };
-    $t.ctor = function ReportingWorkflowCSharpOutputLogicAppGenerator(eventABI, namespace, codeGenLanguage, powerbiDatasetId, powerbiTable) {
-        $t.$baseType.ctor.call(this);
-        this._powerbiDatasetId = powerbiDatasetId;
-        this._powerbiTable = powerbiTable;
-
-        this.set_WorkflowModel((function() {
-            var $obj = new Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowEventCSharpLogicAppModel.ctor(eventABI, 
-                namespace);
-            $obj.set_CodeGenLanguage(codeGenLanguage);
-            return $obj;
-        }).call(this));
-        this.InitialiseTemplate(codeGenLanguage);
+    $t.ctor = function ReportingWorkflowTemplate(model) {
+        $t.$baseType.ctor.call(this, model);
+        // _functionServiceMethodCSharpTemplate = new FunctionServiceMethodCSharpTemplate(model);
+        // _deploymentServiceMethodsCSharpTemplate = new ContractDeploymentServiceMethodsCSharpTemplate(model);
+        this.set_WorkflowFileTemplate(new Nethereum.Generators.Core.LogicAppWorkflowFileTemplate.ctor(this.get_Model(), 
+            this));
     };
-    $p.InitialiseTemplate = function ReportingWorkflowCSharpOutputLogicAppGenerator_InitialiseTemplate(codeGenLanguage) {
-        switch (codeGenLanguage) {
-            case 0 /* CodeGenLanguage.CSharp */:
-                this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpOutputLogicAppTemplate.ctor(this.get_WorkflowModel(), 
-                    this._powerbiDatasetId, this._powerbiTable));
-                break;
-            case 1 /* CodeGenLanguage.Vb */:
-                //ClassTemplate = new FunctionOutputLogicAppVbTemplate(ClassModel);
-                this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpOutputLogicAppTemplate.ctor(this.get_WorkflowModel(), 
-                    this._powerbiDatasetId, this._powerbiTable));
-                break;
-            case 3 /* CodeGenLanguage.FSharp */:
-                //ClassTemplate = new FunctionOutputLogicAppFSharpTemplate(ClassModel);
-                this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpOutputLogicAppTemplate.ctor(this.get_WorkflowModel(), 
-                    this._powerbiDatasetId, this._powerbiTable));
-                break;
-            default:
-                throw new System.ArgumentOutOfRangeException.ctor$4("codeGenLanguage", $d.boxEnum(Nethereum.Generators.Core.CodeGenLanguage, 
-                    codeGenLanguage), "Code generation not implemented for this language");
-        }
+    $p.GenerateWorkflow = function ReportingWorkflowTemplate_GenerateWorkflow() {
+        return "";
     };
-    $p.GenerateWorkflow = function ReportingWorkflowCSharpOutputLogicAppGenerator_GenerateWorkflow() {
-        return this.get_WorkflowModel().CanGenerateOutputLogicApp() ? this.get_WorkflowTemplate().GenerateWorkflow() : null;
-    };
-    $p.GenerateFileContent = function ReportingWorkflowCSharpOutputLogicAppGenerator_GenerateFileContent() {
-        return this.get_WorkflowModel().CanGenerateOutputLogicApp() ? this.get_WorkflowTemplate().GenerateFullWorkflow() : null;
-    };
-    $p.Nethereum$Generators$Core$IWorkflowFileGenerator$GenerateFileContent = $p.GenerateFileContent;
-    $p.Nethereum$Generators$Core$IWFGenerator$GenerateWorkflow = $p.GenerateWorkflow;
-    $p.Nethereum$Generators$Core$IWorkflowGenerator$GenerateWorkflow = $p.GenerateWorkflow;
+    $p.Nethereum$Generators$Core$IWorkflowTemplate$GenerateWorkflow = $p.GenerateWorkflow;
 });
-$d.define(Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpOutputLogicAppTemplate, Nethereum.Generators.Core.WorkflowTemplateBase$1(Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowEventCSharpLogicAppModel, 
-    12761), function($t, $p) {
+$d.define(Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowCSharpOutputLogicAppTemplate, Nethereum.Generators.Core.WorkflowTemplateBase$1(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventCSharpLogicAppModel, 
+    35693), function($t, $p) {
     $t.$intfs = [Nethereum.Generators.Core.IWorkflowTemplate];
     $t.$ator = function() {
         this._powerbiDatasetId = null;
@@ -3869,15 +4018,15 @@ $d.define(Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpO
         return null;
     };
     $p.PowerBICreateTable = function ReportingWorkflowCSharpOutputLogicAppTemplate_PowerBICreateTable() {
-        return String.Format("\r\n\t\t\t\t\t{{\r\n\r\n\t\t\t\t\t \\\"name\\\": \\\"{0}-{1}\\\",\r\n                     \\\"defaultMode\\\": \\\"Streaming\\\",\r\n\t\t\t\t\t\\\"tables\\\": [{{\r\n\t\t\t\t\t\t\t\t\\\"name\\\": \\\"{2}\\\",\r\n\t\t\t\t\t\t\t\t\\\"columns\\\": [{3}]\r\n\t\t\t\t\t\t\t\t}}]\r\n\t\t\t\t\t}}\r\n\t\t\t\t\t", 
-            [this._powerbiDatasetId, this._powerbiTable, this._powerbiTable, this.GetColumns()]);
+        return String.Format("\r\n\t\t\t\t\t{{\r\n\r\n\t\t\t\t\t \\\"name\\\": \\\"{0}\\\",\r\n\t\t\t\t\t\\\"tables\\\": [{{\r\n\t\t\t\t\t\t\t\t\\\"name\\\": \\\"{1}\\\",\r\n\t\t\t\t\t\t\t\t\\\"columns\\\": [{2}]\r\n\t\t\t\t\t\t\t\t}}]\r\n\t\t\t\t\t}}\r\n\t\t\t\t\t", 
+            [this._powerbiDatasetId, this._powerbiTable, this.GetColumns()]);
     };
     $p.GetColumns = function ReportingWorkflowCSharpOutputLogicAppTemplate_GetColumns() {
         var columns = new System.Text.StringBuilder.ctor();
         for (var $i = 0, $a = this.get_Model().get_EventABI().get_InputParameters(), $length = $a.length; $i < $length; $i++) {
             var p = $a[$i];
-            columns.Append$12(String.Format("\r\n\t\t\t\t\t{{\r\n\t\t\t\t\t\t\\\"name\\\": \\\"{0}\\\",\r\n\t\t\t\t\t\t\\\"dataType\\\": \\\"string\\\"\r\n\t\t\t\t\t}},", 
-                [p.get_Name()]));
+            columns.Append$12(String.Format("\r\n\t\t\t\t\t{{\r\n\t\t\t\t\t\t\\\"name\\\": \\\"{0}\\\",\r\n\t\t\t\t\t\t\\\"dataType\\\": \\\"{1}\\\"\r\n\t\t\t\t\t}},\r\n\r\n\t\t\t\t", 
+                [p.get_Name(), p.get_Type()]));
         }
 
         var output = columns.toString();
@@ -3885,320 +4034,13 @@ $d.define(Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpO
         return output;
     };
     $p.GetCSharp = function ReportingWorkflowCSharpOutputLogicAppTemplate_GetCSharp() {
-        return String.Format("using System;\r\nusing Microsoft.IdentityModel.Clients.ActiveDirectory;\r\nusing System.Net;\r\nusing System.IO;\r\n\r\nnamespace walkthrough_push_data\r\n{{\r\n    class Program\r\n    {{\r\n        private static string token = string.Empty;\r\n\r\n        static void Main(string[] args)\r\n        {{\r\n\r\n            //Get an authentication access token\r\n            token = GetToken();\r\n\r\n            //Create a dataset in Power BI\r\n            CreateDataset();\r\n\r\n        }}\r\n\r\n        #region Get an authentication access token\r\n        private static string GetToken()\r\n        {{\r\n            // TODO: Install-Package Microsoft.IdentityModel.Clients.ActiveDirectory -Version 2.21.301221612\r\n\r\n            //The client id that Azure AD created when you registered your client app.\r\n            string clientID = \"{{Client_ID}}\";\r\n\r\n            //RedirectUri you used when you register your app.\r\n            //For a client app, a redirect uri gives Azure AD more details on the application that it will authenticate.\r\n            // You can use this redirect uri for your client app\r\n            string redirectUri = \"https://login.live.com/oauth20_desktop.srf\";\r\n\r\n            //Resource Uri for Power BI API\r\n            string resourceUri = \"https://analysis.windows.net/powerbi/api\";\r\n\r\n            //OAuth2 authority Uri\r\n            string authorityUri = \"https://login.microsoftonline.com/common/\";\r\n\r\n            //Get access token:\r\n            // To call a Power BI REST operation, create an instance of AuthenticationContext and call AcquireToken\r\n            // AuthenticationContext is part of the Active Directory Authentication Library NuGet package\r\n            // To install the Active Directory Authentication Library NuGet package in Visual Studio,\r\n            //  run \"Install-Package Microsoft.IdentityModel.Clients.ActiveDirectory\" from the nuget Package Manager Console.\r\n\r\n            // AcquireToken will acquire an Azure access token\r\n            // Call AcquireToken to get an Azure token from Azure Active Directory token issuance endpoint\r\n            AuthenticationContext authContext = new AuthenticationContext(authorityUri);\r\n            string token = authContext.AcquireToken(resourceUri, clientID, new Uri(redirectUri)).AccessToken;\r\n\r\n            Console.WriteLine(\"Acquired Token:\");\r\n            Console.WriteLine(token);\r\n            Console.WriteLine();\r\n\r\n            return token;\r\n        }}\r\n\r\n        #endregion\r\n\r\n\r\n        #region Create a dataset in Power BI\r\n        private static void CreateDataset()\r\n        {{\r\n            string powerBIDatasetsApiUrl = \"https://api.powerbi.com/v1.0/myorg/datasets\";\r\n            HttpWebRequest request = System.Net.WebRequest.Create(powerBIDatasetsApiUrl) as System.Net.HttpWebRequest;\r\n            request.KeepAlive = true;\r\n            request.Method = \"POST\";\r\n            request.ContentLength = 0;\r\n            request.ContentType = \"application/json\";\r\n\r\n            //Add token to the request header\r\n            request.Headers.Add(\"Authorization\", String.Format(\"Bearer {{0}}\", token));\r\n\r\n            //Create dataset JSON for POST request\r\n            string datasetJson = \"{0}\";\r\n\r\n            //POST web request\r\n            byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(datasetJson);\r\n            request.ContentLength = byteArray.Length;\r\n\r\n            //Write JSON byte[] into a Stream\r\n            using (Stream writer = request.GetRequestStream())\r\n            {{\r\n                writer.Write(byteArray, 0, byteArray.Length);\r\n\r\n                var response = (HttpWebResponse)request.GetResponse();\r\n\r\n                Console.WriteLine(string.Format(\"Dataset {{0}}\", response.StatusCode.ToString()));\r\n            }}\r\n        }}\r\n        #endregion\r\n    }}\r\n}}", 
+        return String.Format("using System;\r\nusing Microsoft.IdentityModel.Clients.ActiveDirectory;\r\nusing System.Net;\r\nusing System.IO;\r\n\r\nnamespace walkthrough_push_data\r\n{{\r\n    class Program\r\n    {{\r\n        private static string token = string.Empty;\r\n\r\n        static void Main(string[] args)\r\n        {{\r\n\r\n            //Get an authentication access token\r\n            token = GetToken();\r\n\r\n            //Create a dataset in Power BI\r\n            CreateDataset();\r\n\r\n        }}\r\n\r\n        #region Get an authentication access token\r\n        private static string GetToken()\r\n        {{\r\n            // TODO: Install-Package Microsoft.IdentityModel.Clients.ActiveDirectory -Version 2.21.301221612\r\n            // and add using Microsoft.IdentityModel.Clients.ActiveDirectory\r\n\r\n            //The client id that Azure AD created when you registered your client app.\r\n            string clientID = \"{{Client_ID}}\";\r\n\r\n            //RedirectUri you used when you register your app.\r\n            //For a client app, a redirect uri gives Azure AD more details on the application that it will authenticate.\r\n            // You can use this redirect uri for your client app\r\n            string redirectUri = \"https://login.live.com/oauth20_desktop.srf\";\r\n\r\n            //Resource Uri for Power BI API\r\n            string resourceUri = \"https://analysis.windows.net/powerbi/api\";\r\n\r\n            //OAuth2 authority Uri\r\n            string authorityUri = \"https://login.microsoftonline.net/common/\";\r\n\r\n            //Get access token:\r\n            // To call a Power BI REST operation, create an instance of AuthenticationContext and call AcquireToken\r\n            // AuthenticationContext is part of the Active Directory Authentication Library NuGet package\r\n            // To install the Active Directory Authentication Library NuGet package in Visual Studio,\r\n            //  run \"Install-Package Microsoft.IdentityModel.Clients.ActiveDirectory\" from the nuget Package Manager Console.\r\n\r\n            // AcquireToken will acquire an Azure access token\r\n            // Call AcquireToken to get an Azure token from Azure Active Directory token issuance endpoint\r\n            AuthenticationContext authContext = new AuthenticationContext(authorityUri);\r\n            string token = authContext.AcquireToken(resourceUri, clientID, new Uri(redirectUri)).AccessToken;\r\n\r\n            Console.WriteLine(token);\r\n            Console.ReadLine();\r\n\r\n            return token;\r\n        }}\r\n\r\n        #endregion\r\n\r\n\r\n        #region Create a dataset in Power BI\r\n        private static void CreateDataset()\r\n        {{\r\n            //TODO: Add using System.Net and using System.IO\r\n\r\n            string powerBIDatasetsApiUrl = \"https://api.powerbi.com/v1.0/myorg/datasets\";\r\n            //POST web request to create a dataset.\r\n            //To create a Dataset in a group, use the Groups uri: https://api.PowerBI.com/v1.0/myorg/groups/{{group_id}}/datasets\r\n            HttpWebRequest request = System.Net.WebRequest.Create(powerBIDatasetsApiUrl) as System.Net.HttpWebRequest;\r\n            request.KeepAlive = true;\r\n            request.Method = \"POST\";\r\n            request.ContentLength = 0;\r\n            request.ContentType = \"application/json\";\r\n\r\n            //Add token to the request header\r\n            request.Headers.Add(\"Authorization\", String.Format(\"Bearer {{0}}\", token));\r\n\r\n            //Create dataset JSON for POST request\r\n            string datasetJson = \"{0})\";\r\n\r\n            //POST web request\r\n            byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(datasetJson);\r\n            request.ContentLength = byteArray.Length;\r\n\r\n            //Write JSON byte[] into a Stream\r\n            using (Stream writer = request.GetRequestStream())\r\n            {{\r\n                writer.Write(byteArray, 0, byteArray.Length);\r\n\r\n                var response = (HttpWebResponse)request.GetResponse();\r\n\r\n                Console.WriteLine(string.Format(\"Dataset {{0}}\", response.StatusCode.ToString()));\r\n\r\n                Console.ReadLine();\r\n            }}\r\n        }}\r\n        #endregion\r\n    }}\r\n}}", 
             [this._parametersProvider.TrimAll(this.PowerBICreateTable())]);
     };
     $p.Nethereum$Generators$Core$IWorkflowTemplate$GenerateWorkflow = $p.GenerateWorkflow;
 });
-$d.define(Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowEventCSharpLogicAppModel, Nethereum.Generators.Core.WorkflowTypeMessageModel, function($t, $p) {
-    $t.$intfs = [Nethereum.Generators.Core.IWorkflowModel, Nethereum.Generators.Core.IFileModel];
-    $t.$ator = function() {
-        this.EventABI = null;
-    };
-    $p.get_EventABI = function ReportingWorkflowEventCSharpLogicAppModel_get_EventABI() { return this.EventABI; };
-    $t.ctor = function ReportingWorkflowEventCSharpLogicAppModel(eventABI, namespace) {
-        $t.$baseType.ctor.call(this, namespace, eventABI.get_Name(), "");
-        this.EventABI = eventABI;
-        this.InitisialiseNamespaceDependencies();
-    };
-    $p.InitisialiseNamespaceDependencies = function ReportingWorkflowEventCSharpLogicAppModel_InitisialiseNamespaceDependencies() {
-        this.get_NamespaceDependencies().AddRange($d.array(String, ["System", "System.Threading.Tasks", 
-            "System.Collections.Generic", "System.Numerics", "Nethereum.Hex.HexTypes", "Nethereum.ABI.FunctionEncoding.Attributes"]));
-    };
-    $p.CanGenerateOutputLogicApp = function ReportingWorkflowEventCSharpLogicAppModel_CanGenerateOutputLogicApp() {
-        return this.get_EventABI().get_InputParameters() != null && this.get_EventABI().get_InputParameters().length > 0 && !System.Linq.Enumerable.Any$1(Nethereum.Generators.Model.ParameterABI, 
-            this.get_EventABI().get_InputParameters(), $d.delegate(function(p) {
-                return p.get_Indexed();
-            }));
-    };
-    $p.GetFileName$1 = function ReportingWorkflowEventCSharpLogicAppModel_GetFileName(name) {
-        return this.GetTypeName$1(name) + ".cs";
-    };
-});
-$d.define(Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventFlowAppModel, Nethereum.Generators.Core.WorkflowTypeMessageModel, function($t, $p) {
-    $t.$intfs = [Nethereum.Generators.Core.IWorkflowModel, Nethereum.Generators.Core.IFileModel];
-    $t.$ator = function() {
-        this.EventABI = null;
-    };
-    $p.get_EventABI = function ReportingWorkflowEventFlowAppModel_get_EventABI() { return this.EventABI; };
-    $t.ctor = function ReportingWorkflowEventFlowAppModel(eventABI, namespace) {
-        $t.$baseType.ctor.call(this, namespace, eventABI.get_Name(), ".flowapp");
-        this.EventABI = eventABI;
-        this.InitisialiseNamespaceDependencies();
-    };
-    $p.InitisialiseNamespaceDependencies = function ReportingWorkflowEventFlowAppModel_InitisialiseNamespaceDependencies() {
-        this.get_NamespaceDependencies().AddRange($d.array(String, ["System", "System.Threading.Tasks", 
-            "System.Collections.Generic", "System.Numerics", "Nethereum.Hex.HexTypes", "Nethereum.ABI.FunctionEncoding.Attributes"]));
-    };
-    $p.CanGenerateOutputLogicApp = function ReportingWorkflowEventFlowAppModel_CanGenerateOutputLogicApp() {
-        return this.get_EventABI().get_InputParameters() != null && this.get_EventABI().get_InputParameters().length > 0 && !System.Linq.Enumerable.Any$1(Nethereum.Generators.Model.ParameterABI, 
-            this.get_EventABI().get_InputParameters(), $d.delegate(function(p) {
-                return p.get_Indexed();
-            }));
-    };
-    $p.GetFileName$1 = function ReportingWorkflowEventFlowAppModel_GetFileName(name) {
-        return String.Format("event.{0}.json", [this.GetTypeName$1(name)]);
-    };
-});
-$d.define(Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventsOutputFlowAppGenerator, Nethereum.Generators.Core.WorkflowGeneratorBase$2(Nethereum.Generators.Core.WorkflowTemplateBase$1(Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventFlowAppModel, 
-    11343), Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventFlowAppModel, 44124), function($t, $p) {
-    $t.$intfs = [Nethereum.Generators.Core.IWorkflowFileGenerator, Nethereum.Generators.Core.IWFGenerator, Nethereum.Generators.Core.IWorkflowGenerator];
-    $t.$ator = function() {
-        this._contractAddress = null;
-        this._subscriptionId = null;
-        this._escapedAbi = null;
-        this._location = null;
-        this._powerbiDatasetId = null;
-        this._powerbiTable = null;
-    };
-    $t.ctor = function ReportingWorkflowEventsOutputFlowAppGenerator(eventABI, namespace, codeGenLanguage, contractAddress, subscriptionId, escapedAbi, location, powerbiDatasetId, powerbiTable) {
-        $t.$baseType.ctor.call(this);
-        this._contractAddress = contractAddress;
-        this._subscriptionId = subscriptionId;
-        this._escapedAbi = escapedAbi;
-        this._location = location;
-        this._powerbiDatasetId = powerbiDatasetId;
-        this._powerbiTable = powerbiTable;
-
-        this.set_WorkflowModel((function() {
-            var $obj = new Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventFlowAppModel.ctor(eventABI, 
-                namespace);
-            $obj.set_CodeGenLanguage(codeGenLanguage);
-            return $obj;
-        }).call(this));
-        this.InitialiseTemplate(codeGenLanguage);
-    };
-    $p.InitialiseTemplate = function ReportingWorkflowEventsOutputFlowAppGenerator_InitialiseTemplate(codeGenLanguage) {
-        this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventsOutputFlowAppTemplate.ctor(this.get_WorkflowModel(), 
-            this._contractAddress, this._escapedAbi, this._subscriptionId, this._location, this._powerbiDatasetId, 
-            this._powerbiTable));
-    };
-    $p.GenerateWorkflow = function ReportingWorkflowEventsOutputFlowAppGenerator_GenerateWorkflow() {
-        return this.get_WorkflowModel().CanGenerateOutputLogicApp() ? this.get_WorkflowTemplate().GenerateWorkflow() : null;
-    };
-    $p.GenerateFileContent = function ReportingWorkflowEventsOutputFlowAppGenerator_GenerateFileContent() {
-        return this.get_WorkflowModel().CanGenerateOutputLogicApp() ? this.get_WorkflowTemplate().GenerateFullWorkflow() : null;
-    };
-    $p.Nethereum$Generators$Core$IWorkflowFileGenerator$GenerateFileContent = $p.GenerateFileContent;
-    $p.Nethereum$Generators$Core$IWFGenerator$GenerateWorkflow = $p.GenerateWorkflow;
-    $p.Nethereum$Generators$Core$IWorkflowGenerator$GenerateWorkflow = $p.GenerateWorkflow;
-});
-$d.define(Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventsOutputFlowAppTemplate, Nethereum.Generators.Core.WorkflowTemplateBase$1(Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventFlowAppModel, 
-    11343), function($t, $p) {
-    $t.$intfs = [Nethereum.Generators.Core.IWorkflowTemplate];
-    $t.$ator = function() {
-        this._contractAddress = null;
-        this._powerbiDatasetId = null;
-        this._powerbiTable = null;
-        this._escapedAbi = null;
-        this._subsciptionId = null;
-        this._location = null;
-        this._parametersProvider = null;
-    };
-    $t.ctor = function ReportingWorkflowEventsOutputFlowAppTemplate(model, contractAddress, escapedAbi, subsciptionId, location, powerbiDatasetId, powerbiTable) {
-        $t.$baseType.ctor.call(this, model);
-        this._contractAddress = contractAddress;
-        this._escapedAbi = escapedAbi;
-        this._subsciptionId = subsciptionId;
-        this._location = location;
-        this._powerbiDatasetId = powerbiDatasetId;
-        this._powerbiTable = powerbiTable;
-        this._parametersProvider = new Nethereum.Generators.ReportingWorkflow.FlowApps.ParametersProvider.ctor();
-
-        this.set_WorkflowFileTemplate(new Nethereum.Generators.Core.LogicAppWorkflowFileTemplate.ctor(this.get_Model(), 
-            this));
-    };
-    $p.GenerateWorkflow = function ReportingWorkflowEventsOutputFlowAppTemplate_GenerateWorkflow() {
-        if (this.get_Model().CanGenerateOutputLogicApp()) {
-            return String.Format("{{\r\n\t\t\"category\": 5,\r\n\t\t\"statecode\": 0,\r\n\t\t\"name\": \"{0}-{1} Flow\",\r\n\t\t\"type\": 1,\r\n\t\t\"description\": \"This flow reads blockchain data.\",\r\n\t\t\"primaryentity\":\"none\",\r\n\t\t\"clientdata\": \"{2}\"\r\n    }}", 
-                [this._powerbiDatasetId, this.get_Model().get_EventABI().get_Name(), this.GetClientData()]);
-        }
-        return null;
-    };
-    $p.GetClientData = function ReportingWorkflowEventsOutputFlowAppTemplate_GetClientData() {
-        var clientData = String.Format("{0}\r\n{1}\r\n{2}\r\n{3}\r\n{4}\r\n", [this.GetConnections(), 
-            this.GetLogicAppStart(), this.GetBlockchainEventTriggerForLogicApp(this._escapedAbi, this._contractAddress), 
-            this.GetActions(), this.GetLogicAppEnd()]);
-
-        clientData = Nethereum.Generators.Core.JavascriptEscapeUtility.JavaScriptEscape(clientData);
-        return clientData;
-    };
-    $p.GetConnections = function ReportingWorkflowEventsOutputFlowAppTemplate_GetConnections() {
-        return "{\"schemaVersion\":\"1.0.0.0\", \"properties\": {     \r\n        \"connectionReferences\":{\r\n            \"shared_blockchainethereum\":{\r\n                \"connectionName\":\"shared-blockchaineth-2af28ac9-9086-46d3-9eb9-f19e7bc4d766\",\r\n                \"source\":\"Embedded\",\r\n                \"id\":\"/providers/Microsoft.PowerApps/apis/shared_blockchainethereum\",\r\n                \"tier\":\"NotSpecified\"\r\n            },\r\n            \"shared_powerbi\":{\r\n                \"connectionName\":\"shared-powerbi-2af28ac9-9086-46d3-9eb9-f19e7bc4d766\",\r\n                \"source\":\"Embedded\",\r\n                \"id\":\"/providers/Microsoft.PowerApps/apis/shared_powerbi\",\r\n                \"tier\":\"NotSpecified\"\r\n            }\r\n        },";
-    };
-    $p.GetLogicAppStart = function ReportingWorkflowEventsOutputFlowAppTemplate_GetLogicAppStart() {
-        return "    \"definition\": {\r\n    \"$schema\": \"https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#\",\r\n    \"contentVersion\": \"1.0.0.0\",\r\n    \"parameters\": {\r\n                \"$connections\": {\r\n                    \"defaultValue\": {\r\n                    },\r\n            \"type\": \"Object\"\r\n        }\r\n    },";
-
-
-    };
-    $p.GetBlockchainEventTriggerForLogicApp = function ReportingWorkflowEventsOutputFlowAppTemplate_GetBlockchainEventTriggerForLogicApp(escapedAbi, contractAddress) {
-        var triggerStart = "        \"triggers\": {\r\n            \"When_a_smart_contract_event_occurs\": {\r\n                \"inputs\": {\r\n                    \"host\": {\r\n                        \"connection\": {\r\n                            \"name\": \"@parameters('$connections')['shared_blockchainethereum']['connectionId']\"\r\n                        }\r\n                    },\r\n                    \"method\": \"get\",\r\n                    \"path\": \"/contract/OnNewEvent\",\r\n                    \"queries\": {\r\n                            ";
-
-        var abi = String.Format("\"abi\": \"{0}\",", [escapedAbi]);
-
-        var contractAddressSection = String.Format("\r\n\"contractAddress\": \"{0}\",", [contractAddress]);
-        var eventName = "\r\n\"eventName\": \"" + this.get_Model().get_Name() + "\"";
-        var triggerEnd = "\r\n        }\r\n                },\r\n                \"recurrence\": {\r\n                    \"frequency\": \"Minute\",\r\n                    \"interval\": 1\r\n                },\r\n                \"type\": \"ApiConnection\"\r\n            }\r\n        },";
-
-        return String.Concat$3($d.array(String, [triggerStart, abi, contractAddressSection, eventName, 
-            triggerEnd]));
-    };
-    $p.GetActions = function ReportingWorkflowEventsOutputFlowAppTemplate_GetActions() {
-        var beginActions = "\"actions\": {\r\n            \"Add_rows_to_a_dataset\": {\r\n                \"inputs\": {\r\n                    \"body\": { \"Payload\":\r\n                        ";
-
-        var parameters = "\"[" + this._parametersProvider.Get(System.Linq.Enumerable.ToArray(String, 
-            System.Linq.Enumerable.Select(Nethereum.Generators.Model.ParameterABI, String, this.get_Model().get_EventABI().get_InputParameters(), 
-                $d.delegate(function(s) {
-                    return s.get_Name();
-                })))) + "]" + "\"";
-
-        var endActions = String.Format("\r\n                    }},\r\n                    \"host\": {{\r\n                        \"connection\": {{\r\n                            \"name\": \"@parameters('$connections')['shared_powerbi']['connectionId']\"\r\n                        }}\r\n                    }},\r\n                    \"method\": \"post\",\r\n                    \"path\": \"/v1.0/myorg/groups/@{{encodeURIComponent('myworkspace')}}/datasets/@{{encodeURIComponent('{0}-{1}')}}/tables/@{{encodeURIComponent('RealTimeData')}}/rows\"\r\n                }},\r\n                \"runAfter\": {{}},\r\n                \"type\": \"ApiConnection\"\r\n            }}\r\n        }}", 
-            [this._powerbiDatasetId, this._powerbiTable]);
-        return String.Concat$7(beginActions, parameters, endActions);
-    };
-    $p.GetLogicAppEnd = function ReportingWorkflowEventsOutputFlowAppTemplate_GetLogicAppEnd() {
-        return "        }\r\n    }\r\n}";
-
-    };
-    $p.Nethereum$Generators$Core$IWorkflowTemplate$GenerateWorkflow = $p.GenerateWorkflow;
-});
-$d.define(Nethereum.Generators.ReportingWorkflow.FlowApps.ParametersProvider, null, function($t, $p) {
-    $t.$ator = function() {
-        this.outerSingleTemplate = "@{base64(concat('{', '\\n', \r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{{singleTriggerTemplate}},\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t'\\n',\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t'}'\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
-        this.singleTriggerTemplate = String.Format("\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t'\\\"{0}\\\": ',triggerBody()?['{1}']\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t", 
-            [$t.GenerateValueFromToken("SmartContractEventParameterName"), $t.GenerateValueFromToken("SmartContractEventParameterName")]);
-        this.SmartContractEventParameterName = "SmartContractEventParameterName";
-        this.ContentData = "ContentData";
-    };
-    $t.ctor = function ParametersProvider() {
-        $t.$baseType.ctor.call(this);
-    };
-    $p.Get = function ParametersProvider_Get(parameters) {
-        var result;
-        if (parameters.length == 1) {
-            result = this.outerSingleTemplate.Replace$1($t.GenerateValueFromToken("singleTriggerTemplate"), 
-                this.singleTriggerTemplate);
-            result = result.Replace$1($t.GenerateValueFromToken("SmartContractEventParameterName"), parameters[0]);
-        }
-        else {
-            result = this.GetMultiple(parameters);
-        }
-
-        return this.TrimAll(result);
-    };
-    $p.GetMultiple = function ParametersProvider_GetMultiple(parameters) {
-        var eventParams = new System.Text.StringBuilder.ctor();
-        for (var p = 0; p < parameters.length; p++) {
-            var value = this.singleTriggerTemplate.Replace$1($t.GenerateValueFromToken("SmartContractEventParameterName"), 
-                parameters[p]);
-            eventParams.Append$12(value);
-
-            if (p < parameters.length - 1)
-                eventParams.Append$12(",',',");
-        }
-
-        var result = this.outerSingleTemplate.Replace$1($t.GenerateValueFromToken("singleTriggerTemplate"), 
-            eventParams.toString());
-
-        return result;
-    };
-    $p.TrimAll = function ParametersProvider_TrimAll(s) {
-        return s.trim().Replace$1("\t", String.Empty).Replace$1("\n", String.Empty).Replace$1("\r", String.Empty).Replace$1(" ", 
-            String.Empty);
-    };
-    $t.GenerateValueFromToken = function ParametersProvider_GenerateValueFromToken(token) {
-        return String.Format("{{{{{0}}}}}", [token]);
-    };
-});
-$d.define(Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventLogicAppModel, Nethereum.Generators.Core.WorkflowTypeMessageModel, function($t, $p) {
-    $t.$intfs = [Nethereum.Generators.Core.IWorkflowModel, Nethereum.Generators.Core.IFileModel];
-    $t.$ator = function() {
-        this.EventABI = null;
-    };
-    $p.get_EventABI = function ReportingWorkflowEventLogicAppModel_get_EventABI() { return this.EventABI; };
-    $t.ctor = function ReportingWorkflowEventLogicAppModel(eventABI, namespace) {
-        $t.$baseType.ctor.call(this, namespace, eventABI.get_Name(), ".logicapp");
-        this.EventABI = eventABI;
-        this.InitisialiseNamespaceDependencies();
-    };
-    $p.InitisialiseNamespaceDependencies = function ReportingWorkflowEventLogicAppModel_InitisialiseNamespaceDependencies() {
-        this.get_NamespaceDependencies().AddRange($d.array(String, ["System", "System.Threading.Tasks", 
-            "System.Collections.Generic", "System.Numerics", "Nethereum.Hex.HexTypes", "Nethereum.ABI.FunctionEncoding.Attributes"]));
-    };
-    $p.CanGenerateOutputLogicApp = function ReportingWorkflowEventLogicAppModel_CanGenerateOutputLogicApp() {
-        return this.get_EventABI().get_InputParameters() != null && this.get_EventABI().get_InputParameters().length > 0 && !System.Linq.Enumerable.Any$1(Nethereum.Generators.Model.ParameterABI, 
-            this.get_EventABI().get_InputParameters(), $d.delegate(function(p) {
-                return p.get_Indexed();
-            }));
-    };
-    $p.GetFileName$1 = function ReportingWorkflowEventLogicAppModel_GetFileName(name) {
-        return String.Format("event.{0}.json", [this.GetTypeName$1(name)]);
-    };
-});
-$d.define(Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppGenerator, Nethereum.Generators.Core.WorkflowGeneratorBase$2(Nethereum.Generators.Core.WorkflowTemplateBase$1(Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventLogicAppModel, 
-    34073), Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventLogicAppModel, 5848), function($t, $p) {
-    $t.$intfs = [Nethereum.Generators.Core.IWorkflowFileGenerator, Nethereum.Generators.Core.IWFGenerator, Nethereum.Generators.Core.IWorkflowGenerator];
-    $t.$ator = function() {
-        this._contractAddress = null;
-        this._subscriptionId = null;
-        this._escapedAbi = null;
-        this._location = null;
-        this._powerbiDatasetId = null;
-        this._powerbiTable = null;
-    };
-    $t.ctor = function ReportingWorkflowEventsOutputLogicAppGenerator(eventABI, namespace, codeGenLanguage, contractAddress, subscriptionId, escapedAbi, location, powerbiDatasetId, powerbiTable) {
-        $t.$baseType.ctor.call(this);
-        this._contractAddress = contractAddress;
-        this._subscriptionId = subscriptionId;
-        this._escapedAbi = escapedAbi;
-        this._location = location;
-        this._powerbiDatasetId = powerbiDatasetId;
-        this._powerbiTable = powerbiTable;
-
-        this.set_WorkflowModel((function() {
-            var $obj = new Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventLogicAppModel.ctor(eventABI, 
-                namespace);
-            $obj.set_CodeGenLanguage(codeGenLanguage);
-            return $obj;
-        }).call(this));
-        this.InitialiseTemplate(codeGenLanguage);
-    };
-    $p.InitialiseTemplate = function ReportingWorkflowEventsOutputLogicAppGenerator_InitialiseTemplate(codeGenLanguage) {
-        switch (codeGenLanguage) {
-            case 0 /* CodeGenLanguage.CSharp */:
-                this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppTemplate.ctor(this.get_WorkflowModel(), 
-                    this._contractAddress, this._escapedAbi, this._subscriptionId, this._location, this._powerbiDatasetId, 
-                    this._powerbiTable));
-                break;
-            case 1 /* CodeGenLanguage.Vb */:
-                //ClassTemplate = new FunctionOutputLogicAppVbTemplate(ClassModel);
-                this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppTemplate.ctor(this.get_WorkflowModel(), 
-                    this._contractAddress, this._escapedAbi, this._subscriptionId, this._location, this._powerbiDatasetId, 
-                    this._powerbiTable));
-                break;
-            case 3 /* CodeGenLanguage.FSharp */:
-                //ClassTemplate = new FunctionOutputLogicAppFSharpTemplate(ClassModel);
-                this.set_WorkflowTemplate(new Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppTemplate.ctor(this.get_WorkflowModel(), 
-                    this._contractAddress, this._escapedAbi, this._subscriptionId, this._location, this._powerbiDatasetId, 
-                    this._powerbiTable));
-                break;
-            default:
-                throw new System.ArgumentOutOfRangeException.ctor$4("codeGenLanguage", $d.boxEnum(Nethereum.Generators.Core.CodeGenLanguage, 
-                    codeGenLanguage), "Code generation not implemented for this language");
-        }
-    };
-    $p.GenerateWorkflow = function ReportingWorkflowEventsOutputLogicAppGenerator_GenerateWorkflow() {
-        return this.get_WorkflowModel().CanGenerateOutputLogicApp() ? this.get_WorkflowTemplate().GenerateWorkflow() : null;
-    };
-    $p.GenerateFileContent = function ReportingWorkflowEventsOutputLogicAppGenerator_GenerateFileContent() {
-        return this.get_WorkflowModel().CanGenerateOutputLogicApp() ? this.get_WorkflowTemplate().GenerateFullWorkflow() : null;
-    };
-    $p.Nethereum$Generators$Core$IWorkflowFileGenerator$GenerateFileContent = $p.GenerateFileContent;
-    $p.Nethereum$Generators$Core$IWFGenerator$GenerateWorkflow = $p.GenerateWorkflow;
-    $p.Nethereum$Generators$Core$IWorkflowGenerator$GenerateWorkflow = $p.GenerateWorkflow;
-});
-$d.define(Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppTemplate, Nethereum.Generators.Core.WorkflowTemplateBase$1(Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventLogicAppModel, 
-    34073), function($t, $p) {
+$d.define(Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppTemplate, Nethereum.Generators.Core.WorkflowTemplateBase$1(Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventLogicAppModel, 
+    4016), function($t, $p) {
     $t.$intfs = [Nethereum.Generators.Core.IWorkflowTemplate];
     $t.$ator = function() {
         this._contractAddress = null;
@@ -4260,7 +4102,7 @@ $d.define(Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEven
                     return s.get_Name();
                 })))) + "]" + "\"";
 
-        var endActions = String.Format("\r\n                    }},\r\n                    \"host\": {{\r\n                        \"connection\": {{\r\n                            \"name\": \"@parameters('$connections')['powerbi']['connectionId']\"\r\n                        }}\r\n                    }},\r\n                    \"method\": \"post\",\r\n                    \"path\": \"/v1.0/myorg/groups/@{{encodeURIComponent('myworkspace')}}/datasets/@{{encodeURIComponent('{0}-{1}')}}/tables/@{{encodeURIComponent('RealTimeData')}}/rows\"\r\n                }},\r\n                \"runAfter\": {{}},\r\n                \"type\": \"ApiConnection\"\r\n            }}\r\n        }}", 
+        var endActions = String.Format("\r\n                    }},\r\n                    \"host\": {{\r\n                        \"connection\": {{\r\n                            \"name\": \"@parameters('$connections')['powerbi']['connectionId']\"\r\n                        }}\r\n                    }},\r\n                    \"method\": \"post\",\r\n                    \"path\": \"/v1.0/myorg/groups/@{{encodeURIComponent('myworkspace')}}/datasets/@{{encodeURIComponent('{0}')}}/tables/@{{encodeURIComponent('{1}')}}/rows\"\r\n                }},\r\n                \"runAfter\": {{}},\r\n                \"type\": \"ApiConnection\"\r\n            }}\r\n        }}", 
             [this._powerbiDatasetId, this._powerbiTable]);
         return String.Concat$7(beginActions, parameters, endActions);
     };
@@ -5181,7 +5023,7 @@ $d.define(Nethereum.Generators.ServiceWorkflow.FlowApps.ServiceWorkflowFunctionO
         return clientData;
     };
     $p.GetConnections = function ServiceWorkflowFunctionOutputFlowAppTemplate_GetConnections() {
-        return "{\"schemaVersion\":\"1.0.0.0\", \"properties\": {     \r\n        \"connectionReferences\":{\r\n                \"shared_blockchainethereum\":{\r\n                    \"connectionName\":\"shared-blockchaineth-2af28ac9-9086-46d3-9eb9-f19e7bc4d766\",\r\n                    \"source\":\"Embedded\",\r\n                    \"id\":\"/providers/Microsoft.PowerApps/apis/shared_blockchainethereum\",\r\n                    \"tier\":\"NotSpecified\"}},";
+        return "{{\"schemaVersion\":\"1.0.0.0\", \"properties\": {{     \r\n        \"connectionReferences\":{{\r\n                \"shared_blockchainethereum\":{{\r\n                    \"connectionName\":\"shared-blockchaineth-2af28ac9-9086-46d3-9eb9-f19e7bc4d766\",\r\n                    \"source\":\"Embedded\",\r\n                    \"id\":\"/providers/Microsoft.PowerApps/apis/shared_blockchainethereum\",\r\n                    \"tier\":\"NotSpecified\"}}}},";
     };
     $p.GetLogicAppStart = function ServiceWorkflowFunctionOutputFlowAppTemplate_GetLogicAppStart() {
         return "\"definition\": {\r\n    \"$schema\": \"https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#\",\r\n    \"contentVersion\": \"1.0.0.0\",\r\n    \"parameters\": {\r\n                \"$connections\": {\r\n                    \"defaultValue\": {\r\n                    },\r\n            \"type\": \"Object\"\r\n        }\r\n            },";

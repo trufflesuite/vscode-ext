@@ -37,6 +37,9 @@ export class TransactionProvider {
     }
 
     public async getTransactionsInfo(txHashes: string[]): Promise<ITransactionResponse[]> {
+        if (txHashes.length === 0) {
+            return Promise.resolve([]);
+        }
         const batchRequest = this._web3.createBatchRequest();
         txHashes.forEach((txHash) => {
             batchRequest.add(this._web3.eth.getTransaction, txHash);

@@ -70,10 +70,6 @@ export namespace TruffleConfiguration {
      * if a transaction is not mined, keep waiting for this number of blocks (default is 50)
      */
     timeoutBlocks?: number;
-    /**
-     * This identifier needs just for out extension.
-     */
-    consortium_id?: number;
   }
 
   export interface INetwork {
@@ -399,11 +395,6 @@ export namespace TruffleConfiguration {
       options.provider = astToHDWalletProvider(provider.value);
     }
 
-    const consortiumId = findProperty(node, 'consortium_id');
-    if (consortiumId && consortiumId.value.type === 'Literal' && typeof consortiumId.value.value === 'number') {
-      options.consortium_id = consortiumId.value.value;
-    }
-
     return options;
   }
 
@@ -452,10 +443,6 @@ export namespace TruffleConfiguration {
 
     if (options.provider !== undefined) {
       obj.properties.push(generateProperty('provider', hdWalletProviderToAst(options.provider)));
-    }
-
-    if (options.consortium_id !== undefined) {
-      obj.properties.push(generateProperty('consortium_id', generateLiteral(options.consortium_id)));
     }
 
     return obj;

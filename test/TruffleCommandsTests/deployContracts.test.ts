@@ -7,39 +7,38 @@ import * as path from 'path';
 import * as sinon from 'sinon';
 import uuid = require('uuid');
 import * as vscode from 'vscode';
-import { ExtensionContext } from 'vscode';
-import { AzureAccount } from '../../src/azure-account.api';
-import { TruffleCommands } from '../../src/commands/TruffleCommands';
-import { ConsortiumResourceExplorer } from '../../src/ConsortiumResourceExplorer';
+import { TruffleCommands } from '../../src/commands';
 import { Constants } from '../../src/Constants';
-import { GanacheService } from '../../src/GanacheService/GanacheService';
 import * as helpers from '../../src/helpers';
 import { TruffleConfiguration } from '../../src/helpers';
 import * as commands from '../../src/helpers/command';
 import * as workspace from '../../src/helpers/workspace';
-import { MnemonicRepository } from '../../src/MnemonicService/MnemonicRepository';
+import { CancellationEvent } from '../../src/Models';
 import {
-  AzureConsortium,
-  CancellationEvent,
+  AzureBlockchainNetworkNode,
+  AzureBlockchainProject,
+  AzureBlockchainService,
   IExtensionItem,
-  ItemType,
-  LocalNetworkConsortium,
-  MainNetworkConsortium,
-  Network,
-  TestNetworkConsortium,
-  } from '../../src/Models';
-import { ConsortiumTreeManager } from '../../src/treeService/ConsortiumTreeManager';
+  LocalNetworkNode,
+  LocalProject,
+  LocalService,
+  Service,
+} from '../../src/Models/TreeItems';
+import { ConsortiumResourceExplorer } from '../../src/resourceExplorers';
+import { GanacheService, MnemonicRepository, TreeManager } from '../../src/services';
+import { OpenZeppelinService, OZContractValidated } from '../../src/services/openZeppelin/OpenZeppelinService';
 import { TestConstants } from '../TestConstants';
+import { AzureAccountHelper } from '../testHelpers/AzureAccountHelper';
 
 describe('TruffleCommands', () => {
   describe('Integration test', async () => {
     describe('deployContracts', () => {
       let requiredMock: sinon.SinonMock;
-      let checkAppsSilent: sinon.SinonExpectation;
-      let installTruffle: sinon.SinonExpectation;
-      let isHdWalletProviderRequired: sinon.SinonExpectation;
-      let checkHdWalletProviderVersion: sinon.SinonExpectation;
-      let installTruffleHdWalletProvider: sinon.SinonExpectation;
+      let checkAppsSilentMock: sinon.SinonExpectation;
+      let installTruffleMock: sinon.SinonExpectation;
+      let isHdWalletProviderRequiredMock: sinon.SinonExpectation;
+      let checkHdWalletProviderVersionMock: sinon.SinonExpectation;
+      let installTruffleHdWalletProviderMock: sinon.SinonExpectation;
 
       let getWorkspaceRootMock: any;
 
@@ -49,16 +48,15 @@ describe('TruffleCommands', () => {
       let showSaveDialogMock: sinon.SinonExpectation;
 
       let ganacheServiceMock: sinon.SinonMock;
-      let startGanacheServer: sinon.SinonExpectation;
+      let startGanacheServerMock: sinon.SinonExpectation;
 
       let getItemsMock: sinon.SinonStub<[(boolean | undefined)?], IExtensionItem[]>;
       let loadStateMock: sinon.SinonStub<[], IExtensionItem[]>;
-      let testConsortiumItems: Network[];
+      let servicesItems: Service[];
 
       let truffleConfigSetNetworkMock: any;
       let truffleConfigGetNetworkMock: any;
       let truffleConfigGenerateMnemonicMock: any;
-      let consortiumTreeManager: ConsortiumTreeManager;
 
       let commandContextMock: sinon.SinonMock;
       let executeCommandMock: sinon.SinonExpectation;
@@ -74,17 +72,19 @@ describe('TruffleCommands', () => {
 
       let getExtensionMock: any;
 
+      let openZeppelinValidateContractsMock: any;
+
       beforeEach(async () => {
         getWorkspaceRootMock = sinon.stub(workspace, 'getWorkspaceRoot');
 
         requiredMock = sinon.mock(helpers.required);
-        checkAppsSilent = requiredMock.expects('checkAppsSilent');
-        installTruffle = requiredMock.expects('installTruffle');
-        isHdWalletProviderRequired = requiredMock.expects('isHdWalletProviderRequired');
-        checkHdWalletProviderVersion = requiredMock.expects('checkHdWalletProviderVersion');
-        installTruffleHdWalletProvider = requiredMock.expects('installTruffleHdWalletProvider');
-        isHdWalletProviderRequired.returns(false);
-        checkHdWalletProviderVersion.returns(false);
+        checkAppsSilentMock = requiredMock.expects('checkAppsSilent');
+        installTruffleMock = requiredMock.expects('installTruffle');
+        isHdWalletProviderRequiredMock = requiredMock.expects('isHdWalletProviderRequired');
+        checkHdWalletProviderVersionMock = requiredMock.expects('checkHdWalletProviderVersion');
+        installTruffleHdWalletProviderMock = requiredMock.expects('installTruffleHdWalletProvider');
+        isHdWalletProviderRequiredMock.returns(false);
+        checkHdWalletProviderVersionMock.returns(false);
 
         windowMock = sinon.mock(vscode.window);
         showQuickPickMock = sinon.stub(vscode.window, 'showQuickPick');
@@ -92,21 +92,19 @@ describe('TruffleCommands', () => {
         showSaveDialogMock = windowMock.expects('showSaveDialog');
 
         ganacheServiceMock = sinon.mock(GanacheService);
-        startGanacheServer = ganacheServiceMock.expects('startGanacheServer');
+        startGanacheServerMock = ganacheServiceMock.expects('startGanacheServer');
 
-        getItemsMock = sinon.stub(ConsortiumTreeManager.prototype, 'getItems');
-        loadStateMock = sinon.stub(ConsortiumTreeManager.prototype, 'loadState');
-        testConsortiumItems = await createTestConsortiumItems();
-        getItemsMock.returns(testConsortiumItems);
-        loadStateMock.returns(testConsortiumItems);
+        getItemsMock = sinon.stub(TreeManager, 'getItems');
+        loadStateMock = sinon.stub(TreeManager, 'loadState');
+        servicesItems = await createTestServicesItems();
+        getItemsMock.returns(servicesItems);
+        loadStateMock.returns(servicesItems);
 
         truffleConfigSetNetworkMock = sinon.stub(TruffleConfiguration.TruffleConfig.prototype, 'setNetworks');
         truffleConfigGetNetworkMock = sinon.stub(TruffleConfiguration.TruffleConfig.prototype, 'getNetworks');
         truffleConfigGetNetworkMock.returns(getTestTruffleNetworks());
         truffleConfigGenerateMnemonicMock = sinon.stub(TruffleConfiguration, 'generateMnemonic');
         truffleConfigGenerateMnemonicMock.returns(TestConstants.testMnemonic);
-
-        consortiumTreeManager = new ConsortiumTreeManager({} as ExtensionContext);
 
         commandContextMock = sinon.mock(commands);
         executeCommandMock = commandContextMock.expects('executeCommand');
@@ -120,7 +118,11 @@ describe('TruffleCommands', () => {
 
         getAccessKeysMock = sinon.stub(ConsortiumResourceExplorer.prototype, 'getAccessKeys');
 
-        getExtensionMock = sinon.stub(vscode.extensions, 'getExtension').returns(mockExtension);
+        getExtensionMock = sinon.stub(vscode.extensions, 'getExtension').returns(AzureAccountHelper.mockExtension);
+
+        const openZeppelinServiceMock = sinon.mock(OpenZeppelinService);
+        openZeppelinValidateContractsMock = openZeppelinServiceMock.expects('validateContracts')
+          .resolves([]);
       });
 
       afterEach(() => {
@@ -133,7 +135,7 @@ describe('TruffleCommands', () => {
         executeCommandMock.returns(uuid.v4());
 
         // Act and assert
-        await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager),
+        await assert.rejects(TruffleCommands.deployContracts(),
           Error,
           Constants.errorMessageStrings.TruffleConfigIsNotExist);
       });
@@ -145,342 +147,213 @@ describe('TruffleCommands', () => {
         showQuickPickMock.returns(undefined);
 
         // Act and assert
-        await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager), CancellationEvent);
+        await assert.rejects(TruffleCommands.deployContracts(), CancellationEvent);
       });
 
       it('should install TruffleHdWalletProvider when it required', async () => {
         // Arrange
-        checkAppsSilent.returns(true);
+        checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        isHdWalletProviderRequired.returns(true);
+        isHdWalletProviderRequiredMock.returns(true);
         executeCommandMock.returns(uuid.v4());
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.networksNames.development);
+          return items.find((item: any) => item.label === TestConstants.servicesNames.development);
         });
 
         // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
+        await TruffleCommands.deployContracts();
 
         // Assert
         assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
         assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(checkAppsSilentMock.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffleMock.called, false, 'installTruffle should not be called');
         assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(startGanacheServerMock.called, true, 'startGanacheServer should be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
         assert.strictEqual(
-          isHdWalletProviderRequired.calledOnce,
+          isHdWalletProviderRequiredMock.calledOnce,
           true,
           'isHdWalletProviderRequired should be called');
         assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
+          checkHdWalletProviderVersionMock.calledOnce,
           true,
           'checkHdWalletProviderVersion should be called');
         assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
+          installTruffleHdWalletProviderMock.calledOnce,
           true,
           'installTruffleHdWalletProvider should be called');
       });
 
       it('should not install TruffleHdWalletProvider when it version correct', async () => {
         // Arrange
-        checkAppsSilent.returns(true);
+        checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        isHdWalletProviderRequired.returns(true);
-        checkHdWalletProviderVersion.returns(true);
+        isHdWalletProviderRequiredMock.returns(true);
+        checkHdWalletProviderVersionMock.returns(true);
         executeCommandMock.returns(uuid.v4());
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.networksNames.development);
+          return items.find((item: any) => item.label === TestConstants.servicesNames.development);
         });
 
         // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
+        await TruffleCommands.deployContracts();
 
         // Assert
         assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
         assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(checkAppsSilentMock.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffleMock.called, false, 'installTruffle should not be called');
         assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(startGanacheServerMock.called, true, 'startGanacheServer should be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
-        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(isHdWalletProviderRequiredMock.calledOnce, true, 'isHdWalletProviderRequired should be called');
         assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
+          checkHdWalletProviderVersionMock.calledOnce,
           true,
           'checkHdWalletProviderVersion should be called');
         assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
+          installTruffleHdWalletProviderMock.calledOnce,
           false,
           'installTruffleHdWalletProvider should not be called');
       });
 
       it('to development should complete successfully', async () => {
         // Arrange
-        checkAppsSilent.returns(true);
+        checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.networksNames.development);
+          return items.find((item: any) => item.label === TestConstants.servicesNames.development);
         });
 
         // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
+        await TruffleCommands.deployContracts();
 
         // Assert
         assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
         assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(checkAppsSilentMock.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffleMock.called, false, 'installTruffle should not be called');
         assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(startGanacheServerMock.called, true, 'startGanacheServer should be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
-        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(isHdWalletProviderRequiredMock.calledOnce, true, 'isHdWalletProviderRequired should be called');
         assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
+          checkHdWalletProviderVersionMock.calledOnce,
           false,
           'checkHdWalletProviderVersion should not be called');
         assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
+          installTruffleHdWalletProviderMock.calledOnce,
           false,
           'installTruffleHdWalletProvider should not be called');
       });
 
       it('to development should throw exception when there is an error on command execution', async () => {
         // Arrange
-        checkAppsSilent.returns(true);
+        checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.throws(TestConstants.testError);
 
         showQuickPickMock.callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.networksNames.development);
+          return items.find((item: any) => item.label === TestConstants.servicesNames.development);
         });
 
         // Act and assert
-        await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager), Error);
+        await assert.rejects(TruffleCommands.deployContracts(), Error);
 
         assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
         assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(checkAppsSilentMock.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffleMock.called, false, 'installTruffle should not be called');
         assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(startGanacheServerMock.called, true, 'startGanacheServer should be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
-        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(isHdWalletProviderRequiredMock.calledOnce, true, 'isHdWalletProviderRequired should be called');
         assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
+          checkHdWalletProviderVersionMock.calledOnce,
           false,
           'checkHdWalletProviderVersion should not be called');
         assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
-          false,
-          'installTruffleHdWalletProvider should not be called');
-      });
-
-      it('to mainNetwork should throw cancellationEvent when showInputBox return undefined', async () => {
-        // Arrange
-        checkAppsSilent.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        showInputBoxMock.returns(undefined);
-        executeCommandMock.returns(uuid.v4());
-
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.networksNames.testMainNetwork);
-        });
-
-        // Act and assert
-        await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager), CancellationEvent);
-        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
-        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
-        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
-        assert.strictEqual(executeCommandMock.called, false, 'executeCommand should not be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
-        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
-        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
-        assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
-          false,
-          'checkHdWalletProviderVersion should not be called');
-        assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
-          false,
-          'installTruffleHdWalletProvider should not be called');
-      });
-
-      it('to mainNetwork should throw cancellationEvent when showInputBox return not "yes"', async () => {
-        // Arrange
-        checkAppsSilent.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        showInputBoxMock.returns(uuid.v4());
-        executeCommandMock.returns(uuid.v4());
-
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.networksNames.testMainNetwork);
-        });
-
-        // Act and assert
-        await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager), CancellationEvent);
-        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
-        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
-        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
-        assert.strictEqual(executeCommandMock.called, false, 'executeCommand should not be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
-        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
-        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
-        assert.strictEqual(checkHdWalletProviderVersion.calledOnce,
-          false,
-          'checkHdWalletProviderVersion should not be called');
-        assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
-          false,
-          'installTruffleHdWalletProvider should not be called');
-      });
-
-      it('to mainNetwork should complete successfully', async () => {
-        // Arrange
-        checkAppsSilent.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        showInputBoxMock.returns(Constants.confirmationDialogResult.yes);
-        executeCommandMock.returns(uuid.v4());
-
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.networksNames.testMainNetwork);
-        });
-
-        // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
-
-        // Assert
-        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
-        assert.strictEqual(showInputBoxMock.calledOnce, true, 'showInputBox should be called once');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
-        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
-        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
-        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
-        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
-        assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
-          false,
-          'checkHdWalletProviderVersion should not be called');
-        assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
-          false,
-          'installTruffleHdWalletProvider should not be called');
-      });
-
-      it('to mainNetwork should throw exception when there is an error on command execution', async () => {
-        // Arrange
-        checkAppsSilent.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        showInputBoxMock.returns(Constants.confirmationDialogResult.yes);
-        executeCommandMock.throws(TestConstants.testError);
-
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.networksNames.testMainNetwork);
-        });
-
-        // Act and assert
-        await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager));
-        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
-        assert.strictEqual(showInputBoxMock.calledOnce, true, 'showInputBox should be called once');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
-        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
-        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
-        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
-        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
-        assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
-          false,
-          'checkHdWalletProviderVersion should not be called');
-        assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
+          installTruffleHdWalletProviderMock.calledOnce,
           false,
           'installTruffleHdWalletProvider should not be called');
       });
 
       it('to network should complete successfully', async () => {
         // Arrange
-        checkAppsSilent.returns(true);
+        checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.networksNames.testNetwork);
+          return items.find((item: any) => item.label === TestConstants.servicesNames.testNetwork);
         });
 
         // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
+        await TruffleCommands.deployContracts();
 
         // Assert
         assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
         assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(checkAppsSilentMock.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffleMock.called, false, 'installTruffle should not be called');
         assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(startGanacheServerMock.called, false, 'startGanacheServer should not be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
-        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(isHdWalletProviderRequiredMock.calledOnce, true, 'isHdWalletProviderRequired should be called');
         assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
+          checkHdWalletProviderVersionMock.calledOnce,
           false,
           'checkHdWalletProviderVersion should not be called');
         assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
+          installTruffleHdWalletProviderMock.calledOnce,
           false,
           'installTruffleHdWalletProvider should not be called');
       });
 
       it('to network should throw exception when there is an error on command execution', async () => {
         // Arrange
-        checkAppsSilent.returns(true);
+        checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.throws(TestConstants.testError);
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.networksNames.testNetwork);
+          return items.find((item: any) => item.label === TestConstants.servicesNames.testNetwork);
         });
 
         // Act and assert
-        await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager));
+        await assert.rejects(TruffleCommands.deployContracts());
         assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
         assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(checkAppsSilentMock.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffleMock.called, false, 'installTruffle should not be called');
         assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(startGanacheServerMock.called, false, 'startGanacheServer should not be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
-        assert.strictEqual(isHdWalletProviderRequired.calledOnce, true, 'isHdWalletProviderRequired should be called');
+        assert.strictEqual(isHdWalletProviderRequiredMock.calledOnce, true, 'isHdWalletProviderRequired should be called');
         assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
+          checkHdWalletProviderVersionMock.calledOnce,
           false,
           'checkHdWalletProviderVersion should not be called');
         assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
+          installTruffleHdWalletProviderMock.calledOnce,
           false,
           'installTruffleHdWalletProvider should not be called');
       });
 
-      it('to local consortium should complete successfully', async () => {
+      it('to local network should complete successfully', async () => {
         // Arrange
-        checkAppsSilent.returns(true);
+        checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
 
@@ -489,34 +362,34 @@ describe('TruffleCommands', () => {
         });
 
         // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
+        await TruffleCommands.deployContracts();
 
         // Assert
         assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
         assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(checkAppsSilentMock.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffleMock.called, false, 'installTruffle should not be called');
         assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(startGanacheServerMock.called, true, 'startGanacheServer should be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
         assert.strictEqual(
-          isHdWalletProviderRequired.calledOnce,
+          isHdWalletProviderRequiredMock.calledOnce,
           true,
           'isHdWalletProviderRequired should be called');
         assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
+          checkHdWalletProviderVersionMock.calledOnce,
           false,
           'checkHdWalletProviderVersion should not be called');
         assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
+          installTruffleHdWalletProviderMock.calledOnce,
           false,
           'installTruffleHdWalletProvider should not be called');
       });
 
-      it('to local consortium should throw exception when there is an error on command execution', async () => {
+      it('to local network should throw exception when there is an error on command execution', async () => {
         // Arrange
-        checkAppsSilent.returns(true);
+        checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.throws(TestConstants.testError);
 
@@ -525,454 +398,38 @@ describe('TruffleCommands', () => {
         });
 
         // Act and assert
-        await assert.rejects(TruffleCommands.deployContracts(consortiumTreeManager));
+        await assert.rejects(TruffleCommands.deployContracts());
         assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
         assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(checkAppsSilentMock.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffleMock.called, false, 'installTruffle should not be called');
         assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(startGanacheServerMock.called, true, 'startGanacheServer should be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
         assert.strictEqual(
-          isHdWalletProviderRequired.calledOnce,
+          isHdWalletProviderRequiredMock.calledOnce,
           true,
           'isHdWalletProviderRequired should be called');
         assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
+          checkHdWalletProviderVersionMock.calledOnce,
           false,
           'checkHdWalletProviderVersion should not be called');
         assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
-          false,
-          'installTruffleHdWalletProvider should not be called');
-      });
-
-      it('to EthereumNetwork should generate mnemonic and complete successfully', async () => {
-        // Arrange
-        checkAppsSilent.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        executeCommandMock.returns(uuid.v4());
-
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.consortiumTestNames.publicEthereum);
-        });
-
-        showQuickPickMock.onCall(1).callsFake((items: any) => {
-          return items.find((item: any) => item.label === Constants.placeholders.generateMnemonic);
-        });
-
-        showInputBoxMock.onCall(0).returns(Constants.confirmationDialogResult.yes);
-        showInputBoxMock.onCall(1).returns(100000000000);
-        showInputBoxMock.onCall(2).returns(4712388);
-
-        showSaveDialogMock.returns(uuid.v4());
-
-        // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
-
-        // Assert
-        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
-        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
-        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
-        assert.strictEqual(showInputBoxMock.callCount, 3, 'showInputBox should be called tree times');
-        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
-        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
-        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
-        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
-        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
-        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
-        assert.strictEqual(
-          isHdWalletProviderRequired.calledOnce,
-          true,
-          'isHdWalletProviderRequired should be called');
-        assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
-          false,
-          'checkHdWalletProviderVersion should not be called');
-        assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
-          false,
-          'installTruffleHdWalletProvider should not be called');
-      });
-
-      it('to EthereumNetwork should generate mnemonic and complete successfully with default params', async () => {
-        // Arrange
-        checkAppsSilent.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        executeCommandMock.returns(uuid.v4());
-
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.consortiumTestNames.publicEthereum);
-        });
-
-        showQuickPickMock.onCall(1).callsFake((items: any) => {
-          return items.find((item: any) => item.label === Constants.placeholders.generateMnemonic);
-        });
-
-        showInputBoxMock.onCall(0).returns(Constants.confirmationDialogResult.yes);
-        showInputBoxMock.onCall(1).returns('');
-        showInputBoxMock.onCall(2).returns('');
-
-        showSaveDialogMock.returns(uuid.v4());
-
-        // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
-
-        // Assert
-        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
-        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
-        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
-        assert.strictEqual(showInputBoxMock.callCount, 3, 'showInputBox should be called tree times');
-        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
-        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
-        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
-        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
-        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
-        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
-        assert.strictEqual(
-          isHdWalletProviderRequired.calledOnce,
-          true,
-          'isHdWalletProviderRequired should be called');
-        assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
-          false,
-          'checkHdWalletProviderVersion should not be called');
-        assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
-          false,
-          'installTruffleHdWalletProvider should not be called');
-      });
-
-      it('to EthereumNetwork should complete successfully when user paste mnemonic', async () => {
-        // Arrange
-        checkAppsSilent.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        executeCommandMock.returns(uuid.v4());
-
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.consortiumTestNames.publicEthereum);
-        });
-
-        showQuickPickMock.onCall(1).callsFake((items: any) => {
-          return items.find((item: any) => item.label === Constants.placeholders.pasteMnemonic);
-        });
-
-        showInputBoxMock.onCall(0).returns(Constants.confirmationDialogResult.yes);
-        showInputBoxMock.onCall(1).returns(TestConstants.testMnemonic);
-        showInputBoxMock.onCall(2).returns(100000000000);
-        showInputBoxMock.onCall(3).returns(4712388);
-
-        showSaveDialogMock.returns(uuid.v4());
-
-        // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
-
-        // Assert
-        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
-        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
-        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
-        assert.strictEqual(showInputBoxMock.callCount, 4, 'showInputBox should be called four times');
-        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
-        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
-        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
-        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
-        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
-        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
-        assert.strictEqual(
-          isHdWalletProviderRequired.calledOnce,
-          true,
-          'isHdWalletProviderRequired should be called');
-        assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
-          false,
-          'checkHdWalletProviderVersion should not be called');
-        assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
-          false,
-          'installTruffleHdWalletProvider should not be called');
-      });
-
-      it('to EthereumNetwork should complete successfully with default params when user paste mnemonic', async () => {
-        // Arrange
-        checkAppsSilent.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        executeCommandMock.returns(uuid.v4());
-
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.consortiumTestNames.publicEthereum);
-        });
-
-        showQuickPickMock.onCall(1).callsFake((items: any) => {
-          return items.find((item: any) => item.label === Constants.placeholders.pasteMnemonic);
-        });
-
-        showInputBoxMock.onCall(0).returns(Constants.confirmationDialogResult.yes);
-        showInputBoxMock.onCall(1).returns(TestConstants.testMnemonic);
-        showInputBoxMock.onCall(2).returns('');
-        showInputBoxMock.onCall(3).returns('');
-
-        showSaveDialogMock.returns(uuid.v4());
-
-        // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
-
-        // Assert
-        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
-        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
-        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
-        assert.strictEqual(showInputBoxMock.callCount, 4, 'showInputBox should be called four times');
-        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
-        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
-        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
-        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
-        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
-        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
-        assert.strictEqual(
-          isHdWalletProviderRequired.calledOnce,
-          true,
-          'isHdWalletProviderRequired should be called');
-        assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
-          false,
-          'checkHdWalletProviderVersion should not be called');
-        assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
-          false,
-          'installTruffleHdWalletProvider should not be called');
-      });
-
-      it('to EthereumTestnet should generate mnemonic and complete successfully', async () => {
-        // Arrange
-        checkAppsSilent.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        executeCommandMock.returns(uuid.v4());
-
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.consortiumTestNames.testEthereum);
-        });
-
-        showQuickPickMock.onCall(1).callsFake((items: any) => {
-          return items.find((item: any) => item.label === Constants.placeholders.generateMnemonic);
-        });
-
-        showInputBoxMock.onCall(0).returns(100000000000);
-        showInputBoxMock.onCall(1).returns(4712388);
-
-        showSaveDialogMock.returns(uuid.v4());
-
-        // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
-
-        // Assert
-        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
-        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
-        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
-        assert.strictEqual(showInputBoxMock.callCount, 2, 'showInputBox should be called twice');
-        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
-        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
-        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
-        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
-        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
-        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
-        assert.strictEqual(
-          isHdWalletProviderRequired.calledOnce,
-          true,
-          'isHdWalletProviderRequired should be called');
-        assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
-          false,
-          'checkHdWalletProviderVersion should not be called');
-        assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
-          false,
-          'installTruffleHdWalletProvider should not be called');
-      });
-
-      it('to EthereumTestnet should generate mnemonic and complete successfully with default params', async () => {
-        // Arrange
-        checkAppsSilent.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        executeCommandMock.returns(uuid.v4());
-
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.consortiumTestNames.testEthereum);
-        });
-
-        showQuickPickMock.onCall(1).callsFake((items: any) => {
-          return items.find((item: any) => item.label === Constants.placeholders.generateMnemonic);
-        });
-
-        showInputBoxMock.onCall(0).returns('');
-        showInputBoxMock.onCall(1).returns('');
-
-        showSaveDialogMock.returns(uuid.v4());
-
-        // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
-
-        // Assert
-        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
-        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
-        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
-        assert.strictEqual(showInputBoxMock.callCount, 2, 'showInputBox should be called twice');
-        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
-        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
-        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
-        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
-        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
-        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
-        assert.strictEqual(
-          isHdWalletProviderRequired.calledOnce,
-          true,
-          'isHdWalletProviderRequired should be called');
-        assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
-          false,
-          'checkHdWalletProviderVersion should not be called');
-        assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
-          false,
-          'installTruffleHdWalletProvider should not be called');
-      });
-
-      it('to EthereumTestnet should complete successfully when user paste mnemonic', async () => {
-        // Arrange
-        checkAppsSilent.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        executeCommandMock.returns(uuid.v4());
-
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.consortiumTestNames.testEthereum);
-        });
-
-        showQuickPickMock.onCall(1).callsFake((items: any) => {
-          return items.find((item: any) => item.label === Constants.placeholders.pasteMnemonic);
-        });
-
-        showInputBoxMock.onCall(0).returns(TestConstants.testMnemonic);
-        showInputBoxMock.onCall(1).returns(100000000000);
-        showInputBoxMock.onCall(2).returns(4712388);
-
-        showSaveDialogMock.returns(uuid.v4());
-
-        // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
-
-        // Assert
-        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
-        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
-        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
-        assert.strictEqual(showInputBoxMock.callCount, 3, 'showInputBox should be called tree times');
-        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
-        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
-        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
-        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
-        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
-        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
-        assert.strictEqual(
-          isHdWalletProviderRequired.calledOnce,
-          true,
-          'isHdWalletProviderRequired should be called');
-        assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
-          false,
-          'checkHdWalletProviderVersion should not be called');
-        assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
-          false,
-          'installTruffleHdWalletProvider should not be called');
-      });
-
-      it('to EthereumTestnet should complete successfully with default params when user paste mnemonic', async () => {
-        // Arrange
-        checkAppsSilent.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-        executeCommandMock.returns(uuid.v4());
-
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.consortiumTestNames.testEthereum);
-        });
-
-        showQuickPickMock.onCall(1).callsFake((items: any) => {
-          return items.find((item: any) => item.label === Constants.placeholders.pasteMnemonic);
-        });
-
-        showInputBoxMock.onCall(0).returns(TestConstants.testMnemonic);
-        showInputBoxMock.onCall(1).returns('');
-        showInputBoxMock.onCall(2).returns('');
-
-        showSaveDialogMock.returns(uuid.v4());
-
-        // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
-
-        // Assert
-        assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
-        assert.strictEqual(showQuickPickMock.callCount, 2, 'showQuickPick should be called twice');
-        assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
-        assert.strictEqual(showInputBoxMock.callCount, 3, 'showInputBox should be called tree times');
-        assert.strictEqual(getMnemonicMock.called, false, 'getMnemonic should not be called');
-        assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
-        assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
-        assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
-        assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
-        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
-        assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
-        assert.strictEqual(
-          isHdWalletProviderRequired.calledOnce,
-          true,
-          'isHdWalletProviderRequired should be called');
-        assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
-          false,
-          'checkHdWalletProviderVersion should not be called');
-        assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
+          installTruffleHdWalletProviderMock.calledOnce,
           false,
           'installTruffleHdWalletProvider should not be called');
       });
 
       it('to AzureBlockchainService should generate mnemonic and complete successfully', async () => {
         // Arrange
-        checkAppsSilent.returns(true);
+        checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
         getAccessKeysMock.returns(uuid.v4());
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.networksNames.testConsortium);
+          return items.find((item: any) => item.label === TestConstants.servicesNames.testConsortium);
         });
 
         showQuickPickMock.onCall(1).callsFake((items: any) => {
@@ -982,7 +439,7 @@ describe('TruffleCommands', () => {
         showSaveDialogMock.returns(uuid.v4());
 
         // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
+        await TruffleCommands.deployContracts();
 
         // Assert
         assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
@@ -993,36 +450,36 @@ describe('TruffleCommands', () => {
         assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
         assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
         assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(checkAppsSilentMock.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffleMock.called, false, 'installTruffle should not be called');
         assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(startGanacheServerMock.called, false, 'startGanacheServer should not be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
         assert.strictEqual(getExtensionMock.called, true, 'getExtension should be called');
         assert.strictEqual(
-          isHdWalletProviderRequired.calledOnce,
+          isHdWalletProviderRequiredMock.calledOnce,
           true,
           'isHdWalletProviderRequired should be called');
         assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
+          checkHdWalletProviderVersionMock.calledOnce,
           false,
           'checkHdWalletProviderVersion should not be called');
         assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
+          installTruffleHdWalletProviderMock.calledOnce,
           false,
           'installTruffleHdWalletProvider should not be called');
       });
 
       it('to AzureBlockchainService should complete successfully when user paste mnemonic', async () => {
         // Arrange
-        checkAppsSilent.returns(true);
+        checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
         getAccessKeysMock.returns(uuid.v4());
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.networksNames.testConsortium);
+          return items.find((item: any) => item.label === TestConstants.servicesNames.testConsortium);
         });
 
         showQuickPickMock.onCall(1).callsFake((items: any) => {
@@ -1034,7 +491,7 @@ describe('TruffleCommands', () => {
         showSaveDialogMock.returns(uuid.v4());
 
         // Act
-        await TruffleCommands.deployContracts(consortiumTreeManager);
+        await TruffleCommands.deployContracts();
 
         // Assert
         assert.strictEqual(showQuickPickMock.called, true, 'showQuickPick should be called');
@@ -1045,78 +502,121 @@ describe('TruffleCommands', () => {
         assert.strictEqual(getAllMnemonicPathsMock.called, true, 'getAllMnemonicPaths should be called');
         assert.strictEqual(saveMnemonicPathMock.called, true, 'saveMnemonicPath should be called');
         assert.strictEqual(writeFileSyncMock.called, true, 'writeFileSync should be called');
-        assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
-        assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
+        assert.strictEqual(checkAppsSilentMock.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffleMock.called, false, 'installTruffle should not be called');
         assert.strictEqual(getWorkspaceRootMock.called, true, 'getWorkspaceRoot should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
-        assert.strictEqual(startGanacheServer.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(startGanacheServerMock.called, false, 'startGanacheServer should not be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
         assert.strictEqual(getExtensionMock.called, true, 'getExtension should be called');
         assert.strictEqual(
-          isHdWalletProviderRequired.calledOnce,
+          isHdWalletProviderRequiredMock.calledOnce,
           true,
           'isHdWalletProviderRequired should be called');
         assert.strictEqual(
-          checkHdWalletProviderVersion.calledOnce,
+          checkHdWalletProviderVersionMock.calledOnce,
           false,
           'checkHdWalletProviderVersion should not be called');
         assert.strictEqual(
-          installTruffleHdWalletProvider.calledOnce,
+          installTruffleHdWalletProviderMock.calledOnce,
           false,
           'installTruffleHdWalletProvider should not be called');
+      });
+
+      describe('validating openZeppelin contracts before deploy', () => {
+        beforeEach(() => {
+          checkAppsSilentMock.resolves(true);
+          getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
+          showInputBoxMock.returns(Constants.confirmationDialogResult.yes);
+          executeCommandMock.returns(uuid.v4());
+
+          showQuickPickMock.onCall(0).callsFake((items: any) => {
+            return items.find((item: any) => item.label === TestConstants.servicesNames.testNetwork);
+          });
+        });
+
+        afterEach(() => {
+          sinon.restore();
+        });
+
+        it('should pass when openZeppelin contracts are valid', async () => {
+          // Arrange
+          openZeppelinValidateContractsMock.resolves([ new OZContractValidated('1', true, true) ]);
+
+          // Act
+          await TruffleCommands.deployContracts();
+
+          // Assert
+          assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        });
+
+        it('should throw error when downloaded openZeppelin contract has invalid hash', async () => {
+          // Arrange
+          openZeppelinValidateContractsMock.resolves([ new OZContractValidated('1', true, false) ]);
+
+          // Act and Assert
+          await assert.rejects(TruffleCommands.deployContracts(), Error);
+        });
+
+        it('should throw error when downloaded openZeppelin contract doesn\'t exist on the disk', async () => {
+          // Arrange
+          openZeppelinValidateContractsMock.resolves([ new OZContractValidated('1', false) ]);
+
+          // Act and Assert
+          await assert.rejects(TruffleCommands.deployContracts(), Error);
+        });
+
+        it('should throw error when any downloaded openZeppelin contract is invalid', async () => {
+          // Arrange
+          openZeppelinValidateContractsMock.resolves([
+            new OZContractValidated('1', true, false),
+            new OZContractValidated('2', true, true),
+          ]);
+
+          // Act and Assert
+          await assert.rejects(TruffleCommands.deployContracts(), Error);
+        });
       });
     });
   });
 });
 
-async function createTestConsortiumItems(): Promise<Network[]> {
-  const networks: Network[] = [];
+async function createTestServicesItems(): Promise<Service[]> {
+  const services: Service[] = [];
 
-  const azureNetwork = new Network(TestConstants.networksNames.azureBlockchainService, ItemType.AZURE_BLOCKCHAIN);
-  const localNetwork = new Network(TestConstants.networksNames.localNetwork, ItemType.LOCAL_NETWORK);
-  const ethereumTestnet = new Network(TestConstants.networksNames.ethereumTestnet, ItemType.ETHEREUM_TEST_NETWORK);
-  const ethereumNetwork = new Network(TestConstants.networksNames.ethereumNetwork, ItemType.ETHEREUM_MAIN_NETWORK);
+  const azureBlockchainService = new AzureBlockchainService();
+  const localService = new LocalService();
 
-  const azureConsortium = new AzureConsortium(
-    TestConstants.networksNames.testConsortium,
+  const azureBlockchainProject = new AzureBlockchainProject(
+    TestConstants.servicesNames.testConsortium,
     uuid.v4(),
     uuid.v4(),
     uuid.v4(),
-    'https://testConsortium.blockchain.azure.com/',
   );
-  const localNetworkConsortium = new LocalNetworkConsortium(
-    TestConstants.consortiumTestNames.local,
-    'http://127.0.0.1:8545/',
-  );
-  const testNetworkConsortium = new TestNetworkConsortium(
-    TestConstants.consortiumTestNames.testEthereum,
-    'https://0.0.0.3:1234/',
-  );
-  const mainNetworkConsortium = new MainNetworkConsortium(
-    TestConstants.consortiumTestNames.publicEthereum,
-    'https://0.0.0.4:1234/',
-  );
+  azureBlockchainProject.addChild(
+    new AzureBlockchainNetworkNode(TestConstants.servicesNames.testConsortium, uuid.v4(), '*', '', '', '',
+  ));
 
-  azureConsortium.setConsortiumId(randomInteger());
-  localNetworkConsortium.setConsortiumId(randomInteger());
-  testNetworkConsortium.setConsortiumId(randomInteger());
-  mainNetworkConsortium.setConsortiumId(randomInteger());
+  const defaultPort = 8545;
+  const defaultLabel = TestConstants.consortiumTestNames.local;
+  const localProject = new LocalProject(defaultLabel, defaultPort);
+  const defaultUrl = `${Constants.networkProtocols.http}${Constants.localhost}:${defaultPort}`;
+  const localNetworkNode = new LocalNetworkNode(defaultLabel, defaultUrl, '*');
+  localProject.addChild(localNetworkNode);
 
-  azureNetwork.addChild(azureConsortium);
-  localNetwork.addChild(localNetworkConsortium);
-  ethereumTestnet.addChild(testNetworkConsortium);
-  ethereumNetwork.addChild(mainNetworkConsortium);
+  azureBlockchainService.addChild(azureBlockchainProject);
+  localService.addChild(localProject);
 
-  networks.push(azureNetwork, localNetwork, ethereumNetwork, ethereumTestnet);
+  services.push(azureBlockchainService, localService);
 
-  return networks;
+  return services;
 }
 
 function getTestTruffleNetworks(): TruffleConfiguration.INetwork[] {
   const networks: TruffleConfiguration.INetwork[] = [];
 
   networks.push({
-    name: TestConstants.networksNames.development,
+    name: TestConstants.servicesNames.development,
     options: {
       host: '127.0.0.1',
       network_id: '*',
@@ -1124,18 +624,8 @@ function getTestTruffleNetworks(): TruffleConfiguration.INetwork[] {
     },
   },
   {
-    name: TestConstants.networksNames.testMainNetwork,
+    name: TestConstants.servicesNames.testNetwork,
     options: {
-      consortium_id: 1559217403180,
-      gas: 4712388,
-      gasPrice: 100000000000,
-      network_id: 1,
-    },
-  },
-  {
-    name: TestConstants.networksNames.testNetwork,
-    options: {
-      consortium_id: 1559217403181,
       gas: 4712388,
       gasPrice: 100000000000,
       network_id: 2,
@@ -1144,29 +634,3 @@ function getTestTruffleNetworks(): TruffleConfiguration.INetwork[] {
 
   return networks;
 }
-
-function randomInteger(): number {
-  const max = + Date.now();
-  const rand = - 0.5 + Math.random() * (max + 1);
-  return Math.round(rand);
-}
-
-async function waitAMoment() {
-  await new Promise<void>((resolve) => {
-    setTimeout(resolve, 100);
-  });
-}
-
-async function mockActivate() {
-  await waitAMoment();
-  return {} as AzureAccount;
-}
-
-const mockExtension: vscode.Extension<AzureAccount> = {
-  activate: mockActivate,
-  exports: {} as AzureAccount,
-  extensionPath: uuid.v4(),
-  id: uuid.v4(),
-  isActive: true,
-  packageJSON: uuid.v4(),
-};

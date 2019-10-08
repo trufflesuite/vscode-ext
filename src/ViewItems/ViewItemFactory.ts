@@ -1,7 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import { IExtensionItem, ItemType } from '../Models';
+import { ItemType } from '../Models';
+import { IExtensionItem, Nullable } from '../Models/TreeItems';
 import { Telemetry } from '../TelemetryClient';
 import { ExtensionView } from './ExtensionView';
 import { ViewCreator } from './ViewCreators';
@@ -22,9 +23,8 @@ export namespace ViewItemFactory {
   export function create(extensionItem: IExtensionItem): ExtensionView<IExtensionItem> {
     const creator = registeredTypes[extensionItem.itemType];
     if (!creator) {
-      const error = new Error(`Type ${extensionItem.itemType} doesn't exist in factory`);
-      Telemetry.sendException(error);
-      throw error;
+      Telemetry.sendException(new Error(`Type ${extensionItem.itemType} doesn't exist in factory`));
+      extensionItem = new Nullable();
     }
 
     return creator.create(extensionItem);

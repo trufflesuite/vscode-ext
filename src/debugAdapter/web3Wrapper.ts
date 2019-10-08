@@ -1,20 +1,20 @@
 import * as truffleProvider from 'truffle-provider';
 import * as web3 from 'web3';
-import { TruffleConfiguration } from '../helpers/truffleConfig';
+import { ConfigurationReader } from './configurationReader';
 
 export class Web3Wrapper extends web3 {
     private _networkId: number | undefined;
-    private _options: TruffleConfiguration.INetworkOption;
+    private _options: ConfigurationReader.INetworkOption;
     private _cachedProvider: any;
 
-    public constructor(options: TruffleConfiguration.INetworkOption) {
+    public constructor(options: ConfigurationReader.INetworkOption) {
         const innerProvider = getWeb3InnerProvider(options);
         super(innerProvider);
         this._options = options;
     }
 
     // Important! It's a truffle provider instance (from truffle-provider library)
-    public async getProvider() {
+    public getProvider() {
         if (!this._cachedProvider) {
             const web3Provider = this.eth.currentProvider;
             const truffleProviderOptions = {
@@ -82,7 +82,7 @@ function PromiseBatch(batch: web3.IBatchRequest) {
     };
 }
 
-function getProviderUrl(options: TruffleConfiguration.INetworkOption): string {
+function getProviderUrl(options: ConfigurationReader.INetworkOption): string {
     if (options.host && options.port) {
         const protocol = options.websockets ? 'ws' : 'http';
         return `${protocol}://${options.host}:${options.port}`;
@@ -95,7 +95,7 @@ function getProviderUrl(options: TruffleConfiguration.INetworkOption): string {
     throw new Error('Undefined network options.');
 }
 
-function getWeb3InnerProvider(options: TruffleConfiguration.INetworkOption): web3.IProvider {
+function getWeb3InnerProvider(options: ConfigurationReader.INetworkOption): web3.IProvider {
     const providerUrl = getProviderUrl(options);
     let provider: web3.IProvider;
     if (providerUrl.startsWith('ws')) {

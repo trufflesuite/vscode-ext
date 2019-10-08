@@ -24,20 +24,19 @@ describe('Commands helper', () => {
   ];
 
   cases.forEach((testCase) => {
-    it(`startProcess should return new ChildProcess when directory ${testCase.workingDirectory}`,
-      async () => {
-        // Arrange
-        const tmpdirStub = sinon.stub(os, 'tmpdir').returns('');
-        const spawnStub = sinon.stub(cp, 'spawn');
+    it(`startProcess should return new ChildProcess when directory ${testCase.workingDirectory}`, async () => {
+      // Arrange
+      const tmpdirStub = sinon.stub(os, 'tmpdir').returns('');
+      const spawnStub = sinon.stub(cp, 'spawn');
 
-        // Act
-        await outputCommandHelper.startProcess(testCase.workingDirectory, command, ['']);
+      // Act
+      await outputCommandHelper.spawnProcess(testCase.workingDirectory, command, ['']);
 
-        // Assert
-        assert.strictEqual(tmpdirStub.calledOnce, testCase.tmpdirExecuted, 'tmpdir should (not) called once');
-        assert.strictEqual(spawnStub.calledOnce, true, 'spawn should called once');
-        assert.strictEqual(spawnStub.getCall(0).args[0], command, 'spawn should called with correct arguments');
-      });
+      // Assert
+      assert.strictEqual(tmpdirStub.calledOnce, testCase.tmpdirExecuted, 'tmpdir should (not) called once');
+      assert.strictEqual(spawnStub.calledOnce, true, 'spawn should called once');
+      assert.strictEqual(spawnStub.getCall(0).args[0], command, 'spawn should called with correct arguments');
+    });
   });
 
   describe('tryExecuteCommand', () => {
@@ -57,120 +56,119 @@ describe('Commands helper', () => {
       sinon.restore();
     });
 
-    it('tryExecuteCommand should return correct result',
-      async () => {
-        // Arrange
-        const spawnMock = childProcessMock.expects('spawn').returns(processMock);
-
-        // Act
-        const commandResultPromise = outputCommandHelper.tryExecuteCommand('workingDirectory', command, '');
-
-        await new Promise<void>(async (resolve) => {
-          setTimeout(async () => {
-            await processMock.stdout.emit('data', 'test stdout');
-            await processMock.emit('close', 0);
-            resolve();
-          }, 500);
-        });
-
-        const commandResult = await commandResultPromise;
-
-        // Assert
-        assert.strictEqual(
-          commandResult.cmdOutput,
-          'test stdout',
-          'commandResult.cmdOutput should be equal to test data');
-        assert.strictEqual(spawnMock.calledOnce, true, 'spawn should called once');
-      });
-
-    it('tryExecuteCommand should return correct result when there is message in error output',
-      async () => {
-        // Arrange
-        const spawnMock = childProcessMock.expects('spawn').returns(processMock);
-
-        // Act
-        const commandResultProms = outputCommandHelper.tryExecuteCommand('workingDirectory', command, '');
-
-        await new Promise<void>(async (resolve) => {
-          setTimeout(async () => {
-            await processMock.stderr.emit('data', 'test stdout');
-            await processMock.emit('close', 0);
-            resolve();
-          }, 500);
-        });
-
-        const commandResult = await commandResultProms;
-
-        // Assert
-        assert.strictEqual(spawnMock.calledOnce, true, 'spawn should called once');
-        assert.strictEqual(
-          commandResult.cmdOutputIncludingStderr,
-          'test stdout',
-          'commandResult.cmdOutput should be equal to test data');
-      });
-
-    it('tryExecuteCommand should rejected on error',
-      async () => {
-        // Arrange
-        sinon.replace(cp, 'spawn', () => { throw new Error(); });
-
-        // Act
-        const commandResultProms = outputCommandHelper.tryExecuteCommand('workingDirectory', command, '');
-        await new Promise<void>(async (resolve) => {
-          setTimeout(async () => {
-            await processMock.stderr.emit('data', 'test stdout');
-            await processMock.emit('close', 0);
-            resolve();
-          }, 500);
-        });
-
-        // Assert
-        await assert.rejects(commandResultProms);
-      });
-  });
-
-  it('executeCommand should throw error when result code not equal to 0',
-    async () => {
+    it('tryExecuteCommand should return correct result', async () => {
       // Arrange
-      const commandResult = {
-        cmdOutput: '',
-        cmdOutputIncludingStderr: '',
-        code: 1,
-      };
-      const commandRewire = rewire('../src/helpers/command');
-      commandRewire.__set__('tryExecuteCommand', sinon.mock().returns(commandResult));
-
-      // Act and Assert
-      await assert.rejects(commandRewire.executeCommand('workingDirectory', command, ''));
-    });
-
-  it('executeCommand should return command output',
-    async () => {
-      // Arrange
-      const commandResult = {
-        cmdOutput: 'stdout message',
-        cmdOutputIncludingStderr: 'stderr message',
-        code: 0,
-      };
-      const commandRewire = rewire('../src/helpers/command');
-      commandRewire.__set__('tryExecuteCommand', sinon.mock().returns(commandResult));
+      const spawnMock = childProcessMock.expects('spawn').returns(processMock);
 
       // Act
-      const res = await commandRewire.executeCommand('workingDirectory', command, '');
+      const commandResultPromise = outputCommandHelper.tryExecuteCommand('workingDirectory', command, '');
+
+      await new Promise<void>(async (resolve) => {
+        setTimeout(async () => {
+          await processMock.stdout.emit('data', 'test stdout');
+          await processMock.emit('exit', 0);
+          resolve();
+        }, 500);
+      });
+
+      const commandResult = await commandResultPromise;
 
       // Assert
-      assert.strictEqual(res, commandResult.cmdOutput, `result should be equal to ${commandResult.cmdOutput}`);
+      assert.strictEqual(
+        commandResult.cmdOutput,
+        'test stdout',
+        'commandResult.cmdOutput should be equal to test data');
+      assert.strictEqual(spawnMock.calledOnce, true, 'spawn should called once');
     });
 
-  it('executeCommand throw error when tryExecuteCommand rejected',
-    async () => {
+    it('tryExecuteCommand should return correct result when there is message in error output', async () => {
+      // Arrange
+      const spawnMock = childProcessMock.expects('spawn').returns(processMock);
+
+      // Act
+      const commandResultProms = outputCommandHelper.tryExecuteCommand('workingDirectory', command, '');
+
+      await new Promise<void>(async (resolve) => {
+        setTimeout(async () => {
+          await processMock.stderr.emit('data', 'test stdout');
+          await processMock.emit('exit', 0);
+          resolve();
+        }, 500);
+      });
+
+      const commandResult = await commandResultProms;
+
+      // Assert
+      assert.strictEqual(spawnMock.calledOnce, true, 'spawn should called once');
+      assert.strictEqual(
+        commandResult.cmdOutputIncludingStderr,
+        'test stdout',
+        'commandResult.cmdOutput should be equal to test data');
+    });
+
+    it('tryExecuteCommand should rejected on error', async () => {
       // Arrange
       sinon.replace(cp, 'spawn', () => { throw new Error(); });
 
-      // Act and Assert
-      await assert.rejects(outputCommandHelper.executeCommand('workingDirectory', command, ''))
-        .then(() => {
-          return undefined;
-        });
+      // Act
+      const action = async () => {
+        return await outputCommandHelper.tryExecuteCommand('workingDirectory', command, '');
+      };
+
+      await new Promise<void>(async (resolve) => {
+        setTimeout(async () => {
+          await processMock.stderr.emit('data', 'test stdout');
+          await processMock.emit('close', 0);
+          resolve();
+        }, 500);
+      });
+
+      // Assert
+      await assert.rejects(action);
     });
+  });
+
+  it('executeCommand should throw error when result code not equal to 0', async () => {
+    // Arrange
+    const commandResult = {
+      cmdOutput: '',
+      cmdOutputIncludingStderr: '',
+      code: 1,
+    };
+    const commandRewire = rewire('../src/helpers/command');
+    commandRewire.__set__('tryExecuteCommand', sinon.mock().returns(commandResult));
+
+    // Act and Assert
+    await assert.rejects(commandRewire.executeCommand('workingDirectory', command, ''));
+  });
+
+  it('executeCommand should return command output', async () => {
+    // Arrange
+    const commandResult = {
+      cmdOutput: 'stdout message',
+      cmdOutputIncludingStderr: 'stderr message',
+      code: 0,
+    };
+    const commandRewire = rewire('../src/helpers/command');
+    commandRewire.__set__('tryExecuteCommand', sinon.mock().returns(commandResult));
+
+    // Act
+    const res = await commandRewire.executeCommand('workingDirectory', command, '');
+
+    // Assert
+    assert.strictEqual(res, commandResult.cmdOutput, `result should be equal to ${commandResult.cmdOutput}`);
+  });
+
+  it('executeCommand throw error when tryExecuteCommand rejected', async () => {
+    // Arrange
+    sinon.replace(cp, 'spawn', () => {
+      throw new Error();
+    });
+
+    // Act and Assert
+    await assert.rejects(outputCommandHelper.executeCommand('workingDirectory', command, ''))
+      .then(() => {
+        return undefined;
+      });
+  });
 });

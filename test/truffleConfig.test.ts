@@ -134,7 +134,6 @@ describe('class TruffleConfig', () => {
       const newNetwork = {
         name: 'newNetworkName',
         options: {
-          consortium_id: 456,
           network_id: 'ntwrk',
         },
       };
@@ -157,7 +156,6 @@ describe('class TruffleConfig', () => {
       const newNetwork = {
         name: 'development',
         options: {
-          consortium_id: 456,
           network_id: 'ntwrk',
         },
       };

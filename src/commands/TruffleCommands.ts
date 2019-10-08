@@ -6,10 +6,8 @@ import * as fs from 'fs-extra';
 // @ts-ignore
 import * as hdkey from 'hdkey';
 import * as path from 'path';
-import { format } from 'url';
 import { ProgressLocation, QuickPickItem, Uri, window } from 'vscode';
 import { Constants, RequiredApps } from '../Constants';
-import { GanacheService } from '../GanacheService/GanacheService';
 import {
   getWorkspaceRoot,
   outputCommandHelper,
@@ -20,18 +18,13 @@ import {
   TruffleConfiguration,
   vscodeEnvironment,
 } from '../helpers';
-import { MnemonicRepository } from '../MnemonicService/MnemonicRepository';
-import {
-  Consortium,
-  LocalNetworkConsortium,
-  MainNetworkConsortium,
-} from '../Models';
+import { LocalNetworkNode, NetworkNode, Project } from '../Models/TreeItems';
 import { Output } from '../Output';
-import { ContractDB } from '../services';
+import { ContractDB, GanacheService, MnemonicRepository, OpenZeppelinService, TreeManager } from '../services';
+import { OZContractValidated } from '../services/openZeppelin/OpenZeppelinService';
 import { Telemetry } from '../TelemetryClient';
-import { ConsortiumTreeManager } from '../treeService/ConsortiumTreeManager';
-import { ConsortiumView } from '../ViewItems';
-import { ConsortiumCommands } from './ConsortiumCommands';
+import { ProjectView } from '../ViewItems';
+import { ServiceCommands } from './ServiceCommands';
 
 interface IDeployDestination {
   cmd: () => Promise<void>;
@@ -40,7 +33,6 @@ interface IDeployDestination {
   detail?: string;
   label: string;
   networkId: string | number;
-  consortiumId?: number;
 }
 
 interface IExtendedQuickPickItem extends QuickPickItem {
@@ -70,23 +62,22 @@ export namespace TruffleCommands {
     Telemetry.sendEvent('TruffleCommands.buildContracts.commandFinished');
   }
 
-  export async function deployContracts(consortiumTreeManager: ConsortiumTreeManager): Promise<void> {
+  export async function deployContracts(): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandStarted');
+
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
-    const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri, consortiumTreeManager);
+    const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri);
     const truffleDeployDestinations = getTruffleDeployDestinations(truffleConfigsUri);
-    const consortiumDeployDestinations = getConsortiumDeployDestinations(truffleConfigsUri, consortiumTreeManager);
+    const treeDeployDestinations = await getTreeDeployDestinations(truffleConfigsUri);
 
     const deployDestinations: IDeployDestination[] = [];
     deployDestinations.push(...defaultDeployDestinations);
     deployDestinations.push(...truffleDeployDestinations);
-    deployDestinations.push(...consortiumDeployDestinations);
+    deployDestinations.push(...treeDeployDestinations);
 
-    const uniqueDestinations = deployDestinations.filter((destination, index, self) => {
-      if (!destination.consortiumId) {
-        return true;
-      }
-      return self.findIndex((dest) => dest.consortiumId === destination.consortiumId) === index;
+    const uniqueDestinations = deployDestinations.filter(() => {
+      // FIXME: here should be filter by URL
+      return true;
     });
     const command = await showQuickPick(
       uniqueDestinations,
@@ -96,11 +87,10 @@ export namespace TruffleCommands {
       },
     );
 
-    Telemetry.sendEvent('TruffleCommands.deployContracts.selectedDestination',
-      {
-        cid: Telemetry.obfuscate((command.consortiumId || '').toString()),
-        url: Telemetry.obfuscate((command.description || '').toString()),
-      });
+    Telemetry.sendEvent(
+      'TruffleCommands.deployContracts.selectedDestination',
+      { url: Telemetry.obfuscate(command.description || '') },
+    );
 
     // this code should be below showQuickPick because it takes time and it affects on responsiveness
     if (!await required.checkAppsSilent(RequiredApps.truffle)) {
@@ -113,6 +103,8 @@ export namespace TruffleCommands {
       Telemetry.sendEvent('TruffleCommands.deployContracts.installTruffleHdWalletProvider');
       await required.installTruffleHdWalletProvider();
     }
+
+    await validateOpenZeppelinContracts();
 
     await command.cmd();
 
@@ -135,15 +127,17 @@ export namespace TruffleCommands {
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
   }
 
-  export async function writeRPCEndpointAddressToBuffer(consortiumNode: ConsortiumView): Promise<void> {
+  export async function writeRPCEndpointAddressToBuffer(projectView: ProjectView): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.writeRPCEndpointAddressToBuffer.commandStarted');
-    const rpcEndpointAddress = await consortiumNode.getRPCAddress();
+    const rpcEndpointAddress = await projectView.extensionItem.getRPCAddress();
     Telemetry.sendEvent('TruffleCommands.writeRPCEndpointAddressToBuffer.getRPCAddress',
       { data: Telemetry.obfuscate(rpcEndpointAddress) },
     );
 
-    await vscodeEnvironment.writeToClipboard(rpcEndpointAddress);
-    window.showInformationMessage(Constants.informationMessage.rpcEndpointCopiedToClipboard);
+    if (rpcEndpointAddress) {
+      await vscodeEnvironment.writeToClipboard(rpcEndpointAddress);
+      window.showInformationMessage(Constants.informationMessage.rpcEndpointCopiedToClipboard);
+    }
   }
 
   export async function getPrivateKeyFromMnemonic(): Promise<void> {
@@ -192,20 +186,44 @@ export namespace TruffleCommands {
   }
 }
 
-function getDefaultDeployDestinations(truffleConfigsUri: string, consortiumTreeManager: ConsortiumTreeManager)
-  : IDeployDestination[] {
+async function validateOpenZeppelinContracts(): Promise<void> {
+  const validatedContracts = await OpenZeppelinService.validateContracts();
+  validatedContracts.forEach((ozContract: OZContractValidated) => {
+    if (ozContract.isExistedOnDisk) {
+      Output.outputLine('', ozContract.isHashValid
+        ? Constants.openZeppelin.validHashMessage(ozContract.contractPath)
+        : Constants.openZeppelin.invalidHashMessage(ozContract.contractPath));
+    } else {
+      Output.outputLine('', Constants.openZeppelin.contractNotExistedOnDisk(ozContract.contractPath));
+    }
+  });
+
+  const invalidContractsPaths = validatedContracts
+    .filter((ozContract: OZContractValidated) => !ozContract.isExistedOnDisk || !ozContract.isHashValid)
+    .map((ozContract: OZContractValidated) => ozContract.contractPath);
+
+  if (invalidContractsPaths.length !== 0) {
+    const errorMsg = Constants.validationMessages.openZeppelinFilesAreInvalid(invalidContractsPaths);
+    const error = new Error(errorMsg);
+    window.showErrorMessage(errorMsg);
+    Telemetry.sendException(error);
+    throw error;
+  }
+}
+
+function getDefaultDeployDestinations(truffleConfigPath: string): IDeployDestination[] {
   return [
     {
-      cmd: createNewDeploymentNetwork.bind(undefined, consortiumTreeManager, truffleConfigsUri),
-      label: Constants.uiCommandStrings.CreateNewNetwork,
+      cmd: createNewDeploymentService.bind(undefined, truffleConfigPath),
+      label: Constants.uiCommandStrings.createProject,
       networkId: '*',
     },
   ];
 }
 
-function getTruffleDeployDestinations(truffleConfigsUri: string): IDeployDestination[] {
+function getTruffleDeployDestinations(truffleConfigPath: string): IDeployDestination[] {
   const deployDestination: IDeployDestination[] = [];
-  const truffleConfig = new TruffleConfig(truffleConfigsUri);
+  const truffleConfig = new TruffleConfig(truffleConfigPath);
   const networksFromConfig = truffleConfig.getNetworks();
 
   networksFromConfig.forEach((network: TruffleConfiguration.INetwork) => {
@@ -214,9 +232,8 @@ function getTruffleDeployDestinations(truffleConfigsUri: string): IDeployDestina
       `${options.host ? options.host : ''}${options.port ? ':' + options.port : ''}`;
 
     deployDestination.push({
-      cmd: getTruffleDeployFunction(url, network.name, truffleConfigsUri, network.options.network_id),
-      consortiumId: options.consortium_id,
-      cwd: path.dirname(truffleConfigsUri),
+      cmd: getTruffleDeployFunction(url, network.name, truffleConfigPath, network.options.network_id),
+      cwd: path.dirname(truffleConfigPath),
       description: url,
       detail: 'From truffle-config.js',
       label: network.name,
@@ -227,28 +244,28 @@ function getTruffleDeployDestinations(truffleConfigsUri: string): IDeployDestina
   return deployDestination;
 }
 
-function getConsortiumDeployDestinations(truffleConfigsUri: string, consortiumTreeManager: ConsortiumTreeManager)
-  : IDeployDestination[] {
-  const deployDestination: IDeployDestination[] = [];
-  const networks = consortiumTreeManager.getItems(true);
+async function getTreeDeployDestinations(truffleConfigPath: string): Promise<IDeployDestination[]> {
+  const services = TreeManager.getItems();
 
-  networks.forEach((network) => {
-    network.getChildren().forEach((child) => {
-      const consortium = child as Consortium;
-      const urls = consortium.getUrls().map((url) => format(url)).join(', ');
+  const projects = services.reduce((res, service) => {
+    res.push(...service.getChildren() as Project[]);
+    return res;
+  }, [] as Project[]);
 
-      deployDestination.push({
-        cmd: getConsortiumCreateFunction(urls, consortium, truffleConfigsUri),
-        consortiumId: consortium.getConsortiumId(),
-        description: urls,
-        detail: 'Consortium',
-        label: consortium.label,
-        networkId: '*',
-      });
-    });
-  });
+  const networks = projects.reduce((res, project) => {
+    res.push(...project.getChildren().filter((child) => child instanceof NetworkNode) as NetworkNode[]);
+    return res;
+  }, [] as NetworkNode[]);
 
-  return deployDestination;
+  return Promise.all(networks.map(async (network) => {
+    return {
+      cmd: getServiceCreateFunction(network, truffleConfigPath),
+      description: await network.getRPCAddress(),
+      detail: 'Tree Item',
+      label: network.label,
+      networkId: network.networkId,
+    };
+  }));
 }
 
 function getTruffleDeployFunction(url: string, name: string, truffleConfigPath: string, networkId: number | string)
@@ -264,46 +281,67 @@ function getTruffleDeployFunction(url: string, name: string, truffleConfigPath: 
     Telemetry.sendEvent('TruffleCommands.getTruffleDeployFunction.returnDeployToMainNetwork');
     return deployToMainNetwork.bind(undefined, name, truffleConfigPath);
   }
+
   Telemetry.sendEvent('TruffleCommands.getTruffleDeployFunction.returnDeployToNetwork');
   return deployToNetwork.bind(undefined, name, truffleConfigPath);
 }
 
-function getConsortiumCreateFunction(url: string, consortium: Consortium, truffleConfigPath: string)
+function getServiceCreateFunction(networkNode: NetworkNode, truffleConfigPath: string)
   : () => Promise<void> {
   // At this moment ganache-cli start only on port 8545.
   // Refactor this after the build
-  if (url.match(localGanacheRegexp)) {
-    Telemetry.sendEvent('TruffleCommands.getConsortiumCreateFunction.returnCreateLocalGanacheNetwork');
-    return createLocalGanacheNetwork.bind(undefined, consortium as LocalNetworkConsortium, truffleConfigPath);
+  if (networkNode instanceof LocalNetworkNode && networkNode.port === Constants.defaultLocalhostPort) {
+    Telemetry.sendEvent('TruffleCommands.getServiceCreateFunction.returnCreateLocalGanacheNetwork');
+    return createLocalGanacheNetwork.bind(undefined, networkNode, truffleConfigPath);
   }
-  if (consortium instanceof MainNetworkConsortium) {
-    Telemetry.sendEvent('TruffleCommands.getConsortiumCreateFunction.returnCreateMainNetwork');
-    return createMainNetwork.bind(undefined, consortium, truffleConfigPath);
-  }
-  Telemetry.sendEvent('TruffleCommands.getConsortiumCreateFunction.returnCreateNetwork');
-  return createNetwork.bind(undefined, consortium, truffleConfigPath);
+
+  Telemetry.sendEvent('TruffleCommands.getServiceCreateFunction.returnCreateService');
+  return createNetwork.bind(undefined, networkNode, truffleConfigPath);
 }
 
-async function createNewDeploymentNetwork(consortiumTreeManager: ConsortiumTreeManager, truffleConfigPath: string)
-  : Promise<void> {
-  Telemetry.sendEvent('TruffleCommands.createNewDeploymentNetwork.commandStarted');
-  const consortium = await ConsortiumCommands.connectConsortium(consortiumTreeManager);
+async function createNewDeploymentService(truffleConfigPath: string): Promise<void> {
+  Telemetry.sendEvent('TruffleCommands.createNewDeploymentService.commandStarted');
+  const deployDestination: IDeployDestination[] = [];
+  const project = await ServiceCommands.connectProject();
+  const networks = project.getChildren().filter((child) => child instanceof NetworkNode) as NetworkNode[];
 
-  await createNetwork(consortium, truffleConfigPath);
+  await networks.map(async (network) => {
+    deployDestination.push({
+      cmd: createNetwork.bind(undefined, network, truffleConfigPath),
+      description: await network.getRPCAddress(),
+      detail: 'Tree Item',
+      label: network.label,
+      networkId: network.networkId,
+    });
+  });
+
+  const command = await showQuickPick(
+    deployDestination,
+    {
+      ignoreFocusOut: true,
+      placeHolder: Constants.placeholders.selectDeployDestination,
+    },
+  );
+
+  Telemetry.sendEvent(
+    'TruffleCommands.deployContracts.createNewDeploymentService.selectedDestination',
+    { url: Telemetry.obfuscate(command.description || '') },
+  );
+
+  await command.cmd();
 }
 
-async function createNetwork(consortium: Consortium, truffleConfigPath: string): Promise<void> {
-  const network = await consortium.getTruffleNetwork();
+async function createLocalGanacheNetwork(localNetworkNode: LocalNetworkNode, truffleConfigPath: string): Promise<void> {
+  await GanacheService.startGanacheServer(localNetworkNode.port);
+  await createNetwork(localNetworkNode, truffleConfigPath);
+}
+
+async function createNetwork(networkNode: NetworkNode, truffleConfigPath: string): Promise<void> {
+  const network = await networkNode.getTruffleNetwork();
   const truffleConfig = new TruffleConfig(truffleConfigPath);
   truffleConfig.setNetworks(network);
 
   await deployToNetwork(network.name, truffleConfigPath);
-}
-
-async function createMainNetwork(consortium: Consortium, truffleConfigPath: string): Promise<void> {
-  await showConfirmPaidOperationDialog();
-
-  await createNetwork(consortium, truffleConfigPath);
 }
 
 async function deployToNetwork(networkName: string, truffleConfigPath: string): Promise<void> {
@@ -324,18 +362,10 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
   });
 }
 
-async function createLocalGanacheNetwork(consortium: LocalNetworkConsortium, truffleConfigPath: string): Promise<void> {
-  const port = await consortium.getPort();
-
-  await GanacheService.startGanacheServer(port!);
-
-  await createNetwork(consortium, truffleConfigPath);
-}
-
 async function deployToLocalGanache(networkName: string, truffleConfigPath: string, url: string): Promise<void> {
   const port = GanacheService.getPortFromUrl(url);
-  await GanacheService.startGanacheServer(port!);
 
+  await GanacheService.startGanacheServer(port!);
   await deployToNetwork(networkName, truffleConfigPath);
 }
 
@@ -345,20 +375,14 @@ async function deployToMainNetwork(networkName: string, truffleConfigPath: strin
   await deployToNetwork(networkName, truffleConfigPath);
 }
 
-async function acquireCompiledContractUri(uri: Uri): Promise<Uri> {
+async function readCompiledContract(uri: Uri): Promise<any> {
   if (path.extname(uri.fsPath) !== Constants.contractExtension.json) {
     const error = new Error(Constants.errorMessageStrings.InvalidContract);
     Telemetry.sendException(error);
     throw error;
   }
 
-  Telemetry.sendEvent('TruffleCommands.acquireCompiledContractUri.jsonExtension');
-  return uri;
-}
-
-async function readCompiledContract(uri: Uri): Promise<any> {
-  const contractUri = await acquireCompiledContractUri(uri);
-  const data = fs.readFileSync(contractUri.fsPath, null);
+  const data = fs.readFileSync(uri.fsPath, null);
 
   return JSON.parse(data.toString());
 }

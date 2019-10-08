@@ -7,9 +7,9 @@ import { Uri, window } from 'vscode';
 import { Constants } from '../Constants';
 import { getWorkspaceRoot, TruffleConfiguration } from '../helpers';
 import { showInputBox, showQuickPick } from '../helpers/userInteraction';
-import { ResourceGroupItem, SubscriptionItem } from '../Models';
+import { ResourceGroupItem, SubscriptionItem } from '../Models/QuickPickItems';
 import { Output } from '../Output';
-import { ResourceExplorerAndGenerator } from '../ResourceExplorerAndGenerator';
+import { AzureResourceExplorer } from '../resourceExplorers';
 import { Telemetry } from '../TelemetryClient';
 import { buildContract } from './AbiDeserialiser';
 import './Nethereum.Generators.DuoCode';
@@ -25,25 +25,25 @@ interface ILogicAppData {
   workflowType: string;
 }
 
-export class LogicAppGenerator extends ResourceExplorerAndGenerator {
+export class LogicAppGenerator {
   public async generateMicroservicesWorkflows(filePath?: Uri): Promise<void> {
     Telemetry.sendEvent('LogicAppGenerator.microservicesWorkflows');
-    return this.generateWorkflows(Constants.microservicesWorkflows.Service, filePath);
+    this.generateWorkflows(Constants.microservicesWorkflows.Service, filePath);
   }
 
   public async generateDataPublishingWorkflows(filePath?: Uri): Promise<void> {
     Telemetry.sendEvent('LogicAppGenerator.dataPublishingWorkflows');
-    return this.generateWorkflows(Constants.microservicesWorkflows.Data, filePath);
+    this.generateWorkflows(Constants.microservicesWorkflows.Data, filePath);
   }
 
   public async generateEventPublishingWorkflows(filePath?: Uri): Promise<void> {
     Telemetry.sendEvent('LogicAppGenerator.eventPublishingWorkflows');
-    return this.generateWorkflows(Constants.microservicesWorkflows.Messaging, filePath);
+    this.generateWorkflows(Constants.microservicesWorkflows.Messaging, filePath);
   }
 
   public async generateReportPublishingWorkflows(filePath?: Uri): Promise<void> {
     Telemetry.sendEvent('LogicAppGenerator.reportPublishingWorkflows');
-    return this.generateWorkflows(Constants.microservicesWorkflows.Reporting, filePath);
+    this.generateWorkflows(Constants.microservicesWorkflows.Reporting, filePath);
   }
 
   private async generateWorkflows(workflowType: string, filePath?: Uri): Promise<void> {
@@ -148,10 +148,11 @@ export class LogicAppGenerator extends ResourceExplorerAndGenerator {
   }
 
   private async selectSubscriptionAndResourceGroup(): Promise<[SubscriptionItem, ResourceGroupItem]> {
-    await this.waitForLogin();
+    const azureResourceExplorer = new AzureResourceExplorer();
+    await azureResourceExplorer.waitForLogin();
 
-    const subscriptionItem = await this.getOrSelectSubscriptionItem();
-    const resourceGroupItem = await this.getOrCreateResourceGroupItem(subscriptionItem);
+    const subscriptionItem = await azureResourceExplorer.getOrSelectSubscriptionItem();
+    const resourceGroupItem = await azureResourceExplorer.getOrCreateResourceGroupItem(subscriptionItem);
 
     return [subscriptionItem, resourceGroupItem];
   }
@@ -188,8 +189,8 @@ export class LogicAppGenerator extends ResourceExplorerAndGenerator {
 
   private async getMessagingType(): Promise<number> {
     const items = [
-      { label: 'Service Bus', messagingType: 0 },
-      { label: 'Event Grid', messagingType: 1 },
+      { label: 'Event Grid', messagingType: 0 },
+      { label: 'Service Bus', messagingType: 1 },
     ];
 
     const item = await showQuickPick(items, { ignoreFocusOut: true });

@@ -8,7 +8,7 @@ import * as sinon from 'sinon';
 import uuid = require('uuid');
 import { Memento } from 'vscode';
 import { Constants } from '../src/Constants';
-import { MnemonicRepository } from '../src/MnemonicService/MnemonicRepository';
+import { MnemonicRepository } from '../src/services';
 import { FakeExtensionState } from './FakeExtensionState';
 import { TestConstants } from './TestConstants';
 

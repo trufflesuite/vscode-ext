@@ -1561,6 +1561,81 @@ declare module Nethereum {
             }
         }
         module ReportingWorkflow {
+            // Nethereum.Generators.ReportingWorkflow.ReportingWorkflowCSharpOutputLogicAppGenerator
+            export interface ReportingWorkflowCSharpOutputLogicAppGenerator extends Core.WorkflowGeneratorBase$2<Core.WorkflowTemplateBase$1<ReportingWorkflowEventCSharpLogicAppModel>, ReportingWorkflowEventCSharpLogicAppModel>, Core.IWorkflowFileGenerator, Core.IWFGenerator, Core.IWorkflowGenerator {
+                InitialiseTemplate(codeGenLanguage: Core.CodeGenLanguage): void;
+            }
+            export interface ReportingWorkflowCSharpOutputLogicAppGeneratorTypeFunc extends TypeFunction {
+                (): ReportingWorkflowCSharpOutputLogicAppGeneratorTypeFunc;
+                prototype: ReportingWorkflowCSharpOutputLogicAppGenerator;
+                new (eventABI: Model.EventABI, namespace: string, codeGenLanguage: Core.CodeGenLanguage, powerbiDatasetId: string, powerbiTable: string): ReportingWorkflowCSharpOutputLogicAppGenerator;
+                ctor: { new (eventABI: Model.EventABI, namespace: string, codeGenLanguage: Core.CodeGenLanguage, powerbiDatasetId: string, powerbiTable: string): ReportingWorkflowCSharpOutputLogicAppGenerator; };
+            }
+            const ReportingWorkflowCSharpOutputLogicAppGenerator: ReportingWorkflowCSharpOutputLogicAppGeneratorTypeFunc;
+
+            // Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventCSharpLogicAppModel
+            export interface ReportingWorkflowEventCSharpLogicAppModel extends Core.WorkflowTypeMessageModel, Core.IWorkflowModel, Core.IFileModel {
+                get_EventABI(): Model.EventABI;
+                CanGenerateOutputLogicApp(): boolean;
+            }
+            export interface ReportingWorkflowEventCSharpLogicAppModelTypeFunc extends TypeFunction {
+                (): ReportingWorkflowEventCSharpLogicAppModelTypeFunc;
+                prototype: ReportingWorkflowEventCSharpLogicAppModel;
+                new (eventABI: Model.EventABI, namespace: string): ReportingWorkflowEventCSharpLogicAppModel;
+                ctor: { new (eventABI: Model.EventABI, namespace: string): ReportingWorkflowEventCSharpLogicAppModel; };
+            }
+            const ReportingWorkflowEventCSharpLogicAppModel: ReportingWorkflowEventCSharpLogicAppModelTypeFunc;
+
+            // Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventLogicAppModel
+            export interface ReportingWorkflowEventLogicAppModel extends Core.WorkflowTypeMessageModel, Core.IWorkflowModel, Core.IFileModel {
+                get_EventABI(): Model.EventABI;
+                CanGenerateOutputLogicApp(): boolean;
+            }
+            export interface ReportingWorkflowEventLogicAppModelTypeFunc extends TypeFunction {
+                (): ReportingWorkflowEventLogicAppModelTypeFunc;
+                prototype: ReportingWorkflowEventLogicAppModel;
+                new (eventABI: Model.EventABI, namespace: string): ReportingWorkflowEventLogicAppModel;
+                ctor: { new (eventABI: Model.EventABI, namespace: string): ReportingWorkflowEventLogicAppModel; };
+            }
+            const ReportingWorkflowEventLogicAppModel: ReportingWorkflowEventLogicAppModelTypeFunc;
+
+            // Nethereum.Generators.ReportingWorkflow.ReportingWorkflowEventsOutputLogicAppGenerator
+            export interface ReportingWorkflowEventsOutputLogicAppGenerator extends Core.WorkflowGeneratorBase$2<Core.WorkflowTemplateBase$1<ReportingWorkflowEventLogicAppModel>, ReportingWorkflowEventLogicAppModel>, Core.IWorkflowFileGenerator, Core.IWFGenerator, Core.IWorkflowGenerator {
+                InitialiseTemplate(codeGenLanguage: Core.CodeGenLanguage): void;
+            }
+            export interface ReportingWorkflowEventsOutputLogicAppGeneratorTypeFunc extends TypeFunction {
+                (): ReportingWorkflowEventsOutputLogicAppGeneratorTypeFunc;
+                prototype: ReportingWorkflowEventsOutputLogicAppGenerator;
+                new (eventABI: Model.EventABI, namespace: string, codeGenLanguage: Core.CodeGenLanguage, contractAddress: string, subscriptionId: string, escapedAbi: string, location: string, powerbiDatasetId: string, powerbiTable: string): ReportingWorkflowEventsOutputLogicAppGenerator;
+                ctor: { new (eventABI: Model.EventABI, namespace: string, codeGenLanguage: Core.CodeGenLanguage, contractAddress: string, subscriptionId: string, escapedAbi: string, location: string, powerbiDatasetId: string, powerbiTable: string): ReportingWorkflowEventsOutputLogicAppGenerator; };
+            }
+            const ReportingWorkflowEventsOutputLogicAppGenerator: ReportingWorkflowEventsOutputLogicAppGeneratorTypeFunc;
+
+            // Nethereum.Generators.ReportingWorkflow.ReportingWorkflowGenerator
+            export interface ReportingWorkflowGenerator extends Core.WorkflowGeneratorBase$2<Core.WorkflowTemplateBase$1<ReportingWorkflowModel>, ReportingWorkflowModel>, Core.IWorkflowFileGenerator, Core.IWFGenerator, Core.IWorkflowGenerator {
+                get_ContractABI(): Model.ContractABI;
+                InitialiseTemplate(serviceType: Core.ServiceType, codeGenLanguage: Core.CodeGenLanguage): void;
+            }
+            export interface ReportingWorkflowGeneratorTypeFunc extends TypeFunction {
+                (): ReportingWorkflowGeneratorTypeFunc;
+                prototype: ReportingWorkflowGenerator;
+                new (contractABI: Model.ContractABI, contractName: string, byteCode: string, serviceType: Core.ServiceType, codeGenLanguage: Core.CodeGenLanguage): ReportingWorkflowGenerator;
+                ctor: { new (contractABI: Model.ContractABI, contractName: string, byteCode: string, serviceType: Core.ServiceType, codeGenLanguage: Core.CodeGenLanguage): ReportingWorkflowGenerator; };
+            }
+            const ReportingWorkflowGenerator: ReportingWorkflowGeneratorTypeFunc;
+
+            // Nethereum.Generators.ReportingWorkflow.ReportingWorkflowModel
+            export interface ReportingWorkflowModel extends Core.WorkflowTypeMessageModel, Core.IWorkflowModel, Core.IFileModel {
+                get_ContractABI(): Model.ContractABI;
+            }
+            export interface ReportingWorkflowModelTypeFunc extends TypeFunction {
+                (): ReportingWorkflowModelTypeFunc;
+                prototype: ReportingWorkflowModel;
+                new (contractABI: Model.ContractABI, contractName: string, byteCode: string): ReportingWorkflowModel;
+                ctor: { new (contractABI: Model.ContractABI, contractName: string, byteCode: string): ReportingWorkflowModel; };
+            }
+            const ReportingWorkflowModel: ReportingWorkflowModelTypeFunc;
+
             // Nethereum.Generators.ReportingWorkflow.ReportingWorkflowProjectGenerator
             export interface ReportingWorkflowProjectGenerator extends System.Object {
                 get_ContractABI(): Model.ContractABI;
@@ -1579,7 +1654,7 @@ declare module Nethereum {
                 GenerateAll(): Core.GeneratedFile[];
                 GenerateAllLogicAppFiles(): System.Collections.Generic.List$1<Core.GeneratedFile>;
                 GenerateLogicAppFiles(): System.Collections.Generic.List$1<Core.GeneratedFile>;
-                GetAllLogicAppGenerators(): System.Collections.Generic.List$1<Core.IWorkflowFileGenerator>;
+                GetAllLogicAppGenerators(): System.Collections.Generic.List$1<ReportingWorkflowEventsOutputLogicAppGenerator>;
                 GetFullNamespace(namespace: string): string;
                 GetFullPath(namespace: string): string;
             }
@@ -1590,20 +1665,19 @@ declare module Nethereum {
                 ctor: { new (contractABI: Model.ContractABI, contractName: string, byteCode: string, baseNamespace: string, serviceNamespace: string, baseOutputPath: string, pathDelimiter: string, serviceType: Core.ServiceType, codeGenLanguage: Core.CodeGenLanguage, contractAddress: string, subscriptionId: string, location: string, contractAbiString: string): ReportingWorkflowProjectGenerator; };
             }
             const ReportingWorkflowProjectGenerator: ReportingWorkflowProjectGeneratorTypeFunc;
-            module Csharp {
-                // Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpOutputLogicAppGenerator
-                export interface ReportingWorkflowCSharpOutputLogicAppGenerator extends Core.WorkflowGeneratorBase$2<Core.WorkflowTemplateBase$1<ReportingWorkflowEventCSharpLogicAppModel>, ReportingWorkflowEventCSharpLogicAppModel>, Core.IWorkflowFileGenerator, Core.IWFGenerator, Core.IWorkflowGenerator {
-                    InitialiseTemplate(codeGenLanguage: Core.CodeGenLanguage): void;
-                }
-                export interface ReportingWorkflowCSharpOutputLogicAppGeneratorTypeFunc extends TypeFunction {
-                    (): ReportingWorkflowCSharpOutputLogicAppGeneratorTypeFunc;
-                    prototype: ReportingWorkflowCSharpOutputLogicAppGenerator;
-                    new (eventABI: Model.EventABI, namespace: string, codeGenLanguage: Core.CodeGenLanguage, powerbiDatasetId: string, powerbiTable: string): ReportingWorkflowCSharpOutputLogicAppGenerator;
-                    ctor: { new (eventABI: Model.EventABI, namespace: string, codeGenLanguage: Core.CodeGenLanguage, powerbiDatasetId: string, powerbiTable: string): ReportingWorkflowCSharpOutputLogicAppGenerator; };
-                }
-                const ReportingWorkflowCSharpOutputLogicAppGenerator: ReportingWorkflowCSharpOutputLogicAppGeneratorTypeFunc;
 
-                // Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowCSharpOutputLogicAppTemplate
+            // Nethereum.Generators.ReportingWorkflow.ReportingWorkflowTemplate
+            export interface ReportingWorkflowTemplate extends Core.WorkflowTemplateBase$1<ReportingWorkflowModel>, Core.IWorkflowTemplate {
+            }
+            export interface ReportingWorkflowTemplateTypeFunc extends TypeFunction {
+                (): ReportingWorkflowTemplateTypeFunc;
+                prototype: ReportingWorkflowTemplate;
+                new (model: ReportingWorkflowModel): ReportingWorkflowTemplate;
+                ctor: { new (model: ReportingWorkflowModel): ReportingWorkflowTemplate; };
+            }
+            const ReportingWorkflowTemplate: ReportingWorkflowTemplateTypeFunc;
+            module LogicApps {
+                // Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowCSharpOutputLogicAppTemplate
                 export interface ReportingWorkflowCSharpOutputLogicAppTemplate extends Core.WorkflowTemplateBase$1<ReportingWorkflowEventCSharpLogicAppModel>, Core.IWorkflowTemplate {
                 }
                 export interface ReportingWorkflowCSharpOutputLogicAppTemplateTypeFunc extends TypeFunction {
@@ -1613,87 +1687,6 @@ declare module Nethereum {
                     ctor: { new (model: ReportingWorkflowEventCSharpLogicAppModel, powerbiDatasetId: string, powerbiTable: string): ReportingWorkflowCSharpOutputLogicAppTemplate; };
                 }
                 const ReportingWorkflowCSharpOutputLogicAppTemplate: ReportingWorkflowCSharpOutputLogicAppTemplateTypeFunc;
-
-                // Nethereum.Generators.ReportingWorkflow.Csharp.ReportingWorkflowEventCSharpLogicAppModel
-                export interface ReportingWorkflowEventCSharpLogicAppModel extends Core.WorkflowTypeMessageModel, Core.IWorkflowModel, Core.IFileModel {
-                    get_EventABI(): Model.EventABI;
-                    CanGenerateOutputLogicApp(): boolean;
-                }
-                export interface ReportingWorkflowEventCSharpLogicAppModelTypeFunc extends TypeFunction {
-                    (): ReportingWorkflowEventCSharpLogicAppModelTypeFunc;
-                    prototype: ReportingWorkflowEventCSharpLogicAppModel;
-                    new (eventABI: Model.EventABI, namespace: string): ReportingWorkflowEventCSharpLogicAppModel;
-                    ctor: { new (eventABI: Model.EventABI, namespace: string): ReportingWorkflowEventCSharpLogicAppModel; };
-                }
-                const ReportingWorkflowEventCSharpLogicAppModel: ReportingWorkflowEventCSharpLogicAppModelTypeFunc;
-            }
-            module FlowApps {
-                // Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventFlowAppModel
-                export interface ReportingWorkflowEventFlowAppModel extends Core.WorkflowTypeMessageModel, Core.IWorkflowModel, Core.IFileModel {
-                    get_EventABI(): Model.EventABI;
-                    CanGenerateOutputLogicApp(): boolean;
-                }
-                export interface ReportingWorkflowEventFlowAppModelTypeFunc extends TypeFunction {
-                    (): ReportingWorkflowEventFlowAppModelTypeFunc;
-                    prototype: ReportingWorkflowEventFlowAppModel;
-                    new (eventABI: Model.EventABI, namespace: string): ReportingWorkflowEventFlowAppModel;
-                    ctor: { new (eventABI: Model.EventABI, namespace: string): ReportingWorkflowEventFlowAppModel; };
-                }
-                const ReportingWorkflowEventFlowAppModel: ReportingWorkflowEventFlowAppModelTypeFunc;
-
-                // Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventsOutputFlowAppGenerator
-                export interface ReportingWorkflowEventsOutputFlowAppGenerator extends Core.WorkflowGeneratorBase$2<Core.WorkflowTemplateBase$1<ReportingWorkflowEventFlowAppModel>, ReportingWorkflowEventFlowAppModel>, Core.IWorkflowFileGenerator, Core.IWFGenerator, Core.IWorkflowGenerator {
-                    InitialiseTemplate(codeGenLanguage: Core.CodeGenLanguage): void;
-                }
-                export interface ReportingWorkflowEventsOutputFlowAppGeneratorTypeFunc extends TypeFunction {
-                    (): ReportingWorkflowEventsOutputFlowAppGeneratorTypeFunc;
-                    prototype: ReportingWorkflowEventsOutputFlowAppGenerator;
-                    new (eventABI: Model.EventABI, namespace: string, codeGenLanguage: Core.CodeGenLanguage, contractAddress: string, subscriptionId: string, escapedAbi: string, location: string, powerbiDatasetId: string, powerbiTable: string): ReportingWorkflowEventsOutputFlowAppGenerator;
-                    ctor: { new (eventABI: Model.EventABI, namespace: string, codeGenLanguage: Core.CodeGenLanguage, contractAddress: string, subscriptionId: string, escapedAbi: string, location: string, powerbiDatasetId: string, powerbiTable: string): ReportingWorkflowEventsOutputFlowAppGenerator; };
-                }
-                const ReportingWorkflowEventsOutputFlowAppGenerator: ReportingWorkflowEventsOutputFlowAppGeneratorTypeFunc;
-
-                // Nethereum.Generators.ReportingWorkflow.FlowApps.ReportingWorkflowEventsOutputFlowAppTemplate
-                export interface ReportingWorkflowEventsOutputFlowAppTemplate extends Core.WorkflowTemplateBase$1<ReportingWorkflowEventFlowAppModel>, Core.IWorkflowTemplate {
-                    GetConnections(): string;
-                    GetLogicAppStart(): string;
-                    GetBlockchainEventTriggerForLogicApp(escapedAbi: string, contractAddress: string): string;
-                    GetActions(): string;
-                    GetLogicAppEnd(): string;
-                }
-                export interface ReportingWorkflowEventsOutputFlowAppTemplateTypeFunc extends TypeFunction {
-                    (): ReportingWorkflowEventsOutputFlowAppTemplateTypeFunc;
-                    prototype: ReportingWorkflowEventsOutputFlowAppTemplate;
-                    new (model: ReportingWorkflowEventFlowAppModel, contractAddress: string, escapedAbi: string, subsciptionId: string, location: string, powerbiDatasetId: string, powerbiTable: string): ReportingWorkflowEventsOutputFlowAppTemplate;
-                    ctor: { new (model: ReportingWorkflowEventFlowAppModel, contractAddress: string, escapedAbi: string, subsciptionId: string, location: string, powerbiDatasetId: string, powerbiTable: string): ReportingWorkflowEventsOutputFlowAppTemplate; };
-                }
-                const ReportingWorkflowEventsOutputFlowAppTemplate: ReportingWorkflowEventsOutputFlowAppTemplateTypeFunc;
-            }
-            module LogicApps {
-                // Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventLogicAppModel
-                export interface ReportingWorkflowEventLogicAppModel extends Core.WorkflowTypeMessageModel, Core.IWorkflowModel, Core.IFileModel {
-                    get_EventABI(): Model.EventABI;
-                    CanGenerateOutputLogicApp(): boolean;
-                }
-                export interface ReportingWorkflowEventLogicAppModelTypeFunc extends TypeFunction {
-                    (): ReportingWorkflowEventLogicAppModelTypeFunc;
-                    prototype: ReportingWorkflowEventLogicAppModel;
-                    new (eventABI: Model.EventABI, namespace: string): ReportingWorkflowEventLogicAppModel;
-                    ctor: { new (eventABI: Model.EventABI, namespace: string): ReportingWorkflowEventLogicAppModel; };
-                }
-                const ReportingWorkflowEventLogicAppModel: ReportingWorkflowEventLogicAppModelTypeFunc;
-
-                // Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppGenerator
-                export interface ReportingWorkflowEventsOutputLogicAppGenerator extends Core.WorkflowGeneratorBase$2<Core.WorkflowTemplateBase$1<ReportingWorkflowEventLogicAppModel>, ReportingWorkflowEventLogicAppModel>, Core.IWorkflowFileGenerator, Core.IWFGenerator, Core.IWorkflowGenerator {
-                    InitialiseTemplate(codeGenLanguage: Core.CodeGenLanguage): void;
-                }
-                export interface ReportingWorkflowEventsOutputLogicAppGeneratorTypeFunc extends TypeFunction {
-                    (): ReportingWorkflowEventsOutputLogicAppGeneratorTypeFunc;
-                    prototype: ReportingWorkflowEventsOutputLogicAppGenerator;
-                    new (eventABI: Model.EventABI, namespace: string, codeGenLanguage: Core.CodeGenLanguage, contractAddress: string, subscriptionId: string, escapedAbi: string, location: string, powerbiDatasetId: string, powerbiTable: string): ReportingWorkflowEventsOutputLogicAppGenerator;
-                    ctor: { new (eventABI: Model.EventABI, namespace: string, codeGenLanguage: Core.CodeGenLanguage, contractAddress: string, subscriptionId: string, escapedAbi: string, location: string, powerbiDatasetId: string, powerbiTable: string): ReportingWorkflowEventsOutputLogicAppGenerator; };
-                }
-                const ReportingWorkflowEventsOutputLogicAppGenerator: ReportingWorkflowEventsOutputLogicAppGeneratorTypeFunc;
 
                 // Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEventsOutputLogicAppTemplate
                 export interface ReportingWorkflowEventsOutputLogicAppTemplate extends Core.WorkflowTemplateBase$1<ReportingWorkflowEventLogicAppModel>, Core.IWorkflowTemplate {

@@ -25,8 +25,8 @@
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/@machinomy",
-      "./src/debugger/types",
-    ],
+      "./src/debugger/types"
+    ]
   },
   "include": ["src/**/*.js", "src/**/*.ts", "test/**/*.js", "test/**/*.ts", "test/**/*.json"],
   "exclude": [

@@ -77,7 +77,7 @@ describe('Validator', () => {
             .hasLowerCase()
             .hasUpperCase()
             .hasDigit()
-            .hasSpecialChar(Constants.validationRegexps.specialCharsPassword)
+            .hasSpecialChar(Constants.validationRegexps.specialChars.password)
             .hasNoForbiddenChar(
               Constants.validationRegexps.forbiddenChars.password,
               Constants.validationMessages.unresolvedSymbols(Constants.validationMessages.forbiddenChars.password))
@@ -101,7 +101,7 @@ describe('Validator', () => {
         const result = new Validator(testString)
           .hasDigit()
           .hasUpperCase()
-          .hasSpecialChar(Constants.validationRegexps.specialCharsPassword)
+          .hasSpecialChar(Constants.validationRegexps.specialChars.password)
           .getErrors() as string;
 
         // Assert

@@ -5,16 +5,16 @@ import { TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE, TRUFFLE_CONFIG_NAME } from './consta
 
 export class DebugNetwork {
     public workingDirectory: string;
-    private _basedConfig: ConfigurationReader.TruffleConfig;
+    private _basedConfig: ConfigurationReader.TruffleConfig | undefined;
     private _truffleConfiguration: ConfigurationReader.IConfiguration | undefined;
     private _networkForDebug: ConfigurationReader.INetwork | undefined;
     constructor(truffleConfigDirectory: string) {
-        this._basedConfig =
-            new ConfigurationReader.TruffleConfig(path.join(truffleConfigDirectory, TRUFFLE_CONFIG_NAME));
         this.workingDirectory = truffleConfigDirectory;
     }
 
     public async load(): Promise<void> {
+        this._basedConfig =
+            new ConfigurationReader.TruffleConfig(path.join(this.workingDirectory, TRUFFLE_CONFIG_NAME));
         this._truffleConfiguration = this.loadConfiguration();
         this._networkForDebug = await this.loadNetworkForDebug();
     }
@@ -37,7 +37,7 @@ export class DebugNetwork {
     }
 
     private loadConfiguration(): ConfigurationReader.IConfiguration {
-        const configuration = this._basedConfig.getConfiguration();
+        const configuration = this._basedConfig!.getConfiguration();
         configuration.contracts_build_directory =
             path.join(this.workingDirectory, configuration.contracts_build_directory);
         configuration.contracts_directory =
@@ -48,7 +48,7 @@ export class DebugNetwork {
     }
 
     private async loadNetworkForDebug(): Promise<ConfigurationReader.INetwork> {
-        const networks = this._basedConfig.getNetworks();
+        const networks = this._basedConfig!.getNetworks();
         const networkForDebug = networks
             .find((n) => n.name === TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE);
         if (!this.isNetworkForDebugValid(networkForDebug)) {

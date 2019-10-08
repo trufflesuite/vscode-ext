@@ -25,12 +25,12 @@ export class WelcomePage extends BasicWebView {
     }
 
     if (message.command === 'executeCommand') {
-      if (message.value === 'createConsortium') {
-        await commands.executeCommand('azureBlockchainService.createConsortium');
+      if (message.value === 'createProject') {
+        await commands.executeCommand('azureBlockchainService.createProject');
       }
 
-      if (message.value === 'connectConsortium') {
-        await commands.executeCommand('azureBlockchainService.connectConsortium');
+      if (message.value === 'connectProject') {
+        await commands.executeCommand('azureBlockchainService.connectProject');
       }
     }
   }

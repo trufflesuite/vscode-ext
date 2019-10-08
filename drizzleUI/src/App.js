@@ -89,6 +89,7 @@ class App extends React.Component {
     }
 
     const address = contractInstance.address;
+    const networkName = contractInstance.network.name;
     const accounts = await drizzle.web3.eth.getAccounts();
 
     const contractConfig = {
@@ -100,9 +101,11 @@ class App extends React.Component {
           from: accounts[0],
           data: contract.bytecode,
           networks: contract.networks,
-          isOnline: !!provider
+          isOnline: !!provider,
+          networkName,
+          enumsInfo: contractInstance.enumsInfo,
         }
-      )
+      ),
     };
 
     drizzle.addContract(contractConfig);

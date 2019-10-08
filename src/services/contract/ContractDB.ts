@@ -2,8 +2,6 @@
 // Licensed under the MIT license.
 
 import { EventEmitter } from 'events';
-import { Constants } from '../../Constants';
-import { Output } from '../../Output';
 import { Telemetry } from '../../TelemetryClient';
 import { AbstractAdapter } from './AbstractAdapter';
 import { ContractInstance } from './ContractInstance';
@@ -38,12 +36,7 @@ class ExtensionContractDB {
       return;
     }
 
-    try {
-      await this.adapter.initialize();
-    } catch (error) {
-      Telemetry.sendException(error);
-      Output.outputLine(Constants.outputChannel.azureBlockchain, error.message);
-    }
+    await this.adapter.initialize();
   }
 
   public async getContractInstances(contractName: string): Promise<ContractInstance[]> {

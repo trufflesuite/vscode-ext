@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Container, FormHelperText, FormLabel } from '@material-ui/core';

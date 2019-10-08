@@ -34,11 +34,6 @@ const config = {
   resolve: {
     // .json is added to prevent import error from /node_modules/got/index.js
     extensions: ['.ts', '.js', '.json'],
-    alias: {
-      // workaround to require pure js implementation of scrypt.js instead of .node implementation
-      // remove and test when https://github.com/trufflesuite/truffle/pull/1852 is brought to release and used
-      'scrypt.js': path.resolve('./node_modules/scrypt.js/js.js'),
-    },
   },
   module: {
     rules: [
@@ -56,7 +51,7 @@ const config = {
     new CopyPlugin([
       { from: './src/Generators/mscorlib.js', to: './' },
       { from: './src/Generators/Nethereum.Generators.DuoCode.js', to: './' },
-      { from: './src/debugger/web3ProviderResolver.js', to: './' },
+      { from: './src/debugAdapter/web3ProviderResolver.js', to: './' },
     ]),
     new webpack.DefinePlugin({
       IS_BUNDLE_TIME: JSON.stringify(true),

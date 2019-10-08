@@ -19,6 +19,7 @@ describe('AzureBlockchainServiceClient', () => {
   let baseUri: string;
   let apiVersion: string;
   let memberName: string;
+  let transactionNode: string;
   const azureBlockchainServiceClient = require('../src/ARMBlockchain/AzureBlockchainServiceClient');
   const defaultResponseBody = '{ "message": "default response body" }';
   let callbackFunction: (error: Error | null, result?: any) => void;
@@ -36,6 +37,7 @@ describe('AzureBlockchainServiceClient', () => {
     baseUri = uuid.v4();
     apiVersion = uuid.v4();
     memberName = uuid.v4();
+    transactionNode = uuid.v4();
     sinon.stub(azureBlockchainServiceClient.__proto__, 'constructor');
   });
 
@@ -172,7 +174,7 @@ describe('AzureBlockchainServiceClient', () => {
         windowMock.restore();
       });
 
-      it('createConsortium shows error when request failed.', async () => {
+      it('createProject shows error when request failed.', async () => {
         // Arrange
         const response = sinon.stub();
         const error = { message: uuid.v4() };
@@ -193,7 +195,7 @@ describe('AzureBlockchainServiceClient', () => {
         assert.strictEqual(openExternalSpy.notCalled, true, 'openExternal should not called');
       });
 
-      describe('createConsortium shows error when response is not success.', () => {
+      describe('createProject shows error when response is not success.', () => {
         const statusCodes = [103, 300, 400, 498];
         statusCodes.forEach(async (statusCode) => {
           it(`response status code is ${statusCode}.`, async () => {
@@ -227,7 +229,7 @@ describe('AzureBlockchainServiceClient', () => {
         });
       });
 
-      describe('createConsortium does not show error when response is success.', () => {
+      describe('createProject does not show error when response is success.', () => {
         const statusCodes = [200, 207, 226];
         statusCodes.forEach(async (statusCode) => {
           it(`response status code is ${statusCode}.`, async () => {
@@ -330,7 +332,7 @@ describe('AzureBlockchainServiceClient', () => {
           'callbackFunction should called once with correct arguments');
       });
 
-      it('getMemberAccessKeys returns error.', async () => {
+      it('getTransactionNodeAccessKeys returns error.', async () => {
         // Arrange
         const callbackFunctionSpy = sinon.spy(callbackFunction);
         const error = new Error(uuid.v4());
@@ -339,7 +341,7 @@ describe('AzureBlockchainServiceClient', () => {
         });
 
         // Act
-        await serviceClient.getMemberAccessKeys(memberName, callbackFunctionSpy);
+        await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy);
 
         // Assert
         assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
@@ -349,7 +351,7 @@ describe('AzureBlockchainServiceClient', () => {
           'callbackFunction should called once with correct arguments');
       });
 
-      it('getMemberAccessKeys does not return error.', async () => {
+      it('getTransactionNodeAccessKeys does not return error.', async () => {
         // Arrange
         const callbackFunctionSpy = sinon.spy(callbackFunction);
         sendRequestToAzureMock.callsFake((...args: any[]): {} => {
@@ -357,7 +359,7 @@ describe('AzureBlockchainServiceClient', () => {
         });
 
         // Act
-        await serviceClient.getMemberAccessKeys(memberName, callbackFunctionSpy);
+        await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy);
 
         // Assert
         assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
@@ -627,7 +629,7 @@ describe('AzureBlockchainServiceClient', () => {
       });
     });
 
-    describe('getMemberAccessKeys', () => {
+    describe('getTransactionNodeAccessKeys', () => {
       it('shows error when request failed.', async () => {
         // Arrange
         const response = sinon.stub();
@@ -639,7 +641,7 @@ describe('AzureBlockchainServiceClient', () => {
         });
 
         // Act
-        await serviceClient.getMemberAccessKeys(memberName, callbackFunctionSpy);
+        await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy);
 
         // Assert
         assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
@@ -673,7 +675,7 @@ describe('AzureBlockchainServiceClient', () => {
             });
 
             // Act
-            await serviceClient.getMemberAccessKeys(memberName, callbackFunctionSpy);
+            await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy);
 
             // Assert
             assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
@@ -705,7 +707,7 @@ describe('AzureBlockchainServiceClient', () => {
          });
 
          // Act
-         await serviceClient.getMemberAccessKeys(memberName, callbackFunctionSpy);
+         await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy);
 
          // Assert
          assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');

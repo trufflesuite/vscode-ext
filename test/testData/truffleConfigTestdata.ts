@@ -13,7 +13,6 @@ export const referenceCfgContent = 'const HDWalletProvider = require("truffle-hd
   + '      network_id: "*"'
   + '    },'
   + '    "localhost:123": {'
-  + '      consortium_id: 1559239491663,'
   + '      from: "string",'
   + '      gas: 2,'
   + '      gasPrice: 3,'
@@ -46,7 +45,6 @@ export const referenceCfgContentWithDirectories = 'const HDWalletProvider = requ
   + '      network_id: "*"'
   + '    },'
   + '    "localhost:123": {'
-  + '      consortium_id: 1559239491663,'
   + '      from: "string",'
   + '      gas: 2,'
   + '      gasPrice: 3,'
@@ -83,7 +81,6 @@ export const referenceConfiguration = {
     {
       name: 'localhost:123',
       options: {
-        consortium_id: 1559239491663,
         from: 'string',
         gas: 2,
         gasPrice: 3,

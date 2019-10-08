@@ -6,22 +6,25 @@ import * as cp from 'child_process';
 import * as rp from 'request-promise';
 import * as sinon from 'sinon';
 import * as stream from 'stream';
-import { ExtensionContext } from 'vscode';
-import { GanacheCommands } from '../../src/commands/GanacheCommands';
+import { GanacheCommands } from '../../src/commands';
 import * as commands from '../../src/helpers/command';
 import * as shell from '../../src/helpers/shell';
-import { IExtensionItem, ItemType, LocalNetworkConsortium, Network } from '../../src/Models';
-import { ConsortiumTreeManager } from '../../src/treeService/ConsortiumTreeManager';
-import { ConsortiumView } from '../../src/ViewItems';
-import { TestConstants } from '../TestConstants';
+import {
+  AzureBlockchainService,
+  IExtensionItem,
+  LocalProject,
+  LocalService,
+  Service,
+} from '../../src/Models/TreeItems';
+import { TreeManager } from '../../src/services';
+import { ProjectView } from '../../src/ViewItems';
 
 describe('Integration tests GanacheCommands', () => {
   const defaultPort = 8545;
-  let consortiumTreeManager: ConsortiumTreeManager;
   let getItemsMock: sinon.SinonStub<[(boolean | undefined)?], IExtensionItem[]>;
-  let testConsortiumItems: Network[];
+  let serviceItems: Service[];
   let loadStateMock: sinon.SinonStub<[], IExtensionItem[]>;
-  let consortiumView: ConsortiumView;
+  let projectView: ProjectView;
   const streamMock = {
     on(_event: 'data', _listener: (chunk: any) => void): any { /* empty */ },
   };
@@ -40,16 +43,13 @@ describe('Integration tests GanacheCommands', () => {
   };
 
   before(async () => {
-    testConsortiumItems = await createTestConsortiumItems();
-    getItemsMock = sinon.stub(ConsortiumTreeManager.prototype, 'getItems');
-    getItemsMock.returns(testConsortiumItems);
-    loadStateMock = sinon.stub(ConsortiumTreeManager.prototype, 'loadState');
-    loadStateMock.returns(testConsortiumItems);
+    serviceItems = await createTestServiceItems();
+    getItemsMock = sinon.stub(TreeManager, 'getItems');
+    getItemsMock.returns(serviceItems);
+    loadStateMock = sinon.stub(TreeManager, 'loadState');
+    loadStateMock.returns(serviceItems);
 
-    consortiumView = new ConsortiumView(
-      new LocalNetworkConsortium('test consortium', `http://microsoft.com:${defaultPort}`),
-    );
-    consortiumTreeManager = new ConsortiumTreeManager({} as ExtensionContext);
+    projectView = new ProjectView(new LocalProject('test consortium', defaultPort));
   });
 
   afterEach(() => {
@@ -68,7 +68,7 @@ describe('Integration tests GanacheCommands', () => {
       sinon.stub(rp, 'post').resolves(response);
 
       // Act
-      await GanacheCommands.startGanacheCmd(consortiumTreeManager, consortiumView);
+      await GanacheCommands.startGanacheCmd(projectView);
 
       // Assert
       assert.strictEqual(spawnStub.called, true, 'should execute external command ');
@@ -81,15 +81,9 @@ describe('Integration tests GanacheCommands', () => {
     });
 });
 
-async function createTestConsortiumItems(): Promise<Network[]> {
-  const networks: Network[] = [];
+async function createTestServiceItems(): Promise<Service[]> {
+  const azureBlockchainService = new AzureBlockchainService();
+  const localService = new LocalService();
 
-  const azureNetwork = new Network(TestConstants.networksNames.azureBlockchainService, ItemType.AZURE_BLOCKCHAIN);
-  const localNetwork = new Network(TestConstants.networksNames.localNetwork, ItemType.LOCAL_NETWORK);
-  const ethereumTestnet = new Network(TestConstants.networksNames.ethereumTestnet, ItemType.ETHEREUM_TEST_NETWORK);
-  const ethereumNetwork = new Network(TestConstants.networksNames.ethereumNetwork, ItemType.ETHEREUM_MAIN_NETWORK);
-
-  networks.push(azureNetwork, localNetwork, ethereumNetwork, ethereumTestnet);
-
-  return networks;
+  return [azureBlockchainService, localService];
 }

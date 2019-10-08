@@ -682,7 +682,7 @@ describe('Required helper', () => {
         // Arrange
         getWorkspaceRootMock.returns(uuid.v4());
         executeCommandMock.returns(uuid.v4());
-        tryExecuteCommandMock.returns(npmValidVersion);
+        tryExecuteCommandMock.returns(truffleValidVersion);
 
         // Act
         await requiredRewire.required.installTruffle();
@@ -697,7 +697,7 @@ describe('Required helper', () => {
         // Arrange
         getWorkspaceRootMock.returns(uuid.v4());
         executeCommandMock.throws(TestConstants.testError);
-        tryExecuteCommandMock.returns(npmValidVersion);
+        tryExecuteCommandMock.returns(truffleValidVersion);
 
         // Act
         await requiredRewire.required.installTruffle();
@@ -714,7 +714,7 @@ describe('Required helper', () => {
         // Arrange
         getWorkspaceRootMock.returns(uuid.v4());
         executeCommandMock.returns(uuid.v4());
-        tryExecuteCommandMock.returns(npmValidVersion);
+        tryExecuteCommandMock.returns(ganacheValidVersion);
 
         // Act
         await requiredRewire.required.installGanache();
@@ -729,7 +729,7 @@ describe('Required helper', () => {
         // Arrange
         getWorkspaceRootMock.returns(uuid.v4());
         executeCommandMock.throws(TestConstants.testError);
-        tryExecuteCommandMock.returns(npmValidVersion);
+        tryExecuteCommandMock.returns(ganacheValidVersion);
 
         // Act
         await requiredRewire.required.installGanache();

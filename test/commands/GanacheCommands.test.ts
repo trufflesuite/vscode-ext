@@ -4,47 +4,43 @@
 import * as assert from 'assert';
 import { ChildProcess } from 'child_process';
 import * as sinon from 'sinon';
-import { commands, ExtensionContext, OutputChannel, QuickPickItem, window } from 'vscode';
-import { GanacheCommands } from '../../src/commands/GanacheCommands';
+import { commands, OutputChannel, QuickPickItem, window } from 'vscode';
+import { GanacheCommands } from '../../src/commands';
 import { Constants, RequiredApps } from '../../src/Constants';
-import * as GanacheService from '../../src/GanacheService/GanacheService';
-import * as GanacheServiceClient from '../../src/GanacheService/GanacheServiceClient';
 import * as helpers from '../../src/helpers';
 import { required } from '../../src/helpers';
+import * as shell from '../../src/helpers/shell';
 import {
-  AzureConsortium,
+  AzureBlockchainProject,
+  AzureBlockchainService,
   IExtensionItem,
-  ItemType,
-  LocalNetworkConsortium,
-  MainNetworkConsortium,
-  Network,
-  TestNetworkConsortium,
-} from '../../src/Models';
-import { Output } from '../../src/Output';
-import { ConsortiumTreeManager } from '../../src/treeService/ConsortiumTreeManager';
-import { ConsortiumView } from '../../src/ViewItems';
+  LocalProject,
+  LocalService,
+  Service,
+} from '../../src/Models/TreeItems';
+import { GanacheService, TreeManager } from '../../src/services';
+import * as GanacheServiceClient from '../../src/services/ganache/GanacheServiceClient';
+import { ProjectView } from '../../src/ViewItems';
 import { TestConstants } from '../TestConstants';
 
 describe('Unit tests GanacheCommands', () => {
-  let consortiumTreeManager: ConsortiumTreeManager;
   let checkAppsStub: sinon.SinonStub<RequiredApps[], Promise<boolean>>;
 
   let getItemsMock: sinon.SinonStub<[(boolean | undefined)?], IExtensionItem[]>;
-  let testConsortiumItems: Network[];
+  let testServiceItems: Service[];
   let loadStateMock: sinon.SinonStub<[], IExtensionItem[]>;
-  let consortiumView: ConsortiumView;
+  let projectView: ProjectView;
 
   before(async () => {
-    testConsortiumItems = await createTestConsortiumItems();
-    getItemsMock = sinon.stub(ConsortiumTreeManager.prototype, 'getItems');
-    getItemsMock.returns(testConsortiumItems);
-    loadStateMock = sinon.stub(ConsortiumTreeManager.prototype, 'loadState');
-    loadStateMock.returns(testConsortiumItems);
+    testServiceItems = await createTestServiceItems();
+    getItemsMock = sinon.stub(TreeManager, 'getItems');
+    getItemsMock.returns(testServiceItems);
+    loadStateMock = sinon.stub(TreeManager, 'loadState');
+    loadStateMock.returns(testServiceItems);
 
-    consortiumView = new ConsortiumView(
-      new LocalNetworkConsortium('test consortium', `http://microsoft.com:${testPort}`),
+    projectView = new ProjectView(
+      new LocalProject('test consortium', testPort),
     );
-    consortiumTreeManager = new ConsortiumTreeManager({} as ExtensionContext);
   });
 
   afterEach(() => {
@@ -59,7 +55,7 @@ describe('Unit tests GanacheCommands', () => {
       sinon.replace(GanacheCommands, 'getGanachePort', async () => 99);
 
       // Act
-      await GanacheCommands.startGanacheCmd(consortiumTreeManager, consortiumView);
+      await GanacheCommands.startGanacheCmd(projectView);
 
       // Assert
       assert.strictEqual(checkAppsStub.called, true, 'should check installed apps');
@@ -70,21 +66,18 @@ describe('Unit tests GanacheCommands', () => {
   it('startGanacheCmd shows information message when server already running', async () => {
     // Arrange
     checkAppsStub = sinon.stub(required, 'checkApps').returns(Promise.resolve(true));
-    const startGanacheServerStub = sinon.stub(GanacheService.GanacheService, 'startGanacheServer')
-      .returns(Promise.resolve(null));
+    const startGanacheServerStub = sinon.stub(GanacheService, 'startGanacheServer')
+      .returns(Promise.resolve({ pid: 1234, port: testPort }));
     const showInformationMessageStub = sinon.stub(window, 'showInformationMessage');
 
     // Act
-    await GanacheCommands.startGanacheCmd(consortiumTreeManager, consortiumView);
+    await GanacheCommands.startGanacheCmd(projectView);
 
     // Assert
     assert.strictEqual(checkAppsStub.called, true, 'should check installed apps');
     assert.strictEqual(startGanacheServerStub.called, true, 'should try to start Ganache server');
     assert.strictEqual(
-      startGanacheServerStub.getCall(0).args[0],
-      testPort,
-      'should try to start Ganache server on current port',
-    );
+      startGanacheServerStub.getCall(0).args[0], testPort, 'should try to start Ganache server on current port');
     assert.strictEqual(
       showInformationMessageStub.getCall(0).args[0],
       Constants.ganacheCommandStrings.serverAlreadyRunning,
@@ -99,14 +92,15 @@ describe('Unit tests GanacheCommands', () => {
       output: {
         name: 'channel name',
       } as OutputChannel,
+      port: testPort,
       process: {} as ChildProcess,
     };
     const showInformationMessageStub = sinon.stub(window, 'showInformationMessage');
-    const startGanacheServerStub = sinon.stub(GanacheService.GanacheService, 'startGanacheServer')
+    const startGanacheServerStub = sinon.stub(GanacheService, 'startGanacheServer')
       .returns(Promise.resolve(ganacheProcess));
 
     // Act
-    await GanacheCommands.startGanacheCmd(consortiumTreeManager, consortiumView);
+    await GanacheCommands.startGanacheCmd(projectView);
 
     // Assert
     assert.strictEqual(checkAppsStub.called, true, 'should check installed apps');
@@ -125,37 +119,31 @@ describe('Unit tests GanacheCommands', () => {
 
   it('stopGanacheCmd should show message when no server on current port', async () => {
     // Arrange
-    const isGanacheServerStub = sinon.stub(GanacheServiceClient, 'isGanacheServer').returns(Promise.resolve(false));
-    const outputShowStub = sinon.stub(Output, 'show');
-    const showWarningMessageStub = sinon.stub(window, 'showWarningMessage');
+    const isGanacheServerStub = sinon.stub(GanacheServiceClient, 'isGanacheServer');
+    const showWarningMessageStub = sinon.stub(window, 'showInformationMessage');
+    sinon.stub(shell, 'findPid').returns(Promise.resolve(Number.NaN));
 
     // Act
-    await GanacheCommands.stopGanacheCmd(consortiumTreeManager, consortiumView);
+    await GanacheCommands.stopGanacheCmd(projectView);
 
     // Assert
-    assert.strictEqual(isGanacheServerStub.called, true, 'should check installed apps');
-    assert.strictEqual(
-      isGanacheServerStub.getCall(0).args[0],
-      testPort,
-      'should try to start Ganache server on current port',
-    );
+    assert.strictEqual(isGanacheServerStub.called, false, 'should check installed apps');
     assert.strictEqual(
       showWarningMessageStub.getCall(0).args[0],
-      Constants.ganacheCommandStrings.serverCanNotStop,
-      'should show "server cannot stop" warning message',
+      Constants.ganacheCommandStrings.serverSuccessfullyStopped,
+      'should show "server successfully stopped" information message',
     );
-    assert.strictEqual(outputShowStub.called, true, 'should move focus to output tab');
   });
 
   it('stopGanacheCmd should stop server and show message', async () => {
     // Arrange
     const isGanacheServerStub = sinon.stub(GanacheServiceClient, 'isGanacheServer').returns(Promise.resolve(true));
-    const outputShowStub = sinon.stub(Output, 'show');
     const showInformationMessageStub = sinon.stub(window, 'showInformationMessage');
-    const stopGanacheServerStub = sinon.stub(GanacheService.GanacheService, 'stopGanacheServer');
+    const stopGanacheServerStub = sinon.stub(GanacheService, 'stopGanacheServer');
+    sinon.stub(shell, 'findPid').returns(Promise.resolve(312));
 
     // Act
-    await GanacheCommands.stopGanacheCmd(consortiumTreeManager, consortiumView);
+    await GanacheCommands.stopGanacheCmd(projectView);
 
     // Assert
     assert.strictEqual(isGanacheServerStub.called, true, 'should check for port for Ganache server');
@@ -170,85 +158,49 @@ describe('Unit tests GanacheCommands', () => {
       'should show "server successfully stopped" information message',
     );
     assert.strictEqual(stopGanacheServerStub.getCall(0).args[0], testPort, 'should stop server on current port');
-    assert.strictEqual(outputShowStub.called, true, 'should move focus to output tab');
   });
 
-  it('getGanachePort LocalNetworkConsortium item passed', async () => {
+  it('getGanachePort LocalProject item passed', async () => {
     // Act
-    const result = await GanacheCommands.getGanachePort(consortiumTreeManager, consortiumView);
+    const result = await GanacheCommands.getGanachePort(projectView);
 
     // Assert
     assert.strictEqual(result, testPort, 'should execute correct port');
   });
 
-  it('getGanachePort tree manager contains LOCAL_NETWORK item with children', async () => {
+  it('getGanachePort tree manager contains LOCAL_SERVICE item with children', async () => {
     // Arrange
-    sinon.stub(helpers, 'showQuickPick')
-      .returns(Promise.resolve(localNetworkConsortium as QuickPickItem));
+    sinon.stub(TreeManager, 'getItem').returns(new LocalService());
+    sinon.stub(helpers, 'showQuickPick').returns(Promise.resolve(localProject as QuickPickItem));
 
     // Act
-    const result = await GanacheCommands.getGanachePort(consortiumTreeManager);
+    const result = await GanacheCommands.getGanachePort();
 
     // Assert
     assert.strictEqual(result, testPort, 'should execute correct port');
-  });
-
-  it('getGanachePort tree manager does not contains LOCAL_NETWORK item with children', async () => {
-    // Arrange
-    sinon.restore(); // to overwrite getItem() wrapping
-    sinon.stub(consortiumTreeManager, 'getItem').returns(undefined);
-
-    // Act and Assert
-    assert.rejects(
-      GanacheCommands.getGanachePort(consortiumTreeManager),
-      Error,
-      Constants.ganacheCommandStrings.serverNoGanacheAvailable,
-    );
   });
 });
 
 const testPort = 8544;
+const localProject = new LocalProject(TestConstants.consortiumTestNames.local, testPort);
 
-const localNetworkConsortium = new LocalNetworkConsortium(
-  TestConstants.consortiumTestNames.local,
-  `http://127.0.0.1:${testPort}/`,
-);
-const testNetworkConsortium = new TestNetworkConsortium(
-  TestConstants.consortiumTestNames.testEthereum,
-  'https://127.0.0.3:1234/',
-);
-const mainNetworkConsortium = new MainNetworkConsortium(
-  TestConstants.consortiumTestNames.publicEthereum,
-  'https://127.0.0.4:1234/',
-);
+async function createTestServiceItems(): Promise<Service[]> {
+  const services: Service[] = [];
 
-async function createTestConsortiumItems(): Promise<Network[]> {
-  const networks: Network[] = [];
+  const azureBlockchainService = new AzureBlockchainService();
+  const localService = new LocalService();
 
-  const azureNetwork = new Network(TestConstants.networksNames.azureBlockchainService, ItemType.AZURE_BLOCKCHAIN);
-  const localNetwork = new Network(TestConstants.networksNames.localNetwork, ItemType.LOCAL_NETWORK);
-  const ethereumTestnet = new Network(TestConstants.networksNames.ethereumTestnet, ItemType.ETHEREUM_TEST_NETWORK);
-  const ethereumNetwork = new Network(TestConstants.networksNames.ethereumNetwork, ItemType.ETHEREUM_MAIN_NETWORK);
-
-  const azureConsortium = new AzureConsortium(
-    TestConstants.networksNames.testConsortium,
+  const azureBlockchainProject = new AzureBlockchainProject(
+    TestConstants.servicesNames.testConsortium,
     'subscriptionId',
-    'resourcesGroup',
+    'resourceGroup',
     'memberName',
-    'https://testConsortium.blockchain.azure.com/',
   );
 
-  azureConsortium.setConsortiumId(1);
-  localNetworkConsortium.setConsortiumId(2);
-  testNetworkConsortium.setConsortiumId(3);
-  mainNetworkConsortium.setConsortiumId(4);
+  azureBlockchainService.addChild(azureBlockchainProject);
+  localService.addChild(localProject);
 
-  azureNetwork.addChild(azureConsortium);
-  localNetwork.addChild(localNetworkConsortium);
-  ethereumTestnet.addChild(testNetworkConsortium);
-  ethereumNetwork.addChild(mainNetworkConsortium);
+  services.push(azureBlockchainService, localService);
 
-  networks.push(azureNetwork, localNetwork, ethereumNetwork, ethereumTestnet);
-
-  return networks;
+  return services;
 }

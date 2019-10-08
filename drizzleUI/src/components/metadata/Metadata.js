@@ -28,6 +28,7 @@ class Metadata extends React.Component {
       bytecode: undefined,
       events: undefined,
       network: undefined,
+      networkName: undefined,
       showBytecodeTooltip: false,
       showABITooltip: false,
       transaction: {
@@ -52,6 +53,7 @@ class Metadata extends React.Component {
     const bytecode = contract.options.data;
     const events = this.getEvents();
     const network = this.getNetwork();
+    const networkName = contract.options.networkName;
 
     const state = {
       ...this.state,
@@ -59,7 +61,8 @@ class Metadata extends React.Component {
       address,
       bytecode,
       events,
-      network
+      network,
+      networkName
     };
 
     if (!deepEqual(this.state, state)) {
@@ -121,6 +124,7 @@ class Metadata extends React.Component {
       network,
       bytecode,
       transaction,
+      networkName,
       showABITooltip,
       showBytecodeTooltip
     } = this.state;
@@ -142,6 +146,14 @@ class Metadata extends React.Component {
         <TextField
           disabled
           fullWidth
+          id='deployed-location'
+          label='Deployed Location:'
+          value={networkName || network.id}
+          className='text field'
+        />
+        <TextField
+          disabled
+          fullWidth
           id='contract-address'
           label='Contract Address:'
           value={address}
@@ -153,14 +165,6 @@ class Metadata extends React.Component {
           id='creator-account'
           label='Creator Account:'
           value={transaction && transaction.from || ''}
-          className='text field'
-        />
-        <TextField
-          disabled
-          fullWidth
-          id='deployed-location'
-          label='Deployed Location:'
-          value={network.id} // TODO: get network name by network id
           className='text field'
         />
         <TextFieldWithTooltip
@@ -225,6 +229,7 @@ Metadata.propTypes = {
       options: PropTypes.shape({
         data: PropTypes.string.isRequired,
         networks: PropTypes.object.isRequired,
+        networkName: PropTypes.string,
       }).isRequired,
       web3: PropTypes.shape({
         eth: PropTypes.shape({

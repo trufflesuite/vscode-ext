@@ -4,27 +4,19 @@
 export class TestConstants {
   public static testError: string = 'TestError';
 
-  public static testShouldThrowError: string = 'Unexpected behaviour - should throw error';
-
   public static testMnemonic: string = 'test test test test test test test test test test test test';
 
   public static testDialogAnswers: string[] =
     ['yes', 'YES', 'Yes', 'YEs', 'YeS', 'yES', 'yEs', 'yeS', 'no', 'NO', 'No', 'nO'];
 
   public static consortiumTestNames = {
-    local: 'localhost:1234',
-    publicEthereum: 'publicEthereum',
-    testEthereum: 'testEthereum',
+    local: 'localNetworkName',
   };
 
-  public static networksNames = {
-    azureBlockchainService: 'azureBlockchainService',
+  public static servicesNames = {
     development: 'development',
-    ethereumNetwork: 'EthereumNetwork',
-    ethereumTestnet: 'EthereumTestnet',
-    localNetwork: 'LocalNetwork',
+    localProject: 'LocalProject',
     testConsortium: 'testConsortium',
-    testMainNetwork: 'testMainNetwork',
     testNetwork: 'testNetwork',
   };
 

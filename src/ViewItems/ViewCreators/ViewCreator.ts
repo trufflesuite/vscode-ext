@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import { IExtensionItem } from '../../Models';
+import { IExtensionItem } from '../../Models/TreeItems';
 import { ExtensionView } from '../ExtensionView';
 
 export abstract class ViewCreator {

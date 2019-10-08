@@ -24,7 +24,7 @@ export const deepEqual = (first, second) => {
     const secondKeys = Object.keys(second);
 
     if (firstKeys.length !== secondKeys.length) return false;
-
+    /* eslint-disable no-unused-vars */
     for (const key of firstKeys) {
       if (!second.hasOwnProperty(key)) return false;
     }
@@ -32,6 +32,7 @@ export const deepEqual = (first, second) => {
     for (const key of firstKeys) {
       if (!deepEqual(first[key], second[key])) return false;
     }
+    /* eslint-enable no-unused-vars */
 
     return true;
   }

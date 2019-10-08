@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 
 import { Telemetry } from '../TelemetryClient';
-import { IExtensionItem } from './IExtensionItem';
 import { ItemCreator } from './ItemCreators/ItemCreator';
 import { ItemType } from './ItemType';
+import { IExtensionItem } from './TreeItems';
 
 export namespace ItemFactory {
   const registeredTypes: {[key: number]: ItemCreator} = {};
@@ -20,15 +20,14 @@ export namespace ItemFactory {
   }
 
   export function create(obj: { [key: string]: any }): IExtensionItem {
-    const creator = registeredTypes[obj.itemType];
+    let creator = registeredTypes[obj.itemType];
     if (!creator) {
-      const error = new Error(`Type ${obj.itemType} doesn't exist in factory`);
-      Telemetry.sendException(error);
-      throw error;
+      Telemetry.sendException(new Error(`Type ${obj.itemType} doesn't exist in factory`));
+      obj = { itemType: ItemType.NULLABLE, label: obj.label };
+      creator = registeredTypes[obj.itemType];
     }
 
     const extensionItem = creator.create(obj);
-
     const children = obj.children;
 
     if (children && Array.isArray(children)) {

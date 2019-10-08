@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import { Member } from '../../Models';
+import { Member } from '../../Models/TreeItems';
 import { MemberView } from '../MemberView';
 import { ViewCreator } from './ViewCreator';
 

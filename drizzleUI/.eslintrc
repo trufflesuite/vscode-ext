@@ -11,6 +11,8 @@
         "memberSyntaxSortOrder": ["single", "multiple", "all", "none"]
       }
     ],
+    "operator-linebreak": "off",
+    "react/display-name": "off",
     "func-names": "off",
     "max-len": 0,
     "prefer-destructuring": 0,
@@ -71,7 +73,8 @@
   },
   "globals": {
     "shallow": true,
-    "mount": true
+    "mount": true,
+    "BigInt": true
   },
   "settings": {
     "react": {

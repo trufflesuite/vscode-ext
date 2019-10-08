@@ -10,10 +10,9 @@ class TextInput extends React.Component {
     super(props);
 
     this.state = { value: '' };
-    this.onChange = this.onChange.bind(this);
   }
 
-  onChange(event) {
+  onChange = (event) => {
     this.setState({ value: event.target.value });
     this.props.handleInputChange(event);
   }
@@ -22,7 +21,7 @@ class TextInput extends React.Component {
     return <TextField
       className='input-field'
       id={this.props.item.name}
-      label={`${this.props.item.name} :`}
+      label={`${this.props.item.name}:`}
       name={this.props.item.name}
       onChange={this.onChange}
       value={this.state.value}
@@ -34,5 +33,5 @@ export default TextInput;
 
 TextInput.propTypes = {
   item: PropTypes.any.isRequired,
-  handleInputChange: PropTypes.any.isRequired,
+  handleInputChange: PropTypes.func.isRequired,
 };

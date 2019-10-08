@@ -30,6 +30,19 @@ export async function showQuickPick<T extends QuickPickItem>(items: T[] | Promis
   return result;
 }
 
+export async function showConfirmDialog(yesDescription?: string, noDescription?: string): Promise<string> {
+  const answer = await showQuickPick(
+    [
+      { label: Constants.confirmationDialogResult.no, description: noDescription },
+      { label: Constants.confirmationDialogResult.yes, description: yesDescription },
+    ], {
+    ignoreFocusOut: true,
+    placeHolder: Constants.placeholders.confirmDialog,
+  });
+
+  return answer.label;
+}
+
 export async function showConfirmPaidOperationDialog() {
   const answer = await showInputBox({
     ignoreFocusOut: true,

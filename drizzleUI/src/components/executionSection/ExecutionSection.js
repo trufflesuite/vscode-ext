@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import { createInputComponent } from '../factory/InputComponentFactory';
 import { newContextComponents } from 'drizzle-react-components';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -11,7 +12,6 @@ import {
   MenuItem,
   Select
 } from '@material-ui/core';
-import { InputComponentMapping, UnsupportedInput } from './inputControlsCollection';
 import './executionSection.less';
 
 const { ContractForm } = newContextComponents;
@@ -21,21 +21,50 @@ class ExecutionSection extends React.Component {
     super(props);
 
     this.state = {
-      executedMethod: undefined
+      executedMethod: '',
+      disabledExecute: false,
+      formControlsValidation: {},
     };
   }
 
   componentDidMount() {
-    this.setState({ executedMethod: this.props.actions[0] });
+    const formControlsValidation = this.createFormControlsList(this.props.actions[0]);
+    this.setState({ executedMethod: this.props.actions[0], formControlsValidation });
   }
 
-  onChange = (e) => this.setState({
-    executedMethod: e.target.value
-  });
+  componentDidUpdate = () => {
+    const isUnsupportedInputExist = !!document.getElementsByClassName('unsupported-input').length;
+    const validationValues = Object.values(this.state.formControlsValidation);
+    const errors = validationValues.filter(value => value !== '' && value !== undefined);
+    const isDisabled = isUnsupportedInputExist || errors.length > 0;
+    if (isDisabled !== this.state.disabledExecute) {
+      this.setState({ disabledExecute: isDisabled });
+    }
+  };
+
+  createFormControlsList = (executedMethod) => {
+    const method = this.props.drizzle.contracts[this.props.contractName].abi.find(
+      element => !element.constant && element.name === executedMethod);
+    const formControlsValidation = {};
+    method.inputs.forEach(input => {
+      formControlsValidation[input.name] = '';
+    });
+    return formControlsValidation;
+  };
+
+  onChange = (e) => {
+    const formControlsValidation = this.createFormControlsList(e.target.value);
+    this.setState({
+      executedMethod: e.target.value,
+      formControlsValidation,
+    });
+  };
+
+  updateValidationResult = (name, errorMessage) => {
+    this.setState({ formControlsValidation: { ...this.state.formControlsValidation, [name]: errorMessage } });
+  }
 
   renderExecutionSection = ({ inputs, handleInputChange, handleSubmit }) => {
-    const containsUnsupportedInput = inputs.some(input => !InputComponentMapping[input.type]);
-
     return <Container className='execution-section'>
       <Container className='action'>
         <InputLabel className='input-label'>Contract Action</InputLabel>
@@ -57,24 +86,27 @@ class ExecutionSection extends React.Component {
       </Container>
       <Container className='input-fields'>
         {inputs.map((item, index) => {
-          const InputControl = InputComponentMapping[item.type] || UnsupportedInput;
-          return <InputControl
-            key={index}
-            item={item}
-            handleInputChange={handleInputChange}
-          />;
+          return createInputComponent(
+            item,
+            handleInputChange,
+            this.updateValidationResult.bind(this, item.name),
+            index,
+            {
+              executedMethod: this.state.executedMethod,
+              enumsInfo: this.props.drizzle.contracts[this.props.contractName].options.enumsInfo,
+            });
         })}
       </Container>
       <Button
         className='execute-button'
         variant='contained'
         onClick={handleSubmit}
-        disabled={containsUnsupportedInput}
+        disabled={this.state.disabledExecute}
       >
         Execute
       </Button>
     </Container>;
-  }
+  };
 
   render() {
     return <ContractForm

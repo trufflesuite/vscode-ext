@@ -60,10 +60,10 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     // @ts-ignore
     await this.pipeline(httpRequest, (err: ServiceError, response: IncomingMessage, responseBody: string) => {
       if (err) {
-        Telemetry.sendException(new Error('AzureBlockchainServiceClient.createConsortium.pipeline.error'));
+        Telemetry.sendException(new Error('AzureBlockchainServiceClient.createProject.pipeline.error'));
         Output.outputLine(Constants.outputChannel.azureBlockchainServiceClient, err.message);
       } else if (response.statusCode! < 200 || response.statusCode! > 299) {
-        Telemetry.sendException(new Error('AzureBlockchainServiceClient.createConsortium.pipeline.invalidStatus'));
+        Telemetry.sendException(new Error('AzureBlockchainServiceClient.createProject.pipeline.invalidStatus'));
         Output.outputLine(
           Constants.outputChannel.azureBlockchainServiceClient,
           `${response.statusMessage}(${response.statusCode}): ${responseBody}`,
@@ -102,12 +102,20 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     return this.sendRequestToAzure(httpRequest, callback);
   }
 
-  public getMemberAccessKeys(
+  public getTransactionNodeAccessKeys(
     memberName: string,
+    nodeName: string,
     callback: (error: Error | null, result?: any) => void,
   ): Promise<void> {
-    const url = `${this.baseUri}/subscriptions/${this.subscriptionId}/resourceGroups/${this.resourceGroup}/` +
+    let url = '';
+    if (memberName === nodeName) {
+      url = `${this.baseUri}/subscriptions/${this.subscriptionId}/resourceGroups/${this.resourceGroup}/` +
       `providers/Microsoft.Blockchain/blockchainMembers/${memberName}/listApikeys?api-version=${this.apiVersion}`;
+    } else {
+      url = `${this.baseUri}/subscriptions/${this.subscriptionId}/resourceGroups/${this.resourceGroup}/` +
+      `providers/Microsoft.Blockchain/blockchainMembers/${memberName}/transactionNodes/${nodeName}/` +
+      `listApikeys?api-version=${this.apiVersion}`;
+    }
 
     const httpRequest = this.getHttpRequest(url, 'POST');
 

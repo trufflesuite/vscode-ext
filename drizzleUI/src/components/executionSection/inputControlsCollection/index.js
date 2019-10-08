@@ -1,14 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import AddressInput from './AddressInput';
+import ArrayInput from './ArrayInput';
 import BooleanInput from './BooleanInput';
-import InputComponentMapping from './InputComponentMapping';
+import EnumInput from './EnumInput';
+import IntegerInput from './IntegerInput';
 import TextInput from './TextInput';
 import UnsupportedInput from './UnsupportedInput';
 
 export {
+  AddressInput,
+  ArrayInput,
   BooleanInput,
-  InputComponentMapping,
+  EnumInput,
+  IntegerInput,
   TextInput,
   UnsupportedInput,
 };

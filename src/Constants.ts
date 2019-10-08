@@ -4,6 +4,7 @@
 import * as os from 'os';
 import * as path from 'path';
 import { ExtensionContext, extensions } from 'vscode';
+import { IOZAsset } from './services';
 
 const extensionId = 'AzBlockchain.azure-blockchain';
 const packageJSON = extensions.getExtension(extensionId)!.packageJSON;
@@ -29,21 +30,23 @@ export class Constants {
   public static outputChannel = {
     azureBlockchain: 'Azure Blockchain',
     azureBlockchainServiceClient: 'Azure Blockchain Service Client',
-    consortiumTreeManager: 'Consortium Tree Manager',
     executeCommand: 'Execute command',
     ganacheCommands: 'Ganache Server',
     logicAppGenerator: 'Logic App Generator',
     requirements: 'Requirements',
     telemetryClient: 'Telemetry Client',
+    treeManager: 'Service Tree Manager',
   };
 
   public static defaultTruffleBox = 'Azure-Samples/Blockchain-Ethereum-Template';
   public static defaultDebounceTimeout = 300;
 
+  public static infuraHost = 'infura.io';
   public static localhost = '127.0.0.1';
-  public static localhostName = 'localhost';
+  public static localhostName = 'development';
   public static defaultLocalhostPort = 8545;
-  public static defaultAzureBSPort = 3200;
+  public static defaultABSPort = 3200;
+  public static defaultABSHost = 'blockchain.azure.com';
 
   public static ganacheRetryTimeout = 2000; // milliseconds
   public static ganacheRetryAttempts = 5;
@@ -145,34 +148,21 @@ export class Constants {
     gasPrice: 100000000000,
   };
 
-  public static consortiumTreeResourceKey = 'treeContent';
+  public static serviceResourceKey = 'treeContent';
 
-  public static networkName = {
-    azure: 'Azure Blockchain Service',
-    local: 'Local Network',
-    mainnet: 'Ethereum Network',
-    testnet: 'Ethereum Testnet',
-  };
-
-  public static paletteABSLabels = {
-    enterABSUrl: 'Enter Azure Blockchain Service url',
-    enterAccessKey: 'Enter access key',
-    enterAccountPassword: 'Enter accounts password',
-    enterAccountsNumber: 'Enter accounts number',
+  public static paletteLabels = {
     enterConsortiumManagementPassword: 'Enter consortium management password',
     enterConsortiumName: 'Enter consortium name',
-    enterEtherAmount: 'Enter amount of ether to assign each test account',
-    enterLocalNetworkLocation: 'Enter local port number',
+    enterInfuraProjectId: 'Enter project id',
+    enterInfuraProjectName: 'Enter project name',
+    enterLocalProjectName: 'Enter local project name',
+    enterLocalProjectPort: 'Enter local port number',
     enterMemberName: 'Enter member name',
     enterMemberPassword: 'Enter member password',
-    enterMnemonic: 'Enter mnemonic',
-    enterNetworkLocation: 'Enter network location',
-    enterPort: 'Enter port',
-    enterProjectName: 'Enter project name',
-    enterPublicNetworkUrl: 'Enter public network url',
-    enterPublicTestnetUrl: 'Enter public testnet url',
     enterTruffleBoxName: 'Enter pre-built Truffle project',
-    enterYourGanacheUrl: 'Enter your Ganache url',
+    enterUserEmail: 'Enter user email address',
+    enterUserName: 'Enter user name',
+    enterUserPassword: 'Enter user password',
     provideResourceGroupName: 'Provide a resource group name',
     selectConsortiumProtocol: 'Select protocol',
     selectConsortiumRegion: 'Select region',
@@ -185,6 +175,7 @@ export class Constants {
   public static validationRegexps = {
     forbiddenChars: {
       dotAtTheEnd: /^(?=.*[.]$).*$/g,
+      networkName: /[^0-9a-z]/g,
       password: /[#`*"'\-%;,]/g,
       resourceGroupName: /[#`*"'%;,!@$^&+=?\/<>|[\]{}:\\~]/g,
     },
@@ -199,9 +190,6 @@ export class Constants {
       password: /[!@$^&()+=?\/<>|[\]{}_:.\\~]/g,
       resourceGroupName: /[-\w.()]/g,
     },
-    specialCharsConsortiumMemberName: /^(?=^[a-z])[a-z0-9]+$/g,
-    specialCharsPassword: /[!@$^&()+=?\/<>|[\]{}_:.\\~]/g,
-    specialCharsResourceGroup: /[-\w.()]/g,
     upperCaseLetter: /(?=.*[A-Z]).*/g,
   };
 
@@ -212,6 +200,7 @@ export class Constants {
   public static validationMessages = {
     forbiddenChars: {
       dotAtTheEnd: "Input value must not have '.' at the end.",
+      networkName: 'Invalid name. Name can contain only lowercase letters and numbers.',
       password: "'#', '`', '*', '\"', ''', '-', '%', ',', ';'",
       // tslint:disable-next-line: max-line-length
       resourceGroupName: "'#', '`', '*', '\"', ''', '\%', ';', ',', '!', '@', '$', '^', '&', '+', '=', '?', '\/', '<', '>', '|', '[', '\]', '{', '}', ':', '\\', '~'",
@@ -227,14 +216,18 @@ export class Constants {
       'underscores, hyphens and parenthesis and cannot end in a period. ' +
       `Length must be between ${Constants.minResourceGroupLength} and ${Constants.maxResourceGroupLength} characters.`,
     lengthRange: Constants.getMessageLengthRange,
-    networkAlreadyExists: 'Network already exists.',
+    nameAlreadyInUse: 'This name is already in use. Choose another one.',
     noDigits: 'Password should have at least one digit.',
     noLowerCaseLetter: 'Password should have at least one lowercase letter from a to z.',
     noSpecialChars: 'Password must have 1 special character.',
     noUpperCaseLetter: 'Password should have at least one uppercase letter from A to Z.',
     onlyLowerCaseAllowed: 'Only lower case allowed.',
     onlyNumberAllowed: 'Value after \':\' should be a number.',
+    openZeppelinFilesAreInvalid: Constants.getMessageOpenZeppelinFilesAreInvalid,
     portAlreadyInUse: 'This port is already in use. Choose another one.',
+    portNotInUseGanache: 'No local service running on port. Please start service or select another port.',
+    projectAlreadyExists: 'Network already exists.',
+    projectIdAlreadyExists: 'Network with project ID already exists.',
     resourceGroupAlreadyExists: Constants.getMessageResourceGroupAlreadyExist,
     unresolvedSymbols: Constants.getMessageInputHasUnresolvedSymbols,
     valueCannotBeEmpty: 'Value cannot be empty.',
@@ -242,8 +235,8 @@ export class Constants {
   };
 
   public static placeholders = {
+    confirmDialog: 'Are your sure?',
     confirmPaidOperation: 'This operation will cost Ether, type \'yes\' to continue',
-    deployedUrlStructure: 'host:port',
     emptyLineText: '<empty line>',
     generateMnemonic: 'Generate mnemonic',
     pasteMnemonic: 'Paste mnemonic',
@@ -252,30 +245,107 @@ export class Constants {
     selectDeployDestination: 'Select deploy destination',
     selectDestination: 'Select destination',
     selectGanacheServer: 'Select Ganache server',
+    selectInfuraProject: 'Select Infura project',
     selectMnemonicExtractKey: 'Select mnemonic to extract key',
     selectMnemonicStorage: 'Select mnemonic storage',
     selectNewProjectPath: 'Select new project path',
     selectResourceGroup: 'Select a resource group',
     selectRgLocation: 'Select a location to create your Resource Group in...',
     selectSubscription: 'Select subscription',
-    selectTypeOfMnemonic: 'Select type of mnemonic',
     selectTypeOfSolidityProject: 'Select type of solidity project',
     setupMnemonic: 'Setup mnemonic',
   };
 
-  public static icons = {
-    blockchainService: { light: '', dark: '' },
-    consortium: { light: '', dark: '' },
-    member: { light: '', dark: '' },
-    transactionNode: { light: '', dark: '' },
+  public static treeItemData = {
+    member: {
+      default: {
+        contextValue: 'member',
+        iconPath: { dark: '', light: ''},
+      },
+    },
+    network: {
+      azure: {
+        contextValue: 'network',
+        iconPath: { dark: '', light: ''},
+      },
+      default: {
+        contextValue: 'network',
+        iconPath: { dark: '', light: ''},
+      },
+      infura: {
+        contextValue: 'network',
+        iconPath: { dark: '', light: ''},
+      },
+      local: {
+        contextValue: 'localnetwork',
+        iconPath: { dark: '', light: ''},
+      },
+    },
+    project: {
+      azure: {
+        contextValue: 'project',
+        iconPath: { dark: '', light: ''},
+      },
+      default: {
+        contextValue: 'project',
+        iconPath: { dark: '', light: ''},
+      },
+      infura: {
+        contextValue: 'project',
+        iconPath: { dark: '', light: ''},
+      },
+      local: {
+        contextValue: 'localproject',
+        iconPath: { dark: '', light: ''},
+      },
+    },
+    service: {
+      azure: {
+        contextValue: 'service',
+        iconPath: { dark: '', light: ''},
+        label: 'Azure Blockchain Service',
+      },
+      default: {
+        contextValue: 'service',
+        iconPath: { dark: '', light: ''},
+        label: 'Default Service',
+      },
+      infura: {
+        contextValue: 'service',
+        iconPath: { dark: '', light: ''},
+        label: 'Infura Service',
+      },
+      local: {
+        contextValue: 'service',
+        iconPath: { dark: '', light: ''},
+        label: 'Local Service',
+      },
+    },
   };
 
-  public static contextValue = {
-    blockchainService: 'network',
-    consortium: 'consortium',
-    localConsortium: 'localconsortium',
-    member: 'member',
-    transactionNode: 'transactionNode',
+  // More information see here
+  // https://ethereum.stackexchange.com/questions/17051/how-to-select-a-network-id-or-is-there-a-list-of-network-ids
+  public static infuraEndpoints = {
+    goerli: {
+      id: 5,
+      name: 'goerli',
+    },
+    kovan: {
+      id: 42,
+      name: 'kovan',
+    },
+    mainnet: {
+      id: 1,
+      name: 'mainnet',
+    },
+    rinkeby: {
+      id: 4,
+      name: 'rinkeby',
+    },
+    ropsten: {
+      id: 3,
+      name: 'ropsten',
+    },
   };
 
   public static executeCommandMessage = {
@@ -312,7 +382,8 @@ export class Constants {
 
   public static ganacheCommandStrings = {
     cannotStartServer: 'Cannot start ganache server',
-    invalidGanachePort: 'Couldn\'t start Ganache server. Invalid port',
+    ganachePortIsBusy: 'Cannot start ganache server, port is busy',
+    invalidGanachePort: 'Cannot start Ganache server. Invalid port',
     serverAlreadyRunning: 'Ganache server already running',
     serverCanNotRunWithoutGanache: 'To start a local server, installed ganache-cli is required',
     serverCanNotStop: 'Ganache stop server was failed because is not ganache application',
@@ -323,19 +394,17 @@ export class Constants {
   };
 
   public static uiCommandStrings = {
-    ConnectConsortiumAzureBlockchainService: 'Connect to Azure Blockchain Service consortium',
-    ConnectConsortiumLocalGanache: 'Connect to Local Ganache network',
-    ConnectConsortiumPublicEthereum: 'Connect to Public Ethereum network',
-    ConnectConsortiumTestEthereum: 'Connect to Test Ethereum network',
-    CreateConsortiumAzureBlockchainService: 'Create Azure Blockchain Service consortium',
-    CreateConsortiumLocally: 'Create local Ganache consortium',
-    CreateNewNetwork: '$(plus) Create new network',
-    DeployToConsortium: 'Deploy to consortium',
+    azureBlockchainService: 'Azure Blockchain Service',
+    createProject: '$(plus) Create a new network',
+    deployToConsortium: 'Deploy to consortium',
+    infuraService: 'Infura Service',
+    localService: 'Local Service',
   };
 
   public static errorMessageStrings = {
     // TODO names to lower case
     ActionAborted: 'Action aborted',
+    AstIsEmpty: 'enums could not be extracted, current AST is empty',
     BuildContractsBeforeGenerating: 'Please build contracts before generating',
     BuildContractsDirIsEmpty: Constants.getMessageContractsBuildDirectoryIsEmpty,
     BuildContractsDirIsNotExist: Constants.getMessageContractsBuildDirectoryIsNotExist,
@@ -346,11 +415,12 @@ export class Constants {
     InvalidContract: 'This file is not a valid contract.',
     InvalidMnemonic: 'Invalid mnemonic',
     InvalidServiceType: 'Invalid service type.',
-    LoadConsortiumTreeFailed: 'Load consortium tree has failed.',
+    LoadServiceTreeFailed: 'Load service tree has failed.',
     MnemonicFileHaveNoText: 'Mnemonic file have no text',
     NetworkAlreadyExist: Constants.getMessageNetworkAlreadyExist,
     NetworkNotFound: Constants.getMessageNetworkNotFound,
     NewProjectCreationFailed: 'Command createProject has failed.',
+    NoContractBody: 'No contract body in AST',
     NoSubscriptionFound: 'No subscription found.',
     NoSubscriptionFoundClick: 'No subscription found, click an Azure account ' +
       'at the bottom left corner and choose Select All',
@@ -365,6 +435,7 @@ export class Constants {
   };
 
   public static informationMessage = {
+    absItemNotReady: 'Azure Blockchain Service item is not ready yet. Please wait.',
     cancelButton: 'Cancel',
     consortiumDoesNotHaveMemberWithUrl: 'Consortium does not have member with url',
     consortiumNameValidating: 'Consortium name validating...',
@@ -372,6 +443,9 @@ export class Constants {
     deployButton: 'Deploy',
     detailsButton: 'Details',
     generatedLogicApp: 'Generated the logic app!',
+    infuraAccountSuccessfullyCreated: 'Your Infura account successfully created. Please check you email for complete registration',
+    infuraSignIn: 'You are sign in to your Infura account.',
+    infuraSignOut: 'You are sign out of your Infura account.',
     invalidRequiredVersion: 'Required app is not installed or has an old version.',
     memberNameValidating: 'Member name validating...',
     newProjectCreationFinished: 'New project was created successfully',
@@ -410,6 +484,50 @@ export class Constants {
     resourceType: 'blockchainMembers',
   };
 
+  public static openZeppelin = {
+    cancelButtonTitle: 'Cancel',
+    descriptionDownloadingFailed: 'Description downloading failed',
+    downloadingContractsFromOpenZeppelin: 'Downloading contracts from OpenZeppelin',
+    exploreDownloadedContractsInfo: 'Explore more information about the contracts downloaded',
+    moreDetailsButtonTitle: 'More details',
+    overwriteExistedContracts: 'Overwrite existed contracts',
+    projectFileName: 'project.json',
+    replaceButtonTitle: 'Replace',
+    retryButtonTitle: 'Retry',
+    retryDownloading: 'Retry downloading',
+    selectCategoryForDownloading: 'Select category for downloading',
+    skipButtonTitle: 'Skip files',
+    hashCalculationFailed(errorMessage: string): string {
+      return `Error while calculating file hash. Message: ${errorMessage}`;
+    },
+    wereNotDownloaded(count: number): string {
+      return `OpenZeppelin: Some files (${count}) were not downloaded`;
+    },
+    wereDownloaded(count: number): string {
+      return `OpenZeppelin: (${count}) files were stored`;
+    },
+    alreadyExisted(existing: IOZAsset[]): string {
+      return `OpenZeppelin: (${existing.length}) files already exist on disk: `
+          + existing.slice(0, 3).map((contract) => contract.name).join(' ')
+          + (existing.length > 3 ? '...' : '');
+    },
+    invalidHashMessage(contractPath: string): string {
+      return `${contractPath} - invalid hash`;
+    },
+    validHashMessage(contractPath: string): string {
+      return `${contractPath} - valid hash`;
+    },
+    contractNotExistedOnDisk(contractPath: string): string {
+      return `${contractPath} - not existed on disk`;
+    },
+    categoryWillDownloaded(categoryName: string): string {
+      return `OpenZeppelin category will be downloaded: ${categoryName}`;
+    },
+    fileNow(count: number): string {
+      return `${count} file(s) on OpenZeppelin library now`;
+    },
+  };
+
   public static initialize(context: ExtensionContext) {
     this.extensionContext = context;
     this.temporaryDirectory = context.storagePath ? context.storagePath : os.tmpdir();
@@ -417,21 +535,59 @@ export class Constants {
     this.webViewPages.welcome.path = context.asAbsolutePath(path.join('resources', 'welcome', 'index.html'));
     this.webViewPages.requirements.path = context.asAbsolutePath(path.join('resources', 'welcome', 'prereqs.html'));
 
-    this.icons.blockchainService = {
-      dark: context.asAbsolutePath(path.join('resources/dark', 'blockchainService.svg')),
-      light: context.asAbsolutePath(path.join('resources/light', 'blockchainService.svg')),
-    };
-    this.icons.consortium = {
-      dark: context.asAbsolutePath(path.join('resources/dark', 'consortium.svg')),
-      light: context.asAbsolutePath(path.join('resources/light', 'consortium.svg')),
-    };
-    this.icons.member = {
+    this.treeItemData.member.default.iconPath = {
       dark: context.asAbsolutePath(path.join('resources/dark', 'member.svg')),
       light: context.asAbsolutePath(path.join('resources/light', 'member.svg')),
     };
-    this.icons.transactionNode = {
-      dark: context.asAbsolutePath(path.join('resources/dark', 'transactionNode.svg')),
-      light: context.asAbsolutePath(path.join('resources/light', 'transactionNode.svg')),
+
+    this.treeItemData.network.default.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'EthereumNetwork.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'EthereumNetwork.svg')),
+    };
+
+    this.treeItemData.network.azure.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'ABNetwork.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'ABNetwork.svg')),
+    };
+
+    this.treeItemData.network.infura.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'InfuraNetwork.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'InfuraNetwork.svg')),
+    };
+
+    this.treeItemData.network.local.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'LocalNetwork.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'LocalNetwork.svg')),
+    };
+
+    this.treeItemData.project.azure.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'ABProject.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'ABProject.svg')),
+    };
+
+    this.treeItemData.project.infura.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'InfuraProject.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'InfuraProject.svg')),
+    };
+
+    this.treeItemData.project.local.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'LocalProject.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'LocalProject.svg')),
+    };
+
+    this.treeItemData.service.azure.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'ABService.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'ABService.svg')),
+    };
+
+    this.treeItemData.service.infura.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'InfuraService.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'InfuraService.svg')),
+    };
+
+    this.treeItemData.service.local.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'LocalService.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'LocalService.svg')),
     };
   }
 
@@ -479,5 +635,10 @@ export class Constants {
 
   private static getMessageInputHasUnresolvedSymbols(unresolvedSymbols: string): string {
     return `Input value must not have '${unresolvedSymbols}'.`;
+  }
+
+  private static getMessageOpenZeppelinFilesAreInvalid(invalidFilePaths: string[]): string {
+    return `OpenZeppelin files have been modified or removed:
+      ${invalidFilePaths.join('; ')}. Please revert changes or download them again.`;
   }
 }

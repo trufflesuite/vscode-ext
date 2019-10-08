@@ -1,47 +1,35 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+export * from './ExtensionView';
+export * from './IExtensionView';
+export * from './MemberView';
+export * from './NetworkNodeView';
+export * from './NullableView';
+export * from './ProjectView';
+export * from './ServiceView';
+export * from './ViewItemFactory';
+
 import { ItemType } from '../Models';
-import { CommandView } from './CommandView';
-import { ConsortiumView } from './ConsortiumView';
-import { ExtensionView } from './ExtensionView';
-import { IExtensionView } from './IExtensionView';
-import { InfoView } from './InfoView';
-import { MemberView } from './MemberView';
-import { NetworkView } from './NetworkView';
-import { TransactionNodeView } from './TransactionNodeView';
 import {
-  CommandViewCreator,
-  ConsortiumViewCreator,
-  InfoViewCreator,
   MemberViewCreator,
-  NetworkViewCreator,
-  TransactionNodeViewCreator,
+  NetworkNodeViewCreator,
+  NullableViewCreator,
+  ProjectViewCreator,
+  ServiceViewCreator,
 } from './ViewCreators';
 import { ViewItemFactory } from './ViewItemFactory';
 
-ViewItemFactory.register(ItemType.UNKNOWN, new InfoViewCreator());
-ViewItemFactory.register(ItemType.INFO, new InfoViewCreator());
-ViewItemFactory.register(ItemType.COMMAND, new CommandViewCreator());
-ViewItemFactory.register(ItemType.AZURE_BLOCKCHAIN, new NetworkViewCreator());
-ViewItemFactory.register(ItemType.LOCAL_NETWORK, new NetworkViewCreator());
-ViewItemFactory.register(ItemType.ETHEREUM_TEST_NETWORK, new NetworkViewCreator());
-ViewItemFactory.register(ItemType.ETHEREUM_MAIN_NETWORK, new NetworkViewCreator());
-ViewItemFactory.register(ItemType.AZURE_CONSORTIUM, new ConsortiumViewCreator());
-ViewItemFactory.register(ItemType.LOCAL_CONSORTIUM, new ConsortiumViewCreator());
-ViewItemFactory.register(ItemType.ETHEREUM_TEST_CONSORTIUM, new ConsortiumViewCreator());
-ViewItemFactory.register(ItemType.ETHEREUM_MAIN_CONSORTIUM, new ConsortiumViewCreator());
-ViewItemFactory.register(ItemType.MEMBER, new MemberViewCreator());
-ViewItemFactory.register(ItemType.TRANSACTION_NODE, new TransactionNodeViewCreator());
+ViewItemFactory.register(ItemType.COMMAND, new ServiceViewCreator());
+ViewItemFactory.register(ItemType.NULLABLE, new NullableViewCreator());
 
-export {
-  CommandView,
-  ConsortiumView,
-  ExtensionView,
-  InfoView,
-  IExtensionView,
-  MemberView,
-  NetworkView,
-  TransactionNodeView,
-  ViewItemFactory,
-};
+ViewItemFactory.register(ItemType.AZURE_BLOCKCHAIN_SERVICE, new ServiceViewCreator());
+ViewItemFactory.register(ItemType.LOCAL_SERVICE, new ServiceViewCreator());
+
+ViewItemFactory.register(ItemType.AZURE_BLOCKCHAIN_PROJECT, new ProjectViewCreator());
+ViewItemFactory.register(ItemType.LOCAL_PROJECT, new ProjectViewCreator());
+
+ViewItemFactory.register(ItemType.AZURE_BLOCKCHAIN_NETWORK_NODE, new NetworkNodeViewCreator());
+ViewItemFactory.register(ItemType.LOCAL_NETWORK_NODE, new NetworkNodeViewCreator());
+
+ViewItemFactory.register(ItemType.MEMBER, new MemberViewCreator());
