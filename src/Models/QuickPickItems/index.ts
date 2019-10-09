@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 export * from './ConsortiumItem';
+export * from './InfuraProjectItem';
 export * from './LocationItem';
 export * from './ResourceGroupItem';
 export * from './SkuItem';

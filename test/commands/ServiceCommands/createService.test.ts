@@ -25,7 +25,7 @@ describe('Create Service', () => {
         .returns({
           cmd: sinon.mock().returns(new LocalProject('label', 8545)),
           itemType: ItemType.AZURE_BLOCKCHAIN_SERVICE,
-          label: Constants.uiCommandStrings.azureBlockchainService,
+          label: Constants.treeItemData.service.azure.label,
         });
 
       sinon.stub(TreeManager, 'getItem').returns(new LocalService());

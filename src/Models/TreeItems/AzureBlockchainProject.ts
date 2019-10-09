@@ -2,8 +2,12 @@
 // Licensed under the MIT license.
 
 import { Constants } from '../../Constants';
+import { IDeployDestination } from '../IDeployDestination';
 import { ItemType } from '../ItemType';
+import { AzureBlockchainNetworkNode } from './AzureBlockchainNetworkNode';
+import { NetworkNode } from './NetworkNode';
 import { Project } from './Project';
+const { project, service } = Constants.treeItemData;
 
 export class AzureBlockchainProject extends Project {
   public readonly subscriptionId: string;
@@ -19,7 +23,7 @@ export class AzureBlockchainProject extends Project {
     super(
       ItemType.AZURE_BLOCKCHAIN_PROJECT,
       label,
-      Constants.treeItemData.project.azure,
+      project.azure,
     );
 
     this.subscriptionId = subscriptionId;
@@ -35,5 +39,26 @@ export class AzureBlockchainProject extends Project {
     obj.memberName = this.memberName;
 
     return obj;
+  }
+
+  public async getDeployDestinations(): Promise<IDeployDestination[]> {
+    const getDeployName = (labelNode: string) => [service.azure.prefix, this.label, labelNode].join('_');
+
+    return Promise.all((this.getChildren()
+      .filter((child) => child instanceof NetworkNode) as AzureBlockchainNetworkNode[])
+      .map(async (node) => {
+        return {
+          description: await node.getRPCAddress(),
+          detail: service.azure.label,
+          getTruffleNetwork: async () => {
+            const truffleNetwork = await node.getTruffleNetwork();
+            truffleNetwork.name = getDeployName(node.label);
+            return truffleNetwork;
+          },
+          label: getDeployName(node.label),
+          networkId: node.networkId,
+          networkType: node.itemType as number,
+        } as IDeployDestination;
+      }));
   }
 }

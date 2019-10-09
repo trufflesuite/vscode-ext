@@ -8,6 +8,7 @@ import {
   AzureBlockchainService,
   Command,
   IExtensionItem,
+  InfuraService,
   LocalService,
   Service,
   ServiceTypes,
@@ -95,7 +96,12 @@ class ExtensionTreeManager {
       localService = new LocalService();
     }
 
-    return [ azureBlockchainService, localService];
+    let infuraService = items.find((item) => item instanceof InfuraService);
+    if (!infuraService) {
+      infuraService = new InfuraService();
+    }
+
+    return [ azureBlockchainService, infuraService, localService];
   }
 }
 

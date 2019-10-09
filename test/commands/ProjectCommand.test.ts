@@ -13,19 +13,11 @@ import { Output } from '../../src/Output';
 
 describe('ProjectCommands', () => {
   describe('Unit tests', () => {
-    let helpersMock: sinon.SinonMock;
     const projectPath = 'projectPath';
     const truffleBoxName = 'truffleBoxName';
 
-    before(() => {
-      helpersMock = sinon.mock(helpers);
-    });
-
-    after(() => {
-      helpersMock.restore();
-    });
-
     describe('newSolidityProject', () => {
+      let helpersMock: sinon.SinonMock;
       let gitHelperMock: sinon.SinonMock;
       let showQuickPickMock: sinon.SinonStub<any[], any>;
       let gitInitMock: sinon.SinonStub<any[], any>;
@@ -88,6 +80,7 @@ describe('ProjectCommands', () => {
     });
 
     describe('chooseNewProjectDir', () => {
+      let helpersMock: sinon.SinonMock;
       const firstProjectPath = 'firstProjectPath';
       const secondProjectPath = 'secondProjectPath';
       let fsMock: sinon.SinonMock;
@@ -430,6 +423,7 @@ describe('ProjectCommands', () => {
 
     it('Method getTruffleBoxName should return a value', async () => {
       // Arrange
+      const helpersMock = sinon.mock(helpers);
       const testName = 'test';
       const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
       const getTruffleBoxName = projectCommandsRewire.__get__('getTruffleBoxName');
@@ -451,14 +445,6 @@ describe('ProjectCommands', () => {
     const truffleBoxName = 'truffleBoxName';
     const firstProjectPath = 'firstProjectPath';
     const secondProjectPath = 'secondProjectPath';
-
-    before(() => {
-      helpersMock = sinon.mock(helpers);
-    });
-
-    after(() => {
-      helpersMock.restore();
-    });
 
     let gitHelperMock: sinon.SinonMock;
     let showQuickPickMock: sinon.SinonStub<any[], any>;

@@ -5,7 +5,7 @@
   "publisher": "AzBlockchain",
   "preview": true,
   "icon": "images/blockchain-service-logo.png",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "repository": {
     "type": "git",
     "url": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum"
@@ -52,6 +52,8 @@
     "onCommand:azureBlockchainService.disconnectProject",
     "onCommand:extension.truffle.debugTransaction",
     "onCommand:openZeppelin.addCategory",
+    "onCommand:azureBlockchainService.signInToInfuraAccount",
+    "onCommand:azureBlockchainService.signOutOfInfuraAccount",
     "onDebug"
   ],
   "contributes": {
@@ -148,6 +150,16 @@
       {
         "command": "azureBlockchainService.stopGanacheServer",
         "title": "Stop Ganache Server",
+        "category": "Azure Blockchain"
+      },
+      {
+        "command": "azureBlockchainService.signInToInfuraAccount",
+        "title": "Sign in to Infura account",
+        "category": "Azure Blockchain"
+      },
+      {
+        "command": "azureBlockchainService.signOutOfInfuraAccount",
+        "title": "Sign out of Infura account",
         "category": "Azure Blockchain"
       },
       {

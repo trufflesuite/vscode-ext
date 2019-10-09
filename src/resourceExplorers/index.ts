@@ -3,4 +3,6 @@
 
 export * from './AzureResourceExplorer';
 export * from './ConsortiumResourceExplorer';
+export * from './InfuraResourceExplorer';
 export * from './LocalResourceExplorer';
+export * from './InfuraResourceExplorer';

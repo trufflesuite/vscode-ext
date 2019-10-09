@@ -357,8 +357,14 @@ describe('TruffleCommands', () => {
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
 
+        const networkNodeName = [
+          Constants.treeItemData.service.local.prefix,
+          TestConstants.consortiumTestNames.local,
+          TestConstants.consortiumTestNames.local,
+        ].join('_');
+
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.consortiumTestNames.local);
+          return items.find((item: any) => item.label === networkNodeName);
         });
 
         // Act
@@ -393,8 +399,14 @@ describe('TruffleCommands', () => {
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.throws(TestConstants.testError);
 
+        const networkNodeName = [
+          Constants.treeItemData.service.local.prefix,
+          TestConstants.consortiumTestNames.local,
+          TestConstants.consortiumTestNames.local,
+        ].join('_');
+
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.consortiumTestNames.local);
+          return items.find((item: any) => item.label === networkNodeName);
         });
 
         // Act and assert
@@ -428,8 +440,14 @@ describe('TruffleCommands', () => {
         executeCommandMock.returns(uuid.v4());
         getAccessKeysMock.returns(uuid.v4());
 
+        const networkNodeName = [
+          Constants.treeItemData.service.azure.prefix,
+          TestConstants.servicesNames.testConsortium,
+          TestConstants.servicesNames.testConsortium,
+        ].join('_');
+
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.servicesNames.testConsortium);
+          return items.find((item: any) => item.label === networkNodeName);
         });
 
         showQuickPickMock.onCall(1).callsFake((items: any) => {
@@ -478,8 +496,14 @@ describe('TruffleCommands', () => {
         executeCommandMock.returns(uuid.v4());
         getAccessKeysMock.returns(uuid.v4());
 
+        const networkNodeName = [
+          Constants.treeItemData.service.azure.prefix,
+          TestConstants.servicesNames.testConsortium,
+          TestConstants.servicesNames.testConsortium,
+        ].join('_');
+
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === TestConstants.servicesNames.testConsortium);
+          return items.find((item: any) => item.label === networkNodeName);
         });
 
         showQuickPickMock.onCall(1).callsFake((items: any) => {
@@ -487,7 +511,6 @@ describe('TruffleCommands', () => {
         });
 
         showInputBoxMock.onCall(0).returns(TestConstants.testMnemonic);
-
         showSaveDialogMock.returns(uuid.v4());
 
         // Act

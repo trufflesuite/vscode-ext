@@ -90,6 +90,11 @@ export class Constants {
     },
   };
 
+  public static infuraFileResponse = {
+    css: '',
+    path: '',
+  };
+
   public static webViewPages = {
     contractUI: {
       path: '',
@@ -153,7 +158,6 @@ export class Constants {
   public static paletteLabels = {
     enterConsortiumManagementPassword: 'Enter consortium management password',
     enterConsortiumName: 'Enter consortium name',
-    enterInfuraProjectId: 'Enter project id',
     enterInfuraProjectName: 'Enter project name',
     enterLocalProjectName: 'Enter local project name',
     enterLocalProjectPort: 'Enter local port number',
@@ -180,6 +184,7 @@ export class Constants {
       resourceGroupName: /[#`*"'%;,!@$^&+=?\/<>|[\]{}:\\~]/g,
     },
     hasDigits: /(?=.*\d)/g,
+    infuraProjectname: /^([a-zA-Z]|\d|\s|[-_:]){3,}$/g,
     isLowerCase: /^[a-z0-9_\-!@$^&()+=?\/<>|[\]{}:.\\~ #`*"'%;,]+$/g,
     isUrl: /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/igm,
     lowerCaseLetter: /(?=.*[a-z]).*/g,
@@ -206,6 +211,7 @@ export class Constants {
       resourceGroupName: "'#', '`', '*', '\"', ''', '\%', ';', ',', '!', '@', '$', '^', '&', '+', '=', '?', '\/', '<', '>', '|', '[', '\]', '{', '}', ':', '\\', '~'",
     },
     forbiddenSymbols: 'Provided name has forbidden symbols.',
+    infuraProjectInvalidName: 'Project name must be at least 3 characters and should have alphanumeric, space, and the symbols "-", "_", ":".',
     invalidAzureName: 'Invalid name. Name can contain only lowercase letters and numbers. ' +
       `The first character must be a letter. Length must be between ${Constants.minConsortiumAndMemberLength} ` +
       `and ${Constants.maxConsortiumAndMemberLength} characters.`,
@@ -227,6 +233,7 @@ export class Constants {
     portAlreadyInUse: 'This port is already in use. Choose another one.',
     portNotInUseGanache: 'No local service running on port. Please start service or select another port.',
     projectAlreadyExists: 'Network already exists.',
+    projectAlreadyExistsOnInfura: 'Project already exist with the same name on Infura.',
     projectIdAlreadyExists: 'Network with project ID already exists.',
     resourceGroupAlreadyExists: Constants.getMessageResourceGroupAlreadyExist,
     unresolvedSymbols: Constants.getMessageInputHasUnresolvedSymbols,
@@ -246,6 +253,7 @@ export class Constants {
     selectDestination: 'Select destination',
     selectGanacheServer: 'Select Ganache server',
     selectInfuraProject: 'Select Infura project',
+    selectInfuraProjectAvailability: 'Select Infura project availability',
     selectMnemonicExtractKey: 'Select mnemonic to extract key',
     selectMnemonicStorage: 'Select mnemonic storage',
     selectNewProjectPath: 'Select new project path',
@@ -304,6 +312,7 @@ export class Constants {
         contextValue: 'service',
         iconPath: { dark: '', light: ''},
         label: 'Azure Blockchain Service',
+        prefix: 'abs',
       },
       default: {
         contextValue: 'service',
@@ -314,38 +323,30 @@ export class Constants {
         contextValue: 'service',
         iconPath: { dark: '', light: ''},
         label: 'Infura Service',
+        prefix: 'inf',
       },
       local: {
         contextValue: 'service',
         iconPath: { dark: '', light: ''},
         label: 'Local Service',
+        prefix: 'loc',
       },
     },
   };
 
   // More information see here
   // https://ethereum.stackexchange.com/questions/17051/how-to-select-a-network-id-or-is-there-a-list-of-network-ids
-  public static infuraEndpoints = {
-    goerli: {
-      id: 5,
-      name: 'goerli',
-    },
-    kovan: {
-      id: 42,
-      name: 'kovan',
-    },
-    mainnet: {
-      id: 1,
-      name: 'mainnet',
-    },
-    rinkeby: {
-      id: 4,
-      name: 'rinkeby',
-    },
-    ropsten: {
-      id: 3,
-      name: 'ropsten',
-    },
+  public static infuraEndpointsIds: { [key: string]: number } = {
+    goerli: 5,
+    kovan: 42,
+    mainnet: 1,
+    rinkeby: 4,
+    ropsten: 3,
+  };
+
+  public static projectAvailability = {
+    private: 'Private',
+    public: 'Public',
   };
 
   public static executeCommandMessage = {
@@ -394,11 +395,9 @@ export class Constants {
   };
 
   public static uiCommandStrings = {
-    azureBlockchainService: 'Azure Blockchain Service',
+    createInfuraProject: '$(plus) Create Infura Project',
     createProject: '$(plus) Create a new network',
     deployToConsortium: 'Deploy to consortium',
-    infuraService: 'Infura Service',
-    localService: 'Local Service',
   };
 
   public static errorMessageStrings = {
@@ -412,6 +411,7 @@ export class Constants {
     DirectoryIsNotEmpty: 'Directory is not empty. Open another one?',
     GetMessageChildAlreadyConnected: Constants.getMessageChildAlreadyConnected,
     GitIsNotInstalled: 'Git is not installed',
+    InfuraUnauthorized: 'Unauthorized: please sign in with Infura account.',
     InvalidContract: 'This file is not a valid contract.',
     InvalidMnemonic: 'Invalid mnemonic',
     InvalidServiceType: 'Invalid service type.',
@@ -444,8 +444,8 @@ export class Constants {
     detailsButton: 'Details',
     generatedLogicApp: 'Generated the logic app!',
     infuraAccountSuccessfullyCreated: 'Your Infura account successfully created. Please check you email for complete registration',
-    infuraSignIn: 'You are sign in to your Infura account.',
-    infuraSignOut: 'You are sign out of your Infura account.',
+    infuraSignIn: 'You are signed in to your Infura account.',
+    infuraSignOut: 'You are signed out of your Infura account.',
     invalidRequiredVersion: 'Required app is not installed or has an old version.',
     memberNameValidating: 'Member name validating...',
     newProjectCreationFinished: 'New project was created successfully',
@@ -454,6 +454,36 @@ export class Constants {
     privateKeyWasCopiedToClipboard: 'Private key was copied to clipboard',
     rpcEndpointCopiedToClipboard: 'RPCEndpointAddress copied to clipboard',
     seeDetailsRequirementsPage: 'Please see details on the Requirements Page',
+  };
+
+  public static infuraCredentials = {
+    clientId: 'vs-code',
+    clientSecret: 'pRo64S3izL72crOsuZ9PatRad0og5dlB',
+    scopes: {
+      offline: 'offline',
+      projectRead: 'projects.read',
+      projectWrite: 'projects.write',
+      userRead: 'user.read',
+    },
+  };
+
+  public static infuraAuthUrls = {
+    authURL: 'oauth2/auth',
+    baseURL: 'https://oauth.infura.io/',
+    callbackURL: 'http://127.0.0.1:9010/callback',
+    revoke: 'oauth2/revoke',
+    tokenURL: 'oauth2/token',
+  };
+
+  public static infuraAPIUrls = {
+    projects: 'eth/projects',
+    rootURL: 'https://system.infura.io/',
+    userMe: 'user/me',
+  };
+
+  public static infuraRequestGrantType = {
+    authorizationCode: 'authorization_code',
+    refreshToken: 'refresh_token',
   };
 
   public static microservicesWorkflows = {
@@ -534,6 +564,8 @@ export class Constants {
     this.webViewPages.contractUI.path = context.asAbsolutePath(path.join('resources', 'drizzle', 'index.html'));
     this.webViewPages.welcome.path = context.asAbsolutePath(path.join('resources', 'welcome', 'index.html'));
     this.webViewPages.requirements.path = context.asAbsolutePath(path.join('resources', 'welcome', 'prereqs.html'));
+    this.infuraFileResponse.path = context.asAbsolutePath(path.join('resources', 'codeFlowResult', 'index.html'));
+    this.infuraFileResponse.css = context.asAbsolutePath(path.join('resources', 'codeFlowResult', 'main.css'));
 
     this.treeItemData.member.default.iconPath = {
       dark: context.asAbsolutePath(path.join('resources/dark', 'member.svg')),

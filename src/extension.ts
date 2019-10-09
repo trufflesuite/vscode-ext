@@ -6,6 +6,7 @@ import {
   ContractCommands,
   DebuggerCommands,
   GanacheCommands,
+  InfuraCommands,
   LogicAppCommands,
   OpenZeppelinCommands,
   ProjectCommands,
@@ -17,7 +18,15 @@ import { CommandContext, isWorkspaceOpen, required, setCommandContext } from './
 import { CancellationEvent } from './Models';
 import { Output } from './Output';
 import { RequirementsPage, WelcomePage } from './pages';
-import { AdapterType, ContractDB, GanacheService, MnemonicRepository, TreeManager, TreeService } from './services';
+import { InfuraServiceClient } from './services';
+import {
+  AdapterType,
+  ContractDB,
+  GanacheService,
+  MnemonicRepository,
+  TreeManager,
+  TreeService,
+} from './services';
 import { Telemetry } from './TelemetryClient';
 import { ProjectView } from './ViewItems';
 
@@ -27,6 +36,7 @@ export async function activate(context: ExtensionContext) {
   Constants.initialize(context);
   DebuggerConfiguration.initialize(context);
   await ContractDB.initialize(AdapterType.IN_MEMORY);
+  await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
   TreeManager.initialize(context.globalState);
   TreeService.initialize('AzureBlockchain');
@@ -102,6 +112,15 @@ export async function activate(context: ExtensionContext) {
     });
   //#endregion
 
+  //#region Infura commands
+  const signInToInfuraAccount = commands.registerCommand('azureBlockchainService.signInToInfuraAccount', async () => {
+    await tryExecute(() => InfuraCommands.signIn());
+  });
+  const signOutOfInfuraAccount = commands.registerCommand('azureBlockchainService.signOutOfInfuraAccount', async () => {
+    await tryExecute(() => InfuraCommands.signOut());
+  });
+
+  //#endregion
   //#region contract commands
   const showSmartContractPage = commands.registerCommand(
     'azureBlockchainService.showSmartContractPage',
@@ -167,6 +186,8 @@ export async function activate(context: ExtensionContext) {
     generateReportPublishingWorkflows,
     getPrivateKeyFromMnemonic,
     startDebugger,
+    signInToInfuraAccount,
+    signOutOfInfuraAccount,
     openZeppelinAddCategory,
   ];
   context.subscriptions.push(...subscriptions);

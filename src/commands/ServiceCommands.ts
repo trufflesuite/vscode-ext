@@ -7,13 +7,15 @@ import { ItemType } from '../Models';
 import {
   AzureBlockchainProject,
   AzureBlockchainService,
+  InfuraProject,
+  InfuraService,
   LocalProject,
   LocalService,
   Project,
   Service,
   ServiceTypes,
 } from '../Models/TreeItems';
-import { ConsortiumResourceExplorer, LocalResourceExplorer } from '../resourceExplorers';
+import { ConsortiumResourceExplorer, InfuraResourceExplorer, LocalResourceExplorer } from '../resourceExplorers';
 import { GanacheService, TreeManager } from '../services';
 import { Telemetry } from '../TelemetryClient';
 import { ProjectView } from '../ViewItems';
@@ -32,12 +34,17 @@ export namespace ServiceCommands {
       {
         cmd: createLocalProject,
         itemType: ItemType.LOCAL_SERVICE,
-        label: Constants.uiCommandStrings.localService,
+        label: Constants.treeItemData.service.local.label,
       },
       {
         cmd: createAzureBlockchainProject,
         itemType: ItemType.AZURE_BLOCKCHAIN_SERVICE,
-        label: Constants.uiCommandStrings.azureBlockchainService,
+        label: Constants.treeItemData.service.azure.label,
+      },
+      {
+        cmd: createInfuraProject,
+        itemType: ItemType.INFURA_SERVICE,
+        label: Constants.treeItemData.service.infura.label,
       },
     ];
 
@@ -52,12 +59,17 @@ export namespace ServiceCommands {
       {
         cmd: connectLocalProject,
         itemType: ItemType.LOCAL_SERVICE,
-        label: Constants.uiCommandStrings.localService,
+        label: Constants.treeItemData.service.local.label,
       },
       {
         cmd: connectAzureBlockchainProject,
         itemType: ItemType.AZURE_BLOCKCHAIN_SERVICE,
-        label: Constants.uiCommandStrings.azureBlockchainService,
+        label: Constants.treeItemData.service.azure.label,
+      },
+      {
+        cmd: connectInfuraProject,
+        itemType: ItemType.INFURA_SERVICE,
+        label: Constants.treeItemData.service.infura.label,
       },
     ];
 
@@ -125,6 +137,27 @@ async function connectAzureBlockchainProject(service: AzureBlockchainService): P
 async function getExistingConsortia(service: AzureBlockchainService): Promise<string[]> {
   const azureBlockchainProjects = service.getChildren() as AzureBlockchainProject[];
   return azureBlockchainProjects.map((item) => item.label); // Maybe member name?
+}
+
+// ------------ INFURA ------------ //
+async function createInfuraProject(service: InfuraService): Promise<InfuraProject> {
+  const infuraResourceExplorer = new InfuraResourceExplorer();
+  return infuraResourceExplorer.createProject(await getExistingProjects(service));
+}
+
+async function connectInfuraProject(service: InfuraService): Promise<InfuraProject> {
+  const infuraResourceExplorer = new InfuraResourceExplorer();
+  return infuraResourceExplorer.selectProject(await getExistingProjects(service), await getExistingProjectIds(service));
+}
+
+async function getExistingProjects(service: InfuraService): Promise<string[]> {
+  const infuraProjects = service.getChildren() as InfuraProject[];
+  return infuraProjects.map((item) => item.label);
+}
+
+async function getExistingProjectIds(service: InfuraService): Promise<string[]> {
+  const infuraProjects = service.getChildren() as InfuraProject[];
+  return infuraProjects.map((item) => item.projectId);
 }
 
 // ------------ LOCAL ------------ //

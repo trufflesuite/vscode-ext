@@ -16,7 +16,8 @@ const protocolRegExp = new RegExp('^(' +
 
 export type NetworkNodeTypes =
   ItemType.AZURE_BLOCKCHAIN_NETWORK_NODE |
-  ItemType.LOCAL_NETWORK_NODE;
+  ItemType.LOCAL_NETWORK_NODE |
+  ItemType.INFURA_NETWORK_NODE;
 
 export abstract class NetworkNode extends ExtensionItem {
   public readonly networkId: number | string;

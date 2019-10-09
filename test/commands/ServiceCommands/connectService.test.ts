@@ -20,6 +20,7 @@ import { ConsortiumResourceExplorer } from '../../../src/resourceExplorers';
 import { GanacheService, TreeManager } from '../../../src/services';
 import { AzureAccountHelper } from '../../testHelpers/AzureAccountHelper';
 import { getRandomInt } from '../../testHelpers/Random';
+const { project, service } = Constants.treeItemData;
 
 describe('Service Commands', () => {
   let getItemsMock: any;
@@ -93,7 +94,7 @@ describe('Service Commands', () => {
         const expectedLabel = `${name}`;
         getItemMock.returns(localGroup);
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === Constants.uiCommandStrings.localService);
+          return items.find((item: any) => item.label === service.local.label);
         });
         showInputBoxMock.onCall(0).returns(name);
         showInputBoxMock.onCall(1).returns(port);
@@ -106,7 +107,7 @@ describe('Service Commands', () => {
         assertAfterEachTest(
           result,
           ItemType.LOCAL_PROJECT,
-          Constants.treeItemData.project.local.contextValue,
+          project.local.contextValue,
           expectedLabel);
         assert.strictEqual(startGanacheServerMock.called, true, 'startGanacheServer should be called');
       });
@@ -116,8 +117,7 @@ describe('Service Commands', () => {
         const consortiumName = uuid.v4;
         getItemMock.returns(azureGroup);
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) =>
-          item.label === Constants.uiCommandStrings.azureBlockchainService);
+          return items.find((item: any) => item.label === service.azure.label);
         });
         const azureBlockchainProject = new AzureBlockchainProject(
           consortiumName.toString(),
@@ -136,7 +136,7 @@ describe('Service Commands', () => {
         assertAfterEachTest(
           result,
           ItemType.AZURE_BLOCKCHAIN_PROJECT,
-          Constants.treeItemData.project.default.contextValue,
+          project.default.contextValue,
           consortiumName.toString());
       });
     });
@@ -146,7 +146,7 @@ describe('Service Commands', () => {
         // Arrange
         getItemMock.returns(localGroup);
         showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === Constants.uiCommandStrings.localService);
+          return items.find((item: any) => item.label === service.local.label);
         });
         showInputBoxMock.returns(undefined);
         getPortStatusMock.returns(GanacheService.PortStatus.NOT_GANACHE);

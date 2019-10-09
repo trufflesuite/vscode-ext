@@ -18,7 +18,8 @@ import {
   TruffleConfiguration,
   vscodeEnvironment,
 } from '../helpers';
-import { LocalNetworkNode, NetworkNode, Project } from '../Models/TreeItems';
+import { IDeployDestination, ItemType } from '../Models';
+import { Project } from '../Models/TreeItems';
 import { Output } from '../Output';
 import { ContractDB, GanacheService, MnemonicRepository, OpenZeppelinService, TreeManager } from '../services';
 import { OZContractValidated } from '../services/openZeppelin/OpenZeppelinService';
@@ -26,7 +27,7 @@ import { Telemetry } from '../TelemetryClient';
 import { ProjectView } from '../ViewItems';
 import { ServiceCommands } from './ServiceCommands';
 
-interface IDeployDestination {
+interface IDeployDestinationItem {
   cmd: () => Promise<void>;
   cwd?: string;
   description?: string;
@@ -70,15 +71,13 @@ export namespace TruffleCommands {
     const truffleDeployDestinations = getTruffleDeployDestinations(truffleConfigsUri);
     const treeDeployDestinations = await getTreeDeployDestinations(truffleConfigsUri);
 
-    const deployDestinations: IDeployDestination[] = [];
+    const deployDestinations: IDeployDestinationItem[] = [];
     deployDestinations.push(...defaultDeployDestinations);
     deployDestinations.push(...truffleDeployDestinations);
     deployDestinations.push(...treeDeployDestinations);
 
-    const uniqueDestinations = deployDestinations.filter(() => {
-      // FIXME: here should be filter by URL
-      return true;
-    });
+    const uniqueDestinations = removeDuplicateNetworks(deployDestinations);
+
     const command = await showQuickPick(
       uniqueDestinations,
       {
@@ -186,6 +185,12 @@ export namespace TruffleCommands {
   }
 }
 
+function removeDuplicateNetworks(deployDestinations: IDeployDestinationItem[]): IDeployDestinationItem[] {
+  return deployDestinations.filter((destination, index, destinations) => {
+    return destinations.findIndex((dest) => dest.label === destination.label) === index;
+  });
+}
+
 async function validateOpenZeppelinContracts(): Promise<void> {
   const validatedContracts = await OpenZeppelinService.validateContracts();
   validatedContracts.forEach((ozContract: OZContractValidated) => {
@@ -211,7 +216,7 @@ async function validateOpenZeppelinContracts(): Promise<void> {
   }
 }
 
-function getDefaultDeployDestinations(truffleConfigPath: string): IDeployDestination[] {
+function getDefaultDeployDestinations(truffleConfigPath: string): IDeployDestinationItem[] {
   return [
     {
       cmd: createNewDeploymentService.bind(undefined, truffleConfigPath),
@@ -221,8 +226,8 @@ function getDefaultDeployDestinations(truffleConfigPath: string): IDeployDestina
   ];
 }
 
-function getTruffleDeployDestinations(truffleConfigPath: string): IDeployDestination[] {
-  const deployDestination: IDeployDestination[] = [];
+function getTruffleDeployDestinations(truffleConfigPath: string): IDeployDestinationItem[] {
+  const deployDestination: IDeployDestinationItem[] = [];
   const truffleConfig = new TruffleConfig(truffleConfigPath);
   const networksFromConfig = truffleConfig.getNetworks();
 
@@ -244,7 +249,7 @@ function getTruffleDeployDestinations(truffleConfigPath: string): IDeployDestina
   return deployDestination;
 }
 
-async function getTreeDeployDestinations(truffleConfigPath: string): Promise<IDeployDestination[]> {
+async function getTreeDeployDestinations(truffleConfigPath: string): Promise<IDeployDestinationItem[]> {
   const services = TreeManager.getItems();
 
   const projects = services.reduce((res, service) => {
@@ -252,20 +257,29 @@ async function getTreeDeployDestinations(truffleConfigPath: string): Promise<IDe
     return res;
   }, [] as Project[]);
 
-  const networks = projects.reduce((res, project) => {
-    res.push(...project.getChildren().filter((child) => child instanceof NetworkNode) as NetworkNode[]);
-    return res;
-  }, [] as NetworkNode[]);
+  return getProjectDeployDestinationItems(projects, truffleConfigPath);
+}
 
-  return Promise.all(networks.map(async (network) => {
+async function getProjectDeployDestinationItems(projects: Project[], truffleConfigPath: string)
+: Promise<IDeployDestinationItem[]> {
+  const destinations: IDeployDestination[] = [];
+
+  for (const project of projects) {
+    const projectDestinations = await project.getDeployDestinations();
+    destinations.push(...projectDestinations);
+  }
+
+  return destinations.map((destination) => {
+    const { description, detail, getTruffleNetwork, label, networkId, networkType, port } = destination;
+
     return {
-      cmd: getServiceCreateFunction(network, truffleConfigPath),
-      description: await network.getRPCAddress(),
-      detail: 'Tree Item',
-      label: network.label,
-      networkId: network.networkId,
-    };
-  }));
+      cmd: getServiceCreateFunction(networkType, getTruffleNetwork, truffleConfigPath, port),
+      description,
+      detail,
+      label,
+      networkId,
+    } as IDeployDestinationItem;
+  });
 }
 
 function getTruffleDeployFunction(url: string, name: string, truffleConfigPath: string, networkId: number | string)
@@ -286,34 +300,28 @@ function getTruffleDeployFunction(url: string, name: string, truffleConfigPath: 
   return deployToNetwork.bind(undefined, name, truffleConfigPath);
 }
 
-function getServiceCreateFunction(networkNode: NetworkNode, truffleConfigPath: string)
-  : () => Promise<void> {
+function getServiceCreateFunction(
+  type: ItemType,
+  getTruffleNetwork: () => Promise<TruffleConfiguration.INetwork>,
+  truffleConfigPath: string,
+  port?: number,
+): () => Promise<void> {
   // At this moment ganache-cli start only on port 8545.
   // Refactor this after the build
-  if (networkNode instanceof LocalNetworkNode && networkNode.port === Constants.defaultLocalhostPort) {
+  if (type === ItemType.LOCAL_NETWORK_NODE && port === Constants.defaultLocalhostPort) {
     Telemetry.sendEvent('TruffleCommands.getServiceCreateFunction.returnCreateLocalGanacheNetwork');
-    return createLocalGanacheNetwork.bind(undefined, networkNode, truffleConfigPath);
+    return createLocalGanacheNetwork.bind(undefined, getTruffleNetwork, truffleConfigPath, port);
   }
 
   Telemetry.sendEvent('TruffleCommands.getServiceCreateFunction.returnCreateService');
-  return createNetwork.bind(undefined, networkNode, truffleConfigPath);
+  return createNetwork.bind(undefined, getTruffleNetwork, truffleConfigPath);
 }
 
 async function createNewDeploymentService(truffleConfigPath: string): Promise<void> {
   Telemetry.sendEvent('TruffleCommands.createNewDeploymentService.commandStarted');
-  const deployDestination: IDeployDestination[] = [];
-  const project = await ServiceCommands.connectProject();
-  const networks = project.getChildren().filter((child) => child instanceof NetworkNode) as NetworkNode[];
 
-  await networks.map(async (network) => {
-    deployDestination.push({
-      cmd: createNetwork.bind(undefined, network, truffleConfigPath),
-      description: await network.getRPCAddress(),
-      detail: 'Tree Item',
-      label: network.label,
-      networkId: network.networkId,
-    });
-  });
+  const project = await ServiceCommands.createProject();
+  const deployDestination = await getProjectDeployDestinationItems([project], truffleConfigPath);
 
   const command = await showQuickPick(
     deployDestination,
@@ -331,13 +339,18 @@ async function createNewDeploymentService(truffleConfigPath: string): Promise<vo
   await command.cmd();
 }
 
-async function createLocalGanacheNetwork(localNetworkNode: LocalNetworkNode, truffleConfigPath: string): Promise<void> {
-  await GanacheService.startGanacheServer(localNetworkNode.port);
-  await createNetwork(localNetworkNode, truffleConfigPath);
+async function createLocalGanacheNetwork(
+  getTruffleNetwork: () => Promise<TruffleConfiguration.INetwork>,
+  truffleConfigPath: string,
+  port: number,
+): Promise<void> {
+  await GanacheService.startGanacheServer(port);
+  await createNetwork(getTruffleNetwork, truffleConfigPath);
 }
 
-async function createNetwork(networkNode: NetworkNode, truffleConfigPath: string): Promise<void> {
-  const network = await networkNode.getTruffleNetwork();
+async function createNetwork(getTruffleNetwork: () => Promise<TruffleConfiguration.INetwork>, truffleConfigPath: string)
+: Promise<void> {
+  const network = await getTruffleNetwork();
   const truffleConfig = new TruffleConfig(truffleConfigPath);
   truffleConfig.setNetworks(network);
 

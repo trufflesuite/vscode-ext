@@ -1,14 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
-// export * from './command';
-// export * from './commandContext';
-// export * from './enumExtractor';
-// export * from './git';
-// export * from './required';
-// export * from './shell';
-// export * from './userInteraction';
-// export * from './vscodeEnvironment';
-// export * from './workspace';
 
 import * as outputCommandHelper from './command';
 import * as commandContext from './commandContext';

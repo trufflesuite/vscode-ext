@@ -14,3 +14,4 @@ export * from './tree/TreeManager';
 export * from './tree/TreeService';
 export * from './openZeppelin/OpenZeppelinService';
 export * from './openZeppelin/OpenZeppelinMigrationsService';
+export * from './infuraService/InfuraServiceClient';

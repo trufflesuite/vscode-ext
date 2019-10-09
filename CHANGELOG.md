@@ -4,9 +4,13 @@ All notable changes to the "azureblockchain" extension will be documented in thi
 
 
 
+## 0.1.9
+
+- Added support for Infura project integration and account management
+
 ## 0.1.8
 
-- Added support for Open Zeppelin contract/library download and delployment
+- Added support for Open Zeppelin contract/library download and deployment
 - Contract UI/Interaction functionality updates
   - Implement support for array types as function parameters
   - Support Enum types
