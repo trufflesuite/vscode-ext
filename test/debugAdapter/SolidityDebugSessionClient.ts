@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
 
 import { SolidityDebugSession } from '../../src/debugAdapter/debugSession';
 
@@ -10,19 +12,19 @@ export class SolidityDebugSessionClient extends SolidityDebugSession {
   }
 
   public execProtectedSetBreakPointsRequest() {
-    const mockLaunchResponse = { body: { breakpoints: [] } , ...baseDebugAdapterResponseMock };
+    const mockSetBreakPointsResponse = { body: { breakpoints: [] } , ...baseDebugAdapterResponseMock };
     const mockArgs = { source: {} };
-    return this.setBreakPointsRequest(mockLaunchResponse, mockArgs);
+    return this.setBreakPointsRequest(mockSetBreakPointsResponse, mockArgs);
   }
 
   public execProtectedThreadRequest() {
-      const mockLaunchResponse = { body: { threads: [] } , ...baseDebugAdapterResponseMock };
-      return this.threadsRequest(mockLaunchResponse);
+      const mockThreadsResponse = { body: { threads: [] } , ...baseDebugAdapterResponseMock };
+      return this.threadsRequest(mockThreadsResponse);
   }
 
   public execProtectedStackTraceRequest() {
-      const mockLaunchResponse = { body: { stackFrames: [] } , ...baseDebugAdapterResponseMock };
-      return this.stackTraceRequest(mockLaunchResponse);
+      const mockStackTraceResponse = { body: { stackFrames: [] } , ...baseDebugAdapterResponseMock };
+      return this.stackTraceRequest(mockStackTraceResponse);
   }
 
   public execProtectedCustomRequest(command: string) {

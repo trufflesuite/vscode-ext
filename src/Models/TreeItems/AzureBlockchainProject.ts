@@ -5,20 +5,19 @@ import { Constants } from '../../Constants';
 import { IDeployDestination } from '../IDeployDestination';
 import { ItemType } from '../ItemType';
 import { AzureBlockchainNetworkNode } from './AzureBlockchainNetworkNode';
-import { NetworkNode } from './NetworkNode';
 import { Project } from './Project';
 const { project, service } = Constants.treeItemData;
 
 export class AzureBlockchainProject extends Project {
   public readonly subscriptionId: string;
   public readonly resourceGroup: string;
-  public readonly memberName: string;
+  public readonly memberNames: string[];
 
   constructor(
     label: string,
     subscriptionId: string,
     resourceGroup: string,
-    memberName: string,
+    memberNames: string[],
   ) {
     super(
       ItemType.AZURE_BLOCKCHAIN_PROJECT,
@@ -28,7 +27,7 @@ export class AzureBlockchainProject extends Project {
 
     this.subscriptionId = subscriptionId;
     this.resourceGroup = resourceGroup;
-    this.memberName = memberName;
+    this.memberNames = memberNames;
   }
 
   public toJSON(): { [p: string]: any } {
@@ -36,29 +35,37 @@ export class AzureBlockchainProject extends Project {
 
     obj.subscriptionId = this.subscriptionId;
     obj.resourceGroup = this.resourceGroup;
-    obj.memberName = this.memberName;
+    obj.memberNames = this.memberNames;
 
     return obj;
   }
 
   public async getDeployDestinations(): Promise<IDeployDestination[]> {
-    const getDeployName = (labelNode: string) => [service.azure.prefix, this.label, labelNode].join('_');
+    const getDeployName = (memberName: string, labelNode: string) =>
+      [service.azure.prefix, this.label, memberName, labelNode].join('_');
 
-    return Promise.all((this.getChildren()
-      .filter((child) => child instanceof NetworkNode) as AzureBlockchainNetworkNode[])
-      .map(async (node) => {
-        return {
-          description: await node.getRPCAddress(),
-          detail: service.azure.label,
-          getTruffleNetwork: async () => {
-            const truffleNetwork = await node.getTruffleNetwork();
-            truffleNetwork.name = getDeployName(node.label);
-            return truffleNetwork;
-          },
-          label: getDeployName(node.label),
-          networkId: node.networkId,
-          networkType: node.itemType as number,
-        } as IDeployDestination;
-      }));
+    const transactionNodes: AzureBlockchainNetworkNode[] = [];
+    this.getChildren()
+      .forEach((member) => transactionNodes.push(...member.getChildren() as AzureBlockchainNetworkNode[]));
+
+    return Promise.all(transactionNodes.map(async (node) => {
+      const deployName = getDeployName(node.memberName, node.label);
+      return this.getNetworkNode(deployName, node);
+    }));
+  }
+
+  private async getNetworkNode(deployName: string, node: AzureBlockchainNetworkNode): Promise<IDeployDestination> {
+    return {
+      description: await node.getRPCAddress(),
+      detail: service.azure.label,
+      getTruffleNetwork: async () => {
+        const truffleNetwork = await node.getTruffleNetwork();
+        truffleNetwork.name = deployName;
+        return truffleNetwork;
+      },
+      label: deployName,
+      networkId: node.networkId,
+      networkType: node.itemType as number,
+    } as IDeployDestination;
   }
 }

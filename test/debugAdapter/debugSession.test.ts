@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 import * as assert from 'assert';
 import { spawn } from 'child_process';
 import { join as pathJoin } from 'path';
@@ -117,6 +120,7 @@ describe('DebugSession unit tests', () => {
       const storeInitialBreakPointsStub = sinon.stub(RuntimeInterface.prototype, 'storeInitialBreakPoints')
         .returns();
       sinon.stub(RuntimeInterface.prototype, 'isDebuggerAttached').returns(false);
+      sinon.stub(SolidityDebugSession.prototype, 'sendResponse').returns();
 
       // Act
       const debugSessionClient = new SolidityDebugSessionClient();

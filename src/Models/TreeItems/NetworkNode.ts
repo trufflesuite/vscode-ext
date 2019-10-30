@@ -31,7 +31,6 @@ export abstract class NetworkNode extends ExtensionItem {
     networkId: number | string,
   ) {
     networkId = networkId === '*' ? networkId : parseInt(networkId + '', 10);
-    data = networkId === 1 ? Constants.treeItemData.network.default : data;
 
     super(itemType, label, data);
 

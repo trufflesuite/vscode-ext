@@ -35,7 +35,7 @@ class ExtensionTreeManager {
 
   public loadState(): Service[] {
     let items: Service[] = [];
-    const store = this.globalState && this.globalState.get(Constants.serviceResourceKey, undefined);
+    const store = this.globalState && this.globalState.get(Constants.globalStateKeys.serviceResourceKey, undefined);
     if (store) {
       try {
         const obj = JSON.parse(store);
@@ -57,7 +57,7 @@ class ExtensionTreeManager {
 
   public saveState(): void {
     if (this.globalState) {
-      this.globalState.update(Constants.serviceResourceKey, JSON.stringify(this.items));
+      this.globalState.update(Constants.globalStateKeys.serviceResourceKey, JSON.stringify(this.items));
     }
   }
 

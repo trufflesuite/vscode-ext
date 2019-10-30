@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
+
 import * as fs from 'fs';
 import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace } from 'vscode';
 import { Constants } from '../Constants';
@@ -18,6 +19,23 @@ export async function showInputBox(options: InputBoxOptions): Promise<string> {
   return result;
 }
 
+export async function showQuickPickMany<T extends QuickPickItem>(
+  items: T[] | Promise<T[]>,
+  options: QuickPickOptions & { canPickMany: true; },
+): Promise<T[]> {
+  const result = await window.showQuickPick(items, options);
+
+  if (result === undefined) {
+    Telemetry.sendEvent(
+      'userInteraction.showQuickPickMany.userCancellation',
+      { placeHolder: options.placeHolder || '' },
+    );
+    throw new CancellationEvent();
+  }
+
+  return result;
+}
+
 export async function showQuickPick<T extends QuickPickItem>(items: T[] | Promise<T[]>, options: QuickPickOptions)
   : Promise<T> {
   const result = await window.showQuickPick(items, options);
@@ -28,19 +46,6 @@ export async function showQuickPick<T extends QuickPickItem>(items: T[] | Promis
   }
 
   return result;
-}
-
-export async function showConfirmDialog(yesDescription?: string, noDescription?: string): Promise<string> {
-  const answer = await showQuickPick(
-    [
-      { label: Constants.confirmationDialogResult.no, description: noDescription },
-      { label: Constants.confirmationDialogResult.yes, description: yesDescription },
-    ], {
-    ignoreFocusOut: true,
-    placeHolder: Constants.placeholders.confirmDialog,
-  });
-
-  return answer.label;
 }
 
 export async function showConfirmPaidOperationDialog() {
@@ -78,10 +83,10 @@ export async function showOpenFolderDialog(): Promise<string> {
 
 export async function showOpenFileDialog(): Promise<string> {
   const defaultFolder = workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : '';
-  const folder = await (await window.showSaveDialog({
+  const folder = await window.showSaveDialog({
     defaultUri: Uri.parse(defaultFolder),
     saveLabel: Constants.placeholders.selectMnemonicStorage,
-  }));
+  });
 
   if (!folder) {
     Telemetry.sendEvent(
@@ -100,7 +105,9 @@ export async function saveTextInFile(
 ): Promise<string> {
   const file = await window.showSaveDialog({
     defaultUri: Uri.file(defaultFilename),
-    filters: ext});
+    filters: ext,
+  });
+
   if (!file) {
     Telemetry.sendEvent('userInteraction.saveTextInFile.userCancellation', { label: 'fileNotSelected' });
     throw new CancellationEvent();
@@ -108,4 +115,23 @@ export async function saveTextInFile(
 
   fs.writeFileSync(file.fsPath, text);
   return file.fsPath;
+}
+
+export async function showNotification(options: Notification.IShowNotificationOptions): Promise<void> {
+  options.type = options.type || 'info';
+
+  Notification.types[options.type](options.message);
+}
+
+namespace Notification {
+  export const types = {
+    error: window.showErrorMessage,
+    info: window.showInformationMessage,
+    warning: window.showWarningMessage,
+  };
+
+  export interface IShowNotificationOptions {
+    type?: 'error' | 'warning' | 'info';
+    message: string;
+  }
 }

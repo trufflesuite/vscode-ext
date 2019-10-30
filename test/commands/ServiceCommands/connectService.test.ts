@@ -123,7 +123,7 @@ describe('Service Commands', () => {
           consortiumName.toString(),
           uuid.v4(),
           uuid.v4(),
-          uuid.v4(),
+          [uuid.v4()],
         );
         selectConsortiumMock.returns(azureBlockchainProject);
 

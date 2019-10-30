@@ -6,3 +6,4 @@ export * from './IInfuraProjectDto';
 export * from './IInfuraUserDto';
 export * from './IProjectsResultDto';
 export * from './IInfuraEndpointDto';
+export * from './IInfuraProjectQuickPick';

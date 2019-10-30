@@ -11,7 +11,7 @@ export class AzureBlockchainProjectItemCreator extends ItemCreator {
       { fieldName: 'label', type: 'string' },
       { fieldName: 'subscriptionId', type: 'string' },
       { fieldName: 'resourceGroup', type: 'string' },
-      { fieldName: 'memberName', type: 'string' },
+      { fieldName: 'memberNames', type: 'array' },
     ]);
 
     return requiredFields;
@@ -22,12 +22,12 @@ export class AzureBlockchainProjectItemCreator extends ItemCreator {
       obj.label,
       obj.subscriptionId,
       obj.resourceGroup,
-      obj.memberName,
+      obj.memberNames,
     ];
   }
 
-  protected createFromObject(label: string, subscriptionId: string, resourceGroup: string, memberName: string)
+  protected createFromObject(label: string, subscriptionId: string, resourceGroup: string, memberNames: string[])
     : AzureBlockchainProject {
-    return new AzureBlockchainProject(label, subscriptionId, resourceGroup, memberName);
+    return new AzureBlockchainProject(label, subscriptionId, resourceGroup, memberNames);
   }
 }

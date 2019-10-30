@@ -1,26 +1,33 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import { window } from 'vscode';
 import { Constants } from '../Constants';
-import { showConfirmDialog } from '../helpers';
+import { showQuickPickMany } from '../helpers';
+import { InfuraResourceExplorer } from '../resourceExplorers';
 import { InfuraServiceClient } from '../services';
 
 export namespace InfuraCommands {
   export async function signIn(): Promise<void> {
-
     await InfuraServiceClient.signIn();
-
-    window.showInformationMessage(Constants.informationMessage.infuraSignIn);
   }
 
   export async function signOut(): Promise<void> {
-    const answer = await showConfirmDialog('sign out of Infura account', 'stay sign in');
+    await InfuraServiceClient.signOut();
+  }
 
-    if (answer === Constants.confirmationDialogResult.yes) {
-      await InfuraServiceClient.signOut();
+  export async function showProjectsFromAccount(): Promise<void> {
+    const infuraResourceExplorer = new InfuraResourceExplorer();
+    const allProjects = await infuraResourceExplorer.getProjectsForQuickPick();
 
-      window.showInformationMessage(Constants.informationMessage.infuraSignOut);
-    }
+    const selectedProjects = await showQuickPickMany(
+      allProjects,
+      {
+        canPickMany: true,
+        ignoreFocusOut: true,
+        placeHolder: Constants.placeholders.selectProjects,
+      },
+    );
+
+    await InfuraServiceClient.setExcludedProjects(allProjects, selectedProjects);
   }
 }

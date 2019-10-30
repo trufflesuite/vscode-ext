@@ -18,6 +18,7 @@ interface IDeferred<T> {
 
 export interface IToken {
   accessToken: string;
+  accessTokenExpirationDate: Date;
   refreshToken: string;
 }
 
@@ -77,9 +78,15 @@ async function tokenRequest(params: any): Promise<IToken> {
   const requestUrl = new url.URL(Constants.infuraAuthUrls.tokenURL, Constants.infuraAuthUrls.baseURL);
   const response = await requestPromise.post(requestUrl.toString(), options);
   const result = JSON.parse(response);
+  const expirationDate = new Date();
+
+  if (Number.isInteger(result.expires_in)) {
+    expirationDate.setSeconds(expirationDate.getSeconds() + result.expires_in);
+  }
 
   return {
     accessToken: result.access_token,
+    accessTokenExpirationDate: expirationDate,
     refreshToken: result.refresh_token,
   };
 }

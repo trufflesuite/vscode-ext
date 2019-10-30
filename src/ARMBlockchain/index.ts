@@ -3,6 +3,7 @@
 
 import { AzureBlockchainServiceClient } from './AzureBlockchainServiceClient';
 import { IAzureConsortiumDto } from './AzureDto/ConsortiumDto';
+import { IAzureConsortiumMemberDto } from './AzureDto/ConsortiumMemberDto';
 import { IAzureMemberDto } from './AzureDto/MemberDto';
 import { ISkuDto } from './AzureDto/SkuDto';
 import { IAzureTransactionNodeDto } from './AzureDto/TransactionNodeDto';
@@ -14,6 +15,7 @@ import { SkuResource } from './Operations/SkuResources';
 export {
   AzureBlockchainServiceClient,
   IAzureConsortiumDto,
+  IAzureConsortiumMemberDto,
   IAzureMemberDto,
   IAzureTransactionNodeDto,
   ICreateQuorumMember,

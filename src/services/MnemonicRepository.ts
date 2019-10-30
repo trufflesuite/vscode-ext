@@ -15,7 +15,7 @@ class ExtensionMnemonicRepository {
 
   public getAllMnemonicPaths(): string[] {
     if (this.globalState) {
-      return this.globalState.get(Constants.mnemonicConstants.mnemonicStorage, []) as string[];
+      return this.globalState.get(Constants.globalStateKeys.mnemonicStorageKey, []) as string[];
     }
 
     return [];
@@ -27,8 +27,8 @@ class ExtensionMnemonicRepository {
 
   public saveMnemonicPath(filePath: string): void {
     if (this.globalState) {
-      const storage = this.globalState.get(Constants.mnemonicConstants.mnemonicStorage) as string[] || [];
-      this.globalState.update(Constants.mnemonicConstants.mnemonicStorage, [...storage, filePath]);
+      const storage = this.globalState.get(Constants.globalStateKeys.mnemonicStorageKey) as string[] || [];
+      this.globalState.update(Constants.globalStateKeys.mnemonicStorageKey, [...storage, filePath]);
     }
   }
 

@@ -18,11 +18,11 @@ import { CommandContext, isWorkspaceOpen, required, setCommandContext } from './
 import { CancellationEvent } from './Models';
 import { Output } from './Output';
 import { RequirementsPage, WelcomePage } from './pages';
-import { InfuraServiceClient } from './services';
 import {
   AdapterType,
   ContractDB,
   GanacheService,
+  InfuraServiceClient,
   MnemonicRepository,
   TreeManager,
   TreeService,
@@ -119,6 +119,11 @@ export async function activate(context: ExtensionContext) {
   const signOutOfInfuraAccount = commands.registerCommand('azureBlockchainService.signOutOfInfuraAccount', async () => {
     await tryExecute(() => InfuraCommands.signOut());
   });
+  const showProjectsFromInfuraAccount = commands.registerCommand(
+    'azureBlockchainService.showProjectsFromInfuraAccount',
+    async () => {
+      await tryExecute(() => InfuraCommands.showProjectsFromAccount());
+    });
 
   //#endregion
   //#region contract commands
@@ -188,6 +193,7 @@ export async function activate(context: ExtensionContext) {
     startDebugger,
     signInToInfuraAccount,
     signOutOfInfuraAccount,
+    showProjectsFromInfuraAccount,
     openZeppelinAddCategory,
   ];
   context.subscriptions.push(...subscriptions);

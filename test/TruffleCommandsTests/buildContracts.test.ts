@@ -4,6 +4,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as uuid from 'uuid';
+import { window } from 'vscode';
 import { TruffleCommands } from '../../src/commands/TruffleCommands';
 import * as helpers from '../../src/helpers';
 import * as commands from '../../src/helpers/command';
@@ -17,6 +18,7 @@ describe('BuildContracts Command', () => {
     let installTruffle: sinon.SinonExpectation;
     let commandContextMock: sinon.SinonMock;
     let executeCommandMock: sinon.SinonExpectation;
+    let withProgressStub: sinon.SinonStub<any[], any>;
 
     beforeEach(() => {
       requiredMock = sinon.mock(helpers.required);
@@ -29,6 +31,11 @@ describe('BuildContracts Command', () => {
 
       commandContextMock = sinon.mock(commands);
       executeCommandMock = commandContextMock.expects('executeCommand');
+
+      withProgressStub = sinon.stub(window, 'withProgress');
+      withProgressStub.callsFake(async (...args: any[]) => {
+        return args[1]();
+      });
     });
 
     afterEach(() => {

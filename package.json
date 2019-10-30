@@ -5,7 +5,7 @@
   "publisher": "AzBlockchain",
   "preview": true,
   "icon": "images/blockchain-service-logo.png",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "repository": {
     "type": "git",
     "url": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum"

@@ -3,10 +3,11 @@
 
 import { Container } from '@material-ui/core';
 import { DrizzleContext } from 'drizzle-react';
-import { IPCService } from './ipcService';
+import { IPC } from 'services';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { SingleContractView } from 'views';
+import { Url } from 'helpers/url';
 import {
   ContractSelector,
   Message
@@ -39,8 +40,8 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    IPCService.on('contracts', this.updateContracts);
-    IPCService.postMessage('documentReady', true);
+    IPC.on('contracts', this.updateContracts);
+    IPC.postMessage('documentReady', true);
   }
 
   componentDidUpdate() {
@@ -72,6 +73,8 @@ class App extends React.Component {
   }
 
   setContract = async contractInstance => {
+    // Workaround. Used to prevent drizzle fallback actions.
+    window.showErrors = false;
     this.setState({ updating: true });
 
     const { drizzle } = this.props;
@@ -80,12 +83,11 @@ class App extends React.Component {
     drizzle.deleteAllContracts();
 
     if (provider) {
-      // TODO cannot connect to http (error with subscription)
-      if (!provider.host.toLowerCase().startsWith('ws://')) {
-        provider.host = `ws://${provider.host}`;
-      }
+      const host = new URL(Url.normalize(provider.host));
 
-      drizzle.web3.setProvider(provider.host);
+      host.protocol = 'ws';
+
+      drizzle.web3.setProvider(host.toString());
     }
 
     const address = contractInstance.address;
@@ -109,6 +111,10 @@ class App extends React.Component {
     };
 
     drizzle.addContract(contractConfig);
+
+    // Workaround. Used to prevent drizzle fallback actions.
+    setTimeout(() => { window.showErrors = true; }, 2000);
+
     this.setState({
       selectedContractId: contractInstance.id,
       updating: false

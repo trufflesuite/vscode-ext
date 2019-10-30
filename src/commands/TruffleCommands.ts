@@ -19,6 +19,7 @@ import {
   vscodeEnvironment,
 } from '../helpers';
 import { IDeployDestination, ItemType } from '../Models';
+import { LocalService } from '../Models/TreeItems';
 import { Project } from '../Models/TreeItems';
 import { Output } from '../Output';
 import { ContractDB, GanacheService, MnemonicRepository, OpenZeppelinService, TreeManager } from '../services';
@@ -43,8 +44,6 @@ interface IExtendedQuickPickItem extends QuickPickItem {
   extended: string;
 }
 
-const localGanacheRegexp = new RegExp(`127\.0\.0\.1\:${Constants.defaultLocalhostPort}`, 'g');
-
 export namespace TruffleCommands {
   export async function buildContracts(): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.buildContracts.commandStarted');
@@ -68,7 +67,7 @@ export namespace TruffleCommands {
 
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
     const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri);
-    const truffleDeployDestinations = getTruffleDeployDestinations(truffleConfigsUri);
+    const truffleDeployDestinations = await getTruffleDeployDestinations(truffleConfigsUri);
     const treeDeployDestinations = await getTreeDeployDestinations(truffleConfigsUri);
 
     const deployDestinations: IDeployDestinationItem[] = [];
@@ -226,18 +225,22 @@ function getDefaultDeployDestinations(truffleConfigPath: string): IDeployDestina
   ];
 }
 
-function getTruffleDeployDestinations(truffleConfigPath: string): IDeployDestinationItem[] {
+async function getTruffleDeployDestinations(truffleConfigPath: string): Promise<IDeployDestinationItem[]> {
   const deployDestination: IDeployDestinationItem[] = [];
   const truffleConfig = new TruffleConfig(truffleConfigPath);
   const networksFromConfig = truffleConfig.getNetworks();
 
-  networksFromConfig.forEach((network: TruffleConfiguration.INetwork) => {
+  networksFromConfig.forEach(async (network: TruffleConfiguration.INetwork) => {
     const options = network.options;
     const url = `${options.provider ? options.provider.url : ''}` ||
       `${options.host ? options.host : ''}${options.port ? ':' + options.port : ''}`;
 
     deployDestination.push({
-      cmd: getTruffleDeployFunction(url, network.name, truffleConfigPath, network.options.network_id),
+      cmd: await getTruffleDeployFunction(
+        network.name,
+        truffleConfigPath,
+        network.options.network_id,
+        options.port),
       cwd: path.dirname(truffleConfigPath),
       description: url,
       detail: 'From truffle-config.js',
@@ -282,13 +285,17 @@ async function getProjectDeployDestinationItems(projects: Project[], truffleConf
   });
 }
 
-function getTruffleDeployFunction(url: string, name: string, truffleConfigPath: string, networkId: number | string)
-  : () => Promise<void> {
-  // At this moment ganache-cli start only on port 8545.
-  // Refactor this after the build
-  if (url.match(localGanacheRegexp)) {
+async function getTruffleDeployFunction(
+  name: string,
+  truffleConfigPath: string,
+  networkId: number | string,
+  port?: number)
+  : Promise<() => Promise<void>> {
+  const treeProjectNames = await getTreeProjectNames();
+  if (port !== undefined &&
+    (treeProjectNames.includes(name) || name === Constants.localhostName)) {
     Telemetry.sendEvent('TruffleCommands.getTruffleDeployFunction.returnDeployToLocalGanache');
-    return deployToLocalGanache.bind(undefined, name, truffleConfigPath, url);
+    return deployToLocalGanache.bind(undefined, name, truffleConfigPath, port);
   }
   // 1 - is the marker of main network
   if (networkId === 1 || networkId === '1') {
@@ -300,17 +307,31 @@ function getTruffleDeployFunction(url: string, name: string, truffleConfigPath: 
   return deployToNetwork.bind(undefined, name, truffleConfigPath);
 }
 
+async function getTreeProjectNames(): Promise<string[]> {
+  const services = TreeManager.getItems();
+
+  const localService = services.find((service) => service instanceof LocalService);
+  const projects = (localService ? localService.getChildren() : [])  as  Project[];
+
+  const projectNames = [];
+
+  for (const project of projects) {
+    const projectDestinations = await project.getDeployDestinations();
+    projectNames.push(...projectDestinations);
+  }
+
+  return projectNames.map((destination) => destination.label);
+}
+
 function getServiceCreateFunction(
   type: ItemType,
   getTruffleNetwork: () => Promise<TruffleConfiguration.INetwork>,
   truffleConfigPath: string,
   port?: number,
 ): () => Promise<void> {
-  // At this moment ganache-cli start only on port 8545.
-  // Refactor this after the build
-  if (type === ItemType.LOCAL_NETWORK_NODE && port === Constants.defaultLocalhostPort) {
+  if (type === ItemType.LOCAL_NETWORK_NODE) {
     Telemetry.sendEvent('TruffleCommands.getServiceCreateFunction.returnCreateLocalGanacheNetwork');
-    return createLocalGanacheNetwork.bind(undefined, getTruffleNetwork, truffleConfigPath, port);
+    return createLocalGanacheNetwork.bind(undefined, getTruffleNetwork, truffleConfigPath, port!);
   }
 
   Telemetry.sendEvent('TruffleCommands.getServiceCreateFunction.returnCreateService');
@@ -375,10 +396,8 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
   });
 }
 
-async function deployToLocalGanache(networkName: string, truffleConfigPath: string, url: string): Promise<void> {
-  const port = GanacheService.getPortFromUrl(url);
-
-  await GanacheService.startGanacheServer(port!);
+async function deployToLocalGanache(networkName: string, truffleConfigPath: string, port: number): Promise<void> {
+  await GanacheService.startGanacheServer(port);
   await deployToNetwork(networkName, truffleConfigPath);
 }
 

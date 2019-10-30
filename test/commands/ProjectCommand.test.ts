@@ -23,6 +23,7 @@ describe('ProjectCommands', () => {
       let gitInitMock: sinon.SinonStub<any[], any>;
       let requiredMock: sinon.SinonMock;
       let checkRequiredAppsMock: sinon.SinonExpectation;
+      let withProgressStub: sinon.SinonStub<any[], any>;
 
       beforeEach(() => {
         helpersMock = sinon.mock(helpers);
@@ -34,12 +35,18 @@ describe('ProjectCommands', () => {
         gitInitMock = gitHelperMock.expects('gitInit').returns(() => undefined);
         requiredMock = sinon.mock(helpers.required);
         checkRequiredAppsMock = requiredMock.expects('checkRequiredApps');
+
+        withProgressStub = sinon.stub(vscode.window, 'withProgress');
+        withProgressStub.callsFake(async (...args: any[]) => {
+          return args[1]();
+        });
       });
 
       afterEach(() => {
         requiredMock.restore();
         gitHelperMock.restore();
         helpersMock.restore();
+        withProgressStub.restore();
       });
 
       it('Method newSolidityProject does not provide type of new project, because we have not required apps.',
@@ -106,9 +113,7 @@ describe('ProjectCommands', () => {
       });
 
       afterEach(() => {
-        fsMock.restore();
-        windowMock.restore();
-        helpersMock.restore();
+        sinon.restore();
       });
 
       it('Method chooseNewProjectDir returns projectPath which we selected', async () => {
@@ -199,16 +204,14 @@ describe('ProjectCommands', () => {
     });
 
     describe('createNewEmptyProject', () => {
-      let withProgressMock: sinon.SinonStub<any[], any>;
-      let windowMock: sinon.SinonMock;
+      let withProgressStub: sinon.SinonStub<any[], any>;
 
       beforeEach(() => {
-        windowMock = sinon.mock(vscode.window);
-        withProgressMock = windowMock.expects('withProgress');
+        withProgressStub = sinon.stub(vscode.window, 'withProgress');
       });
 
       afterEach(() => {
-        windowMock.restore();
+        withProgressStub.restore();
       });
 
       it('Method createNewEmptyProject runs method createProject.', async () => {
@@ -220,7 +223,7 @@ describe('ProjectCommands', () => {
         await createNewEmptyProject(projectPath);
 
         // Assert
-        assert.strictEqual(withProgressMock.calledOnce, true, 'withProgress should be called once');
+        assert.strictEqual(withProgressStub.calledOnce, true, 'withProgress should be called once');
       });
     });
 
@@ -270,10 +273,7 @@ describe('ProjectCommands', () => {
       });
 
       afterEach(() => {
-        outputMock.restore();
-        outputCommandHelperMock.restore();
-        workspaceMock.restore();
-        fsMock.restore();
+        sinon.restore();
       });
 
       it('Method createProject run command for create new project and project was created successfully. ' +
@@ -464,6 +464,7 @@ describe('ProjectCommands', () => {
     let workspaceMock: sinon.SinonMock;
     let updateWorkspaceFoldersMock: sinon.SinonExpectation;
     let emptyDirSyncMock: sinon.SinonExpectation;
+    let withProgressStub: sinon.SinonStub<any[], any>;
 
     beforeEach(() => {
       helpersMock = sinon.mock(helpers);
@@ -492,6 +493,11 @@ describe('ProjectCommands', () => {
 
       outputMock = sinon.mock(Output);
       showMock = outputMock.expects('show');
+
+      withProgressStub = sinon.stub(vscode.window, 'withProgress');
+      withProgressStub.callsFake(async (...args: any[]) => {
+        return args[1]();
+      });
     });
 
     afterEach(() => {
@@ -503,6 +509,7 @@ describe('ProjectCommands', () => {
       outputMock.restore();
       outputCommandHelperMock.restore();
       workspaceMock.restore();
+      withProgressStub.restore();
     });
 
     it('Method chooseNewProjectDir returns projectPath which we selected at second time.', async () => {

@@ -39,7 +39,9 @@ module.exports = () => {
         constants: path.join(__dirname, './src/constants'),
         helpers: path.join(__dirname, './src/helpers'),
         polyfills: path.join(__dirname, './src/polyfills'),
-        views: path.join(__dirname, './src/views')
+        services: path.join(__dirname, './src/services'),
+        views: path.join(__dirname, './src/views'),
+        middlewares: path.join(__dirname, './src/middlewares'),
       }
     },
     module: {

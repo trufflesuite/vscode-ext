@@ -4,6 +4,14 @@ All notable changes to the "azureblockchain" extension will be documented in thi
 
 
 
+## 0.1.10
+
+- Fixed Drizzle error handling issues
+- Updated Azure Blockchain Service logos in tree view
+- Updated Azure Blockchain Development Kit logo
+- Fixed unit tests for debugger, OpenZeppelin and Truffle commands
+- Improved sign-in support for Infura projects
+
 ## 0.1.9
 
 - Added support for Infura project integration and account management

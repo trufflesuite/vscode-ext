@@ -22,6 +22,7 @@ import {
   LocalNetworkNode,
   LocalProject,
   LocalService,
+  Member,
   Service,
 } from '../../src/Models/TreeItems';
 import { ConsortiumResourceExplorer } from '../../src/resourceExplorers';
@@ -29,6 +30,7 @@ import { GanacheService, MnemonicRepository, TreeManager } from '../../src/servi
 import { OpenZeppelinService, OZContractValidated } from '../../src/services/openZeppelin/OpenZeppelinService';
 import { TestConstants } from '../TestConstants';
 import { AzureAccountHelper } from '../testHelpers/AzureAccountHelper';
+const { service } = Constants.treeItemData;
 
 describe('TruffleCommands', () => {
   describe('Integration test', async () => {
@@ -90,6 +92,8 @@ describe('TruffleCommands', () => {
         showQuickPickMock = sinon.stub(vscode.window, 'showQuickPick');
         showInputBoxMock = sinon.stub(vscode.window, 'showInputBox');
         showSaveDialogMock = windowMock.expects('showSaveDialog');
+        sinon.stub(vscode.window, 'showErrorMessage');
+        sinon.stub(vscode.window, 'showInformationMessage');
 
         ganacheServiceMock = sinon.mock(GanacheService);
         startGanacheServerMock = ganacheServiceMock.expects('startGanacheServer');
@@ -353,15 +357,12 @@ describe('TruffleCommands', () => {
 
       it('to local network should complete successfully', async () => {
         // Arrange
+        const { local } = TestConstants.consortiumTestNames;
         checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
 
-        const networkNodeName = [
-          Constants.treeItemData.service.local.prefix,
-          TestConstants.consortiumTestNames.local,
-          TestConstants.consortiumTestNames.local,
-        ].join('_');
+        const networkNodeName = getDeployName(service.local.prefix, local, local);
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
           return items.find((item: any) => item.label === networkNodeName);
@@ -395,15 +396,12 @@ describe('TruffleCommands', () => {
 
       it('to local network should throw exception when there is an error on command execution', async () => {
         // Arrange
+        const { local } = TestConstants.consortiumTestNames;
         checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.throws(TestConstants.testError);
 
-        const networkNodeName = [
-          Constants.treeItemData.service.local.prefix,
-          TestConstants.consortiumTestNames.local,
-          TestConstants.consortiumTestNames.local,
-        ].join('_');
+        const networkNodeName = getDeployName(service.local.prefix, local, local);
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
           return items.find((item: any) => item.label === networkNodeName);
@@ -435,16 +433,13 @@ describe('TruffleCommands', () => {
 
       it('to AzureBlockchainService should generate mnemonic and complete successfully', async () => {
         // Arrange
+        const { consortium, member, transactionNode } = azureNames;
         checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
         getAccessKeysMock.returns(uuid.v4());
 
-        const networkNodeName = [
-          Constants.treeItemData.service.azure.prefix,
-          TestConstants.servicesNames.testConsortium,
-          TestConstants.servicesNames.testConsortium,
-        ].join('_');
+        const networkNodeName = getDeployName(service.azure.prefix, consortium, transactionNode, [member]);
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
           return items.find((item: any) => item.label === networkNodeName);
@@ -491,16 +486,13 @@ describe('TruffleCommands', () => {
 
       it('to AzureBlockchainService should complete successfully when user paste mnemonic', async () => {
         // Arrange
+        const { consortium, member, transactionNode } = azureNames;
         checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
         getAccessKeysMock.returns(uuid.v4());
 
-        const networkNodeName = [
-          Constants.treeItemData.service.azure.prefix,
-          TestConstants.servicesNames.testConsortium,
-          TestConstants.servicesNames.testConsortium,
-        ].join('_');
+        const networkNodeName = getDeployName(service.azure.prefix, consortium, transactionNode, [member]);
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
           return items.find((item: any) => item.label === networkNodeName);
@@ -604,6 +596,12 @@ describe('TruffleCommands', () => {
   });
 });
 
+const azureNames = {
+  consortium: uuid.v4(),
+  member: uuid.v4(),
+  transactionNode: TestConstants.servicesNames.testConsortium,
+};
+
 async function createTestServicesItems(): Promise<Service[]> {
   const services: Service[] = [];
 
@@ -611,14 +609,16 @@ async function createTestServicesItems(): Promise<Service[]> {
   const localService = new LocalService();
 
   const azureBlockchainProject = new AzureBlockchainProject(
-    TestConstants.servicesNames.testConsortium,
+    azureNames.consortium,
     uuid.v4(),
     uuid.v4(),
-    uuid.v4(),
+    [azureNames.member],
   );
-  azureBlockchainProject.addChild(
-    new AzureBlockchainNetworkNode(TestConstants.servicesNames.testConsortium, uuid.v4(), '*', '', '', '',
-  ));
+  const member = new Member(azureNames.member);
+  const transactionNode
+    = new AzureBlockchainNetworkNode(azureNames.transactionNode, uuid.v4(), '*', '', '', azureNames.member);
+  member.addChild(transactionNode);
+  azureBlockchainProject.addChild(member);
 
   const defaultPort = 8545;
   const defaultLabel = TestConstants.consortiumTestNames.local;
@@ -656,4 +656,12 @@ function getTestTruffleNetworks(): TruffleConfiguration.INetwork[] {
   });
 
   return networks;
+}
+
+function getDeployName(prefix: string, projectName: string, nodeName: string, args?: string[]): string {
+  if (args) {
+    return [prefix, projectName, ...args, nodeName].join('_');
+  }
+
+  return [prefix, projectName, nodeName].join('_');
 }

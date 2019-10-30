@@ -5,7 +5,6 @@ import {
   debug,
   DebugConfiguration,
   QuickPickItem,
-  window,
   workspace,
 } from 'vscode';
 
@@ -14,6 +13,7 @@ import { DEBUG_TYPE } from '../debugAdapter/constants/debugAdapter';
 import { DebugNetwork } from '../debugAdapter/debugNetwork';
 import { TransactionProvider } from '../debugAdapter/transaction/transactionProvider';
 import { Web3Wrapper } from '../debugAdapter/web3Wrapper';
+import { showInputBox, showQuickPick } from '../helpers/userInteraction';
 
 export namespace DebuggerCommands {
   export async function startSolidityDebugger() {
@@ -31,28 +31,20 @@ export namespace DebuggerCommands {
     if (debugNetwork.isLocalNetwork()) {
       // if local service then provide last transactions to choose
       const transactionProvider = new TransactionProvider(web3, contractBuildDir);
-      const quickPickItems = await getQuickPickItems(transactionProvider);
+      const txHashesAsQuickPickItems = await getQuickPickItems(transactionProvider);
 
-      const quickPick = window.createQuickPick();
-      quickPick.placeholder = 'Enter the transaction hash to debug';
-      quickPick.ignoreFocusOut = true;
-      const onTransactionSelected = (selection: QuickPickItem[]) => {
-        if (selection[0]) {
-          const txHash = selection[0].label;
-          const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
-          debug.startDebugging(undefined, config);
-        }
-        quickPick.hide();
-      };
+      const txHashSelection = await showQuickPick(txHashesAsQuickPickItems, {
+        ignoreFocusOut: true,
+        placeHolder: 'Enter the transaction hash to debug',
+      });
 
-      quickPick.items = quickPickItems;
-      quickPick.onDidChangeSelection(onTransactionSelected);
-      quickPick.onDidHide(() => quickPick.dispose());
-      quickPick.show();
+      const txHash = txHashSelection.label;
+      const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
+      debug.startDebugging(undefined, config);
     } else {
       // if remote network then require txHash
       const placeHolder = 'Type the transaction hash you want to debug (0x...)';
-      const txHash = await window.showInputBox({ placeHolder });
+      const txHash = await showInputBox({ placeHolder });
       if (txHash) {
         const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
         debug.startDebugging(undefined, config);

@@ -6,6 +6,7 @@ import * as cp from 'child_process';
 import * as rp from 'request-promise';
 import * as sinon from 'sinon';
 import * as stream from 'stream';
+import * as vscode from 'vscode';
 import { GanacheCommands } from '../../src/commands';
 import * as commands from '../../src/helpers/command';
 import * as shell from '../../src/helpers/shell';
@@ -25,6 +26,7 @@ describe('Integration tests GanacheCommands', () => {
   let serviceItems: Service[];
   let loadStateMock: sinon.SinonStub<[], IExtensionItem[]>;
   let projectView: ProjectView;
+
   const streamMock = {
     on(_event: 'data', _listener: (chunk: any) => void): any { /* empty */ },
   };
@@ -50,6 +52,9 @@ describe('Integration tests GanacheCommands', () => {
     loadStateMock.returns(serviceItems);
 
     projectView = new ProjectView(new LocalProject('test consortium', defaultPort));
+
+    sinon.mock(vscode.window);
+    sinon.stub(vscode.window, 'showInformationMessage');
   });
 
   afterEach(() => {

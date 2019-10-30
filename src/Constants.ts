@@ -90,6 +90,13 @@ export class Constants {
     },
   };
 
+  public static globalStateKeys = {
+    infuraCredentialsCacheKey: 'InfuraCache',
+    infuraExcludedProjectsListKey: 'InfuraExcludedProjects',
+    mnemonicStorageKey: 'mnemonicStorage',
+    serviceResourceKey: 'treeContent',
+  };
+
   public static infuraFileResponse = {
     css: '',
     path: '',
@@ -145,15 +152,12 @@ export class Constants {
 
   public static mnemonicConstants = {
     fileExt: 'env',
-    mnemonicStorage: 'mnemonicStorage',
   };
 
   public static defaultContractSettings = {
     gasLimit: 4712388,
     gasPrice: 100000000000,
   };
-
-  public static serviceResourceKey = 'treeContent';
 
   public static paletteLabels = {
     enterConsortiumManagementPassword: 'Enter consortium management password',
@@ -172,7 +176,6 @@ export class Constants {
     selectConsortiumRegion: 'Select region',
     selectConsortiumSku: 'Select SKU',
     selectResourceGroup: 'Select resource group',
-    selectSubscription: 'Select subscription.',
     valueOrDefault: Constants.getMessageValueOrDefault,
   };
 
@@ -257,6 +260,7 @@ export class Constants {
     selectMnemonicExtractKey: 'Select mnemonic to extract key',
     selectMnemonicStorage: 'Select mnemonic storage',
     selectNewProjectPath: 'Select new project path',
+    selectProjects: 'Select Projects',
     selectResourceGroup: 'Select a resource group',
     selectRgLocation: 'Select a location to create your Resource Group in...',
     selectSubscription: 'Select subscription',
@@ -266,7 +270,7 @@ export class Constants {
 
   public static treeItemData = {
     member: {
-      default: {
+      azure: {
         contextValue: 'member',
         iconPath: { dark: '', light: ''},
       },
@@ -347,6 +351,10 @@ export class Constants {
   public static projectAvailability = {
     private: 'Private',
     public: 'Public',
+  };
+
+  public static consortiumMemberStatuses = {
+    ready: 'Ready',
   };
 
   public static executeCommandMessage = {
@@ -444,8 +452,7 @@ export class Constants {
     detailsButton: 'Details',
     generatedLogicApp: 'Generated the logic app!',
     infuraAccountSuccessfullyCreated: 'Your Infura account successfully created. Please check you email for complete registration',
-    infuraSignIn: 'You are signed in to your Infura account.',
-    infuraSignOut: 'You are signed out of your Infura account.',
+    infuraSignInPrompt: 'Not signed in to Infura account, sign in first.',
     invalidRequiredVersion: 'Required app is not installed or has an old version.',
     memberNameValidating: 'Member name validating...',
     newProjectCreationFinished: 'New project was created successfully',
@@ -454,6 +461,7 @@ export class Constants {
     privateKeyWasCopiedToClipboard: 'Private key was copied to clipboard',
     rpcEndpointCopiedToClipboard: 'RPCEndpointAddress copied to clipboard',
     seeDetailsRequirementsPage: 'Please see details on the Requirements Page',
+    signInButton: 'Sign In',
   };
 
   public static infuraCredentials = {
@@ -480,6 +488,8 @@ export class Constants {
     rootURL: 'https://system.infura.io/',
     userMe: 'user/me',
   };
+
+  public static infuraSigningIn = 'Signing in';
 
   public static infuraRequestGrantType = {
     authorizationCode: 'authorization_code',
@@ -567,9 +577,9 @@ export class Constants {
     this.infuraFileResponse.path = context.asAbsolutePath(path.join('resources', 'codeFlowResult', 'index.html'));
     this.infuraFileResponse.css = context.asAbsolutePath(path.join('resources', 'codeFlowResult', 'main.css'));
 
-    this.treeItemData.member.default.iconPath = {
-      dark: context.asAbsolutePath(path.join('resources/dark', 'member.svg')),
-      light: context.asAbsolutePath(path.join('resources/light', 'member.svg')),
+    this.treeItemData.member.azure.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'ABS-member.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'ABS-member.svg')),
     };
 
     this.treeItemData.network.default.iconPath = {
@@ -583,8 +593,8 @@ export class Constants {
     };
 
     this.treeItemData.network.infura.iconPath = {
-      dark: context.asAbsolutePath(path.join('resources/dark', 'InfuraNetwork.svg')),
-      light: context.asAbsolutePath(path.join('resources/light', 'InfuraNetwork.svg')),
+      dark: context.asAbsolutePath(path.join('resources/dark', 'EthereumNetwork.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'EthereumNetwork.svg')),
     };
 
     this.treeItemData.network.local.iconPath = {
@@ -593,8 +603,8 @@ export class Constants {
     };
 
     this.treeItemData.project.azure.iconPath = {
-      dark: context.asAbsolutePath(path.join('resources/dark', 'ABProject.svg')),
-      light: context.asAbsolutePath(path.join('resources/light', 'ABProject.svg')),
+      dark: context.asAbsolutePath(path.join('resources/dark', 'ABS-consortium.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'ABS-consortium.svg')),
     };
 
     this.treeItemData.project.infura.iconPath = {
@@ -608,8 +618,8 @@ export class Constants {
     };
 
     this.treeItemData.service.azure.iconPath = {
-      dark: context.asAbsolutePath(path.join('resources/dark', 'ABService.svg')),
-      light: context.asAbsolutePath(path.join('resources/light', 'ABService.svg')),
+      dark: context.asAbsolutePath(path.join('resources/dark', 'ABS-service.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'ABS-service.svg')),
     };
 
     this.treeItemData.service.infura.iconPath = {

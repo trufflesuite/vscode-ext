@@ -52,9 +52,9 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
   }
 
   public async createConsortium(memberName: string, body: string): Promise<void> {
-    const urlDetailsOfConsortium = `subscriptions/${this.subscriptionId}/resourceGroups/${this.resourceGroup}/` +
-    `providers/Microsoft.Blockchain/blockchainMembers/${memberName}`;
-    const url = `${this.baseUri}/${urlDetailsOfConsortium}?api-version=${this.apiVersion}`;
+    const url = this.getUrl(memberName, true, true);
+    const urlDetailsOfConsortium = url.slice(url.indexOf('subscriptions'), url.lastIndexOf(memberName)) + memberName;
+
     const httpRequest = this.getHttpRequest(url, 'PUT', body);
 
     // @ts-ignore
@@ -78,24 +78,24 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     });
   }
 
-  public getMembers(callback: (error: Error | null, result?: any) => void)
-    : Promise<void> {
-
-    const url = `${this.baseUri}/subscriptions/${this.subscriptionId}/resourceGroups/${this.resourceGroup}` +
-      `/providers/Microsoft.Blockchain/blockchainMembers?api-version=${this.apiVersion}`;
+  public getMembers(memberName: string, callback: (error: Error | null, result?: any) => void): Promise<void> {
+    const url = this.getUrl(`${memberName}/ConsortiumMembers`, true, true);
 
     const httpRequest = this.getHttpRequest(url, 'GET');
 
     return this.sendRequestToAzure(httpRequest, callback);
   }
 
-  public getTransactionNodes(
-    memberName: string,
-    callback: (error: Error | null, result?: any) => void,
-  ): Promise<void> {
+  public getConsortia(callback: (error: Error | null, result?: any) => void): Promise<void> {
+    const url = this.getUrl('', true, true);
 
-    const url = `${this.baseUri}/subscriptions/${this.subscriptionId}/resourceGroups/${this.resourceGroup}/` +
-      `providers/Microsoft.Blockchain/blockchainMembers/${memberName}/transactionNodes?api-version=${this.apiVersion}`;
+    const httpRequest = this.getHttpRequest(url, 'GET');
+
+    return this.sendRequestToAzure(httpRequest, callback);
+  }
+
+  public getTransactionNodes(memberName: string, callback: (error: Error | null, result?: any) => void): Promise<void> {
+    const url = this.getUrl(`${memberName}/transactionNodes`, true, true);
 
     const httpRequest = this.getHttpRequest(url, 'GET');
 
@@ -107,35 +107,27 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     nodeName: string,
     callback: (error: Error | null, result?: any) => void,
   ): Promise<void> {
-    let url = '';
-    if (memberName === nodeName) {
-      url = `${this.baseUri}/subscriptions/${this.subscriptionId}/resourceGroups/${this.resourceGroup}/` +
-      `providers/Microsoft.Blockchain/blockchainMembers/${memberName}/listApikeys?api-version=${this.apiVersion}`;
-    } else {
-      url = `${this.baseUri}/subscriptions/${this.subscriptionId}/resourceGroups/${this.resourceGroup}/` +
-      `providers/Microsoft.Blockchain/blockchainMembers/${memberName}/transactionNodes/${nodeName}/` +
-      `listApikeys?api-version=${this.apiVersion}`;
-    }
+    const mainPartOfUrl = (memberName === nodeName)
+      ? `${memberName}/listApikeys`
+      : `${memberName}/transactionNodes/${nodeName}/listApikeys`;
+
+    const url = this.getUrl(mainPartOfUrl, true, true);
 
     const httpRequest = this.getHttpRequest(url, 'POST');
 
     return this.sendRequestToAzure(httpRequest, callback);
   }
 
-  public getSkus(callback: (error: Error | null, result?: any) => void,
-  ): Promise<void> {
-    const url = `${this.baseUri}/subscriptions/${this.subscriptionId}` +
-      `/providers/Microsoft.Blockchain/skus?api-version=${this.apiVersion}`;
+  public getSkus(callback: (error: Error | null, result?: any) => void): Promise<void> {
+    const url = this.getUrl('skus');
 
     const httpRequest = this.getHttpRequest(url, 'GET');
 
     return this.sendRequestToAzure(httpRequest, callback);
   }
 
-  public async sendRequestToAzure(
-    httpRequest: WebResource,
-    callback: (error: Error | null, result?: any) => void,
-  ): Promise<void> {
+  public async sendRequestToAzure(httpRequest: WebResource, callback: (error: Error | null, result?: any) => void)
+  : Promise<void> {
     // @ts-ignore
     return this.pipeline(httpRequest, (err: ServiceError | null, response: IncomingMessage, responseBody: string) => {
       if (err) {
@@ -188,12 +180,10 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     nameAvailable: boolean,
     reason: string,
   }> {
-    const requestUrl = `${this.baseUri}/subscriptions/${this.subscriptionId}` +
-      `/providers/Microsoft.Blockchain/locations/${this.location}` +
-      `/checkNameAvailability?api-version=${this.apiVersion}`;
+    const url = this.getUrl(`locations/${this.location}/checkNameAvailability`);
 
     const request = this.getHttpRequest(
-      requestUrl,
+      url,
       'POST',
       JSON.stringify({
         name,
@@ -210,5 +200,14 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
         }
       });
     });
+  }
+
+  private getUrl(mainPartOfUrl: string, useResourceGroup: boolean = false, useBlockchainMembers: boolean = false)
+  : string {
+    const resourceGroup = useResourceGroup ? `resourceGroups/${this.resourceGroup}/` : '';
+    const blockchainMember = useBlockchainMembers ? 'blockchainMembers/' : '';
+
+    return `${this.baseUri}/subscriptions/${this.subscriptionId}/${resourceGroup}` +
+      `providers/Microsoft.Blockchain/${blockchainMember}${mainPartOfUrl}?api-version=${this.apiVersion}`;
   }
 }

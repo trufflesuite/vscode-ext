@@ -13,6 +13,7 @@ import {
   window,
 } from 'vscode';
 import { Constants } from '../Constants';
+import { showNotification } from '../helpers';
 import { Telemetry } from '../TelemetryClient';
 
 export interface IWebViewConfig {
@@ -46,7 +47,7 @@ export abstract class BasicWebView {
     this.options = {
       enableCommandUris: true,
       enableScripts: true,
-      localResourceRoots: [ this.rootPath ],
+      localResourceRoots: [this.rootPath],
       retainContextWhenHidden: true,
     };
   }
@@ -86,6 +87,7 @@ export abstract class BasicWebView {
     if (!this.panel || !this.panel.webview) {
       return;
     }
+
     await this.panel.webview.postMessage(message);
   }
 
@@ -106,30 +108,34 @@ export abstract class BasicWebView {
   protected abstract async setShowOnStartupFlagAtFirstTime(): Promise<boolean>;
 
   protected async getHtmlForWebview(): Promise<string> {
-    const rootPath = this.rootPath.with({scheme: 'vscode-resource'}).toString();
+    const rootPath = this.rootPath.with({ scheme: 'vscode-resource' }).toString();
     const html = await fs.readFile(this.config.path, 'utf8');
 
     return html.replace(/{{root}}/g, rootPath);
   }
 
-  protected async receiveMessage(message: {[key: string]: any}): Promise<void> {
+  protected async receiveMessage(message: { [key: string]: any }): Promise<void> {
     if (!this.panel) {
       return;
     }
 
-    if (message.command === 'documentReady') {
-      await this.postMessage({
-        command: 'showOnStartup',
-        value: this.context.globalState.get(this.config.showOnStartup),
-      });
-    }
-
-    if (message.command === 'toggleShowPage') {
-      this.context.globalState.update(this.config.showOnStartup, message.value);
-    }
-
-    if (message.command === 'executeCommand' || message.command === 'openLink') {
-      Telemetry.sendEvent(Constants.telemetryEvents.webPages.action, message);
+    switch (message.command) {
+      case 'documentReady':
+        await this.postMessage({
+          command: 'showOnStartup',
+          value: this.context.globalState.get(this.config.showOnStartup),
+        });
+        break;
+      case 'toggleShowPage':
+        this.context.globalState.update(this.config.showOnStartup, message.value);
+        break;
+      case 'executeCommand':
+      case 'openLink':
+        Telemetry.sendEvent(Constants.telemetryEvents.webPages.action, message);
+        break;
+      case 'notification':
+        showNotification(message.value);
+        break;
     }
   }
 

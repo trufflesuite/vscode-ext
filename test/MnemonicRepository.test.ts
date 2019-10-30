@@ -68,7 +68,7 @@ describe('MnemonicRepository', () => {
     it('GetAllMnemonicPaths should return correct paths', () => {
       // Arrange
       const storage: string[] = [uuid.v4(), uuid.v4(), uuid.v4()];
-      globalState.update(Constants.mnemonicConstants.mnemonicStorage, storage);
+      globalState.update(Constants.globalStateKeys.mnemonicStorageKey, storage);
 
       // Act
       const result = MnemonicRepository.getAllMnemonicPaths();
@@ -81,7 +81,7 @@ describe('MnemonicRepository', () => {
     it('getExistedMnemonicPaths should return existing paths', () => {
       // Arrange
       const storage: string[] = [uuid.v4(), uuid.v4(), uuid.v4()];
-      globalState.update(Constants.mnemonicConstants.mnemonicStorage, storage);
+      globalState.update(Constants.globalStateKeys.mnemonicStorageKey, storage);
       existsSyncMock.onCall(0).callsFake(() => true);
       existsSyncMock.onCall(1).callsFake(() => false);
       existsSyncMock.onCall(2).callsFake(() => true);
@@ -102,7 +102,7 @@ describe('MnemonicRepository', () => {
       // Act
       MnemonicRepository.saveMnemonicPath(filePath);
 
-      const result = globalState.get<string[]>(Constants.mnemonicConstants.mnemonicStorage) as string[];
+      const result = globalState.get<string[]>(Constants.globalStateKeys.mnemonicStorageKey) as string[];
 
       // Assert
       assert.strictEqual(result.length, 1, 'result length should be equal to storage length');

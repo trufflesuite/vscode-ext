@@ -23,13 +23,23 @@ class ExecutionSection extends React.Component {
     this.state = {
       executedMethod: '',
       disabledExecute: false,
+      transactionPending: false,
       formControlsValidation: {},
+      unsubscribe: undefined,
     };
   }
 
   componentDidMount() {
-    const formControlsValidation = this.createFormControlsList(this.props.actions[0]);
-    this.setState({ executedMethod: this.props.actions[0], formControlsValidation });
+    const { actions, drizzle } = this.props;
+
+    const unsubscribe = drizzle.store.subscribe(this.updateTransactionStatus);
+    const formControlsValidation = this.createFormControlsList(actions[0]);
+
+    this.setState({
+      executedMethod: actions[0],
+      formControlsValidation,
+      unsubscribe,
+    });
   }
 
   componentDidUpdate = () => {
@@ -41,6 +51,28 @@ class ExecutionSection extends React.Component {
       this.setState({ disabledExecute: isDisabled });
     }
   };
+
+  componentWillUnmount() {
+    this.state.unsubscribe();
+  }
+
+  updateTransactionStatus = () => {
+    const { store } = this.props.drizzle;
+
+    const { transactionStack, transactions } = store.getState();
+
+    const lastTransaction = transactionStack[transactionStack.length - 1];
+
+    if (!!lastTransaction && !!transactions[lastTransaction]) {
+      const transactionPending = transactions[lastTransaction].status !== 'success';
+
+      if (this.state.transactionPending !== transactionPending) {
+        this.setState({
+          transactionPending,
+        });
+      }
+    }
+  }
 
   createFormControlsList = (executedMethod) => {
     const method = this.props.drizzle.contracts[this.props.contractName].abi.find(
@@ -101,7 +133,7 @@ class ExecutionSection extends React.Component {
         className='execute-button'
         variant='contained'
         onClick={handleSubmit}
-        disabled={this.state.disabledExecute}
+        disabled={this.state.disabledExecute || this.state.transactionPending}
       >
         Execute
       </Button>

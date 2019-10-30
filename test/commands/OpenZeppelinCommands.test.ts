@@ -70,6 +70,10 @@ describe('OpenZeppelinCommands tests', () => {
     showQuickPickStub = sinon.stub(window, 'showQuickPick');
     showInformationMessageStub = sinon.stub(window, 'showInformationMessage');
     showErrorMessageStub = sinon.stub(window, 'showErrorMessage');
+    withProgressStub = sinon.stub(window, 'withProgress');
+    withProgressStub.callsFake(async (...args: any[]) => {
+      return args[1]();
+    });
 
     showQuickPickStub.callsFake(async (...args: any[]) => {
       return args[0].find((arg: any) => arg.label === selectedCategory.name);
@@ -152,7 +156,6 @@ describe('OpenZeppelinCommands tests', () => {
     // Arrange
     const notExistingCategoryName = 'notExistingCategoryName';
 
-    withProgressStub = sinon.stub(window, 'withProgress');
     showQuickPickStub.callsFake(async (...args: any[]) => {
       return args[0].find((arg: any) => arg.label === notExistingCategoryName);
     });

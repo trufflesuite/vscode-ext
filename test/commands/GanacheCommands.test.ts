@@ -194,7 +194,7 @@ async function createTestServiceItems(): Promise<Service[]> {
     TestConstants.servicesNames.testConsortium,
     'subscriptionId',
     'resourceGroup',
-    'memberName',
+    ['memberName'],
   );
 
   azureBlockchainService.addChild(azureBlockchainProject);

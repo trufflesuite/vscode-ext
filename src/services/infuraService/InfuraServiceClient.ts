@@ -2,10 +2,22 @@
 // Licensed under the MIT license.
 
 import * as requestPromise from 'request-promise';
-import { Disposable, Event, EventEmitter, Memento, StatusBarItem, window } from 'vscode';
+import {
+  Disposable,
+  Event,
+  EventEmitter,
+  Memento,
+  StatusBarItem,
+  window,
+} from 'vscode';
 import { Constants } from '../../Constants';
 import { IToken, refreshToken, signIn, signOut } from './codeFlowLogin';
-import { ICreateProjectRequestDto, IInfuraProjectDto, IInfuraUserDto, IProjectsResultDto } from './InfuraDto';
+import {
+  ICreateProjectRequestDto,
+  IInfuraProjectDto,
+  IInfuraUserDto,
+  IProjectsResultDto,
+} from './InfuraDto';
 
 interface IInfuraCache {
   user: IInfuraUserDto;
@@ -16,13 +28,13 @@ class InfuraClient {
   private globalState?: Memento;
   private statusBarItem?: StatusBarItem;
   private readonly disposables: Disposable[];
-  private readonly eventEmitter: EventEmitter<void>;
-  private readonly onCacheChange: Event<void>;
-  private readonly infuraCacheKey = 'InfuraCache';
+  private readonly eventEmitter: EventEmitter<string | undefined>;
+  private readonly onCacheChange: Event<string | undefined>;
+  private readonly showProjectsFromInfuraCommand = 'azureBlockchainService.showProjectsFromInfuraAccount';
 
   constructor() {
     this.disposables = [];
-    this.eventEmitter = new EventEmitter<void>();
+    this.eventEmitter = new EventEmitter<string | undefined>();
     this.onCacheChange = this.eventEmitter.event;
   }
 
@@ -31,19 +43,41 @@ class InfuraClient {
 
     this.globalState = globalState;
     this.statusBarItem = window.createStatusBarItem();
+    this.statusBarItem.command = this.showProjectsFromInfuraCommand;
 
     this.onCacheChange(this.updateStatusBar, this, this.disposables);
     this.signInSilently();
   }
 
   public async signIn() {
-    const token = await signIn();
+    this.eventEmitter.fire(Constants.infuraSigningIn);
+    try {
+      const token = await signIn();
 
-    await this.updateCredentials({}, token);
+      await this.updateCredentials({}, token);
 
-    const user = await this.getUserData();
+      const user = await this.getUserData();
 
-    await this.updateCredentials(user, token);
+      await this.updateCredentials(user, token);
+    } catch (error) {
+      this.eventEmitter.fire();
+      throw error;
+    }
+  }
+
+  public async isSignedIn(): Promise<boolean> {
+    const infuraCache = this.getInfuraCache();
+
+    if (infuraCache && infuraCache.tokens) {
+      const isTokenExpired = infuraCache.tokens.accessTokenExpirationDate < new Date();
+      if (isTokenExpired) {
+        return this.signInSilently();
+      } else {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public async signOut() {
@@ -67,17 +101,37 @@ class InfuraClient {
     return result.result.user;
   }
 
-  public async getProjects(): Promise<IProjectsResultDto> {
+  public getExcludedProjects(): IInfuraProjectDto[] {
+    if (this.globalState) {
+      return this.globalState.get<IInfuraProjectDto[]>(Constants.globalStateKeys.infuraExcludedProjectsListKey) || [];
+    } else {
+      return [];
+    }
+  }
 
-    const url = new URL(Constants.infuraAPIUrls.projects, Constants.infuraAPIUrls.rootURL).toString();
-    const params = {
-      method: 'GET',
-      url,
-    };
-    const response = await this.sendRequest(params);
-    const result = JSON.parse(response);
+  public async getAllowedProjects(): Promise<IInfuraProjectDto[]> {
+    const allProjects = await InfuraServiceClient.getProjects();
 
-    return result.result;
+    return allProjects.filter((project) =>
+      !(this.getExcludedProjects().some((excluded) => excluded.id === project.id)),
+    );
+  }
+
+  public async getProjects(): Promise<IInfuraProjectDto[]> {
+    const projectsDto = await this.receiveProjects();
+    return projectsDto.projects;
+  }
+
+  public async setExcludedProjects(
+    allProjects: IInfuraProjectDto[],
+    selectedProjects: IInfuraProjectDto[],
+  ) {
+    if (this.globalState) {
+      const excludedProjects = selectedProjects.length !== 0
+        ? allProjects.filter((project) => !(selectedProjects.some((selected) => selected.id === project.id)))
+        : allProjects;
+      await this.globalState.update(Constants.globalStateKeys.infuraExcludedProjectsListKey, excludedProjects);
+    }
   }
 
   public async getProjectDetails(projectId: string): Promise<IInfuraProjectDto> {
@@ -122,54 +176,79 @@ class InfuraClient {
     this.statusBarItem = undefined;
   }
 
+  private async receiveProjects(): Promise<IProjectsResultDto> {
+    const url = new URL(Constants.infuraAPIUrls.projects, Constants.infuraAPIUrls.rootURL).toString();
+    const params = {
+      method: 'GET',
+      url,
+    };
+    const response = await this.sendRequest(params);
+    const result = JSON.parse(response);
+
+    return result.result;
+  }
+
   private getInfuraCache(): IInfuraCache | undefined {
-      return this.globalState ? this.globalState.get<IInfuraCache>(this.infuraCacheKey) : undefined;
+    return this.globalState
+      ? this.globalState.get<IInfuraCache>(Constants.globalStateKeys.infuraCredentialsCacheKey)
+      : undefined;
   }
 
   private async updateInfuraCache(newInfuraCache?: IInfuraCache): Promise<void> {
     if (this.globalState) {
-      await this.globalState.update(this.infuraCacheKey, newInfuraCache);
+      await this.globalState.update(Constants.globalStateKeys.infuraCredentialsCacheKey, newInfuraCache);
     }
   }
 
   private async updateCredentials(user: any, tokens: IToken): Promise<void> {
     await this.updateInfuraCache({ user, tokens });
-    this.eventEmitter.fire();
+
+    if (tokens && !user.email) {
+      this.eventEmitter.fire(Constants.infuraSigningIn);
+    } else {
+      this.eventEmitter.fire();
+    }
   }
 
   private async cleanCredentials(): Promise<void> {
     await this.updateInfuraCache();
+    await this.setExcludedProjects([], []);
     this.eventEmitter.fire();
   }
 
-  private async signInSilently(): Promise<void> {
+  private async signInSilently(): Promise<boolean> {
     const infuraCache = this.getInfuraCache();
 
     if (infuraCache && infuraCache.tokens && infuraCache.tokens.refreshToken) {
       try {
+        this.eventEmitter.fire(Constants.infuraSigningIn);
         const newToken = await refreshToken(infuraCache.tokens.refreshToken);
         this.updateCredentials({}, newToken);
         const userData = await this.getUserData();
         this.updateCredentials(userData, newToken);
+        return true;
       } catch (error) {
         await this.cleanCredentials();
+        return false;
       }
     }
+
+    return false;
   }
 
   private async sendRequest(
     params: any = {},
-    ): Promise<any> {
-      try {
+  ): Promise<any> {
+    try {
+      return await requestPromise(this.addTokenToParams(params));
+    } catch (error) {
+      if (error.response && error.response.statusCode === 401) {
+        await this.signInSilently();
         return await requestPromise(this.addTokenToParams(params));
-      } catch (error) {
-        if (error.response && error.response.statusCode === 401) {
-          await this.signInSilently();
-          return await requestPromise(this.addTokenToParams(params));
-        } else {
-          throw error;
-        }
+      } else {
+        throw error;
       }
+    }
   }
 
   private addTokenToParams(params: any): any {
@@ -180,15 +259,23 @@ class InfuraClient {
     throw new Error(Constants.errorMessageStrings.InfuraUnauthorized);
   }
 
-  private updateStatusBar(): void {
+  private updateStatusBar(event?: string): void {
     if (this.statusBarItem) {
-      const infuraCache = this.getInfuraCache();
-      if (infuraCache && infuraCache.user) {
-        this.statusBarItem.text = `Infura: ${infuraCache.user.email}`;
-        this.statusBarItem.show();
-      } else {
-        this.statusBarItem.text = '';
-        this.statusBarItem.hide();
+      switch (event) {
+        case Constants.infuraSigningIn:
+          this.statusBarItem.text = 'Infura: Signing in...';
+          this.statusBarItem.show();
+          break;
+        default:
+          const infuraCache = this.getInfuraCache();
+          if (infuraCache && infuraCache.user && infuraCache.user.email) {
+            this.statusBarItem.text = `Infura: ${infuraCache.user.email}`;
+            this.statusBarItem.show();
+          } else {
+            this.statusBarItem.text = '';
+            this.statusBarItem.hide();
+          }
+          break;
       }
     }
   }

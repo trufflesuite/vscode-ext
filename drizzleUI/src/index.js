@@ -2,12 +2,13 @@
 // Licensed under the MIT license.
 
 import App from './App';
-import { Drizzle } from 'drizzle';
+import { contractEventNotifier } from 'middlewares';
 import { DrizzleContext } from 'drizzle-react';
 import { LocalStorage } from 'polyfills/localStorage';
 import { newContextComponents } from 'drizzle-react-components';
 import React from 'react';
 import { render } from 'react-dom';
+import { Drizzle, generateStore } from 'drizzle';
 
 const storage = new LocalStorage();
 
@@ -47,7 +48,13 @@ newContextComponents.ContractForm.prototype.handleInputChange = function (event)
 };
 
 const options = { contracts: [] };
-const drizzle = new Drizzle(options);
+
+const store = generateStore({
+  drizzleOptions: options,
+  appMiddlewares: [contractEventNotifier]
+});
+
+const drizzle = new Drizzle(options, store);
 
 render(
   <DrizzleContext.Provider drizzle={drizzle}>

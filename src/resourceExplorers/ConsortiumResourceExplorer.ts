@@ -5,7 +5,8 @@ import { ProgressLocation, QuickPickItem, window } from 'vscode';
 import {
   AzureBlockchainServiceClient,
   ConsortiumResource,
-  IAzureMemberDto,
+  IAzureConsortiumDto,
+  IAzureConsortiumMemberDto,
   ICreateQuorumMember,
   ISkuDto,
   MemberResource,
@@ -121,17 +122,45 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
     excludedItems: string[] = [],
   ): Promise<ConsortiumItem[]> {
     const azureClient = await this.getAzureClient(subscriptionItem, resourceGroupItem);
-    const members: IAzureMemberDto[] = await azureClient.memberResource.getListMember();
-    return members
-      .map((member) => new ConsortiumItem(
-        member.properties.consortium,
+    const consortia: IAzureConsortiumDto[] = await azureClient.consortiumResource.getListOfConsortia();
+
+    return consortia
+      .filter((item) => !excludedItems.includes(item.consortium))
+      .map((consortium) => new ConsortiumItem(
+        consortium.consortium,
         subscriptionItem.subscriptionId,
         resourceGroupItem.label,
-        member.name,
-        member.properties.dns,
+        consortium.userName,
+        consortium.dns,
       ))
-      .filter((item) => !excludedItems.includes(item.label))
       .sort((a, b) => a.label.localeCompare(b.label));
+  }
+
+  private async loadMemberItems(azureClient: AzureBlockchainServiceClient, memberName: string)
+  : Promise<IAzureConsortiumMemberDto[]> {
+    const members: IAzureConsortiumMemberDto[] = await azureClient.memberResource.getListMember(memberName);
+
+    return members.filter((member) => member.status === Constants.consortiumMemberStatuses.ready);
+  }
+
+  private async loadTransactionNodeItems(
+    azureClient: AzureBlockchainServiceClient,
+    subscriptionId: string,
+    resourceGroup: string,
+    memberName: string,
+  ): Promise<AzureBlockchainNetworkNode[]> {
+    try {
+      const transactionNodes = await azureClient.transactionNodeResource.getListTransactionNode(memberName);
+      const networkNodes = transactionNodes.map((tn) => {
+        return this.getTransactionNetworkNode(tn.name, subscriptionId, resourceGroup, memberName);
+      });
+      const defaultNode
+        = this.getTransactionNetworkNode(memberName, subscriptionId, resourceGroup, memberName);
+
+      return [defaultNode, ...networkNodes];
+    } catch (e) {
+      return [];
+    }
   }
 
   private async getAzureConsortium(
@@ -142,15 +171,21 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
     const { consortiumName, subscriptionId, resourceGroup, memberName } = consortiumItems;
 
     const azureClient = await this.getAzureClient(subscriptionItem, resourceGroupItem);
-    const azureConsortium = new AzureBlockchainProject(consortiumName, subscriptionId, resourceGroup, memberName);
-    const member = new Member(memberName);
-    const defaultNetworkNode = this.getTransactionNetworkNode(memberName, subscriptionId, resourceGroup, memberName);
-    const transactionNodes = await azureClient.transactionNodeResource.getListTransactionNode(memberName);
-    const networkNodes = transactionNodes.map((transactionNode) => {
-      return this.getTransactionNetworkNode(transactionNode.name, subscriptionId, resourceGroup, memberName);
-    });
+    const memberItems = await this.loadMemberItems(azureClient, memberName);
 
-    await azureConsortium.setChildren([ member, defaultNetworkNode, ...networkNodes ]);
+    const azureMembers = await Promise.all(memberItems.map(async (memberItem) => {
+      const transactionNodeItems
+      = await this.loadTransactionNodeItems(azureClient, subscriptionId, resourceGroup, memberItem.name);
+
+      const member = new Member(memberItem.name);
+      member.setChildren(transactionNodeItems);
+
+      return member;
+    }));
+
+    const azureConsortium
+      = new AzureBlockchainProject(consortiumName, subscriptionId, resourceGroup, azureMembers.map((mem) => mem.label));
+    azureConsortium.setChildren(azureMembers);
 
     return azureConsortium;
   }
@@ -186,11 +221,12 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
       const subscriptionId = subscriptionItem.subscriptionId;
       const resourceGroup = resourceGroupItem.label;
 
-      const azureConsortium = new AzureBlockchainProject(consortiumName, subscriptionId, resourceGroup, memberName);
-      const member = new Member(memberName);
+      const azureMember = new Member(memberName);
       const defaultNetworkNode = this.getTransactionNetworkNode(memberName, subscriptionId, resourceGroup, memberName);
+      azureMember.setChildren([defaultNetworkNode]);
 
-      await azureConsortium.setChildren([member, defaultNetworkNode]);
+      const azureConsortium = new AzureBlockchainProject(consortiumName, subscriptionId, resourceGroup, [memberName]);
+      await azureConsortium.setChildren([azureMember]);
 
       return azureConsortium;
     });

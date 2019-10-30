@@ -7,6 +7,6 @@ import { ExtensionItem } from './ExtensionItem';
 
 export class Member extends ExtensionItem {
   constructor(label: string) {
-    super(ItemType.MEMBER, label, Constants.treeItemData.member.default);
+    super(ItemType.MEMBER, label, Constants.treeItemData.member.azure);
   }
 }

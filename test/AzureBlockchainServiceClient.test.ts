@@ -260,6 +260,7 @@ describe('AzureBlockchainServiceClient', () => {
 
       it('getMembers returns error.', async () => {
         // Arrange
+        const consortiumName = 'consortiumName';
         const callbackFunctionSpy = sinon.spy(callbackFunction);
         const error = new Error(uuid.v4());
         sendRequestToAzureMock.callsFake((...args: any[]): {} => {
@@ -267,7 +268,7 @@ describe('AzureBlockchainServiceClient', () => {
         });
 
         // Act
-        await serviceClient.getMembers(callbackFunctionSpy);
+        await serviceClient.getMembers(consortiumName, callbackFunctionSpy);
 
         // Assert
         assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
@@ -279,13 +280,51 @@ describe('AzureBlockchainServiceClient', () => {
 
       it('getMembers does not return error.', async () => {
         // Arrange
+        const consortiumName = 'consortiumName';
         const callbackFunctionSpy = sinon.spy(callbackFunction);
         sendRequestToAzureMock.callsFake((...args: any[]): {} => {
           return args[1](null, resultElement);
         });
 
         // Act
-        await serviceClient.getMembers(callbackFunctionSpy);
+        await serviceClient.getMembers(consortiumName, callbackFunctionSpy);
+
+        // Assert
+        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
+        assert.strictEqual(
+          callbackFunctionSpy.calledOnceWithExactly(null, resultElement),
+          true,
+          'callbackFunction should called once with correct arguments');
+      });
+
+      it('getConsortia returns error.', async () => {
+        // Arrange
+        const callbackFunctionSpy = sinon.spy(callbackFunction);
+        const error = new Error(uuid.v4());
+        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
+          return args[1](error);
+        });
+
+        // Act
+        await serviceClient.getConsortia(callbackFunctionSpy);
+
+        // Assert
+        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
+        assert.strictEqual(
+          callbackFunctionSpy.calledOnceWithExactly(error),
+          true,
+          'callbackFunction should called once with correct arguments');
+      });
+
+      it('getConsortia does not return error.', async () => {
+        // Arrange
+        const callbackFunctionSpy = sinon.spy(callbackFunction);
+        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
+          return args[1](null, resultElement);
+        });
+
+        // Act
+        await serviceClient.getConsortia(callbackFunctionSpy);
 
         // Assert
         assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
@@ -439,9 +478,55 @@ describe('AzureBlockchainServiceClient', () => {
       pipelineMock.restore();
     });
 
+    function assertRequestFailed(error: any, callbackFunctionSpy: sinon.SinonSpy): void {
+      assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
+      assert.strictEqual(
+        showErrorMessageMock.calledOnceWithExactly(error.message),
+        true,
+        'showErrorMessage should called once with correct arguments');
+      assert.strictEqual(
+        callbackFunctionSpy.calledOnceWithExactly(error as Error),
+        true,
+        'callbackFunction should called once with correct arguments');
+    }
+
+    function assertResponseNotSuccess(callbackFunctionSpy: sinon.SinonSpy, pipelineCallbackSpy: sinon.SinonSpy): void {
+      assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
+      assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
+      assert.strictEqual(callbackFunctionSpy.calledOnce, true, 'callbackFunction should called once');
+      assert.strictEqual(
+        callbackFunctionSpy.args[0][0] instanceof Error,
+        true,
+        'callbackFunction should called with correct arguments');
+      assert.strictEqual(pipelineCallbackSpy.calledOnce, true, 'pipelineCallback should called once');
+      assert.strictEqual(
+        pipelineCallbackSpy.args[0][0],
+        null,
+        'callback function should called with correct arguments');
+    }
+
+    function assertResponseSuccess(
+      callbackFunctionSpy: sinon.SinonSpy,
+      pipelineCallbackSpy: sinon.SinonSpy,
+      parsedResult: any)
+    : void {
+      assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
+      assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
+      assert.strictEqual(
+        callbackFunctionSpy.calledOnceWithExactly(null, parsedResult),
+        true,
+        'callbackFunction should called once with correct arguments');
+      assert.strictEqual(pipelineCallbackSpy.calledOnce, true, 'pipelineCallback should called once');
+      assert.strictEqual(
+        pipelineCallbackSpy.args[0][0],
+      null,
+      'callback function should called with correct arguments');
+    }
+
     describe('getMembers', () => {
       it('shows error when request failed.', async () => {
         // Arrange
+        const consortiumName = 'consortiumName';
         const response = sinon.stub();
         const error = { message: uuid.v4() };
         const callbackFunctionSpy = sinon.spy(callbackFunction);
@@ -451,18 +536,10 @@ describe('AzureBlockchainServiceClient', () => {
         });
 
         // Act
-        await serviceClient.getMembers(callbackFunctionSpy);
+        await serviceClient.getMembers(consortiumName, callbackFunctionSpy);
 
         // Assert
-        assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-        assert.strictEqual(
-          showErrorMessageMock.calledOnceWithExactly(error.message),
-          true,
-          'showErrorMessage should called once with correct arguments');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(error as Error),
-          true,
-          'callbackFunction should called once with correct arguments');
+        assertRequestFailed(error, callbackFunctionSpy);
       });
 
       describe('throws error when response is not success.', () => {
@@ -475,6 +552,7 @@ describe('AzureBlockchainServiceClient', () => {
           it(`response status code is ${response[0]} and response body is ${JSON.stringify(response[1])}.`,
           async () => {
             // Arrange
+            const consortiumName = 'consortiumName';
             const res = {statusCode: response[0]};
             const callbackFunctionSpy = sinon.spy(callbackFunction);
             let pipelineCallbackSpy: any;
@@ -485,27 +563,17 @@ describe('AzureBlockchainServiceClient', () => {
             });
 
             // Act
-            await serviceClient.getMembers(callbackFunctionSpy);
+            await serviceClient.getMembers(consortiumName, callbackFunctionSpy);
 
             // Assert
-            assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-            assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
-            assert.strictEqual(callbackFunctionSpy.calledOnce, true, 'callbackFunction should called once');
-            assert.strictEqual(
-              callbackFunctionSpy.args[0][0] instanceof Error,
-              true,
-              'callbackFunction should called with correct arguments');
-            assert.strictEqual(pipelineCallbackSpy.calledOnce, true, 'pipelineCallback should called once');
-            assert.strictEqual(
-              pipelineCallbackSpy.args[0][0],
-              null,
-              'callback function should called with correct arguments');
+            assertResponseNotSuccess(callbackFunctionSpy, pipelineCallbackSpy);
           });
         });
       });
 
       it('does not throw error when response is success.', async () => {
          // Arrange
+         const consortiumName = 'consortiumName';
          const res = {statusCode: 200};
          const callbackFunctionSpy = sinon.spy(callbackFunction);
          const parsedResult = JSON.parse(defaultResponseBody);
@@ -517,20 +585,10 @@ describe('AzureBlockchainServiceClient', () => {
          });
 
          // Act
-         await serviceClient.getMembers(callbackFunctionSpy);
+         await serviceClient.getMembers(consortiumName, callbackFunctionSpy);
 
          // Assert
-         assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-         assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
-         assert.strictEqual(
-           callbackFunctionSpy.calledOnceWithExactly(null, parsedResult),
-           true,
-           'callbackFunction should called once with correct arguments');
-         assert.strictEqual(pipelineCallbackSpy.calledOnce, true, 'pipelineCallback should called once');
-         assert.strictEqual(
-          pipelineCallbackSpy.args[0][0],
-           null,
-           'callback function should called with correct arguments');
+         assertResponseSuccess(callbackFunctionSpy, pipelineCallbackSpy, parsedResult);
       });
     });
 
@@ -549,15 +607,7 @@ describe('AzureBlockchainServiceClient', () => {
         await serviceClient.getTransactionNodes(memberName, callbackFunctionSpy);
 
         // Assert
-        assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-        assert.strictEqual(
-          showErrorMessageMock.calledOnceWithExactly(error.message),
-          true,
-          'showErrorMessage should called once with correct arguments');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(error as Error),
-          true,
-          'callbackFunction should called once with correct arguments');
+        assertRequestFailed(error, callbackFunctionSpy);
       });
 
       describe('throws error when response is not success.', () => {
@@ -583,18 +633,7 @@ describe('AzureBlockchainServiceClient', () => {
             await serviceClient.getTransactionNodes(memberName, callbackFunctionSpy);
 
             // Assert
-            assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-            assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
-            assert.strictEqual(callbackFunctionSpy.calledOnce, true, 'callbackFunction should called once');
-            assert.strictEqual(
-              callbackFunctionSpy.args[0][0] instanceof Error,
-              true,
-              'callbackFunction should called with correct arguments');
-            assert.strictEqual(pipelineCallbackSpy.calledOnce, true, 'pipelineCallback should called once');
-            assert.strictEqual(
-              pipelineCallbackSpy.args[0][0],
-              null,
-              'callback function should called with correct arguments');
+            assertResponseNotSuccess(callbackFunctionSpy, pipelineCallbackSpy);
           });
         });
       });
@@ -615,17 +654,7 @@ describe('AzureBlockchainServiceClient', () => {
          await serviceClient.getTransactionNodes(memberName, callbackFunctionSpy);
 
          // Assert
-         assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-         assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
-         assert.strictEqual(
-           callbackFunctionSpy.calledOnceWithExactly(null, parsedResult),
-           true,
-           'callbackFunction should called once with correct arguments');
-         assert.strictEqual(pipelineCallbackSpy.calledOnce, true, 'pipelineCallback should called once');
-         assert.strictEqual(
-           pipelineCallbackSpy.args[0][0],
-           null,
-           'callback function should called with correct arguments');
+         assertResponseSuccess(callbackFunctionSpy, pipelineCallbackSpy, parsedResult);
       });
     });
 
@@ -644,15 +673,7 @@ describe('AzureBlockchainServiceClient', () => {
         await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy);
 
         // Assert
-        assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-        assert.strictEqual(
-          showErrorMessageMock.calledOnceWithExactly(error.message),
-          true,
-          'showErrorMessage should called once with correct arguments');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(error as Error),
-          true,
-          'callbackFunction should called once with correct arguments');
+        assertRequestFailed(error, callbackFunctionSpy);
       });
 
       describe('throws error when response is not success.', () => {
@@ -678,18 +699,7 @@ describe('AzureBlockchainServiceClient', () => {
             await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy);
 
             // Assert
-            assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-            assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
-            assert.strictEqual(callbackFunctionSpy.calledOnce, true, 'callbackFunction should called once');
-            assert.strictEqual(
-              callbackFunctionSpy.args[0][0] instanceof Error,
-              true,
-              'callbackFunction should called with correct arguments');
-            assert.strictEqual(pipelineCallbackSpy.calledOnce, true, 'pipelineCallback should called once');
-            assert.strictEqual(
-              pipelineCallbackSpy.args[0][0],
-              null,
-              'callback function should called with correct arguments');
+            assertResponseNotSuccess(callbackFunctionSpy, pipelineCallbackSpy);
           });
         });
       });
@@ -710,17 +720,7 @@ describe('AzureBlockchainServiceClient', () => {
          await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy);
 
          // Assert
-         assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-         assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
-         assert.strictEqual(
-           callbackFunctionSpy.calledOnceWithExactly(null, parsedResult),
-           true,
-           'callbackFunction should called once with correct arguments');
-         assert.strictEqual(pipelineCallbackSpy.calledOnce, true, 'pipelineCallback should called once');
-         assert.strictEqual(
-           pipelineCallbackSpy.args[0][0],
-           null,
-           'callback function should called with correct arguments');
+         assertResponseSuccess(callbackFunctionSpy, pipelineCallbackSpy, parsedResult);
       });
     });
 
@@ -739,15 +739,7 @@ describe('AzureBlockchainServiceClient', () => {
         await serviceClient.getSkus(callbackFunctionSpy);
 
         // Assert
-        assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-        assert.strictEqual(
-          showErrorMessageMock.calledOnceWithExactly(error.message),
-          true,
-          'showErrorMessage should called once with correct arguments');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(error as Error),
-          true,
-          'callbackFunction should called once with correct arguments');
+        assertRequestFailed(error, callbackFunctionSpy);
       });
 
       describe('throws error when response is not success.', () => {
@@ -773,18 +765,7 @@ describe('AzureBlockchainServiceClient', () => {
             await serviceClient.getSkus(callbackFunctionSpy);
 
             // Assert
-            assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-            assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
-            assert.strictEqual(callbackFunctionSpy.calledOnce, true, 'callbackFunction should called once');
-            assert.strictEqual(
-              callbackFunctionSpy.args[0][0] instanceof Error,
-              true,
-              'callbackFunction should called with correct arguments');
-            assert.strictEqual(pipelineCallbackSpy.calledOnce, true, 'pipelineCallback should called once');
-            assert.strictEqual(
-              pipelineCallbackSpy.args[0][0],
-              null,
-              'callback function should called with correct arguments');
+            assertResponseNotSuccess(callbackFunctionSpy, pipelineCallbackSpy);
           });
         });
       });
@@ -805,17 +786,73 @@ describe('AzureBlockchainServiceClient', () => {
          await serviceClient.getSkus(callbackFunctionSpy);
 
          // Assert
-         assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-         assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
-         assert.strictEqual(
-           callbackFunctionSpy.calledOnceWithExactly(null, parsedResult),
-           true,
-           'callbackFunction should called once with correct arguments');
-         assert.strictEqual(pipelineCallbackSpy.calledOnce, true, 'pipelineCallback should called once');
-         assert.strictEqual(
-           pipelineCallbackSpy.args[0][0],
-          null,
-          'callback function should called with correct arguments');
+         assertResponseSuccess(callbackFunctionSpy, pipelineCallbackSpy, parsedResult);
+      });
+    });
+
+    describe('getConsortia', () => {
+      it('shows error when request failed.', async () => {
+        // Arrange
+        const response = sinon.stub();
+        const error = { message: uuid.v4() };
+        const callbackFunctionSpy = sinon.spy(callbackFunction);
+
+        pipelineMock.callsFake((...args: any[]): {} => {
+          return args[1](error, response, defaultResponseBody);
+        });
+
+        // Act
+        await serviceClient.getConsortia(callbackFunctionSpy);
+
+        // Assert
+        assertRequestFailed(error, callbackFunctionSpy);
+      });
+
+      describe('throws error when response is not success.', () => {
+        const responseData = [
+          [400, defaultResponseBody],
+          [103, defaultResponseBody],
+          [530, defaultResponseBody],
+          [200, incorrectResponseBody]];
+        responseData.forEach(async (response) => {
+          it(`response status code is ${response[0]} and response body is ${JSON.stringify(response[1])}.`,
+          async () => {
+            // Arrange
+            const res = {statusCode: response[0]};
+            const callbackFunctionSpy = sinon.spy(callbackFunction);
+            let pipelineCallbackSpy: any;
+
+            pipelineMock.callsFake((...args: any[]): {} => {
+              pipelineCallbackSpy = sinon.spy(args[1]);
+              return pipelineCallbackSpy(null, res, response[1]);
+            });
+
+            // Act
+            await serviceClient.getConsortia(callbackFunctionSpy);
+
+            // Assert
+            assertResponseNotSuccess(callbackFunctionSpy, pipelineCallbackSpy);
+          });
+        });
+      });
+
+      it('does not throw error when response is success.', async () => {
+         // Arrange
+         const res = {statusCode: 200};
+         const callbackFunctionSpy = sinon.spy(callbackFunction);
+         const parsedResult = JSON.parse(defaultResponseBody);
+         let pipelineCallbackSpy: any;
+
+         pipelineMock.callsFake((...args: any[]): {} => {
+           pipelineCallbackSpy = sinon.spy(args[1]);
+           return pipelineCallbackSpy(null, res, defaultResponseBody);
+         });
+
+         // Act
+         await serviceClient.getConsortia(callbackFunctionSpy);
+
+         // Assert
+         assertResponseSuccess(callbackFunctionSpy, pipelineCallbackSpy, parsedResult);
       });
     });
   });

@@ -73,7 +73,7 @@ describe('Service Commands', () => {
               defaultConsortiumName,
               defaultSubscriptionId,
               defaultResourceGroup,
-              defaultMemberName,
+              [defaultMemberName],
             )),
           );
       });
