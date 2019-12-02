@@ -3,48 +3,14 @@
 
 import App from './App';
 import { contractEventNotifier } from 'middlewares';
-import { DrizzleContext } from 'drizzle-react';
-import { LocalStorage } from 'polyfills/localStorage';
-import { newContextComponents } from 'drizzle-react-components';
+import { DrizzleContext } from '@drizzle/react-plugin';
 import React from 'react';
 import { render } from 'react-dom';
-import { Drizzle, generateStore } from 'drizzle';
-
-const storage = new LocalStorage();
-
-window.ls = new Proxy(storage, {
-  set: (_, prop, value) => {
-    if (LocalStorage.prototype.hasOwnProperty(prop)) {
-      storage[prop] = value;
-    } else {
-      storage.setItem(prop, value);
-    }
-
-    return true;
-  },
-
-  get: (_, name) => {
-    if (LocalStorage.prototype.hasOwnProperty(name)) {
-      return storage[name];
-    }
-    if (storage.values.has(name)) {
-      return storage.getItem(name);
-    }
-
-    return undefined;
-  },
-});
+import { Drizzle, generateStore } from '@drizzle/store';
 
 Drizzle.prototype.deleteAllContracts = function () {
   Object.keys(this.contracts)
     .forEach(contractName => this.deleteContract(contractName));
-};
-
-newContextComponents.ContractForm.prototype.handleInputChange = function (event) {
-  const value = event.target.type === 'checkbox'
-    ? event.target.checked
-    : event.target.value;
-  this.setState({ [event.target.name]: value });
 };
 
 const options = { contracts: [] };

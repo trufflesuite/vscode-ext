@@ -5,7 +5,7 @@ import * as assert from 'assert';
 import * as fs from 'fs-extra';
 import rewire = require('rewire');
 import * as sinon from 'sinon';
-import * as vscode from 'vscode';
+import { CancellationToken, Progress, ProgressOptions, window, workspace } from 'vscode';
 import { Constants, RequiredApps } from '../../src/Constants';
 import * as helpers from '../../src/helpers';
 import { CancellationEvent } from '../../src/Models';
@@ -23,7 +23,8 @@ describe('ProjectCommands', () => {
       let gitInitMock: sinon.SinonStub<any[], any>;
       let requiredMock: sinon.SinonMock;
       let checkRequiredAppsMock: sinon.SinonExpectation;
-      let withProgressStub: sinon.SinonStub<any[], any>;
+      let withProgressStub: sinon.SinonStub<
+        [ProgressOptions, (progress: Progress<any>, token: CancellationToken) => any], any>;
 
       beforeEach(() => {
         helpersMock = sinon.mock(helpers);
@@ -36,7 +37,7 @@ describe('ProjectCommands', () => {
         requiredMock = sinon.mock(helpers.required);
         checkRequiredAppsMock = requiredMock.expects('checkRequiredApps');
 
-        withProgressStub = sinon.stub(vscode.window, 'withProgress');
+        withProgressStub = sinon.stub(window, 'withProgress');
         withProgressStub.callsFake(async (...args: any[]) => {
           return args[1]();
         });
@@ -108,7 +109,7 @@ describe('ProjectCommands', () => {
         ensureDirMock = fsMock.expects('ensureDir');
         readdirMock = fsMock.expects('readdir');
 
-        windowMock = sinon.mock(vscode.window);
+        windowMock = sinon.mock(window);
         showErrorMessageMock = windowMock.expects('showErrorMessage');
       });
 
@@ -204,10 +205,11 @@ describe('ProjectCommands', () => {
     });
 
     describe('createNewEmptyProject', () => {
-      let withProgressStub: sinon.SinonStub<any[], any>;
+      let withProgressStub: sinon.SinonStub<
+        [ProgressOptions, (progress: Progress<any>, token: CancellationToken) => any], any>;
 
       beforeEach(() => {
-        withProgressStub = sinon.stub(vscode.window, 'withProgress');
+        withProgressStub = sinon.stub(window, 'withProgress');
       });
 
       afterEach(() => {
@@ -252,8 +254,6 @@ describe('ProjectCommands', () => {
     });
 
     describe('createProject', () => {
-      let outputMock: sinon.SinonMock;
-      let showMock: sinon.SinonExpectation;
       let outputCommandHelperMock: sinon.SinonMock;
       let executeCommandMock: sinon.SinonExpectation;
       let workspaceMock: sinon.SinonMock;
@@ -262,11 +262,9 @@ describe('ProjectCommands', () => {
       let emptyDirSyncMock: sinon.SinonExpectation;
 
       beforeEach(() => {
-        outputMock = sinon.mock(Output);
-        showMock = outputMock.expects('show');
         outputCommandHelperMock = sinon.mock(helpers.outputCommandHelper);
         executeCommandMock = outputCommandHelperMock.expects('executeCommand');
-        workspaceMock = sinon.mock(vscode.workspace);
+        workspaceMock = sinon.mock(workspace);
         updateWorkspaceFoldersMock = workspaceMock.expects('updateWorkspaceFolders');
         fsMock = sinon.mock(fs);
         emptyDirSyncMock = fsMock.expects('emptyDirSync');
@@ -279,7 +277,7 @@ describe('ProjectCommands', () => {
       it('Method createProject run command for create new project and project was created successfully. ' +
       'Workspace was updated to certain workspace.', async () => {
         // Arrange
-        sinon.stub(vscode.workspace, 'workspaceFolders').value(['1']);
+        sinon.stub(workspace, 'workspaceFolders').value(['1']);
         const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
         const createProject = projectCommandsRewire.__get__('createProject');
 
@@ -287,7 +285,6 @@ describe('ProjectCommands', () => {
         await createProject(projectPath, truffleBoxName);
 
         // Assert
-        assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
         assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
         assert.strictEqual(
           executeCommandMock.args[0][0],
@@ -328,7 +325,7 @@ describe('ProjectCommands', () => {
       it('Method createProject run command for create new project and project was created successfully. ' +
       'Workspace was not updated to certain workspace.', async () => {
         // Arrange
-        sinon.stub(vscode.workspace, 'workspaceFolders').value(undefined);
+        sinon.stub(workspace, 'workspaceFolders').value(undefined);
         const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
         const createProject = projectCommandsRewire.__get__('createProject');
 
@@ -336,7 +333,6 @@ describe('ProjectCommands', () => {
         await createProject(projectPath, truffleBoxName);
 
         // Assert
-        assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
         assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
         assert.strictEqual(
           executeCommandMock.args[0][0],
@@ -390,7 +386,6 @@ describe('ProjectCommands', () => {
           action,
           Error,
           Constants.errorMessageStrings.NewProjectCreationFailed);
-        assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
         assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
         assert.strictEqual(
           executeCommandMock.args[0][0],
@@ -460,11 +455,11 @@ describe('ProjectCommands', () => {
     let outputCommandHelperMock: sinon.SinonMock;
     let executeCommandMock: sinon.SinonExpectation;
     let outputMock: sinon.SinonMock;
-    let showMock: sinon.SinonExpectation;
     let workspaceMock: sinon.SinonMock;
     let updateWorkspaceFoldersMock: sinon.SinonExpectation;
     let emptyDirSyncMock: sinon.SinonExpectation;
-    let withProgressStub: sinon.SinonStub<any[], any>;
+    let withProgressStub: sinon.SinonStub<
+      [ProgressOptions, (progress: Progress<any>, token: CancellationToken) => any], any>;
 
     beforeEach(() => {
       helpersMock = sinon.mock(helpers);
@@ -486,15 +481,14 @@ describe('ProjectCommands', () => {
       readdirMock = fsMock.expects('readdir');
       emptyDirSyncMock = fsMock.expects('emptyDirSync');
 
-      windowMock = sinon.mock(vscode.window);
+      windowMock = sinon.mock(window);
       showErrorMessageMock = windowMock.expects('showErrorMessage');
-      workspaceMock = sinon.mock(vscode.workspace);
+      workspaceMock = sinon.mock(workspace);
       updateWorkspaceFoldersMock = workspaceMock.expects('updateWorkspaceFolders');
 
       outputMock = sinon.mock(Output);
-      showMock = outputMock.expects('show');
 
-      withProgressStub = sinon.stub(vscode.window, 'withProgress');
+      withProgressStub = sinon.stub(window, 'withProgress');
       withProgressStub.callsFake(async (...args: any[]) => {
         return args[1]();
       });
@@ -559,7 +553,7 @@ describe('ProjectCommands', () => {
     it('Method chooseNewProjectDir returns projectPath which we selected at first time.', async () => {
       // Arrange
       checkRequiredAppsMock.returns(true);
-      sinon.stub(vscode.workspace, 'workspaceFolders').value(['1']);
+      sinon.stub(workspace, 'workspaceFolders').value(['1']);
       readdirMock.returns([]);
       showQuickPickMock.returns({
         cmd: () => undefined,
@@ -591,7 +585,7 @@ describe('ProjectCommands', () => {
       // Arrange
       checkRequiredAppsMock.returns(true);
       readdirMock.returns([]);
-      sinon.stub(vscode.workspace, 'workspaceFolders').value(['1']);
+      sinon.stub(workspace, 'workspaceFolders').value(['1']);
 
       const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
       const createNewEmptyProject = projectCommandsRewire.__get__('createNewEmptyProject');
@@ -619,7 +613,6 @@ describe('ProjectCommands', () => {
       assert.strictEqual(readdirMock.calledOnce, true, 'readdir should be called once');
       assert.strictEqual(readdirMock.args[0][0], firstProjectPath, 'readdir should be called with correct arguments');
       assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not be called');
-      assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
       assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
       assert.strictEqual(
         executeCommandMock.args[0][0],
@@ -694,7 +687,6 @@ describe('ProjectCommands', () => {
       assert.strictEqual(readdirMock.calledOnce, true, 'readdir should be called once');
       assert.strictEqual(readdirMock.args[0][0], firstProjectPath, 'readdir should be called with correct arguments');
       assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not be called');
-      assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
       assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
       assert.strictEqual(
         executeCommandMock.args[0][0],
@@ -729,7 +721,7 @@ describe('ProjectCommands', () => {
       // Arrange
       checkRequiredAppsMock.returns(true);
       readdirMock.returns([]);
-      sinon.stub(vscode.workspace, 'workspaceFolders').value(['1']);
+      sinon.stub(workspace, 'workspaceFolders').value(['1']);
 
       const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
       projectCommandsRewire.__set__('getTruffleBoxName', sinon.mock().returns(truffleBoxName));
@@ -760,7 +752,6 @@ describe('ProjectCommands', () => {
       assert.strictEqual(readdirMock.calledOnce, true, 'readdir should be called once');
       assert.strictEqual(readdirMock.args[0][0], firstProjectPath, 'readdir should be called with correct arguments');
       assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not be called');
-      assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
       assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
       assert.strictEqual(
         executeCommandMock.args[0][0],
@@ -838,7 +829,6 @@ describe('ProjectCommands', () => {
       assert.strictEqual(readdirMock.calledOnce, true, 'readdir should be called once');
       assert.strictEqual(readdirMock.args[0][0], firstProjectPath, 'readdir should be called with correct arguments');
       assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not be called');
-      assert.strictEqual(showMock.calledOnce, true, 'show should be called once');
       assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
       assert.strictEqual(
         executeCommandMock.args[0][0],

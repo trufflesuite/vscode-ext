@@ -92,7 +92,6 @@ export namespace GanacheService {
       addAllListeners(output, port, process);
       await waitGanacheStarted(port, Constants.ganacheRetryAttempts);
       ganacheProcess.pid = await findPid(port);
-      output.show();
     } catch (error) {
       Telemetry.sendException(error);
       await stopGanacheProcess(ganacheProcess, true);

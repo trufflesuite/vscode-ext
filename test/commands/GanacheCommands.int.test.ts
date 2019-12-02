@@ -22,7 +22,7 @@ import { ProjectView } from '../../src/ViewItems';
 
 describe('Integration tests GanacheCommands', () => {
   const defaultPort = 8545;
-  let getItemsMock: sinon.SinonStub<[(boolean | undefined)?], IExtensionItem[]>;
+  let getItemsMock: sinon.SinonStub<[], IExtensionItem[]>;
   let serviceItems: Service[];
   let loadStateMock: sinon.SinonStub<[], IExtensionItem[]>;
   let projectView: ProjectView;

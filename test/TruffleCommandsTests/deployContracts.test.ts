@@ -48,11 +48,12 @@ describe('TruffleCommands', () => {
       let showQuickPickMock: any;
       let showInputBoxMock: any;
       let showSaveDialogMock: sinon.SinonExpectation;
+      let showInformationMessageMock: any;
 
       let ganacheServiceMock: sinon.SinonMock;
       let startGanacheServerMock: sinon.SinonExpectation;
 
-      let getItemsMock: sinon.SinonStub<[(boolean | undefined)?], IExtensionItem[]>;
+      let getItemsMock: sinon.SinonStub<[], IExtensionItem[]>;
       let loadStateMock: sinon.SinonStub<[], IExtensionItem[]>;
       let servicesItems: Service[];
 
@@ -93,7 +94,7 @@ describe('TruffleCommands', () => {
         showInputBoxMock = sinon.stub(vscode.window, 'showInputBox');
         showSaveDialogMock = windowMock.expects('showSaveDialog');
         sinon.stub(vscode.window, 'showErrorMessage');
-        sinon.stub(vscode.window, 'showInformationMessage');
+        showInformationMessageMock = sinon.stub(vscode.window, 'showInformationMessage');
 
         ganacheServiceMock = sinon.mock(GanacheService);
         startGanacheServerMock = ganacheServiceMock.expects('startGanacheServer');
@@ -159,7 +160,9 @@ describe('TruffleCommands', () => {
         checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         isHdWalletProviderRequiredMock.returns(true);
+        checkHdWalletProviderVersionMock.returns(false);
         executeCommandMock.returns(uuid.v4());
+        showInformationMessageMock.returns(Constants.informationMessage.installButton);
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
           return items.find((item: any) => item.label === TestConstants.servicesNames.development);
@@ -231,6 +234,7 @@ describe('TruffleCommands', () => {
         checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
+        isHdWalletProviderRequiredMock.returns(false);
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
           return items.find((item: any) => item.label === TestConstants.servicesNames.development);

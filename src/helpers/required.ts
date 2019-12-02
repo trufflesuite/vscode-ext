@@ -4,7 +4,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as semver from 'semver';
-import { commands, window } from 'vscode';
+import { commands, ProgressLocation, window } from 'vscode';
 import { Constants, RequiredApps } from '../Constants';
 import { Output } from '../Output';
 import { Telemetry } from '../TelemetryClient';
@@ -252,7 +252,7 @@ export namespace required {
       );
       const truffleConfigPath = await TruffleConfiguration.getTruffleConfigUri();
       const config = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
-      await config.importPackage('HDWalletProvider', RequiredApps.hdwalletProvider);
+      await config.importPackage(Constants.truffleConfigRequireNames.hdwalletProvider, RequiredApps.hdwalletProvider);
     } catch (error) {
       Telemetry.sendException(error);
     }
@@ -260,14 +260,24 @@ export namespace required {
 
   export async function isHdWalletProviderRequired(): Promise<boolean> {
     try {
+      const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
+      const config = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
+      return config.isHdWalletProviderDeclared();
+    } catch (error) {
+      Telemetry.sendException(error);
+      Output.outputLine(Constants.outputChannel.requirements, error.message);
+    }
+
+    return false;
+  }
+
+  export async function isDefaultProject(): Promise<boolean> {
+    try {
       // File might not exist in some truffle-box
       const data = await fs.readFile(path.join(getWorkspaceRoot()!, 'package.json'), 'utf-8');
       const packagesData = JSON.parse(data);
-      if (packagesData.name === 'blockchain-ethereum-template') {
-        const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
-        const config = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
-        return config.isHdWalletProviderDeclared();
-      }
+
+      return packagesData.name === 'blockchain-ethereum-template';
     } catch (error) {
       Telemetry.sendException(error);
       Output.outputLine(Constants.outputChannel.requirements, error.message);
@@ -299,8 +309,6 @@ export namespace required {
     packageVersion: string | { min: string, max: string },
     scope?: Scope,
   ): Promise<void> {
-    Output.show();
-
     const versionString = typeof packageVersion === 'string' ?
       `^${packageVersion}` :
       `>=${packageVersion.min} <${packageVersion.max}`;
@@ -313,7 +321,12 @@ export namespace required {
       throw error;
     }
 
-    await executeCommand(workspaceRoot, 'npm', 'i', scope ? '' : '-g', ` ${packageName}@"${versionString}"`);
+    await window.withProgress({
+      location: ProgressLocation.Window,
+      title: `Installing ${packageName}`,
+    }, async () => {
+      await executeCommand(workspaceRoot, 'npm', 'i', scope ? '' : '-g', ` ${packageName}@"${versionString}"`);
+    });
   }
 
   async function getVersion(program: string, command: string, matcher: RegExp): Promise<string> {

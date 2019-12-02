@@ -1,7 +1,10 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+import * as truffleDebugUtils from '@truffle/debug-utils';
+import * as truffleDebugger from '@truffle/debugger';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import * as truffleDebugUtils from 'truffle-debug-utils';
-import * as truffleDebugger from 'truffle-debugger';
 import * as contractsPrepareHelpers from '../../src/debugAdapter/contracts/contractsPrepareHelpers';
 import { IContractModel } from '../../src/debugAdapter/models/IContractModel';
 import RuntimeInterface from '../../src/debugAdapter/runtimeInterface';

@@ -1,8 +1,26 @@
 # Change Log
 
-All notable changes to the "azureblockchain" extension will be documented in this file.
+All notable changes to the "azure blockchain" extension will be documented in this file.
 
 
+
+## 0.1.12
+
+- Deployments from external truffle boxes can now deploy to Azure Blockchain Service
+- Additional context menu for deployed contract bytecode (transaction bytecode)
+- Fix on Mocks category for OpenZeppelin to remove the dead link for not existent docs
+- Better handling of OpenZeppelin when multiple categories are downloaded.
+- Fix misspelling of OpenZeppelin on the welcome page.
+
+## 0.1.11
+
+- Fixed issue with Logic App generation JSON schema
+- Added Contract UI support for contracts deployed on Azure Blockchain Service
+- Updated deprecated Truffle NPM packages
+- Bumped HD wallet provider to latest Truffle version
+- Minimized output channel logs
+- Fixed output channel issue which shows JavaScript object after contract migration
+- Preview features added for token (TTI compliant) generation were added. 
 
 ## 0.1.10
 

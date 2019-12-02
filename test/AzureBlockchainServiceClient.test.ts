@@ -478,7 +478,7 @@ describe('AzureBlockchainServiceClient', () => {
       pipelineMock.restore();
     });
 
-    function assertRequestFailed(error: any, callbackFunctionSpy: sinon.SinonSpy): void {
+    function assertRequestFailed(error: any, callbackFunctionSpy: sinon.SinonSpy<[Error | null, any?], void>): void {
       assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
       assert.strictEqual(
         showErrorMessageMock.calledOnceWithExactly(error.message),
@@ -490,7 +490,10 @@ describe('AzureBlockchainServiceClient', () => {
         'callbackFunction should called once with correct arguments');
     }
 
-    function assertResponseNotSuccess(callbackFunctionSpy: sinon.SinonSpy, pipelineCallbackSpy: sinon.SinonSpy): void {
+    function assertResponseNotSuccess(
+      callbackFunctionSpy: sinon.SinonSpy<[Error | null, any?], void>,
+      pipelineCallbackSpy: sinon.SinonSpy)
+    : void {
       assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
       assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
       assert.strictEqual(callbackFunctionSpy.calledOnce, true, 'callbackFunction should called once');
@@ -506,7 +509,7 @@ describe('AzureBlockchainServiceClient', () => {
     }
 
     function assertResponseSuccess(
-      callbackFunctionSpy: sinon.SinonSpy,
+      callbackFunctionSpy: sinon.SinonSpy<[Error | null, any?], void>,
       pipelineCallbackSpy: sinon.SinonSpy,
       parsedResult: any)
     : void {

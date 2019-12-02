@@ -14,7 +14,6 @@ import {
   TruffleConfiguration,
 } from '../helpers';
 import { CancellationEvent } from '../Models';
-import { Output } from '../Output';
 import { Telemetry } from '../TelemetryClient';
 
 interface IProjectDestination {
@@ -96,7 +95,6 @@ async function createProjectFromTruffleBox(projectPath: string): Promise<void> {
 
 async function createProject(projectPath: string, truffleBoxName: string): Promise<void> {
   try {
-    Output.show();
     Telemetry.sendEvent('ProjectCommands.createProject.unbox', { truffleBoxName });
     await outputCommandHelper.executeCommand(projectPath, 'npx', RequiredApps.truffle, 'unbox', truffleBoxName);
 

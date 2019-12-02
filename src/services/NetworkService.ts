@@ -72,7 +72,7 @@ export namespace NetworkService {
 
     return {
       network: { id: networkId || '*', name: truffleNetwork.name },
-      provider: host ? { host } : null,
+      provider: host ? { host, options: { mnemonic: options.provider && options.provider.mnemonic } } : null,
     };
   }
 

@@ -1,0 +1,37 @@
+.hidden {
+  display: none;
+}
+
+label {
+  display: inline-block;
+  margin: 10px 0 10px 0;
+}
+
+.paragraph > div,
+#numberOfSubTokens {
+  margin-left: 30px;
+}
+
+.textInputMargin {
+  margin-top: 10px;
+}
+
+.generateButton {
+  margin: 20px;
+}
+
+.errorNotification {
+  margin: 0;
+  color: red;
+}
+
+.notificationForRequiredFields {
+  border: 2px solid red;
+  border-radius: 7px;
+  width: fit-content;
+  padding-right: 10px;
+}
+
+#customDetails {
+  margin-top: 10px;
+}

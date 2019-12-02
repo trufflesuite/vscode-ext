@@ -1,4 +1,4 @@
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import { Memento } from 'vscode';
 import { Constants } from '../Constants';
 

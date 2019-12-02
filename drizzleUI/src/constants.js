@@ -52,4 +52,10 @@ export class Constants {
     },
     arrayTypeRegexp: /\w*\[\d*\]/g,
   };
+
+  static regexps = {
+    providerTypes: {
+      azure: /blockchain.azure.com/i
+    }
+  };
 }

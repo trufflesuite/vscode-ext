@@ -54,12 +54,16 @@ describe('TruffleConfiguration helper', () => {
 
 describe('class TruffleConfig', () => {
   const configPathStub = path.normalize('w:/temp/truffle-config.js');
-  let readFileStub: any;
-  let writeFileStub: any;
+  let readFileStub: sinon.SinonStub<any, any>;
+  let writeFileStub: sinon.SinonStub<any, any>;
 
   before(() => {
-    readFileStub = sinon.stub(fs, 'readFileSync').returns(testData.referenceCfgContent);
+    readFileStub = sinon.stub(fs, 'readFileSync');
     writeFileStub = sinon.stub(fs, 'writeFileSync');
+
+    readFileStub.withArgs(configPathStub).returns(testData.referenceCfgContent);
+    readFileStub.withArgs('path').returns(testData.referenceMnemonic);
+    readFileStub.withArgs('path', 'encoding').returns(testData.referenceMnemonic);
   });
 
   after(() => {
@@ -186,6 +190,14 @@ describe('class TruffleConfig', () => {
 
 describe('getConfiguration() in class TruffleConfig', () => {
   const configPathStub = path.normalize('w:/temp/truffle-config.js');
+  let readFileStub: sinon.SinonStub<any, any>;
+
+  beforeEach(() => {
+    readFileStub = sinon.stub(fs, 'readFileSync');
+
+    readFileStub.withArgs('path').returns(testData.referenceMnemonic);
+    readFileStub.withArgs('path, encoding').returns(testData.referenceMnemonic);
+  });
 
   afterEach(() => {
     sinon.restore();
@@ -194,7 +206,7 @@ describe('getConfiguration() in class TruffleConfig', () => {
   it('getConfiguration returns default configuration',
     async () => {
       // Arrange
-      sinon.stub(fs, 'readFileSync').returns('');
+      readFileStub.returns('');
       const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
 
       // Act
@@ -219,7 +231,7 @@ describe('getConfiguration() in class TruffleConfig', () => {
   it('getConfiguration returns configuration without required fields',
     async () => {
       // Arrange
-      sinon.stub(fs, 'readFileSync').returns(testData.referenceCfgContent);
+      readFileStub.returns(testData.referenceCfgContent);
       const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
 
       // Act
@@ -247,7 +259,7 @@ describe('getConfiguration() in class TruffleConfig', () => {
   it('getConfiguration returns configuration with required fields',
     async () => {
       // Arrange
-      sinon.stub(fs, 'readFileSync').returns(testData.referenceCfgContentWithDirectories);
+      readFileStub.returns(testData.referenceCfgContentWithDirectories);
       const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
 
       // Act

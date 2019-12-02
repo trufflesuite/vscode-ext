@@ -37,7 +37,6 @@ export async function executeCommand(workingDirectory: string | undefined, comma
   );
 
   if (result.code !== 0) {
-    Output.show();
     Telemetry.sendException(new Error('commands.executeCommand.resultWithIncorrectCode'));
     throw new Error(Constants.executeCommandMessage.failedToRunCommand(commands.concat(' ', ...args.join(' '))));
   }

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{{root}}/resources/tokenui/generateToken.css">
+        <script type="text/javascript" src="{{root}}/resources/welcome/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="{{root}}/resources/tokenui/generateToken.js"></script>
+    </head>
+    <body>
+        <header>
+            <div id="title-area">
+                <h1>Token generation</h1>
+            </div>
+        </header>
+        <div>
+            <div id="TokenGenerationForm">
+                <div class="inputForm paragraph">
+                    <label>Please provide a name for your token.</label><br>
+                    <div>
+                        <input id="tokenName" type="text" placeholder="Token Name *">
+                        <div id="tokenNameValidationTip" class="hidden">
+                            <label class="errorNotification">Should be alphanumeric and from 1-255 characters.</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="selectionForm paragraph">
+                    <label>Please choose the token type.</label><br>
+                    <div id="tokenType">
+                        <label><input id="singleOrSolitary" type="radio" name="tokenType" value="false">Single/Solitary</label><br>
+                        <label><input id="compositeOrHybrid" type="radio" name="tokenType" value="true">Composite/Hybrid</label><br>
+                        <div id="selectionOfSubTokens" class="hidden">
+                            <label>How many sub tokens?</label><br>
+                            <div class="paragraph">
+                                <select id="numberOfSubTokens">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="mainPropertiesAndBehaviorsToken">
+                    <label>Please choose properties and behaviors for your token.</label>
+
+                </div>
+                <div id="propertiesAndBehaviorsSubTokens">
+
+                </div>
+                <div class="paragraph">
+                    <label>Do you want to add custom details for your token (metadata such as SKU, issue date, place, etc)?</label><br>
+                    <div>
+                        <div id="addCustomDetails">
+                            <label><input id="yesAddCustomDetails" type="radio" name="addCustomDetails" value="true">Yes</label>
+                            <label><input id="noAddCustomDetails" type="radio" name="addCustomDetails" value="false">No</label>
+                        </div>
+                        <input class="textInputMargin hidden" id="customDetails" type="text" placeholder="Comma separated list">
+
+                        <div id="customDetailsValidationTip" class="hidden">
+                            <label class="errorNotification">Should be comma separated list of symbols. Should be alphanumeric and from 1-255 characters.</label>
+                        </div>
+                    </div>
+                </div>
+                <button class="generateButton" id="generateButton" type="submit">Generate</button>
+            </div>
+        </div>
+    </body>
+</html>

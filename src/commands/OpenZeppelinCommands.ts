@@ -26,15 +26,15 @@ export namespace OpenZeppelinCommands {
       Constants.outputChannel.azureBlockchain,
       Constants.openZeppelin.categoryWillDownloaded(category.name),
     );
-    const assetStatuses = OpenZeppelinService.getAssetsStatus(fullAssetWithDependencies);
+    const assetsStatuses = OpenZeppelinService.getAssetsStatus(fullAssetWithDependencies);
     Output.outputLine(
       Constants.outputChannel.azureBlockchain,
-      Constants.openZeppelin.fileNow(assetStatuses.existing.length),
+      Constants.openZeppelin.fileNow(assetsStatuses.existing.length),
     );
 
-    if (assetStatuses.existing.length > 0) {
+    if (assetsStatuses.existing.length > 0) {
       const answer = await window.showInformationMessage(
-        Constants.openZeppelin.alreadyExisted(assetStatuses.existing),
+        Constants.openZeppelin.alreadyExisted(assetsStatuses.existing),
         Constants.openZeppelin.replaceButtonTitle,
         Constants.openZeppelin.skipButtonTitle,
       );
@@ -47,7 +47,7 @@ export namespace OpenZeppelinCommands {
         );
         await downloadFileSetWithProgress(fullAssetWithDependencies, true);
       } else {
-        await downloadFileSetWithProgress(assetStatuses.missing, false);
+        await downloadFileSetWithProgress(assetsStatuses.missing, false);
       }
     } else {
       await downloadFileSetWithProgress(fullAssetWithDependencies, false);
@@ -119,13 +119,17 @@ async function selectCategory(categories: IOZContractCategory[]): Promise<IOZCon
 }
 
 async function openDocumentationUrl(category: IOZContractCategory): Promise<void> {
+  const documentationUrl = OpenZeppelinService.getCategoryApiDocumentationUrl(category);
+  if (!documentationUrl) {
+    return;
+  }
+
   const answer = await window.showInformationMessage(
     Constants.openZeppelin.exploreDownloadedContractsInfo,
     Constants.openZeppelin.moreDetailsButtonTitle,
     Constants.openZeppelin.cancelButtonTitle);
 
   if (answer === Constants.openZeppelin.moreDetailsButtonTitle) {
-    const documentationUrl = OpenZeppelinService.getCategoryApiDocumentationUrl(category);
     open(documentationUrl);
   }
 }

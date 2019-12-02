@@ -11,6 +11,7 @@ import * as ESTree from 'estree';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Constants } from '../Constants';
+import { MnemonicRepository } from '../services';
 import { Telemetry } from '../TelemetryClient';
 import { getWorkspaceRoot } from './workspace';
 
@@ -246,12 +247,18 @@ export namespace TruffleConfiguration {
   }
 
   function isHdWalletProviderDeclaration(nodeType: string, node: ESTree.Node): boolean {
-    if (nodeType !== 'NewExpression') {
-      return false;
+    if (nodeType === 'NewExpression') {
+      node = node as ESTree.NewExpression;
+      node = node.callee as ESTree.Identifier;
+      return node.name === Constants.truffleConfigRequireNames.hdwalletProvider;
     }
-    node = node as ESTree.NewExpression;
-    node = node.callee as ESTree.Identifier;
-    return node.name === 'HDWalletProvider';
+
+    if (nodeType === 'VariablePattern') {
+      node = node as ESTree.Identifier;
+      return node.name === Constants.truffleConfigRequireNames.hdwalletProvider;
+    }
+
+    return false;
   }
 
   function getModuleExportsObjectExpression(ast: ESTree.Node): ESTree.ObjectExpression | void {
@@ -301,7 +308,8 @@ export namespace TruffleConfiguration {
   function isHDWalletProvider(nodeType: string, node: ESTree.Node): boolean {
     if (nodeType === 'NewExpression') {
       node = node as ESTree.NewExpression;
-      if (node.callee.type === 'Identifier' && node.callee.name === 'HDWalletProvider') {
+      if (node.callee.type === 'Identifier'
+        && node.callee.name === Constants.truffleConfigRequireNames.hdwalletProvider) {
         return true;
       }
     }
@@ -448,14 +456,22 @@ export namespace TruffleConfiguration {
     return obj;
   }
 
+  function isMnemonicNode(node: ESTree.Literal | ESTree.NewExpression): boolean {
+    return node && node.type === 'Literal' && typeof node.value === 'string';
+  }
+
   function astToHDWalletProvider(node: ESTree.NewExpression): IProvider {
     const provider: IProvider = {
       raw: generate(node),
     };
 
-    const mnemonicNode = node.arguments[0];
-    if (mnemonicNode && mnemonicNode.type === 'Literal') {
-      provider.mnemonic = '' + mnemonicNode.value;
+    const mnemonicNode = node.arguments[0] as ESTree.NewExpression & ESTree.Literal;
+    const mnemonicFilePathNode = mnemonicNode && mnemonicNode.arguments && mnemonicNode.arguments[0] as ESTree.Literal;
+
+    if (isMnemonicNode(mnemonicNode)) {
+      provider.mnemonic = mnemonicNode.value as string;
+    } else if (isMnemonicNode(mnemonicFilePathNode)) {
+      provider.mnemonic = MnemonicRepository.getMnemonic(mnemonicFilePathNode.value as string);
     }
 
     const urlNode = node.arguments[1];
@@ -477,7 +493,7 @@ export namespace TruffleConfiguration {
         generateLiteral(provider.url || ''),
       ],
       callee: {
-        name: 'HDWalletProvider',
+        name: Constants.truffleConfigRequireNames.hdwalletProvider,
         type: 'Identifier',
       },
       type: 'NewExpression',

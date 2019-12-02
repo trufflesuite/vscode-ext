@@ -14,6 +14,7 @@ export interface ProviderOptions {
   timeout?: number;
   headers?: HttpHeader[];
   withCredentials?: boolean;
+  mnemonic?: string;
 }
 
 // tslint:disable-next-line:interface-name

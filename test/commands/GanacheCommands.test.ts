@@ -26,7 +26,7 @@ import { TestConstants } from '../TestConstants';
 describe('Unit tests GanacheCommands', () => {
   let checkAppsStub: sinon.SinonStub<RequiredApps[], Promise<boolean>>;
 
-  let getItemsMock: sinon.SinonStub<[(boolean | undefined)?], IExtensionItem[]>;
+  let getItemsMock: sinon.SinonStub<[], IExtensionItem[]>;
   let testServiceItems: Service[];
   let loadStateMock: sinon.SinonStub<[], IExtensionItem[]>;
   let projectView: ProjectView;

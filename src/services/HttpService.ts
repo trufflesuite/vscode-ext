@@ -3,14 +3,10 @@
 
 import * as requestPromise from 'request-promise';
 import { Constants } from '../Constants';
-import { Output } from '../Output';
 import { Telemetry } from '../TelemetryClient';
 
 export namespace HttpService {
-  export async function sendRPCRequest(
-    host: string,
-    methodName: string,
-  ): Promise<{ result?: any } | undefined> {
+  export async function sendRPCRequest(host: string, methodName: string): Promise<{ result?: any } | undefined> {
     const address = hasProtocol(host) ? host : `${Constants.networkProtocols.http}${host}`;
     return requestPromise.post(
       address,
@@ -23,15 +19,7 @@ export namespace HttpService {
         },
         json: true,
       })
-      .then((result) => {
-        const message = `HttpService.sendRPCRequest has done with result: ${result}`;
-        Output.outputLine(Constants.outputChannel.azureBlockchain, message);
-
-        return result;
-      })
-      .catch((errorMessage) => {
-        const message = `HttpService.sendRPCRequest has done with error: ${errorMessage}`;
-        Output.outputLine(Constants.outputChannel.azureBlockchain, message);
+      .catch((_errorMessage) => {
         Telemetry.sendException(new Error(`HttpService.sendRPCRequest has done with error for method: ${methodName}`));
 
         return undefined;

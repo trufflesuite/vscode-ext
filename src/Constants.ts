@@ -38,6 +38,12 @@ export class Constants {
     treeManager: 'Service Tree Manager',
   };
 
+  public static truffleConfigRequireNames = {
+    fs: 'fs',
+    fsPackageName: 'fs',
+    hdwalletProvider: 'HDWalletProvider',
+  };
+
   public static defaultTruffleBox = 'Azure-Samples/Blockchain-Ethereum-Template';
   public static defaultDebounceTimeout = 300;
 
@@ -65,8 +71,8 @@ export class Constants {
     },
     [RequiredApps.git]: '2.10.0',
     [RequiredApps.hdwalletProvider]: {
-      max: '1.0.7',
-      min: '1.0.6',
+      max: '2.0.0',
+      min: '1.0.17',
     },
     [RequiredApps.node]: '10.15.0',
     [RequiredApps.npm]: '6.4.1',
@@ -109,6 +115,12 @@ export class Constants {
       title: 'Smart Contract UI',
       viewType: 'contractUIPage',
     },
+    generateToken: {
+      path: '',
+      showOnStartup: 'showOnStartupGenerateToken',
+      title: 'Generate Token',
+      viewType: 'generateTokenPage',
+    },
     requirements: {
       path: '',
       showOnStartup: 'showOnStartupRequirementsPage',
@@ -138,6 +150,7 @@ export class Constants {
   public static contractProperties = {
     abi: 'abi',
     bytecode: 'bytecode',
+    deployedBytecode: 'deployedBytecode',
   };
 
   public static propertyLabels = {
@@ -449,16 +462,20 @@ export class Constants {
     consortiumNameValidating: 'Consortium name validating...',
     contractNotDeployed: 'Contract not deployed yet.',
     deployButton: 'Deploy',
+    deployFailed: 'Deploy failed',
+    deploySucceeded: 'Deploy succeeded',
     detailsButton: 'Details',
     generatedLogicApp: 'Generated the logic app!',
     infuraAccountSuccessfullyCreated: 'Your Infura account successfully created. Please check you email for complete registration',
     infuraSignInPrompt: 'Not signed in to Infura account, sign in first.',
+    installButton: 'Install',
     invalidRequiredVersion: 'Required app is not installed or has an old version.',
     memberNameValidating: 'Member name validating...',
     newProjectCreationFinished: 'New project was created successfully',
     newProjectCreationStarted: 'New project creation is started',
     openButton: 'Open',
     privateKeyWasCopiedToClipboard: 'Private key was copied to clipboard',
+    requiresDependency: 'This project deployment requires the truffle-hdwallet-provider.',
     rpcEndpointCopiedToClipboard: 'RPCEndpointAddress copied to clipboard',
     seeDetailsRequirementsPage: 'Please see details on the Requirements Page',
     signInButton: 'Sign In',
@@ -574,6 +591,8 @@ export class Constants {
     this.webViewPages.contractUI.path = context.asAbsolutePath(path.join('resources', 'drizzle', 'index.html'));
     this.webViewPages.welcome.path = context.asAbsolutePath(path.join('resources', 'welcome', 'index.html'));
     this.webViewPages.requirements.path = context.asAbsolutePath(path.join('resources', 'welcome', 'prereqs.html'));
+    this.webViewPages.generateToken.path = context.asAbsolutePath(
+      path.join('resources', 'tokenui', 'generateToken.html'));
     this.infuraFileResponse.path = context.asAbsolutePath(path.join('resources', 'codeFlowResult', 'index.html'));
     this.infuraFileResponse.css = context.asAbsolutePath(path.join('resources', 'codeFlowResult', 'main.css'));
 

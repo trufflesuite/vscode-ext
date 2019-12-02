@@ -2657,7 +2657,7 @@ $d.define(Nethereum.Generators.DataWorkflow.LogicApps.DataWorkflowFunctionOutput
         return null;
     };
     $p.GetConnectionSection = function DataWorkflowFunctionOutputLogicAppTemplate_GetConnectionSection(subsciptionId) {
-        return String.Format("     \"$connections\": {{\r\n        \"value\": {{\r\n            \"blockchainethereum\": {{\r\n                \"connectionId\": \"/subscriptions/{0}/resourceGroups/\",\r\n                \"connectionName\": \"\",\r\n                \"id\": \"/subscriptions/{1}/providers/Microsoft.Web/locations/{2}/managedApis/blockchainethereum\"\r\n            }},\r\n            \"sql\": {{\r\n                \"connectionId\": \"/subscriptions/{3}/resourceGroups/\",\r\n                \"connectionName\": \"\",\r\n                \"id\": \"/subscriptions/{4}/providers/Microsoft.Web/locations/{5}/managedApis/sql\"\r\n            }}\r\n        }}\r\n    }},", 
+        return String.Format("     \"parameters\": {{\r\n        \"$connections\": {{\r\n        \"value\": {{\r\n            \"blockchainethereum\": {{\r\n                \"connectionId\": \"/subscriptions/{0}/resourceGroups/\",\r\n                \"connectionName\": \"\",\r\n                \"id\": \"/subscriptions/{1}/providers/Microsoft.Web/locations/{2}/managedApis/blockchainethereum\"\r\n            }},\r\n            \"sql\": {{\r\n                \"connectionId\": \"/subscriptions/{3}/resourceGroups/\",\r\n                \"connectionName\": \"\",\r\n                \"id\": \"/subscriptions/{4}/providers/Microsoft.Web/locations/{5}/managedApis/sql\"\r\n            }}\r\n        }}\r\n        }}\r\n    }},", 
             [subsciptionId, subsciptionId, this._location, subsciptionId, subsciptionId, this._location]);
     };
     $p.GetLogicAppStart = function DataWorkflowFunctionOutputLogicAppTemplate_GetLogicAppStart() {
@@ -3552,7 +3552,7 @@ $d.define(Nethereum.Generators.MessagingWorkflow.LogicApps.MessagingWorkflowEven
         return null;
     };
     $p.GetConnectionSection = function MessagingWorkflowEventLogicAppTemplate_GetConnectionSection(subscriptionId) {
-        return String.Format("     \"$connections\": {{\r\n        \"value\": {{\r\n            \"blockchainethereum\": {{\r\n                \"connectionId\": \"/subscriptions/{0}/resourceGroups/\",\r\n                \"connectionName\": \"\",\r\n                \"id\": \"/subscriptions/{1}/providers/Microsoft.Web/locations/{2}/managedApis/blockchainethereum\"\r\n            }},\r\n            {3}\r\n        }}\r\n    }},", 
+        return String.Format("     \"parameters\": {{\r\n        \"$connections\": {{\r\n        \"value\": {{\r\n            \"blockchainethereum\": {{\r\n                \"connectionId\": \"/subscriptions/{0}/resourceGroups/\",\r\n                \"connectionName\": \"\",\r\n                \"id\": \"/subscriptions/{1}/providers/Microsoft.Web/locations/{2}/managedApis/blockchainethereum\"\r\n            }},\r\n            {3}\r\n        }}\r\n        }}\r\n    }},", 
             [subscriptionId, subscriptionId, this._location, this.GetConnection(subscriptionId)]);
     };
     $p.GetConnection = function MessagingWorkflowEventLogicAppTemplate_GetConnection(subscriptionId) {
@@ -3594,10 +3594,12 @@ $d.define(Nethereum.Generators.MessagingWorkflow.LogicApps.MessagingWorkflowEven
         var beginActions = String.Format("\"actions\": {{\r\n            \"Publish_Event\": {{\r\n                \"inputs\": {{\r\n                    \"body\": [\r\n                        {{\r\n                            \"data\": \"@triggerBody()\",\r\n                            \"eventTime\": \"@{{utcNow()}}\",\r\n                            \"eventType\": \"{0}\",\r\n                            \"id\": \"@{{guid()}}\",\r\n                            \"subject\": \"{1}\"\r\n                        }}\r\n                    ]", 
             [this.get_Model().get_EventABI().get_Name(), this._topicName]);
 
-        var paths = "/eventGrid/api/events";
+        var eventProperties = String.Concat(System.Linq.Enumerable.Select(Nethereum.Generators.Model.ParameterABI, 
+            String, this.get_Model().get_EventABI().get_InputParameters(), $d.delegate(function(p) {
+                return "'\\\"" + p.get_Name() + "\\\": ',triggerBody()?['" + p.get_Name() + "'],',','\\n',";
+            })));
 
-        var endActions = String.Format(",\r\n                    \"host\": {{\r\n                        \"connection\": {{\r\n                            \"name\": \"@parameters('$connections')['azureeventgridpublish']['connectionId']\"\r\n                        }}\r\n                    }},\r\n                    \"method\": \"post\",\r\n                    \"path\": \"{0}\"\r\n                }},\r\n                \"runAfter\": {{}},\r\n                \"type\": \"ApiConnection\"\r\n            }}\r\n        }}", 
-            [paths]);
+        var endActions = ",\r\n                    \"host\": {\r\n                        \"connection\": {\r\n                            \"name\": \"@parameters('$connections')['azureeventgridpublish']['connectionId']\"\r\n                        }\r\n                    },\r\n                    \"method\": \"post\",\r\n                    \"path\": \"/eventGrid/api/events\"\r\n                },\r\n                \"runAfter\": {},\r\n                \"type\": \"ApiConnection\"\r\n            }\r\n        }";
         return String.Concat$5(beginActions, endActions);
     };
     $p.GetServiceBusActions = function MessagingWorkflowEventLogicAppTemplate_GetServiceBusActions() {
@@ -4073,7 +4075,7 @@ $d.define(Nethereum.Generators.ReportingWorkflow.LogicApps.ReportingWorkflowEven
         return null;
     };
     $p.GetConnectionSection = function ReportingWorkflowEventsOutputLogicAppTemplate_GetConnectionSection(subsciptionId) {
-        return String.Format("     \"$connections\": {{\r\n        \"value\": {{\r\n            \"blockchainethereum\": {{\r\n                \"connectionId\": \"/subscriptions/{0}/resourceGroups/\",\r\n                \"connectionName\": \"\",\r\n                \"id\": \"/subscriptions/{1}/providers/Microsoft.Web/locations/{2}/managedApis/blockchainethereum\"\r\n            }},\r\n            \"powerbi\": {{\r\n                \"connectionId\": \"/subscriptions/{3}/resourceGroups/\",\r\n                \"connectionName\": \"\",\r\n                \"id\": \"/subscriptions/{4}/providers/Microsoft.Web/locations/{5}/managedApis/powerbi\"\r\n            }}\r\n        }}\r\n    }},", 
+        return String.Format("     \"parameters\": {{\r\n        \"$connections\": {{\r\n        \"value\": {{\r\n            \"blockchainethereum\": {{\r\n                \"connectionId\": \"/subscriptions/{0}/resourceGroups/\",\r\n                \"connectionName\": \"\",\r\n                \"id\": \"/subscriptions/{1}/providers/Microsoft.Web/locations/{2}/managedApis/blockchainethereum\"\r\n            }},\r\n            \"powerbi\": {{\r\n                \"connectionId\": \"/subscriptions/{3}/resourceGroups/\",\r\n                \"connectionName\": \"\",\r\n                \"id\": \"/subscriptions/{4}/providers/Microsoft.Web/locations/{5}/managedApis/powerbi\"\r\n            }}\r\n        }}\r\n        }}\r\n    }},", 
             [subsciptionId, subsciptionId, this._location, subsciptionId, subsciptionId, this._location]);
     };
     $p.GetLogicAppStart = function ReportingWorkflowEventsOutputLogicAppTemplate_GetLogicAppStart() {
@@ -5040,7 +5042,7 @@ $d.define(Nethereum.Generators.ServiceWorkflow.FlowApps.ServiceWorkflowFunctionO
 
     };
     $p.GetExecuteFunctionActionForLogicApp = function ServiceWorkflowFunctionOutputFlowAppTemplate_GetExecuteFunctionActionForLogicApp() {
-        return "    \"actions\": {\r\n        \"Call smart contract function\": {\r\n                \"runAfter\": { },\r\n            \"type\": \"ApiConnection\",\r\n            \"inputs\": {\r\n                    \"body\": {\r\n" + this.GetEthereumConnectorParameters() + "\r\n                    },\r\n                \"host\": {\r\n                        \"connection\": {\r\n                            \"name\": \"@parameters('$connections')['shared_blockchainethereum']['connectionId']\"\r\n                        }\r\n                    },\r\n                \"method\": \"post\",\r\n                \"path\": \"/contract/functions/@{encodeURIComponent(encodeURIComponent('" + this.get_Model().get_FunctionABI().get_Name() + "'))}/" + (this.get_Model().get_FunctionABI().get_Constant() ? "query" : "execute") + "\",\r\n                \"queries\": {\r\n                        \"abi\": \"" + this._escapedAbi + "\",\r\n\r\n                        \"contractAddress\": \"" + this._contractAddress + "\"\r\n                }\r\n                }\r\n            },";
+        return "    \"actions\": {\r\n        \"Call smart contract function\": {\r\n                \"runAfter\": { },\r\n            \"type\": \"ApiConnection\",\r\n            \"inputs\": {\r\n                    \"body\": {\r\n" + this.GetEthereumConnectorParameters() + "\r\n                    },\r\n                \"host\": {    \"parameters\": {{\r\n                        \"connection\": {\r\n                            \"name\": \"@parameters('$connections')['shared_blockchainethereum']['connectionId']\"\r\n                        }\r\n                    }\r\n                 },\r\n                \"method\": \"post\",\r\n                \"path\": \"/contract/functions/@{encodeURIComponent(encodeURIComponent('" + this.get_Model().get_FunctionABI().get_Name() + "'))}/" + (this.get_Model().get_FunctionABI().get_Constant() ? "query" : "execute") + "\",\r\n                \"queries\": {\r\n                        \"abi\": \"" + this._escapedAbi + "\",\r\n\r\n                        \"contractAddress\": \"" + this._contractAddress + "\"\r\n                }\r\n                }\r\n            },";
     };
     $p.GetEthereumConnectorParameters = function ServiceWorkflowFunctionOutputFlowAppTemplate_GetEthereumConnectorParameters() {
         return String.Join$1(String, ",\r\n", System.Linq.Enumerable.Select(Nethereum.Generators.Model.ParameterABI, 
@@ -5436,7 +5438,7 @@ $d.define(Nethereum.Generators.ServiceWorkflow.LogicApps.ServiceWorkflowFunction
         return null;
     };
     $p.GetConnections = function ServiceWorkflowFunctionOutputLogicAppTemplate_GetConnections() {
-        return String.Format("{{     \"$connections\": {{\r\n        \"value\": {{\r\n            \"blockchainethereum\": {{\r\n                \"connectionId\": \"/subscriptions/{0}/resourceGroups/\",\r\n                \"connectionName\": \"\",\r\n                \"id\": \"/subscriptions/{1}/providers/Microsoft.Web/locations/{2}/managedApis/blockchainethereum\"\r\n            }}\r\n        }}\r\n    }},", 
+        return String.Format("{{        \"parameters\": {{\r\n        \"$connections\": {{\r\n        \"value\": {{\r\n            \"blockchainethereum\": {{\r\n                \"connectionId\": \"/subscriptions/{0}/resourceGroups/\",\r\n                \"connectionName\": \"\",\r\n                \"id\": \"/subscriptions/{1}/providers/Microsoft.Web/locations/{2}/managedApis/blockchainethereum\"\r\n            }}\r\n        }}\r\n        }}\r\n    }},", 
             [this._subsciptionId, this._subsciptionId, this._location]);
     };
     $p.GetLogicAppStart = function ServiceWorkflowFunctionOutputLogicAppTemplate_GetLogicAppStart() {

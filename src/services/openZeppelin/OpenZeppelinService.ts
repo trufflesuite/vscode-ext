@@ -14,6 +14,7 @@ import * as _metadata from './manifest.json';
 
 const metadata = _metadata as IOZMetadata;
 const projectFileName: string = 'project.json';
+const categoryWithoutDocumentation = 'mocks';
 
 export interface IOZMetadata {
   contentVersion: string;
@@ -98,8 +99,8 @@ export namespace OpenZeppelinService {
       return result;
     }
 
-    contractDependencies.dependencies.forEach(async (id: string) => {
-      const dependency = metadata.assets.find((asset: IOZAsset) => asset.id === id)!;
+    for (const dependencyId of contractDependencies.dependencies) {
+      const dependency = metadata.assets.find((asset: IOZAsset) => asset.id === dependencyId)!;
       if (dependency.type === OZAssetType.library) {
         if (!result.includes(dependency)) {
           result.push(dependency);
@@ -111,7 +112,7 @@ export namespace OpenZeppelinService {
           }
         });
       }
-    });
+    }
 
     return result;
   }
@@ -145,19 +146,23 @@ export namespace OpenZeppelinService {
 
   export function getAssetsStatus(assets: IOZAsset[]): { existing: IOZAsset[], missing: IOZAsset[] } {
     const openZeppelinSubfolder = getContractFolderPath();
-    const statuses = assets.map((asset) => {
-      if (fs.existsSync(path.join(openZeppelinSubfolder, path.dirname(asset.name)))) {
-        return {asset, exists: true};
-      }
-      return {asset, exists: false};
+    const assetsStatuses = assets.map((asset) => {
+      const assetPath = getAssetFullPath(openZeppelinSubfolder, asset);
+
+      return { asset, exists: fs.existsSync(assetPath) };
     });
+
     return {
-      existing: statuses.filter((status) => status.exists === true).map((status) => status.asset),
-      missing: statuses.filter((status) => status.exists === false).map((status) => status.asset),
+      existing: assetsStatuses.filter((status) => status.exists === true).map((status) => status.asset),
+      missing: assetsStatuses.filter((status) => status.exists === false).map((status) => status.asset),
     };
   }
 
   export function getCategoryApiDocumentationUrl(category: IOZContractCategory) {
+    if (category.id === categoryWithoutDocumentation) {
+      return undefined;
+    }
+
     const baseUrl = appendSlashIfNotExists(metadata.apiDocumentationBaseUri);
     return url.resolve(baseUrl, category.id);
   }
@@ -216,23 +221,23 @@ function isFileExists(filePath: string) {
 
 async function downloadFile(asset: IOZAsset, overwrite: boolean = false, openZeppelinSubfolder: string)
   : Promise<IDownloadingResult> {
-  const fileUrl = new URL(path.join(metadata.targetPoint, asset.name), metadata.baseUri).toString();
-  const destinationPath = path.join(openZeppelinSubfolder, path.dirname(asset.name));
-  const destinationFile = path.join(destinationPath, path.basename(asset.name));
+  const fileUrl = new URL(getAssetFullPath(metadata.targetPoint, asset), metadata.baseUri).toString();
+  const destinationFilePath = getAssetFullPath(openZeppelinSubfolder, asset);
+  const destinationDirPath = path.dirname(destinationFilePath);
 
-  if (fs.existsSync(destinationFile)) {
+  if (fs.existsSync(destinationFilePath)) {
     if (overwrite) {
-      await fs.chmod(destinationFile, 0o222); // reset r/o flag, this allows to overwrite
+      await fs.chmod(destinationFilePath, 0o222); // reset r/o flag, this allows to overwrite
     } else {
       Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - Skipped`);
       return { state: PromiseState.fileExisted, asset };
     }
   }
 
-  return download(fileUrl, destinationPath, { filename: path.basename(asset.name) })
+  return download(fileUrl, destinationDirPath, { filename: path.basename(destinationFilePath) })
     .then(async () => {
       Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - OK`);
-      await fs.chmod(destinationFile, 0o444);
+      await fs.chmod(destinationFilePath, 0o444);
       return { state: PromiseState.fulfilled, asset };
     })
     .catch(() => {
@@ -258,8 +263,7 @@ function getOzContractsFromProjectMetadata(
   openZeppelinSubfolder: string,
   userProjectMetadata: IProjectMetadata) {
     return Object.values(userProjectMetadata.openZeppelin.assets)
-      // map assetName to contractPath
-      .map((asset) => path.join(openZeppelinSubfolder, asset.name));
+      .map((asset) => getAssetFullPath(openZeppelinSubfolder, asset));
 }
 
 function getOriginalHash(
@@ -272,4 +276,8 @@ function getOriginalHash(
       return originalAsset.hash;
     }
     return '';
+}
+
+function getAssetFullPath(baseDir: string, asset: IOZAsset) {
+  return path.join(baseDir, asset.name);
 }

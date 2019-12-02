@@ -28,7 +28,7 @@ export namespace OpenZeppelinMigrationsService {
         '};',
       ].join('\n');
 
-      saveMigrationContent(migrationContent);
+      return saveMigrationContent(migrationContent);
     }
   }
 }
@@ -62,16 +62,17 @@ function generateLibrariesDeployerSection(items: IOZAsset[]): string {
 
 async function generateLinkingSection(items: IOZAsset[]): Promise<string[]> {
   const librariesLinkingSection: string[] = [];
-  items
-    .filter((asset: IOZAsset) => asset.type === OZAssetType.contract)
-    .forEach(async (asset: IOZAsset) => {
-      librariesLinkingSection.push(
-        ...contractToLibraryLinkingSection(
-          asset,
-          await OpenZeppelinService.getReferencesToLibraries(asset),
-        ),
-      );
-    });
+  const contracts = items.filter((asset) => asset.type === OZAssetType.contract);
+
+  for (const contract of contracts) {
+    librariesLinkingSection.push(
+      ...contractToLibraryLinkingSection(
+        contract,
+        await OpenZeppelinService.getReferencesToLibraries(contract),
+      ),
+    );
+  }
+
   return librariesLinkingSection;
 }
 
@@ -88,16 +89,16 @@ async function saveMigrationContent(content: string): Promise<void> {
   const truffleConfig = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
   const configuration = truffleConfig.getConfiguration();
   const migrationFilePath = configuration.migrations_directory;
+  const filePath = path.join(
+    getWorkspaceRoot()!,
+    migrationFilePath,
+    migrationFilename,
+  );
 
   Output.outputLine(
     Constants.outputChannel.azureBlockchain,
     `New migration for OpenZeppelin contracts was stored to file ${migrationFilename}`,
   );
 
-  const filePath = path.join(
-    getWorkspaceRoot()!,
-    migrationFilePath,
-    migrationFilename,
-  );
-  fs.writeFileSync(filePath, content, { encoding: 'utf8' });
+  return fs.writeFile(filePath, content, { encoding: 'utf8' });
 }

@@ -1,8 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import { Constants } from './constants';
 import { Container } from '@material-ui/core';
-import { DrizzleContext } from 'drizzle-react';
+import { DrizzleContext } from '@drizzle/react-plugin';
+import HDWalletProvider from '@truffle/hdwallet-provider';
 import { IPC } from 'services';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -83,11 +85,29 @@ class App extends React.Component {
     drizzle.deleteAllContracts();
 
     if (provider) {
+      const { WebsocketProvider } = drizzle.web3.providers;
       const host = new URL(Url.normalize(provider.host));
 
-      host.protocol = 'ws';
+      let web3Provider;
 
-      drizzle.web3.setProvider(host.toString());
+      if (
+        Constants.regexps.providerTypes.azure.test(host.toString()) &&
+        provider.options &&
+        provider.options.mnemonic
+      ) {
+        host.protocol = 'wss';
+        host.port = 3300;
+
+        web3Provider = new HDWalletProvider(
+          provider.options.mnemonic,
+          new WebsocketProvider(host.toString()),
+        );
+      } else {
+        host.protocol = 'ws';
+        web3Provider = new WebsocketProvider(host.toString());
+      }
+
+      drizzle.web3.setProvider(web3Provider);
     }
 
     const address = contractInstance.address;

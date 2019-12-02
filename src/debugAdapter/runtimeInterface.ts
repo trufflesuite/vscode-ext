@@ -1,7 +1,10 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+import * as truffleDebugUtils from '@truffle/debug-utils';
+import * as truffleDebugger from '@truffle/debugger';
 import { EventEmitter } from 'events';
 import { relative as pathRelative } from 'path';
-import * as truffleDebugUtils from 'truffle-debug-utils';
-import * as truffleDebugger from 'truffle-debugger';
 import {
   filterContractsWithAddress,
   prepareContracts,

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from '../../Constants';
+import { Constants, RequiredApps } from '../../Constants';
 import { saveTextInFile, showInputBox, showQuickPick, TruffleConfiguration } from '../../helpers';
 import { MnemonicRepository } from '../../services/MnemonicRepository'; // Should be full path since cycle dependencies
 import { NetworkNode } from './NetworkNode';
@@ -14,7 +14,9 @@ export abstract class MnemonicNetworkNode extends NetworkNode {
     const targetURL = await this.getRPCAddress();
     const mnemonic = await this.getMnemonic();
 
-    await config.importPackage('fs', 'fs');
+    const { fs, fsPackageName, hdwalletProvider } = Constants.truffleConfigRequireNames;
+    await config.importPackage(fs, fsPackageName);
+    await config.importPackage(hdwalletProvider, RequiredApps.hdwalletProvider);
 
     network.options.provider = {
       mnemonic: mnemonic.path,

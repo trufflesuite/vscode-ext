@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { Container } from '@material-ui/core';
-import { DrizzleContext } from 'drizzle-react';
+import { DrizzleContext } from '@drizzle/react-plugin';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {

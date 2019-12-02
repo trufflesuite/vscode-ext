@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { createInputComponent } from '../factory/InputComponentFactory';
-import { newContextComponents } from 'drizzle-react-components';
+import { newContextComponents } from '@drizzle/react-components';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {

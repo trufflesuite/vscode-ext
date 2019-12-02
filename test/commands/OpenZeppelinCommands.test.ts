@@ -6,7 +6,16 @@ import * as path from 'path';
 import rewire = require('rewire');
 import * as sinon from 'sinon';
 import uuid = require('uuid');
-import { window } from 'vscode';
+import {
+  CancellationToken,
+  MessageItem,
+  MessageOptions,
+  Progress,
+  ProgressOptions,
+  QuickPickItem,
+  QuickPickOptions,
+  window,
+} from 'vscode';
 import { Constants } from '../../src/Constants';
 import { TruffleConfiguration } from '../../src/helpers/truffleConfig';
 import * as workspace from '../../src/helpers/workspace';
@@ -23,18 +32,21 @@ import {
 
 describe('OpenZeppelinCommands tests', () => {
   let testCategories: IOZContractCategory[];
-  let getCategoriesStub: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], unknown>;
-  let collectAssetsWithDependenciesStub: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], unknown>;
-  let downloadFilesStub: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], unknown>;
+  let getCategoriesStub: sinon.SinonStub<[], IOZContractCategory[]>;
+  let collectAssetsWithDependenciesStub: sinon.SinonStub<[(string[] | undefined)?], IOZAsset[]>;
+  let downloadFilesStub: sinon.SinonStub<[IOZAsset[], (boolean | undefined)?], Promise<IDownloadingResult[]>>;
   let addAssetsToProjectJsonStub: sinon.SinonStub<[IOZAsset[]], Promise<void>>;
   let getAssetsStatusStub: sinon.SinonStub<any>;
   let generateMigrationsStub: sinon.SinonStub<[IOZAsset[]], Promise<void>>;
   let getCategoryApiDocumentationUrlStub: sinon.SinonStub<any>;
 
-  let withProgressStub: sinon.SinonStub<any[], any>;
-  let showQuickPickStub: sinon.SinonStub<any[], any>;
-  let showInformationMessageStub: sinon.SinonStub<any[], any>;
-  let showErrorMessageStub: sinon.SinonStub<any[], any>;
+  let withProgressStub: sinon.SinonStub<[ProgressOptions,
+    (progress: Progress<any>, token: CancellationToken) => any], any>;
+  let showQuickPickStub: sinon.SinonStub<
+    [QuickPickItem[] | Thenable<QuickPickItem[]>, (QuickPickOptions | undefined)?, (CancellationToken | undefined)?],
+    any>;
+  let showInformationMessageStub: sinon.SinonStub<[string, MessageOptions, ...MessageItem[]], any>;
+  let showErrorMessageStub: sinon.SinonStub<[string, MessageOptions, ...MessageItem[]], any>;
 
   let selectedCategory: IOZContractCategory;
   let testAssets: IOZAsset[];
@@ -63,7 +75,8 @@ describe('OpenZeppelinCommands tests', () => {
     getAssetsStatusStub = sinon.stub(OpenZeppelinService, 'getAssetsStatus');
     downloadFilesStub = sinon.stub(OpenZeppelinService, 'downloadFiles');
     generateMigrationsStub = sinon.stub(OpenZeppelinMigrationsService, 'generateMigrations');
-    getCategoryApiDocumentationUrlStub = sinon.stub(OpenZeppelinService, 'getCategoryApiDocumentationUrl');
+    getCategoryApiDocumentationUrlStub = sinon.stub(OpenZeppelinService, 'getCategoryApiDocumentationUrl')
+      .returns('testUrl');
 
     getAssetsStatusStub.returns({ existing: [], missing: testAssets });
 
@@ -86,7 +99,7 @@ describe('OpenZeppelinCommands tests', () => {
         state: PromiseState.fulfilled,
       });
     });
-    downloadFilesStub.returns(testDownloadingResult);
+    downloadFilesStub.resolves(testDownloadingResult);
 
     openStub = sinon.stub().resolves();
     const openZeppelinCommandsRewire = rewire('../../src/commands/OpenZeppelinCommands');
@@ -227,11 +240,11 @@ describe('OpenZeppelinCommands tests', () => {
   it('should show error message if some files failed on downloading and allow to retry', async () => {
     // Arrange
     const rejectedAssets = [
-      { asset: {}, state: PromiseState.rejected },
-      { asset: {}, state: PromiseState.rejected },
+      { asset: {} as IOZAsset, state: PromiseState.rejected },
+      { asset: {} as IOZAsset, state: PromiseState.rejected },
     ];
-    downloadFilesStub.returns([
-      { asset: {}, state: PromiseState.fulfilled },
+    downloadFilesStub.resolves([
+      { asset: {} as IOZAsset, state: PromiseState.fulfilled },
       ...rejectedAssets,
     ]);
     showErrorMessageStub
@@ -266,6 +279,22 @@ describe('OpenZeppelinCommands tests', () => {
     assert.strictEqual(openStub.calledWith(testDocumentationUrl), true,
       `open should be called with ${testDocumentationUrl}`);
     assert.strictEqual(openStub.calledAfter(downloadFilesStub), true, 'open should be called after downloadFiles');
+  });
+
+  it('should not ask and open category documentation if it doesn\'t exist', async () => {
+    // Arrange
+    getCategoryApiDocumentationUrlStub.returns(undefined);
+    generateMigrationsStub.resolves();
+
+    // Act
+    await openZeppelinCommands.addCategory();
+
+    // Assert
+    assert.strictEqual(
+      showInformationMessageStub.calledWith(Constants.openZeppelin.exploreDownloadedContractsInfo),
+      false,
+      'showInformationMessageStub should not be called with explore contracts info message');
+    assert.strictEqual(openStub.called, false, 'open should not be called');
   });
 });
 

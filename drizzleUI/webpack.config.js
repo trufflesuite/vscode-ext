@@ -1,7 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ReplacePlugin = require('webpack-plugin-replace');
 const webpack = require('webpack');
 
 module.exports = () => {
@@ -38,7 +37,6 @@ module.exports = () => {
         components: path.join(__dirname, './src/components'),
         constants: path.join(__dirname, './src/constants'),
         helpers: path.join(__dirname, './src/helpers'),
-        polyfills: path.join(__dirname, './src/polyfills'),
         services: path.join(__dirname, './src/services'),
         views: path.join(__dirname, './src/views'),
         middlewares: path.join(__dirname, './src/middlewares'),
@@ -86,17 +84,6 @@ module.exports = () => {
       new MiniCssExtractPlugin({
         filename: '[name].css',
         allChunks: true,
-      }),
-      new ReplacePlugin({
-        exclude: path.join(__dirname, 'src', 'index.js'),
-        include: true,
-        patterns: [{
-          regex: /localStorage/g,
-          value: 'ls'
-        }],
-        values: {
-          ls: 'ls'
-        }
       }),
       new webpack.optimize.AggressiveMergingPlugin(),
     ]

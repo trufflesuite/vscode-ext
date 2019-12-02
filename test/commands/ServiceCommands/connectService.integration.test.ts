@@ -8,7 +8,7 @@ import * as uuid from 'uuid';
 import * as vscode from 'vscode';
 import { Constants } from '../../../src/Constants';
 import { ItemType } from '../../../src/Models';
-import { AzureBlockchainProject, AzureBlockchainService, Project } from '../../../src/Models/TreeItems';
+import { AzureBlockchainProject, AzureBlockchainService, Project, Service, ServiceTypes } from '../../../src/Models/TreeItems';
 import { ConsortiumResourceExplorer } from '../../../src/resourceExplorers';
 import { GanacheService, TreeManager } from '../../../src/services';
 import { AzureAccountHelper } from '../../testHelpers/AzureAccountHelper';
@@ -42,7 +42,7 @@ describe('Service Commands', () => {
 
     describe('connectProject returns project', () => {
       let selectedDestination: any;
-      let getItemStub: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], {}>;
+      let getItemStub: sinon.SinonStub<[ServiceTypes], Service>;
       let addChildStub: sinon.SinonStub<any, any>;
       let showQuickPickMock: sinon.SinonStub<any[], any>;
       let showInputBoxMock: sinon.SinonExpectation;

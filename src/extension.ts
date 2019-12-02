@@ -87,6 +87,9 @@ export async function activate(context: ExtensionContext) {
   const copyByteCode = commands.registerCommand('contract.copyByteCode', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeBytecodeToBuffer(uri));
   });
+  const copyDeployedByteCode = commands.registerCommand('contract.copyDeployedByteCode', async (uri: Uri) => {
+    await tryExecute(() => TruffleCommands.writeDeployedBytecodeToBuffer(uri));
+  });
   const copyABI = commands.registerCommand('contract.copyABI', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeAbiToBuffer(uri));
   });
@@ -132,6 +135,11 @@ export async function activate(context: ExtensionContext) {
     async (contractPath: Uri) => {
       await tryExecute(() => ContractCommands.showSmartContractPage(context, contractPath));
     });
+  const generateToken = commands.registerCommand(
+    'azureBlockchainService.generateToken',
+    async () => {
+      await tryExecute(() => ContractCommands.generateToken(context));
+    });
   //#endregion
 
   //#region open zeppelin commands
@@ -173,6 +181,7 @@ export async function activate(context: ExtensionContext) {
     showWelcomePage,
     showRequirementsPage,
     showSmartContractPage,
+    generateToken,
     refresh,
     newSolidityProject,
     buildContracts,
@@ -181,6 +190,7 @@ export async function activate(context: ExtensionContext) {
     connectProject,
     disconnectProject,
     copyByteCode,
+    copyDeployedByteCode,
     copyABI,
     copyRPCEndpointAddress,
     startGanacheServer,

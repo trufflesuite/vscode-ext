@@ -1,4 +1,7 @@
-import * as truffleProvider from 'truffle-provider';
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+import * as truffleProvider from '@truffle/provider';
 import * as web3 from 'web3';
 import { ConfigurationReader } from './configurationReader';
 

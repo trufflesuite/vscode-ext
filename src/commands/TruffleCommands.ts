@@ -56,7 +56,6 @@ export namespace TruffleCommands {
         await required.installTruffle(required.Scope.locally);
       }
 
-      Output.show();
       await outputCommandHelper.executeCommand(getWorkspaceRoot(), 'npx', RequiredApps.truffle, 'compile');
     });
     Telemetry.sendEvent('TruffleCommands.buildContracts.commandFinished');
@@ -90,18 +89,6 @@ export namespace TruffleCommands {
       { url: Telemetry.obfuscate(command.description || '') },
     );
 
-    // this code should be below showQuickPick because it takes time and it affects on responsiveness
-    if (!await required.checkAppsSilent(RequiredApps.truffle)) {
-      Telemetry.sendEvent('TruffleCommands.deployContracts.installTruffle');
-      await required.installTruffle(required.Scope.locally);
-    }
-
-    if (await required.isHdWalletProviderRequired()
-      && !(await required.checkHdWalletProviderVersion())) {
-      Telemetry.sendEvent('TruffleCommands.deployContracts.installTruffleHdWalletProvider');
-      await required.installTruffleHdWalletProvider();
-    }
-
     await validateOpenZeppelinContracts();
 
     await command.cmd();
@@ -122,6 +109,14 @@ export namespace TruffleCommands {
     const contract = await readCompiledContract(uri);
 
     await vscodeEnvironment.writeToClipboard(contract[Constants.contractProperties.bytecode]);
+    Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
+  }
+
+  export async function writeDeployedBytecodeToBuffer(uri: Uri): Promise<void> {
+    Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandStarted');
+    const contract = await readCompiledContract(uri);
+
+    await vscodeEnvironment.writeToClipboard(contract[Constants.contractProperties.deployedBytecode]);
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
   }
 
@@ -188,6 +183,28 @@ function removeDuplicateNetworks(deployDestinations: IDeployDestinationItem[]): 
   return deployDestinations.filter((destination, index, destinations) => {
     return destinations.findIndex((dest) => dest.label === destination.label) === index;
   });
+}
+
+async function installRequiredDependencies(): Promise<void> {
+  if (!await required.checkAppsSilent(RequiredApps.truffle)) {
+    Telemetry.sendEvent('TruffleCommands.installRequiredDependencies.installTruffle');
+    await required.installTruffle(required.Scope.locally);
+  }
+
+  if (await required.isHdWalletProviderRequired() && !(await required.checkHdWalletProviderVersion())) {
+
+    if (!await required.isDefaultProject()) {
+      const { cancelButton, installButton, requiresDependency } = Constants.informationMessage;
+      const answer = await window.showInformationMessage(requiresDependency, installButton, cancelButton);
+
+      if (answer !== installButton) {
+        return;
+      }
+    }
+
+    Telemetry.sendEvent('TruffleCommands.installRequiredDependencies.installTruffleHdWalletProvider');
+    await required.installTruffleHdWalletProvider();
+  }
 }
 
 async function validateOpenZeppelinContracts(): Promise<void> {
@@ -386,11 +403,19 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
     const workspaceRoot = path.dirname(truffleConfigPath);
 
     await fs.ensureDir(workspaceRoot);
-    await outputCommandHelper.executeCommand(
-      workspaceRoot,
-      'npx',
-      RequiredApps.truffle, 'migrate', '--reset', '--network', networkName,
-    );
+
+    try {
+      await installRequiredDependencies();
+      await outputCommandHelper.executeCommand(
+        workspaceRoot,
+        'npx',
+        RequiredApps.truffle, 'migrate', '--reset', '--network', networkName,
+      );
+      Output.outputLine(Constants.outputChannel.azureBlockchain, Constants.informationMessage.deploySucceeded);
+    } catch (error) {
+      Output.outputLine(Constants.outputChannel.azureBlockchain, Constants.informationMessage.deployFailed);
+      throw error;
+    }
 
     await ContractDB.updateContracts();
   });

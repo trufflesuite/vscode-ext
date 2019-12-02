@@ -1,6 +1,9 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
+import * as truffleProvider from '@truffle/provider';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import * as truffleProvider from 'truffle-provider';
 import { ConfigurationReader } from '../../src/debugAdapter/configurationReader';
 import { Web3Wrapper } from '../../src/debugAdapter/web3Wrapper';
 

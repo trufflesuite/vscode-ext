@@ -4,6 +4,8 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
+export const referenceMnemonic = 'some menmonic some menmonic some menmonic some menmonic some menmonic some menmonic';
+
 export const referenceCfgContent = 'const HDWalletProvider = require("truffle-hdwallet-provider");'
   + 'module.exports = {'
   + '  networks: {'
@@ -88,6 +90,7 @@ export const referenceConfiguration = {
         network_id: '*',
         port: 123,
         provider: {
+          mnemonic: referenceMnemonic,
           raw: 'new HDWalletProvider(fs.readFileSync(\"path\", \"encoding\"), \"url\")',
           url: 'url',
         },
