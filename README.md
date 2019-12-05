@@ -55,7 +55,7 @@ For developers who are not familiar with Truffle, or prefer to use the Command P
 
 Once complete, your project directory should look like this:
 
-[![completed directory](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/newProjectDirCloseup.png)](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/newProjectDir.png#lightbox)
+[![completed directory](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/newProjectDirCloseup.png)](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/newProjectDir.png)
 
 
 ## Build your Solidity Contract
