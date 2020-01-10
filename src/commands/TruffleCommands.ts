@@ -6,24 +6,35 @@ import * as fs from 'fs-extra';
 // @ts-ignore
 import * as hdkey from 'hdkey';
 import * as path from 'path';
-import { ProgressLocation, QuickPickItem, Uri, window } from 'vscode';
+import { QuickPickItem, Uri, window } from 'vscode';
 import { Constants, RequiredApps } from '../Constants';
 import {
   getWorkspaceRoot,
+  openZeppelinHelper,
   outputCommandHelper,
   required,
   showConfirmPaidOperationDialog,
+  showIgnorableNotification,
   showQuickPick,
   TruffleConfig,
   TruffleConfiguration,
   vscodeEnvironment,
 } from '../helpers';
 import { IDeployDestination, ItemType } from '../Models';
+import { NetworkForContractItem } from '../Models/QuickPickItems/NetworkForContractItem';
 import { LocalService } from '../Models/TreeItems';
 import { Project } from '../Models/TreeItems';
 import { Output } from '../Output';
-import { ContractDB, GanacheService, MnemonicRepository, OpenZeppelinService, TreeManager } from '../services';
-import { OZContractValidated } from '../services/openZeppelin/OpenZeppelinService';
+import {
+  ContractDB,
+  ContractInstanceWithMetadata,
+  ContractService,
+  GanacheService,
+  MnemonicRepository,
+  OpenZeppelinService,
+  TreeManager,
+} from '../services';
+import { OZContractValidated } from '../services/openZeppelin/models';
 import { Telemetry } from '../TelemetryClient';
 import { ProjectView } from '../ViewItems';
 import { ServiceCommands } from './ServiceCommands';
@@ -47,17 +58,18 @@ interface IExtendedQuickPickItem extends QuickPickItem {
 export namespace TruffleCommands {
   export async function buildContracts(): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.buildContracts.commandStarted');
-    await window.withProgress({
-      location: ProgressLocation.Window,
-      title: Constants.statusBarMessages.buildingContracts,
-    }, async () => {
-      if (!await required.checkAppsSilent(RequiredApps.truffle)) {
-        Telemetry.sendEvent('TruffleCommands.buildContracts.truffleInstallation');
-        await required.installTruffle(required.Scope.locally);
-      }
+    await showIgnorableNotification(
+      Constants.statusBarMessages.buildingContracts,
+      async () => {
+        if (!await required.checkAppsSilent(RequiredApps.truffle)) {
+          Telemetry.sendEvent('TruffleCommands.buildContracts.truffleInstallation');
+          await required.installTruffle(required.Scope.locally);
+        }
 
-      await outputCommandHelper.executeCommand(getWorkspaceRoot(), 'npx', RequiredApps.truffle, 'compile');
-    });
+        await outputCommandHelper.executeCommand(getWorkspaceRoot(), 'npx', RequiredApps.truffle, 'compile');
+      },
+    );
+
     Telemetry.sendEvent('TruffleCommands.buildContracts.commandFinished');
   }
 
@@ -89,8 +101,7 @@ export namespace TruffleCommands {
       { url: Telemetry.obfuscate(command.description || '') },
     );
 
-    await validateOpenZeppelinContracts();
-
+    await checkOpenZeppelinIfUsed();
     await command.cmd();
 
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandFinished');
@@ -114,9 +125,39 @@ export namespace TruffleCommands {
 
   export async function writeDeployedBytecodeToBuffer(uri: Uri): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandStarted');
-    const contract = await readCompiledContract(uri);
 
-    await vscodeEnvironment.writeToClipboard(contract[Constants.contractProperties.deployedBytecode]);
+    ensureFileIsContractJson(uri.fsPath);
+
+    const contractInstances = await ContractDB.getContractInstances(
+      path.basename(uri.fsPath, Constants.contractExtension.json)) as ContractInstanceWithMetadata[];
+    const contractInstancesWithNetworkInfo = contractInstances.filter((contractIns) => {
+      return contractIns.network.name !== undefined && !!contractIns.provider && !!contractIns.address;
+    });
+
+    if (!contractInstancesWithNetworkInfo.length) {
+      window.showInformationMessage(Constants.informationMessage.contractNotDeployed);
+      return;
+    }
+
+    const networkQuickPickItems = contractInstancesWithNetworkInfo.map((contractIns) =>
+      new NetworkForContractItem(contractIns.network.name!, contractIns.provider!.host, contractIns.address!));
+    const networkItem = await showQuickPick(
+      networkQuickPickItems,
+      { placeHolder: 'Select a network', ignoreFocusOut: true },
+    );
+
+    try {
+      const deployedBytecode =
+        await ContractService.getDeployedBytecodeByAddress(networkItem.host, networkItem.contractAddress);
+
+      window.showInformationMessage(Constants.informationMessage.transactionBytecodeWasCopiedToClipboard);
+
+      await vscodeEnvironment.writeToClipboard(deployedBytecode);
+    } catch (ex) {
+      Telemetry.sendException(ex);
+      window.showErrorMessage(Constants.errorMessageStrings.FetchingDeployedBytecodeIsFailed);
+    }
+
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
   }
 
@@ -179,6 +220,17 @@ export namespace TruffleCommands {
   }
 }
 
+async function checkOpenZeppelinIfUsed(): Promise<void> {
+  if (OpenZeppelinService.projectJsonExists()) {
+    if (await openZeppelinHelper.shouldUpgradeOpenZeppelinAsync()) {
+      await openZeppelinHelper.upgradeOpenZeppelinContractsAsync();
+      await openZeppelinHelper.upgradeOpenZeppelinUserSettingsAsync();
+    }
+
+    await validateOpenZeppelinContracts();
+  }
+}
+
 function removeDuplicateNetworks(deployDestinations: IDeployDestinationItem[]): IDeployDestinationItem[] {
   return deployDestinations.filter((destination, index, destinations) => {
     return destinations.findIndex((dest) => dest.label === destination.label) === index;
@@ -208,7 +260,7 @@ async function installRequiredDependencies(): Promise<void> {
 }
 
 async function validateOpenZeppelinContracts(): Promise<void> {
-  const validatedContracts = await OpenZeppelinService.validateContracts();
+  const validatedContracts = await OpenZeppelinService.validateContractsAsync();
   validatedContracts.forEach((ozContract: OZContractValidated) => {
     if (ozContract.isExistedOnDisk) {
       Output.outputLine('', ozContract.isHashValid
@@ -396,29 +448,29 @@ async function createNetwork(getTruffleNetwork: () => Promise<TruffleConfigurati
 }
 
 async function deployToNetwork(networkName: string, truffleConfigPath: string): Promise<void> {
-  return window.withProgress({
-    location: ProgressLocation.Window,
-    title: Constants.statusBarMessages.deployingContracts(networkName),
-  }, async () => {
-    const workspaceRoot = path.dirname(truffleConfigPath);
+  await showIgnorableNotification(
+    Constants.statusBarMessages.deployingContracts(networkName),
+    async () => {
+      const workspaceRoot = path.dirname(truffleConfigPath);
 
-    await fs.ensureDir(workspaceRoot);
+      await fs.ensureDir(workspaceRoot);
 
-    try {
-      await installRequiredDependencies();
-      await outputCommandHelper.executeCommand(
-        workspaceRoot,
-        'npx',
-        RequiredApps.truffle, 'migrate', '--reset', '--network', networkName,
-      );
-      Output.outputLine(Constants.outputChannel.azureBlockchain, Constants.informationMessage.deploySucceeded);
-    } catch (error) {
-      Output.outputLine(Constants.outputChannel.azureBlockchain, Constants.informationMessage.deployFailed);
-      throw error;
-    }
+      try {
+        await installRequiredDependencies();
+        await outputCommandHelper.executeCommand(
+          workspaceRoot,
+          'npx',
+          RequiredApps.truffle, 'migrate', '--reset', '--network', networkName,
+        );
+        Output.outputLine(Constants.outputChannel.azureBlockchain, Constants.informationMessage.deploySucceeded);
+      } catch (error) {
+        Output.outputLine(Constants.outputChannel.azureBlockchain, Constants.informationMessage.deployFailed);
+        throw error;
+      }
 
-    await ContractDB.updateContracts();
-  });
+      await ContractDB.updateContracts();
+    },
+  );
 }
 
 async function deployToLocalGanache(networkName: string, truffleConfigPath: string, port: number): Promise<void> {
@@ -433,13 +485,16 @@ async function deployToMainNetwork(networkName: string, truffleConfigPath: strin
 }
 
 async function readCompiledContract(uri: Uri): Promise<any> {
-  if (path.extname(uri.fsPath) !== Constants.contractExtension.json) {
+  ensureFileIsContractJson(uri.fsPath);
+  const data = fs.readFileSync(uri.fsPath, null);
+
+  return JSON.parse(data.toString());
+}
+
+function ensureFileIsContractJson(filePath: string) {
+  if (path.extname(filePath) !== Constants.contractExtension.json) {
     const error = new Error(Constants.errorMessageStrings.InvalidContract);
     Telemetry.sendException(error);
     throw error;
   }
-
-  const data = fs.readFileSync(uri.fsPath, null);
-
-  return JSON.parse(data.toString());
 }

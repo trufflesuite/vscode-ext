@@ -5,9 +5,11 @@ import * as outputCommandHelper from './command';
 import * as commandContext from './commandContext';
 import { extractEnumsInfo, extractEnumsInfoSafe } from './enumExtractor';
 import * as gitHelper from './git';
+import * as openZeppelinHelper from './openZeppelinHelper';
 import { required } from './required';
 import * as shell from './shell';
 import { TruffleConfiguration } from './truffleConfig';
+import * as userSettings from './userSettings';
 import * as vscodeEnvironment from './vscodeEnvironment';
 import * as workspaceHelpers from './workspace';
 
@@ -27,6 +29,7 @@ export {
   getWorkspaceRoot,
   gitHelper,
   isWorkspaceOpen,
+  openZeppelinHelper,
   outputCommandHelper,
   required,
   setCommandContext,
@@ -34,5 +37,6 @@ export {
   spawnProcess,
   TruffleConfig,
   TruffleConfiguration,
+  userSettings,
   vscodeEnvironment,
 };

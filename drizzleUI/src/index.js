@@ -4,9 +4,35 @@
 import App from './App';
 import { contractEventNotifier } from 'middlewares';
 import { DrizzleContext } from '@drizzle/react-plugin';
+import { LocalStorage } from 'polyfills/localStorage';
 import React from 'react';
 import { render } from 'react-dom';
 import { Drizzle, generateStore } from '@drizzle/store';
+
+const storage = new LocalStorage();
+
+window.ls = new Proxy(storage, {
+  set: (_, prop, value) => {
+    if (LocalStorage.prototype.hasOwnProperty(prop)) {
+      storage[prop] = value;
+    } else {
+      storage.setItem(prop, value);
+    }
+
+    return true;
+  },
+
+  get: (_, name) => {
+    if (LocalStorage.prototype.hasOwnProperty(name)) {
+      return storage[name];
+    }
+    if (storage.values.has(name)) {
+      return storage.getItem(name);
+    }
+
+    return undefined;
+  },
+});
 
 Drizzle.prototype.deleteAllContracts = function () {
   Object.keys(this.contracts)

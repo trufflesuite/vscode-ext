@@ -7,8 +7,8 @@ import * as sinon from 'sinon';
 import uuid = require('uuid');
 import * as vscode from 'vscode';
 import { RequiredApps } from '../src/Constants';
+import * as helpers from '../src/helpers';
 import * as commands from '../src/helpers/command';
-import * as workspace from '../src/helpers/workspace';
 import { TestConstants } from './TestConstants';
 
 const nodeValidVersion: commands.ICommandResult = {
@@ -54,7 +54,7 @@ describe('Required helper', () => {
     beforeEach(() => {
       requiredRewire = rewire('../src/helpers/required');
       tryExecuteCommandMock = sinon.stub(commands, 'tryExecuteCommand');
-      getWorkspaceRootMock = sinon.stub(workspace, 'getWorkspaceRoot');
+      getWorkspaceRootMock = sinon.stub(helpers, 'getWorkspaceRoot');
       showErrorMessageMock = sinon.stub(vscode.window, 'showErrorMessage');
       executeVSCommandMock = sinon.stub(vscode.commands, 'executeCommand');
       executeCommandMock = sinon.stub(commands, 'executeCommand');

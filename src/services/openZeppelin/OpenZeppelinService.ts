@@ -1,151 +1,150 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import * as download from 'download';
+import download = require('download');
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import * as url from 'url';
 import { Constants } from '../../Constants';
-import { TruffleConfiguration } from '../../helpers';
-import { getWorkspaceRoot } from '../../helpers/workspace';
+import { getWorkspaceRoot, userSettings } from '../../helpers';
 import { Output } from '../../Output';
+import { ContractService } from '../../services';
+import { Telemetry } from '../../TelemetryClient';
 import calculateHash from './fileHashGenerator';
-import * as _metadata from './manifest.json';
+import { CurrentOpenZeppelinVersionLocation, InvalidOpenZeppelinVersionException } from './InvalidOpenZeppelinVersionException';
+import {
+  IDownloadingResult,
+  IOZAsset,
+  IOZContractCategory,
+  IProjectMetadata,
+  OZAssetType,
+  OZContractValidated,
+  PromiseState,
+} from './models';
+import { OpenZeppelinManifest } from './OpenZeppelinManifest';
+import { OpenZeppelinProjectJsonService } from './OpenZeppelinProjectJsonService';
 
-const metadata = _metadata as IOZMetadata;
-const projectFileName: string = 'project.json';
-const categoryWithoutDocumentation = 'mocks';
-
-export interface IOZMetadata {
-  contentVersion: string;
-  baseUri: string;
-  categories: IOZContractCategory[];
-  targetPoint: string;
-  assets: IOZAsset[];
-  apiDocumentationBaseUri: string;
-}
-
-export interface IOZContractCategory {
-  id: string;
-  name: string;
-  assets: string[];
-}
-
-export interface IOZAsset {
-  id: string;
-  name: string;
-  hash: string;
-  dependencies: string[];
-  type: OZAssetType;
-}
-
-export interface IProjectMetadata {
-  openZeppelin: {
-    assets: IOZAsset[],
-  };
-}
-
-export interface IDownloadingResult {
-  asset: IOZAsset;
-  state: PromiseState;
-}
-
-export const enum OZAssetType {
-  contract = 'contract',
-  library = 'library',
-  interface = 'interface',
-  abstractContract = 'abstractContract',
-}
-
-export const enum PromiseState {
-  fulfilled,
-  rejected,
-  fileExisted,
-}
-
-export class OZContractValidated {
-  constructor(
-    public contractPath: string,
-    public isExistedOnDisk: boolean,
-    public isHashValid?: boolean) {
-  }
-}
+const openZeppelinFolderName = 'openZeppelin';
+const userTmpFolder = '.tmp';
 
 export namespace OpenZeppelinService {
-
-  export function getCategories(): IOZContractCategory[] {
-    return metadata.categories;
+  export function projectJsonExists(): boolean {
+    return getWorkspaceRoot(true) !== undefined
+      && isFileExists(OpenZeppelinProjectJsonService.getProjectJsonPath());
   }
 
-  export async function downloadFiles(assets: IOZAsset[], overwrite: boolean = false): Promise<IDownloadingResult[]> {
-    const openZeppelinSubfolder = getContractFolderPath();
+  export async function getCurrentOpenZeppelinVersionAsync(): Promise<string> {
+    // If version of OZ is exist in project.json then use it,
+    // otherwise use version of OZ equal 2.3.0, when project.json is exist.
+    // If project.json is not exist, then use version from user settings, otherwise last version for OZ.
 
-    return Promise.all(assets.map((asset) => downloadFile(asset, overwrite, openZeppelinSubfolder)));
+    const hasProjectJson = OpenZeppelinService.projectJsonExists();
+    let currentVersion: string;
+
+    if (hasProjectJson) {
+      const projectMetadata = await OpenZeppelinProjectJsonService.getProjectJson();
+      currentVersion = projectMetadata.openZeppelin.version || Constants.firstOZVersion;
+    } else {
+      const { defaultValue, userValue } = await userSettings.getConfigurationAsync(Constants.ozVersionUserSettingsKey);
+      currentVersion = userValue || defaultValue;
+    }
+
+    if (Constants.allOpenZeppelinVersions.indexOf(currentVersion) === -1) {
+      throw new InvalidOpenZeppelinVersionException(
+        currentVersion,
+        hasProjectJson
+          ? CurrentOpenZeppelinVersionLocation.projectJson
+          : CurrentOpenZeppelinVersionLocation.userSettings,
+        Constants.openZeppelin.invalidVersionException);
+    }
+
+    return currentVersion;
   }
 
-  export async function getAllDownloadedAssets(): Promise<IOZAsset[]> {
-    const projectMetadata = await getProjectJson();
+  export async function setVersionAsync(version: string, location: CurrentOpenZeppelinVersionLocation): Promise<void> {
+    if (location === CurrentOpenZeppelinVersionLocation.projectJson) {
+      await OpenZeppelinProjectJsonService.addVersionToProjectJsonAsync(version);
+    } else {
+      await userSettings.updateConfigurationAsync(Constants.ozVersionUserSettingsKey, version);
+    }
+  }
+
+  export async function getLatestOpenZeppelinVersionAsync(): Promise<string> {
+    const { defaultValue } = await userSettings.getConfigurationAsync(Constants.ozVersionUserSettingsKey);
+    return defaultValue;
+  }
+
+  export async function getAllDownloadedAssetsAsync(): Promise<IOZAsset[]> {
+    const projectMetadata = await OpenZeppelinProjectJsonService.getProjectJson();
 
     return projectMetadata.openZeppelin.assets;
   }
 
-  export async function getReferencesToLibraries(contract: IOZAsset): Promise<IOZAsset[]> {
-    const result: IOZAsset[] = [];
-    const projectMetadata = await getProjectJson();
+  export async function downloadAssetsAsync(
+    baseUrl: string,
+    assets: IOZAsset[],
+    overwrite: boolean = false,
+    destinationFolder?: string)
+    : Promise<IDownloadingResult[]> {
+    return Promise.all(assets.map(async (asset) => {
+      const fileUrl = new URL(asset.name, baseUrl).toString();
+      const destinationFilePath = getAssetFullPath(destinationFolder || await getOpenZeppelinFolderPath(), asset);
+      const destinationDirPath = path.dirname(destinationFilePath);
 
-    const contractDependencies = projectMetadata.openZeppelin.assets
-      .find((asset: IOZAsset) => asset.id === contract.id);
-    if (!contractDependencies || contractDependencies.dependencies === undefined) {
-      return result;
-    }
-
-    for (const dependencyId of contractDependencies.dependencies) {
-      const dependency = metadata.assets.find((asset: IOZAsset) => asset.id === dependencyId)!;
-      if (dependency.type === OZAssetType.library) {
-        if (!result.includes(dependency)) {
-          result.push(dependency);
+      if (fs.existsSync(destinationFilePath)) {
+        if (overwrite) {
+          await fs.chmod(destinationFilePath, 0o222); // reset r/o flag, this allows to overwrite
+        } else {
+          Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - Skipped`);
+          return { state: PromiseState.fileExisted, asset };
         }
-      } else {
-        (await getReferencesToLibraries(dependency)).forEach((refs: IOZAsset) => {
-          if (!result.includes(refs)) {
-            result.push(refs);
-          }
-        });
       }
+
+      return download(fileUrl, destinationDirPath, { filename: path.basename(destinationFilePath) })
+        .then(async () => {
+          Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - OK`);
+          await fs.chmod(destinationFilePath, 0o444);
+          return { state: PromiseState.fulfilled, asset };
+        })
+        .catch(() => {
+          Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - Failed`);
+          return { state: PromiseState.rejected, asset };
+        });
+    }));
+  }
+
+  export async function updateProjectJsonAsync(version: string, category: IOZContractCategory, assets: IOZAsset[])
+  : Promise<void> {
+    let updatedProjectJson = await OpenZeppelinProjectJsonService
+      .addVersionToProjectJsonAsync(version, false);
+    updatedProjectJson = await OpenZeppelinProjectJsonService
+      .addCategoryToProjectJsonAsync(category, false, updatedProjectJson);
+    updatedProjectJson = await OpenZeppelinProjectJsonService
+      .addAssetsToProjectJsonAsync(assets, false, updatedProjectJson);
+
+    return OpenZeppelinProjectJsonService.storeProjectJsonAsync(updatedProjectJson);
+  }
+
+  export function assetHasContracts(asset: IOZAsset): boolean {
+    return (asset.type === OZAssetType.contract) || !!(asset.contracts && asset.contracts.length);
+  }
+
+  export function getContractsNamesFromAsset(asset: IOZAsset): string[] {
+    if (asset.type) {
+      return [getContractNameByAssetName(asset)];
+    }
+    if (asset.contracts && asset.contracts.length) {
+      return asset.contracts.map((contract) => contract);
     }
 
-    return result;
+    return [];
   }
 
-  export async function addAssetsToProjectJson(downloadedAssets: IOZAsset[]) {
-    const projectMetadata = await getProjectJson();
-    const newStored: IOZAsset[] = [];
-    newStored.push(...downloadedAssets);
-    // merge two assets
-    projectMetadata.openZeppelin.assets.forEach((storedAsset) => {
-      if (!downloadedAssets.some((downloaded) => downloaded.id === storedAsset.id)) {
-        newStored.push(storedAsset);
-      }
-    });
-    projectMetadata.openZeppelin.assets = newStored;
-
-    return storeProjectJson(projectMetadata);
+  export function getContractNameByAssetName(asset: IOZAsset): string {
+    return path.parse(asset.name).name;
   }
 
-  export function collectAssetsWithDependencies(assetIds: string[] = []): IOZAsset[] {
-    const dependencies: IOZAsset[] = [];
-    assetIds.forEach((id) => {
-      const rootAsset = metadata.assets.find((asset) => asset.id === id);
-      if (rootAsset) {
-        dependencies.push(rootAsset, ...collectAssetsWithDependencies(rootAsset.dependencies));
-      }
-    });
-
-    return dependencies.filter((value, index, self) => self.indexOf(value) === index);
-  }
-
-  export function getAssetsStatus(assets: IOZAsset[]): { existing: IOZAsset[], missing: IOZAsset[] } {
-    const openZeppelinSubfolder = getContractFolderPath();
+  export async function getAssetsStatus(assets: IOZAsset[]): Promise<{ existing: IOZAsset[], missing: IOZAsset[] }> {
+    const openZeppelinSubfolder = await getOpenZeppelinFolderPath();
     const assetsStatuses = assets.map((asset) => {
       const assetPath = getAssetFullPath(openZeppelinSubfolder, asset);
 
@@ -158,18 +157,9 @@ export namespace OpenZeppelinService {
     };
   }
 
-  export function getCategoryApiDocumentationUrl(category: IOZContractCategory) {
-    if (category.id === categoryWithoutDocumentation) {
-      return undefined;
-    }
-
-    const baseUrl = appendSlashIfNotExists(metadata.apiDocumentationBaseUri);
-    return url.resolve(baseUrl, category.id);
-  }
-
-  export async function validateContracts(): Promise<OZContractValidated[]> {
-    const openZeppelinSubfolder = getContractFolderPath();
-    const userProjectMetadata = getProjectJson();
+  export async function validateContractsAsync(): Promise<OZContractValidated[]> {
+    const openZeppelinSubfolder = await getOpenZeppelinFolderPath();
+    const userProjectMetadata = OpenZeppelinProjectJsonService.getProjectJson();
     const ozContractsPaths = getOzContractsFromProjectMetadata(openZeppelinSubfolder, userProjectMetadata);
     const validatedContracts = [];
 
@@ -189,26 +179,67 @@ export namespace OpenZeppelinService {
 
     return validatedContracts;
   }
+
+  export async function updateOpenZeppelinContractsAsync(newManifest: OpenZeppelinManifest): Promise<void> {
+    const userWorkspace = getWorkspaceRoot(true);
+
+    if (userWorkspace === undefined) {
+      return;
+    }
+
+    Telemetry.sendEvent('OpenZeppelinService.updateOpenZeppelinContractsAsync.started');
+    const userTmpFolderPath = path.join(userWorkspace, `${userTmpFolder}${Date.now()}`);
+    const tempNewOzFolder = path.join(userTmpFolderPath, 'new');
+    const tempOldOzFolder = path.join(userTmpFolderPath, 'old');
+    const tempNewOzContractsFolder = path.join(tempNewOzFolder, openZeppelinFolderName);
+
+    const currentAssets = await getAllDownloadedAssetsAsync();
+    const { isDownloadSucceed, newAssets } =
+      await downloadNewVersionOfAssetsAsync(currentAssets, newManifest, tempNewOzContractsFolder);
+
+    if (!isDownloadSucceed) {
+      throwOpenZeppelinUpgradeException(userTmpFolderPath);
+    }
+    if (!newAssets.length) {
+      return;
+    }
+
+    try {
+      await createNewProjectJsonAsync(newManifest.getVersion(), newAssets, tempNewOzFolder);
+    } catch {
+      throwOpenZeppelinUpgradeException(userTmpFolderPath);
+    }
+
+    // Backup old openZeppelin data
+    await moveFolderAsync(await getOpenZeppelinFolderPath(), tempOldOzFolder);
+    await moveProjectJsonAsync(tempOldOzFolder, true);
+    // Update new openZeppelin data
+    await moveFolderAsync(tempNewOzContractsFolder, await ContractService.getSolidityContractsFolderPath());
+    await moveProjectJsonAsync(tempNewOzFolder, false);
+
+    try {
+      fs.removeSync(userTmpFolderPath);
+    } catch {
+      // Ignore exception since upgrade is finished
+    }
+
+    Telemetry.sendEvent('OpenZeppelinService.updateOpenZeppelinContractsAsync.finished');
+  }
 }
 
-function getProjectJson(): IProjectMetadata {
-  const projectJsonPath = getProjectJsonPath();
-
-  return fs.readJSONSync(projectJsonPath, { throws: false, encoding: 'utf8' }) ||
-    { openZeppelin: { assets: [] } } as IProjectMetadata;
+function getOzContractsFromProjectMetadata(
+  openZeppelinSubfolder: string,
+  userProjectMetadata: IProjectMetadata)
+  : string[] {
+  return Object.values(userProjectMetadata.openZeppelin.assets)
+    .map((asset) => getAssetFullPath(openZeppelinSubfolder, asset));
 }
 
-async function storeProjectJson(content: IProjectMetadata): Promise<void> {
-  const projectJsonPath = getProjectJsonPath();
-
-  return fs.writeFile(projectJsonPath, JSON.stringify(content, undefined, 2), { encoding: 'utf8' });
+function getAssetFullPath(baseDir: string, asset: IOZAsset): string {
+  return path.join(baseDir, asset.name);
 }
 
-function getProjectJsonPath(): string {
-  return path.join(getWorkspaceRoot()!, projectFileName);
-}
-
-function isFileExists(filePath: string) {
+function isFileExists(filePath: string): boolean {
   try {
     return fs.lstatSync(filePath).isFile();
   } catch (error) {
@@ -219,65 +250,78 @@ function isFileExists(filePath: string) {
   }
 }
 
-async function downloadFile(asset: IOZAsset, overwrite: boolean = false, openZeppelinSubfolder: string)
-  : Promise<IDownloadingResult> {
-  const fileUrl = new URL(getAssetFullPath(metadata.targetPoint, asset), metadata.baseUri).toString();
-  const destinationFilePath = getAssetFullPath(openZeppelinSubfolder, asset);
-  const destinationDirPath = path.dirname(destinationFilePath);
+function getOriginalHash(ozContractPath: string, openZeppelinSubfolder: string, userProjectMetadata: IProjectMetadata)
+  : string {
+  const assetName = path.relative(openZeppelinSubfolder, ozContractPath).replace(/\\/g, '/');
+  const originalAsset = userProjectMetadata.openZeppelin.assets.find((i) => i.name === assetName);
 
-  if (fs.existsSync(destinationFilePath)) {
-    if (overwrite) {
-      await fs.chmod(destinationFilePath, 0o222); // reset r/o flag, this allows to overwrite
-    } else {
-      Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - Skipped`);
-      return { state: PromiseState.fileExisted, asset };
-    }
+  if (originalAsset) {
+    return originalAsset.hash;
+  }
+  return '';
+}
+
+async function getOpenZeppelinFolderPath(): Promise<string> {
+  return path.join(await ContractService.getSolidityContractsFolderPath(), openZeppelinFolderName);
+}
+
+async function moveFolderAsync(folderPath: string, newLocationPath: string): Promise<void> {
+  await fs.ensureDir(newLocationPath);
+  const newFolderPath = path.join(newLocationPath, path.basename(folderPath));
+  return fs.rename(folderPath, newFolderPath);
+}
+
+async function moveProjectJsonAsync(nonUserProjectFolder: string, folderIsDestination: boolean): Promise<void> {
+  const userProjectJsonPath = OpenZeppelinProjectJsonService.getProjectJsonPath();
+  const nonUserProjectJsonPath = path
+    .join(nonUserProjectFolder, OpenZeppelinProjectJsonService.getProjectJsonFileName());
+  if (folderIsDestination) {
+    return fs.rename(userProjectJsonPath, nonUserProjectJsonPath);
   }
 
-  return download(fileUrl, destinationDirPath, { filename: path.basename(destinationFilePath) })
-    .then(async () => {
-      Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - OK`);
-      await fs.chmod(destinationFilePath, 0o444);
-      return { state: PromiseState.fulfilled, asset };
-    })
-    .catch(() => {
-      Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - Failed`);
-      return { state: PromiseState.rejected, asset };
-    });
+  return fs.rename(nonUserProjectJsonPath, userProjectJsonPath);
 }
 
-function getContractFolderPath(): string {
-  const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
-  const truffleConfig = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
-  const configuration = truffleConfig.getConfiguration();
-  return path.join(getWorkspaceRoot()!, configuration.contracts_directory, 'openZeppelin');
+async function createNewProjectJsonAsync(version: string, assets: IOZAsset[], folder: string): Promise<void> {
+  let projectJson = OpenZeppelinProjectJsonService.getProjectJson();
+  projectJson = await OpenZeppelinProjectJsonService.addVersionToProjectJsonAsync(version, false, projectJson);
+  projectJson = await OpenZeppelinProjectJsonService.addAssetsToProjectJsonAsync(assets, false, projectJson, true);
+  const newPath = path.join(folder, OpenZeppelinProjectJsonService.getProjectJsonFileName());
+
+  return OpenZeppelinProjectJsonService.storeProjectJsonAsync(projectJson, newPath);
 }
 
-function appendSlashIfNotExists(urlPath: string) {
-  return urlPath[urlPath.length - 1] === '/'
-    ? urlPath
-    : urlPath + '/';
+function throwOpenZeppelinUpgradeException(tempFolder: string): void {
+  fs.removeSync(tempFolder);
+  throw new Error(Constants.openZeppelin.contractsUpgradeIsFailed);
 }
 
-function getOzContractsFromProjectMetadata(
-  openZeppelinSubfolder: string,
-  userProjectMetadata: IProjectMetadata) {
-    return Object.values(userProjectMetadata.openZeppelin.assets)
-      .map((asset) => getAssetFullPath(openZeppelinSubfolder, asset));
-}
+async function downloadNewVersionOfAssetsAsync(
+  assets: IOZAsset[],
+  newManifest: OpenZeppelinManifest,
+  toFolder: string)
+: Promise<{ isDownloadSucceed: boolean, newAssets: IOZAsset[] }> {
+  if (!assets.length) {
+    return { isDownloadSucceed: true, newAssets: [] };
+  }
 
-function getOriginalHash(
-  ozContractPath: string,
-  openZeppelinSubfolder: string,
-  userProjectMetadata: IProjectMetadata): string {
-    const assetName = path.relative(openZeppelinSubfolder, ozContractPath).replace(/\\/g, '/');
-    const originalAsset = userProjectMetadata.openZeppelin.assets.find((i) => i.name === assetName);
-    if (originalAsset) {
-      return originalAsset.hash;
-    }
-    return '';
-}
+  const assetIdsToDownload = newManifest.getAssets()
+    .filter((newAsset) => assets.some((asset) => asset.name === newAsset.name)) // Search by name match
+    .map((asset) => asset.id);
 
-function getAssetFullPath(baseDir: string, asset: IOZAsset) {
-  return path.join(baseDir, asset.name);
+  if (!assetIdsToDownload.length) {
+    return { isDownloadSucceed: true, newAssets: [] };
+  }
+
+  const newAssets = newManifest.collectAssetsWithDependencies(assetIdsToDownload);
+  const sourceUrl = newManifest.getBaseUrlToContractsSource();
+
+  const downloadResult = await OpenZeppelinService.downloadAssetsAsync(sourceUrl, newAssets, true, toFolder);
+  const isDownloadFailed = downloadResult.some((result) => result.state === PromiseState.rejected);
+
+  if (isDownloadFailed) {
+    return { isDownloadSucceed: false, newAssets: [] };
+  }
+
+  return { isDownloadSucceed: true, newAssets };
 }

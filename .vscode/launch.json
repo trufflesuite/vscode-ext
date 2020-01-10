@@ -1,0 +1,62 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js"
+      ],
+      "preLaunchTask": "Build extension with watcher"
+    },
+    {
+      "name": "Launch Extension with Drizzle UI",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/out/**/*.js"
+      ],
+      "preLaunchTask": "Run extension with Drizzle UI"
+    },
+    {
+      "name": "Extension Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/out/test/**/*.js"
+      ],
+      "env": {
+        "CODE_TEST": "true"
+      },
+      "preLaunchTask": "Build extension with watcher"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debugger Server",
+      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/out/src/debugger.js",
+      "args": [ "--server=4711" ]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Run Extension and Debugger separately",
+      "configurations": [ "Run Extension", "Debugger Server" ]
+    }
+  ]
+}

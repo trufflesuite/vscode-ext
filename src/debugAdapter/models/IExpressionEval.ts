@@ -1,4 +1,7 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 export interface IExpressionEval {
-    result: string;
-    variablesReference: number;
+  result: string;
+  variablesReference: number;
 }

@@ -4,7 +4,8 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window } from 'vscode';
+import uuid = require('uuid');
+import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace, WorkspaceConfiguration } from 'vscode';
 import { Constants } from '../src/Constants';
 import * as userInteraction from '../src/helpers/userInteraction';
 import { CancellationEvent } from '../src/Models';
@@ -18,9 +19,13 @@ interface ITestItems extends QuickPickItem {
 
 describe('User interaction test', () => {
   let windowMock: sinon.SinonMock;
+  let getConfigurationMock: any;
+  let withProgressMock: any;
 
   beforeEach(() => {
     windowMock = sinon.mock(window);
+    getConfigurationMock = sinon.stub(workspace, 'getConfiguration');
+    withProgressMock = sinon.stub(window, 'withProgress');
   });
 
   afterEach(() => {
@@ -210,5 +215,47 @@ describe('User interaction test', () => {
 
     // Act and assert
     await assert.rejects(userInteraction.saveTextInFile(text, filePath), CancellationEvent);
+  });
+
+  it('showIgnorableNotification should show notification', async () => {
+    // Arrange
+    getConfigurationMock.returns({
+      get: (_s: string) => false,
+    } as WorkspaceConfiguration);
+    const fn = async () => { return; };
+    const message = uuid.v4();
+
+    withProgressMock.onCall(0).callsFake(async (_arg1: string, arg2: () => Promise<any>) => {
+      return await arg2();
+    });
+
+    // Act
+    await userInteraction.showIgnorableNotification(message, fn);
+
+    // Assert
+    assert.strictEqual(getConfigurationMock.calledOnce, true);
+    assert.strictEqual(withProgressMock.called, true);
+    assert.strictEqual(withProgressMock.callCount, 2);
+  });
+
+  it('showIgnorableNotification should not show notification', async () => {
+    // Arrange
+    getConfigurationMock.returns({
+      get: (_s: string) => true,
+    } as WorkspaceConfiguration);
+    const fn = async () => { return; };
+    const message = uuid.v4();
+
+    withProgressMock.onCall(0).callsFake(async (_arg1: string, arg2: () => Promise<any>) => {
+      return await arg2();
+    });
+
+    // Act
+    await userInteraction.showIgnorableNotification(message, fn);
+
+    // Assert
+    assert.strictEqual(getConfigurationMock.calledOnce, true);
+    assert.strictEqual(withProgressMock.called, true);
+    assert.strictEqual(withProgressMock.callCount, 1);
   });
 });

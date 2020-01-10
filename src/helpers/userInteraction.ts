@@ -2,8 +2,8 @@
 // Licensed under the MIT license.
 
 import * as fs from 'fs';
-import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace } from 'vscode';
-import { Constants } from '../Constants';
+import { InputBoxOptions, ProgressLocation, QuickPickItem, QuickPickOptions, Uri, window, workspace } from 'vscode';
+import { Constants, NotificationOptions } from '../Constants';
 import { CancellationEvent } from '../Models';
 import { Telemetry } from '../TelemetryClient';
 import { DialogResultValidator } from '../validators/DialogResultValidator';
@@ -117,10 +117,37 @@ export async function saveTextInFile(
   return file.fsPath;
 }
 
+export async function showConfirmDialogToUpdateOpenZeppelin(): Promise<boolean> {
+  const answer = await window.showInformationMessage(
+    Constants.openZeppelin.newVersionAvailable,
+    Constants.confirmationDialogResult.yes,
+    Constants.confirmationDialogResult.no);
+
+  return answer === Constants.confirmationDialogResult.yes;
+}
+
 export async function showNotification(options: Notification.IShowNotificationOptions): Promise<void> {
-  options.type = options.type || 'info';
+  options.type = options.type || NotificationOptions.info;
 
   Notification.types[options.type](options.message);
+}
+
+export async function showIgnorableNotification(message: string, fn: () => Promise<any>): Promise<void> {
+  const ignoreNotification = workspace.getConfiguration('azureBlockchainService').get('ignoreLongRunningTaskNotification');
+
+  await window.withProgress({
+    location: ProgressLocation.Window,
+    title: message,
+  }, async () => {
+    if (ignoreNotification) {
+      await fn();
+    } else {
+      await window.withProgress({
+        location: ProgressLocation.Notification,
+        title: message,
+      }, fn);
+    }
+  });
 }
 
 namespace Notification {
@@ -131,7 +158,7 @@ namespace Notification {
   };
 
   export interface IShowNotificationOptions {
-    type?: 'error' | 'warning' | 'info';
+    type?: NotificationOptions.error | NotificationOptions.warning | NotificationOptions.info;
     message: string;
   }
 }

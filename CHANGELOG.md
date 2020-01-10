@@ -2,7 +2,24 @@
 
 All notable changes to the "azure blockchain" extension will be documented in this file.
 
+## 0.1.13
 
+### Enhancements
+
+- Added progress notifications for long running tasks.
+- Updated transaction bytecode copy option to support libraries and complex contracts.
+- Added the ability to upgrade contracts deployed as part of OpenZeppelin.
+- Added the ability for contract build redirects from configuration to be respected.
+
+### Fixes
+
+- Updated requirements for minimum VS Code version to 1.36.1. This was to resolve some issues specific to Mac OS.
+- Updated notifications for code generation to be accurate for each type (logic app, flow app, function).
+
+### Internal Improvements
+
+- Test runner enhancements to fix some test issues (timing)
+- Updated search tags for SEO
 
 ## 0.1.12
 
@@ -20,7 +37,7 @@ All notable changes to the "azure blockchain" extension will be documented in th
 - Bumped HD wallet provider to latest Truffle version
 - Minimized output channel logs
 - Fixed output channel issue which shows JavaScript object after contract migration
-- Preview features added for token (TTI compliant) generation were added. 
+- Preview features added for token (TTI compliant) generation were added.
 
 ## 0.1.10
 
@@ -55,14 +72,14 @@ All notable changes to the "azure blockchain" extension will be documented in th
 
 ## 0.1.5
 
-- Backend test coverage 	
-- Cleanup of packaging output, optimization 	
-- Truffle installation fails on new installs fix 	
-- Improved support for multiple ganache instances 	
-- Preflight validation for ABS deployments 	
-- Cleanup of code generation output 	
-- Ganache commands cleanup 	
-- Add command to export private key from mnemonic 	
+- Backend test coverage
+- Cleanup of packaging output, optimization
+- Truffle installation fails on new installs fix
+- Improved support for multiple ganache instances
+- Preflight validation for ABS deployments
+- Cleanup of code generation output
+- Ganache commands cleanup
+- Add command to export private key from mnemonic
 - Better error handling ABS deployments
 
 ## 0.1.4
@@ -83,7 +100,6 @@ All notable changes to the "azure blockchain" extension will be documented in th
 
 - Updated menu options
 
-## 0.1.0 
+## 0.1.0
 
 - Initial release
-

@@ -1,5 +1,8 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 export interface ITransactionResponse {
-    hash: string;
-    methodName: string;
-    contractName: string;
+  hash: string;
+  methodName: string;
+  contractName: string;
 }

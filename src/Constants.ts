@@ -4,7 +4,7 @@
 import * as os from 'os';
 import * as path from 'path';
 import { ExtensionContext, extensions } from 'vscode';
-import { IOZAsset } from './services';
+import { IOZAsset } from './services/openZeppelin/models';
 
 const extensionId = 'AzBlockchain.azure-blockchain';
 const packageJSON = extensions.getExtension(extensionId)!.packageJSON;
@@ -19,10 +19,15 @@ export enum RequiredApps {
   hdwalletProvider = 'truffle-hdwallet-provider',
 }
 
+export enum NotificationOptions {
+  error = 'error',
+  info = 'info',
+  warning = 'warning',
+}
+
 export class Constants {
   public static extensionContext: ExtensionContext;
   public static temporaryDirectory = '';
-
   public static extensionName = packageJSON.name;
   public static extensionVersion = packageJSON.version;
   public static extensionKey = packageJSON.aiKey;
@@ -42,6 +47,12 @@ export class Constants {
     fs: 'fs',
     fsPackageName: 'fs',
     hdwalletProvider: 'HDWalletProvider',
+  };
+
+  public static truffleConfigDefaultDirectory = {
+    contracts_build_directory: path.join('./', 'build', 'contracts'),
+    contracts_directory: path.join('./', 'contracts'),
+    migrations_directory: path.join('./', 'migrations'),
   };
 
   public static defaultTruffleBox = 'Azure-Samples/Blockchain-Ethereum-Template';
@@ -201,9 +212,11 @@ export class Constants {
     },
     hasDigits: /(?=.*\d)/g,
     infuraProjectname: /^([a-zA-Z]|\d|\s|[-_:]){3,}$/g,
+    isJsonFile: new RegExp(Constants.contractExtension.json + '$'),
     isLowerCase: /^[a-z0-9_\-!@$^&()+=?\/<>|[\]{}:.\\~ #`*"'%;,]+$/g,
     isUrl: /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/igm,
     lowerCaseLetter: /(?=.*[a-z]).*/g,
+    moduleExportsTemplate: /{(.*)}$/g,
     // tslint:disable-next-line: max-line-length
     port: /^([1-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/,
     specialChars: {
@@ -371,8 +384,10 @@ export class Constants {
   };
 
   public static executeCommandMessage = {
-    failedToRunCommand: Constants.getMessageFailedCommand,
+    failedToRunCommand: (command: string) => `Failed to run command - ${command}. More details in output`,
+    failedToRunScript: (scriptPath: string) => `Failed to run script - ${scriptPath}. More details in output`,
     finishRunningCommand: 'Finished running command',
+    forkingModule: 'Forking script',
     runningCommand: 'Running command',
   };
 
@@ -395,9 +410,11 @@ export class Constants {
     deployingContracts: (destination: string) => {
       return `Deploying contracts to '${destination}'`;
     },
+    generatingLogicApp: (appName: string) => `Generating ${appName}!`,
   };
 
   public static rpcMethods = {
+    getCode: 'eth_getCode',
     netListening: 'net_listening',
     netVersion: 'net_version',
   };
@@ -430,12 +447,13 @@ export class Constants {
     BuildContractsDirIsNotExist: Constants.getMessageContractsBuildDirectoryIsNotExist,
     CompiledContractIsMissing: 'Compiled contract is missing for solidity file.',
     DirectoryIsNotEmpty: 'Directory is not empty. Open another one?',
+    ErrorWhileExecutingCommand: 'Error while executing command: ',
+    FetchingDeployedBytecodeIsFailed: 'An error occurred while fetching bytecode from network',
     GetMessageChildAlreadyConnected: Constants.getMessageChildAlreadyConnected,
     GitIsNotInstalled: 'Git is not installed',
     InfuraUnauthorized: 'Unauthorized: please sign in with Infura account.',
     InvalidContract: 'This file is not a valid contract.',
     InvalidMnemonic: 'Invalid mnemonic',
-    InvalidServiceType: 'Invalid service type.',
     LoadServiceTreeFailed: 'Load service tree has failed.',
     MnemonicFileHaveNoText: 'Mnemonic file have no text',
     NetworkAlreadyExist: Constants.getMessageNetworkAlreadyExist,
@@ -448,6 +466,7 @@ export class Constants {
     PleaseRenameOldStyleTruffleConfig: 'Please rename file "truffle.js" to "truffle-config.js"',
     RequiredAppsAreNotInstalled: 'To run command you should install required apps',
     ThereAreNoMnemonics: 'There are no mnemonics',
+    TruffleConfigHasIncorrectFormat: '"truffle-config.js" has incorrect format',
     TruffleConfigIsNotExist: 'Truffle configuration file not found',
     VariableShouldBeDefined: Constants.getMessageVariableShouldBeDefined,
     WaitForLogin: 'You should sign-in on Azure Portal',
@@ -465,7 +484,7 @@ export class Constants {
     deployFailed: 'Deploy failed',
     deploySucceeded: 'Deploy succeeded',
     detailsButton: 'Details',
-    generatedLogicApp: 'Generated the logic app!',
+    generatedLogicApp: (appName: string) => `Generated the ${appName}!`,
     infuraAccountSuccessfullyCreated: 'Your Infura account successfully created. Please check you email for complete registration',
     infuraSignInPrompt: 'Not signed in to Infura account, sign in first.',
     installButton: 'Install',
@@ -479,6 +498,7 @@ export class Constants {
     rpcEndpointCopiedToClipboard: 'RPCEndpointAddress copied to clipboard',
     seeDetailsRequirementsPage: 'Please see details on the Requirements Page',
     signInButton: 'Sign In',
+    transactionBytecodeWasCopiedToClipboard: 'Transaction Bytecode was copied to clipboard',
   };
 
   public static infuraCredentials = {
@@ -520,15 +540,10 @@ export class Constants {
     Service: 'Service',
   };
 
-  public static logicApp = {
-    AzureFunction: 'Azure Function',
-    FlowApp: 'Flow App',
-    LogicApp: 'Logic App',
-    output: {
-      AzureFunction: 'generatedAzureFunction',
-      FlowApp: 'generatedFlowApp',
-      LogicApp: 'generatedLogicApp',
-    },
+  public static azureApps = {
+    AzureFunction: { label: 'Azure Function', serviceType: 2, outputDir: 'generatedAzureFunction' },
+    FlowApp: { label: 'Flow App', serviceType: 0, outputDir: 'generatedFlowApp' },
+    LogicApp: { label: 'Logic App', serviceType: 1, outputDir: 'generatedLogicApp'},
   };
 
   public static azureResourceExplorer = {
@@ -541,12 +556,19 @@ export class Constants {
     resourceType: 'blockchainMembers',
   };
 
+  public static firstOZVersion = '2.3.0';
+  public static allOpenZeppelinVersions = ['2.3.0', '2.4.0'];
+  public static ozVersionUserSettingsKey = 'azureBlockchainService.openZeppelin.version';
+
   public static openZeppelin = {
     cancelButtonTitle: 'Cancel',
+    contractsUpgradeIsFailed: 'Upgrade of OpenZeppelin contracts has failed',
     descriptionDownloadingFailed: 'Description downloading failed',
     downloadingContractsFromOpenZeppelin: 'Downloading contracts from OpenZeppelin',
     exploreDownloadedContractsInfo: 'Explore more information about the contracts downloaded',
+    invalidVersionException: 'Invalid version. All OpenZeppelin work will be stopped',
     moreDetailsButtonTitle: 'More details',
+    newVersionAvailable: 'There is a new version of your OpenZeppelin contracts available. Would you like to download the latest version?',
     overwriteExistedContracts: 'Overwrite existed contracts',
     projectFileName: 'project.json',
     replaceButtonTitle: 'Replace',
@@ -554,6 +576,7 @@ export class Constants {
     retryDownloading: 'Retry downloading',
     selectCategoryForDownloading: 'Select category for downloading',
     skipButtonTitle: 'Skip files',
+    upgradeOpenZeppelin: 'Upgrading OpenZeppelin',
     hashCalculationFailed(errorMessage: string): string {
       return `Error while calculating file hash. Message: ${errorMessage}`;
     },
@@ -582,6 +605,10 @@ export class Constants {
     },
     fileNow(count: number): string {
       return `${count} file(s) on OpenZeppelin library now`;
+    },
+    invalidVersionDialog(version: string, location: string, lastVersion: string) {
+      return `There is invalid OpenZeppelin version (${version}) in ${location}. ` +
+         `Do you want to use the latest one (${lastVersion})?`;
     },
   };
 
@@ -688,10 +715,6 @@ export class Constants {
 
   private static getMessageLengthRange(min: number, max: number): string {
     return `Length must be between ${min} and ${max} characters`;
-  }
-
-  private static getMessageFailedCommand(command: string): string {
-    return `Failed to run command - ${command}. More details in output`;
   }
 
   private static getMessageInputHasUnresolvedSymbols(unresolvedSymbols: string): string {

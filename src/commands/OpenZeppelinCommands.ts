@@ -4,102 +4,126 @@
 import open = require('open');
 import { ProgressLocation, window } from 'vscode';
 import { Constants } from '../Constants';
-import { showQuickPick } from '../helpers';
+import { openZeppelinHelper, showQuickPick } from '../helpers';
 import { Output } from '../Output';
-import {
-  IOZAsset,
-  IOZContractCategory,
-  OpenZeppelinMigrationsService,
-  OpenZeppelinService,
-  PromiseState,
-} from '../services';
+import { OpenZeppelinMigrationsService, OpenZeppelinService } from '../services';
+import { IOZAsset, IOZContractCategory, PromiseState } from '../services/openZeppelin/models';
 import { Telemetry } from '../TelemetryClient';
 
 export namespace OpenZeppelinCommands {
   export async function addCategory(): Promise<void> {
     Telemetry.sendEvent('OpenZeppelinCommands.addCategory');
-    const categories = OpenZeppelinService.getCategories();
+
+    const currentOZVersion = await openZeppelinHelper.tryGetCurrentOpenZeppelinVersionAsync();
+    const manifest = await openZeppelinHelper.createManifestAsync(currentOZVersion);
+    const categories = await manifest.getCategories();
     const category = await selectCategory(categories);
+
     Telemetry.sendEvent('OpenZeppelinCommands.addCategory.selected', { name: category.name });
-    const fullAssetWithDependencies = OpenZeppelinService.collectAssetsWithDependencies(category.assets);
+
+    const baseUrl = manifest.getBaseUrlToContractsSource();
+    const fullAssetWithDependencies = manifest.collectAssetsWithDependencies(category.assets);
     Output.outputLine(
       Constants.outputChannel.azureBlockchain,
       Constants.openZeppelin.categoryWillDownloaded(category.name),
     );
-    const assetsStatuses = OpenZeppelinService.getAssetsStatus(fullAssetWithDependencies);
+    const assetsStatuses = await OpenZeppelinService.getAssetsStatus(fullAssetWithDependencies);
     Output.outputLine(
       Constants.outputChannel.azureBlockchain,
       Constants.openZeppelin.fileNow(assetsStatuses.existing.length),
     );
 
-    if (assetsStatuses.existing.length > 0) {
-      const answer = await window.showInformationMessage(
-        Constants.openZeppelin.alreadyExisted(assetsStatuses.existing),
-        Constants.openZeppelin.replaceButtonTitle,
-        Constants.openZeppelin.skipButtonTitle,
-      );
+    const downloadedAssets
+      = await downloadOZFiles(baseUrl, assetsStatuses.existing, assetsStatuses.missing, fullAssetWithDependencies);
 
-      Telemetry.sendEvent('OpenZeppelinCommands.addCategory.overwriteExistedDialog', { name: answer || '' });
-      if (answer === Constants.openZeppelin.replaceButtonTitle) {
-        Output.outputLine(
-          Constants.outputChannel.azureBlockchain,
-          Constants.openZeppelin.overwriteExistedContracts,
-        );
-        await downloadFileSetWithProgress(fullAssetWithDependencies, true);
-      } else {
-        await downloadFileSetWithProgress(assetsStatuses.missing, false);
-      }
-    } else {
-      await downloadFileSetWithProgress(fullAssetWithDependencies, false);
-    }
-    openDocumentationUrl(category);
+    await OpenZeppelinService.updateProjectJsonAsync(manifest.getVersion(), category, downloadedAssets);
+
+    openDocumentationUrl(manifest.getCategoryApiDocumentationUrl(category));
+
     Telemetry.sendEvent('OpenZeppelinCommands.addCategory.generateMigrations');
-    await OpenZeppelinMigrationsService.generateMigrations(await OpenZeppelinService.getAllDownloadedAssets());
+    await OpenZeppelinMigrationsService.generateMigrations(await OpenZeppelinService.getAllDownloadedAssetsAsync());
   }
 }
 
-async function downloadFileSetWithProgress(assets: IOZAsset[], overwrite: boolean = false): Promise<void> {
+async function downloadOZFiles(
+  baseUrl: string,
+  existing: IOZAsset[],
+  missing: IOZAsset[],
+  fullAssetWithDependencies: IOZAsset[])
+: Promise<IOZAsset[]> {
+  let downloadedAssets: IOZAsset[];
+
+  if (existing.length > 0) {
+    const answer = await window.showInformationMessage(
+      Constants.openZeppelin.alreadyExisted(existing),
+      Constants.openZeppelin.replaceButtonTitle,
+      Constants.openZeppelin.skipButtonTitle,
+    );
+
+    Telemetry.sendEvent('OpenZeppelinCommands.downloadOZFiles.overwriteExistedDialog', { name: answer || '' });
+    if (answer === Constants.openZeppelin.replaceButtonTitle) {
+      Output.outputLine(
+        Constants.outputChannel.azureBlockchain,
+        Constants.openZeppelin.overwriteExistedContracts,
+      );
+      downloadedAssets = await downloadFileSetWithProgress(baseUrl, fullAssetWithDependencies, true);
+    } else {
+      downloadedAssets = await downloadFileSetWithProgress(baseUrl, missing, false);
+    }
+  } else {
+    downloadedAssets = await downloadFileSetWithProgress(baseUrl, fullAssetWithDependencies, false);
+  }
+
+  if (downloadedAssets.length) {
+    window.showInformationMessage(Constants.openZeppelin.wereDownloaded(downloadedAssets.length));
+  }
+
+  return downloadedAssets;
+}
+
+async function downloadFileSetWithProgress(
+  baseUri: string,
+  assets: IOZAsset[],
+  overwrite: boolean = false)
+: Promise<IOZAsset[]> {
   return window.withProgress({
     location: ProgressLocation.Notification,
     title: Constants.openZeppelin.downloadingContractsFromOpenZeppelin,
-  }, async () => downloadFileSet(assets, overwrite),
-  );
-}
+  }, async () => downloadFileSet(assets));
 
-async function downloadFileSet(assets: IOZAsset[], overwrite: boolean): Promise<void> {
-  const results = await OpenZeppelinService.downloadFiles(assets, overwrite);
+  async function downloadFileSet(_assets: IOZAsset[])
+  : Promise<IOZAsset[]> {
+    const results = await OpenZeppelinService.downloadAssetsAsync(baseUri, _assets, overwrite);
 
-  const downloaded = results
-    .filter((result) => result.state === PromiseState.fulfilled)
-    .map((result) => result.asset);
+    let downloaded = results
+      .filter((result) => result.state === PromiseState.fulfilled)
+      .map((result) => result.asset);
 
-  const rejected = results
-    .filter((result) => result.state === PromiseState.rejected)
-    .map((result) => result.asset);
-  Telemetry.sendEvent(
-    'OpenZeppelinCommands.downloadFileSet.result',
-    { downloadedCount: downloaded.length.toString(), rejectedCount: rejected.length.toString() },
-  );
-
-  if (downloaded.length > 0) {
-    await OpenZeppelinService.addAssetsToProjectJson(downloaded);
-    window.showInformationMessage(Constants.openZeppelin.wereDownloaded(downloaded.length));
-  }
-
-  if (rejected.length > 0) {
-    const answer = await window.showErrorMessage(
-      Constants.openZeppelin.wereNotDownloaded(rejected.length),
-      Constants.openZeppelin.retryButtonTitle,
-      Constants.openZeppelin.cancelButtonTitle,
+    const rejected = results
+      .filter((result) => result.state === PromiseState.rejected)
+      .map((result) => result.asset);
+    Telemetry.sendEvent(
+      'OpenZeppelinCommands.downloadFileSet.result',
+      { downloadedCount: downloaded.length.toString(), rejectedCount: rejected.length.toString() },
     );
-    if (answer === Constants.openZeppelin.retryButtonTitle) {
-      Output.outputLine(
-        Constants.outputChannel.azureBlockchain,
-        Constants.openZeppelin.retryDownloading,
+
+    if (rejected.length > 0) {
+      const answer = await window.showErrorMessage(
+        Constants.openZeppelin.wereNotDownloaded(rejected.length),
+        Constants.openZeppelin.retryButtonTitle,
+        Constants.openZeppelin.cancelButtonTitle,
       );
-      Telemetry.sendEvent('OpenZeppelinCommands.downloadFileSet.retry', { assetsCount: rejected.length.toString() });
-      await downloadFileSet(rejected, overwrite);
+      if (answer === Constants.openZeppelin.retryButtonTitle) {
+        Output.outputLine(
+          Constants.outputChannel.azureBlockchain,
+          Constants.openZeppelin.retryDownloading,
+        );
+        Telemetry.sendEvent('OpenZeppelinCommands.downloadFileSet.retry', { assetsCount: rejected.length.toString() });
+        downloaded = downloaded.concat(await downloadFileSet(rejected));
+      }
     }
+
+    return downloaded;
   }
 }
 
@@ -118,8 +142,7 @@ async function selectCategory(categories: IOZContractCategory[]): Promise<IOZCon
   );
 }
 
-async function openDocumentationUrl(category: IOZContractCategory): Promise<void> {
-  const documentationUrl = OpenZeppelinService.getCategoryApiDocumentationUrl(category);
+async function openDocumentationUrl(documentationUrl?: string): Promise<void> {
   if (!documentationUrl) {
     return;
   }

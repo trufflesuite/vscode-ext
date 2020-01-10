@@ -37,6 +37,7 @@ module.exports = () => {
         components: path.join(__dirname, './src/components'),
         constants: path.join(__dirname, './src/constants'),
         helpers: path.join(__dirname, './src/helpers'),
+        polyfills: path.join(__dirname, './src/polyfills'),
         services: path.join(__dirname, './src/services'),
         views: path.join(__dirname, './src/views'),
         middlewares: path.join(__dirname, './src/middlewares'),
@@ -69,6 +70,19 @@ module.exports = () => {
           test: [/\.js$/, /\.jsx$/],
           exclude: /node_modules/,
           loader: 'eslint-loader'
+        },
+        {
+          test: /\.js$/,
+          loader: 'string-replace-loader',
+          options: {
+            search: 'localStorage',
+            replace: 'ls',
+            flags: 'g'
+          },
+          exclude: path.join(__dirname, 'src', 'index.js'),
+          include: [
+            path.resolve(__dirname, 'node_modules')
+          ]
         }
       ]
     },

@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 declare module '@truffle/debug-utils' {
-    function nativize(variables: any): any;
-    
-    export { nativize }; 
+  function nativize(variables: any): any;
+
+  export { nativize };
 }

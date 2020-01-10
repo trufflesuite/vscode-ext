@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 import { DebugNetwork } from '../debugNetwork';
 import { sortFilePaths } from '../helpers';
 import { IContractJsonModel } from '../models/IContractJsonModel';

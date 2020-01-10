@@ -14,7 +14,7 @@ import {
   TruffleCommands,
 } from './commands';
 import { Constants } from './Constants';
-import { CommandContext, isWorkspaceOpen, required, setCommandContext } from './helpers';
+import { CommandContext, isWorkspaceOpen, openZeppelinHelper, required, setCommandContext } from './helpers';
 import { CancellationEvent } from './Models';
 import { Output } from './Output';
 import { RequirementsPage, WelcomePage } from './pages';
@@ -33,6 +33,10 @@ import { ProjectView } from './ViewItems';
 import { DebuggerConfiguration } from './debugAdapter/configuration/debuggerConfiguration';
 
 export async function activate(context: ExtensionContext) {
+  if (process.env.CODE_TEST) {
+    return;
+  }
+
   Constants.initialize(context);
   DebuggerConfiguration.initialize(context);
   await ContractDB.initialize(AdapterType.IN_MEMORY);
@@ -152,22 +156,22 @@ export async function activate(context: ExtensionContext) {
   const generateMicroservicesWorkflows = commands.registerCommand(
     'azureBlockchainService.generateMicroservicesWorkflows',
     async (filePath: Uri | undefined) => {
-      await tryExecute(() => LogicAppCommands.generateMicroservicesWorkflows(filePath));
+      await tryExecute(async () => await LogicAppCommands.generateMicroservicesWorkflows(filePath));
     });
   const generateDataPublishingWorkflows = commands.registerCommand(
     'azureBlockchainService.generateDataPublishingWorkflows',
     async (filePath: Uri | undefined) => {
-      await tryExecute(() => LogicAppCommands.generateDataPublishingWorkflows(filePath));
+      await tryExecute(async () => await LogicAppCommands.generateDataPublishingWorkflows(filePath));
     });
   const generateEventPublishingWorkflows = commands.registerCommand(
     'azureBlockchainService.generateEventPublishingWorkflows',
     async (filePath: Uri | undefined) => {
-      await tryExecute(() => LogicAppCommands.generateEventPublishingWorkflows(filePath));
+      await tryExecute(async () => await LogicAppCommands.generateEventPublishingWorkflows(filePath));
     });
   const generateReportPublishingWorkflows = commands.registerCommand(
     'azureBlockchainService.generateReportPublishingWorkflows',
     async (filePath: Uri | undefined) => {
-      await tryExecute(() => LogicAppCommands.generateReportPublishingWorkflows(filePath));
+      await tryExecute(async () => await LogicAppCommands.generateReportPublishingWorkflows(filePath));
     });
   //#endregion
 
@@ -211,6 +215,8 @@ export async function activate(context: ExtensionContext) {
   required.checkAllApps();
 
   Telemetry.sendEvent(Constants.telemetryEvents.extensionActivated);
+
+  checkAndUpgradeOpenZeppelinAsync();
 }
 
 export async function deactivate(): Promise<void> {
@@ -233,5 +239,12 @@ async function tryExecute(func: () => Promise<any>, errorMessage: string | null 
       return;
     }
     window.showErrorMessage(errorMessage || error.message);
+  }
+}
+
+async function checkAndUpgradeOpenZeppelinAsync(): Promise<void> {
+  if (await openZeppelinHelper.shouldUpgradeOpenZeppelinAsync()) {
+    await openZeppelinHelper.upgradeOpenZeppelinUserSettingsAsync();
+    await openZeppelinHelper.upgradeOpenZeppelinContractsAsync();
   }
 }

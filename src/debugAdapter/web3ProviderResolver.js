@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 // This is a script for truffle exec command. The purpose is to resolve the provider
 // We cann't use truffle-config since it requires specific "npm install" command in user project
 // (npm install against the concrete version of electron the VS Code is built on)

@@ -5,7 +5,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Uri, window } from 'vscode';
 import { Constants } from '../Constants';
-import { getWorkspaceRoot, TruffleConfiguration } from '../helpers';
+import { getWorkspaceRoot, showIgnorableNotification, TruffleConfiguration } from '../helpers';
 import { showInputBox, showQuickPick } from '../helpers/userInteraction';
 import { ResourceGroupItem, SubscriptionItem } from '../Models/QuickPickItems';
 import { Output } from '../Output';
@@ -23,48 +23,60 @@ interface ILogicAppData {
   subscriptionId: string;
   topicName?: string;
   workflowType: string;
+  label: string;
+}
+
+interface IAzureAppsItem {
+  label: string;
+  serviceType: number;
+  outputDir: string;
 }
 
 export class LogicAppGenerator {
   public async generateMicroservicesWorkflows(filePath?: Uri): Promise<void> {
     Telemetry.sendEvent('LogicAppGenerator.microservicesWorkflows');
-    this.generateWorkflows(Constants.microservicesWorkflows.Service, filePath);
+    await this.generateWorkflows(Constants.microservicesWorkflows.Service, filePath);
   }
 
   public async generateDataPublishingWorkflows(filePath?: Uri): Promise<void> {
     Telemetry.sendEvent('LogicAppGenerator.dataPublishingWorkflows');
-    this.generateWorkflows(Constants.microservicesWorkflows.Data, filePath);
+    await this.generateWorkflows(Constants.microservicesWorkflows.Data, filePath);
   }
 
   public async generateEventPublishingWorkflows(filePath?: Uri): Promise<void> {
     Telemetry.sendEvent('LogicAppGenerator.eventPublishingWorkflows');
-    this.generateWorkflows(Constants.microservicesWorkflows.Messaging, filePath);
+    await this.generateWorkflows(Constants.microservicesWorkflows.Messaging, filePath);
   }
 
   public async generateReportPublishingWorkflows(filePath?: Uri): Promise<void> {
     Telemetry.sendEvent('LogicAppGenerator.reportPublishingWorkflows');
-    this.generateWorkflows(Constants.microservicesWorkflows.Reporting, filePath);
+    await this.generateWorkflows(Constants.microservicesWorkflows.Reporting, filePath);
   }
 
   private async generateWorkflows(workflowType: string, filePath?: Uri): Promise<void> {
     const filePaths = await this.getContractsPath(filePath);
     const logicAppData = await this.getLogicAppData(workflowType);
-    for (const file of filePaths) {
-      const contract = await fs.readJson(file, { encoding: 'utf8' });
-      const generatedFiles: any[] = this.getGenerator(contract, logicAppData).GenerateAll();
-      for (const generatedFile of generatedFiles) {
-        await this.writeFile(generatedFile);
-      }
-    }
+    await showIgnorableNotification(
+      Constants.statusBarMessages.generatingLogicApp(logicAppData.label),
+      async () => {
+        for (const file of filePaths) {
+          const contract = await fs.readJson(file, { encoding: 'utf8' });
+          const generatedFiles: any[] = this.getGenerator(contract, logicAppData).GenerateAll();
+          for (const generatedFile of generatedFiles) {
+            await this.writeFile(generatedFile);
+          }
+        }
 
-    window.showInformationMessage(Constants.informationMessage.generatedLogicApp);
-    Telemetry.sendEvent('LogicAppGenerator.generateWorkflows.commandFinished');
+        window.showInformationMessage(Constants.informationMessage.generatedLogicApp(logicAppData.label));
+        Telemetry.sendEvent('LogicAppGenerator.generateWorkflows.commandFinished');
+      },
+    );
   }
 
   private async getContractsPath(filePath?: Uri): Promise<string[]> {
     const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
     const truffleConfig = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
-    const configuration = truffleConfig.getConfiguration();
+    const configuration = await truffleConfig.getConfiguration();
     const buildDir = path.join(getWorkspaceRoot()!, configuration.contracts_build_directory);
     const files: string[] = [];
 
@@ -102,15 +114,15 @@ export class LogicAppGenerator {
   }
 
   private async getLogicAppData(workflowType: string): Promise<ILogicAppData> {
-    const serviceType = await this.getServiceType(workflowType);
-    const outputDir = await this.getOutputDir(serviceType);
+    const azureAppItem: IAzureAppsItem = await this.getAzureAppItem(workflowType);
     const contractAddress = await showInputBox({ ignoreFocusOut: true, value: 'contract address' });
     const [subscriptionItem, resourceGroupItem] = await this.selectSubscriptionAndResourceGroup();
     const logicAppData: ILogicAppData = {
       contractAddress,
-      outputDir,
+      label: azureAppItem.label,
+      outputDir: path.join(getWorkspaceRoot()!, azureAppItem.outputDir),
       resourceGroup: resourceGroupItem.description,
-      serviceType,
+      serviceType: azureAppItem.serviceType,
       subscriptionId: subscriptionItem.subscriptionId,
       workflowType,
     };
@@ -157,34 +169,14 @@ export class LogicAppGenerator {
     return [subscriptionItem, resourceGroupItem];
   }
 
-  private async getServiceType(workflowType: string): Promise<number> {
-    const items = [
-      { label: Constants.logicApp.LogicApp, serviceType: 1 },
-      { label: Constants.logicApp.FlowApp, serviceType: 0 },
-    ];
+  private async getAzureAppItem(workflowType: string): Promise<IAzureAppsItem> {
+    const items = [Constants.azureApps.LogicApp, Constants.azureApps.FlowApp ];
 
     if (workflowType === Constants.microservicesWorkflows.Service) {
-      items.push({ label: Constants.logicApp.AzureFunction, serviceType: 2 });
+      items.push(Constants.azureApps.AzureFunction);
     }
 
-    const item = await showQuickPick(items, { ignoreFocusOut: true });
-    return item.serviceType;
-  }
-
-  private getOutputDir(serviceType: int): string {
-    switch (serviceType) {
-      case 0:
-        return path.join(getWorkspaceRoot()!, Constants.logicApp.output.FlowApp);
-      case 1:
-        return path.join(getWorkspaceRoot()!, Constants.logicApp.output.LogicApp);
-      case 2:
-        return path.join(getWorkspaceRoot()!, Constants.logicApp.output.AzureFunction);
-      default: {
-        const error = new Error(Constants.errorMessageStrings.InvalidServiceType);
-        Telemetry.sendException(error);
-        throw error;
-      }
-    }
+    return await showQuickPick(items, { ignoreFocusOut: true });
   }
 
   private async getMessagingType(): Promise<number> {

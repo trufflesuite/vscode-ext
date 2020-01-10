@@ -2,12 +2,13 @@
 // Licensed under the MIT license.
 
 import * as fs from 'fs-extra';
-import { ProgressLocation, Uri, window, workspace } from 'vscode';
+import { Uri, window, workspace } from 'vscode';
 import { Constants, RequiredApps } from '../Constants';
 import {
   gitHelper,
   outputCommandHelper,
   required,
+  showIgnorableNotification,
   showInputBox,
   showOpenFolderDialog,
   showQuickPick,
@@ -79,36 +80,38 @@ async function chooseNewProjectDir(): Promise<string> {
 
 async function createNewEmptyProject(projectPath: string): Promise<void> {
   Telemetry.sendEvent('ProjectCommands.createNewEmptyProject.baseProject');
-  return window.withProgress({
-    location: ProgressLocation.Window,
-    title: Constants.statusBarMessages.creatingProject,
-  }, async () => {
-    return createProject(projectPath, Constants.defaultTruffleBox);
-  });
+
+  return createProject(projectPath, Constants.defaultTruffleBox);
 }
 
 async function createProjectFromTruffleBox(projectPath: string): Promise<void> {
   Telemetry.sendEvent('ProjectCommands.createProjectFromTruffleBox.customProject');
   const truffleBoxName = await getTruffleBoxName();
-  await createProject(projectPath, truffleBoxName);
+
+  return createProject(projectPath, truffleBoxName);
 }
 
 async function createProject(projectPath: string, truffleBoxName: string): Promise<void> {
-  try {
-    Telemetry.sendEvent('ProjectCommands.createProject.unbox', { truffleBoxName });
-    await outputCommandHelper.executeCommand(projectPath, 'npx', RequiredApps.truffle, 'unbox', truffleBoxName);
+  await showIgnorableNotification(
+    Constants.statusBarMessages.creatingProject,
+    async () => {
+      try {
+        Telemetry.sendEvent('ProjectCommands.createProject.unbox', { truffleBoxName });
+        await outputCommandHelper.executeCommand(projectPath, 'npx', RequiredApps.truffle, 'unbox', truffleBoxName);
 
-    TruffleConfiguration.checkTruffleConfigNaming(projectPath);
-    workspace.updateWorkspaceFolders(
-      0,
-      workspace.workspaceFolders ? workspace.workspaceFolders.length : null,
-      { uri: Uri.file(projectPath) });
+        TruffleConfiguration.checkTruffleConfigNaming(projectPath);
+        workspace.updateWorkspaceFolders(
+          0,
+          workspace.workspaceFolders ? workspace.workspaceFolders.length : null,
+          { uri: Uri.file(projectPath) });
 
-  } catch (error) {
-    fs.emptyDirSync(projectPath);
-    Telemetry.sendException(new Error(Constants.errorMessageStrings.NewProjectCreationFailed));
-    throw new Error(`${Constants.errorMessageStrings.NewProjectCreationFailed} ${error.message}`);
-  }
+      } catch (error) {
+        fs.emptyDirSync(projectPath);
+        Telemetry.sendException(new Error(Constants.errorMessageStrings.NewProjectCreationFailed));
+        throw new Error(`${Constants.errorMessageStrings.NewProjectCreationFailed} ${error.message}`);
+      }
+    },
+  );
 }
 
 async function getTruffleBoxName(): Promise<string> {

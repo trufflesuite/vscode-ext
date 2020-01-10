@@ -11,9 +11,10 @@ import * as ESTree from 'estree';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Constants } from '../Constants';
+import { getWorkspaceRoot } from '../helpers';
 import { MnemonicRepository } from '../services';
 import { Telemetry } from '../TelemetryClient';
-import { getWorkspaceRoot } from './workspace';
+import { tryExecuteCommandInFork } from './command';
 
 export namespace TruffleConfiguration {
   const notAllowedSymbols = new RegExp(
@@ -225,14 +226,14 @@ export namespace TruffleConfiguration {
       }
     }
 
-    public getConfiguration(): IConfiguration {
-      const moduleExports = getModuleExportsObjectExpression(this.ast);
+    public async getConfiguration(): Promise<IConfiguration> {
+      const truffleConfig = await getTruffleMetadata();
 
-      if (moduleExports) {
-        return astToConfiguration(moduleExports);
+      if (truffleConfig) {
+        return jsonToConfiguration(truffleConfig);
       }
 
-      return getDefaultConfiguration();
+      return Constants.truffleConfigDefaultDirectory;
     }
 
     public isHdWalletProviderDeclared(): boolean {
@@ -273,12 +274,19 @@ export namespace TruffleConfiguration {
     }
   }
 
-  function getDefaultConfiguration(): IConfiguration {
-    return {
-      contracts_build_directory: path.join('./', 'build', 'contracts'),
-      contracts_directory: path.join('./', 'contracts'),
-      migrations_directory: path.join('./', 'migrations'),
-    };
+  async function getTruffleMetadata(): Promise<IConfiguration> {
+    const truffleConfigTemplatePath = path.join(__dirname, 'checkTruffleConfigTemplate.js');
+    const truffleConfigPath =
+      path.relative(path.dirname(truffleConfigTemplatePath), path.join(getWorkspaceRoot()!, 'truffle-config.js'));
+
+    const result = await tryExecuteCommandInFork(getWorkspaceRoot()!, truffleConfigTemplatePath, truffleConfigPath);
+    const truffleConfigObject = result.messages!.find((message) => message.command === 'truffleConfig');
+
+    if (!truffleConfigObject || !truffleConfigObject.message) {
+      throw new Error(Constants.errorMessageStrings.TruffleConfigHasIncorrectFormat);
+    }
+
+    return JSON.parse(truffleConfigObject.message);
   }
 
   function isModuleExportsExpression(nodeType: string, node: ESTree.Node): boolean {
@@ -500,35 +508,29 @@ export namespace TruffleConfiguration {
     };
   }
 
-  function astToConfiguration(node: ESTree.ObjectExpression): IConfiguration {
-    const configuration = getDefaultConfiguration();
+  function jsonToConfiguration(truffleConfig: {[key: string]: any}): IConfiguration {
+    const { contracts_directory, contracts_build_directory, migrations_directory }
+      = Constants.truffleConfigDefaultDirectory;
 
-    const contractsDir = findProperty(node, 'contracts_directory');
-    if (contractsDir && contractsDir.value.type === 'Literal' &&
-      typeof contractsDir.value.value === 'string' && contractsDir.value.value) {
-      configuration.contracts_directory = contractsDir.value.value;
+    truffleConfig.contracts_directory = truffleConfig.contracts_directory || contracts_directory;
+    truffleConfig.contracts_build_directory = truffleConfig.contracts_build_directory || contracts_build_directory;
+    truffleConfig.migrations_directory = truffleConfig.migrations_directory || migrations_directory;
+
+    const arrayNetwork: INetwork[] = [];
+
+    if (truffleConfig.networks) {
+      // Networks are not used yet in the code
+      Object.entries(truffleConfig.networks).forEach(([key, value]) => {
+        arrayNetwork.push({
+          name: key,
+          options: value as INetworkOption,
+        });
+      });
     }
 
-    const contractsBuildDir = findProperty(node, 'contracts_build_directory');
-    if (contractsBuildDir && contractsBuildDir.value.type === 'Literal' &&
-      typeof contractsBuildDir.value.value === 'string' && contractsBuildDir.value.value) {
-      configuration.contracts_build_directory = contractsBuildDir.value.value;
-    }
+    truffleConfig.networks = arrayNetwork;
 
-    const migrationsDir = findProperty(node, 'migrations_directory');
-    if (migrationsDir && migrationsDir.value.type === 'Literal' &&
-      typeof migrationsDir.value.value === 'string' && migrationsDir.value.value) {
-      configuration.migrations_directory = migrationsDir.value.value;
-    }
-
-    const networks = findProperty(node, 'networks');
-    if (networks && networks.value.type === 'ObjectExpression') {
-      configuration.networks = astToNetworks(networks.value);
-    }
-
-    // TODO: compilers
-
-    return configuration;
+    return truffleConfig as IConfiguration;
   }
 
   function astToNetworks(node: ESTree.ObjectExpression): INetwork[] {
