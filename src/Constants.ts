@@ -214,7 +214,7 @@ export class Constants {
     infuraProjectname: /^([a-zA-Z]|\d|\s|[-_:]){3,}$/g,
     isJsonFile: new RegExp(Constants.contractExtension.json + '$'),
     isLowerCase: /^[a-z0-9_\-!@$^&()+=?\/<>|[\]{}:.\\~ #`*"'%;,]+$/g,
-    isUrl: /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/igm,
+    isUrl: /^(?:http(s)?:\/\/)?[\w:@.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/igm,
     lowerCaseLetter: /(?=.*[a-z]).*/g,
     moduleExportsTemplate: /{(.*)}$/g,
     // tslint:disable-next-line: max-line-length
