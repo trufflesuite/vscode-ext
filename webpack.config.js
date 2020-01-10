@@ -52,9 +52,10 @@ const config = {
       { from: './src/Generators/mscorlib.js', to: './' },
       { from: './src/Generators/Nethereum.Generators.DuoCode.js', to: './' },
       { from: './src/debugAdapter/web3ProviderResolver.js', to: './' },
+      { from: './src/helpers/checkTruffleConfigTemplate.js', to: './' },
     ]),
     new webpack.DefinePlugin({
-      IS_BUNDLE_TIME: JSON.stringify(true),
+      IS_BUNDLE_TIME: true,
     })
   ],
   node: {

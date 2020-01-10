@@ -15,7 +15,7 @@ Azure Blockchain Development Kit simplifies how you create, connect to, build an
 - Supported Operating Systems
   - Windows 10
   - Mac OSX
-- VS Code 1.32.0 (or greater)
+- VS Code 1.36.1 (or greater)
 - Python 2.7.15
 - Node 10.15.x
 - Git 2.10.x
@@ -30,9 +30,9 @@ The first thing to do is to create an Azure Blockchain Service in your subscript
 
 2. Choose your subscription, resource group and region to deploy to.
 
-4. Enter the name of your [Consortium](https://docs.microsoft.com/azure/blockchain/service/consortium)
+3. Enter the name of your [Consortium](https://docs.microsoft.com/azure/blockchain/service/consortium)
 
-5. Wait until your resource has been created in Azure.
+4. Wait until your resource has been created in Azure.
    `Note: Deploying the Azure Blockchain Service takes quite some time to complete. Please check the deployment status in the Azure portal.`
 
 ## Create a new Solidity Contract
@@ -55,8 +55,7 @@ For developers who are not familiar with Truffle, or prefer to use the Command P
 
 Once complete, your project directory should look like this:
 
-![completed directory](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/newProjectDir.png)
-
+[![completed directory](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/newProjectDirCloseup.png)](https://raw.githubusercontent.com/Microsoft/vscode-azure-blockchain-ethereum/master/images/newProjectDir.png#lightbox)
 
 ## Build your Solidity Contract
 

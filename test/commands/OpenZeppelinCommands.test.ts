@@ -17,28 +17,34 @@ import {
   window,
 } from 'vscode';
 import { Constants } from '../../src/Constants';
+import * as helpers from '../../src/helpers';
+import { openZeppelinHelper } from '../../src/helpers';
 import { TruffleConfiguration } from '../../src/helpers/truffleConfig';
-import * as workspace from '../../src/helpers/workspace';
 import { CancellationEvent } from '../../src/Models';
+import {
+  OpenZeppelinMigrationsService,
+  OpenZeppelinService,
+} from '../../src/services';
 import {
   IDownloadingResult,
   IOZAsset,
   IOZContractCategory,
-  OpenZeppelinMigrationsService,
-  OpenZeppelinService,
   OZAssetType,
   PromiseState,
-} from '../../src/services';
+} from '../../src/services/openZeppelin/models';
+import { OpenZeppelinManifest } from '../../src/services/openZeppelin/OpenZeppelinManifest';
 
 describe('OpenZeppelinCommands tests', () => {
   let testCategories: IOZContractCategory[];
-  let getCategoriesStub: sinon.SinonStub<[], IOZContractCategory[]>;
-  let collectAssetsWithDependenciesStub: sinon.SinonStub<[(string[] | undefined)?], IOZAsset[]>;
-  let downloadFilesStub: sinon.SinonStub<[IOZAsset[], (boolean | undefined)?], Promise<IDownloadingResult[]>>;
-  let addAssetsToProjectJsonStub: sinon.SinonStub<[IOZAsset[]], Promise<void>>;
+  let getCategoriesStub: sinon.SinonSpy<[], IOZContractCategory[]>;
+  let collectAssetsWithDependenciesStub: sinon.SinonSpy<[(string[] | undefined)?], IOZAsset[]>;
+  let downloadAssetsAsyncStub: sinon.SinonStub<
+    [string, IOZAsset[], (boolean | undefined)?, (string | undefined)?],
+    Promise<IDownloadingResult[]>>;
   let getAssetsStatusStub: sinon.SinonStub<any>;
   let generateMigrationsStub: sinon.SinonStub<[IOZAsset[]], Promise<void>>;
   let getCategoryApiDocumentationUrlStub: sinon.SinonStub<any>;
+  let updateProjectJsonAsyncStub: sinon.SinonStub<[string, IOZContractCategory, IOZAsset[]], Promise<void>>;
 
   let withProgressStub: sinon.SinonStub<[ProgressOptions,
     (progress: Progress<any>, token: CancellationToken) => any], any>;
@@ -51,7 +57,7 @@ describe('OpenZeppelinCommands tests', () => {
   let selectedCategory: IOZContractCategory;
   let testAssets: IOZAsset[];
 
-  let openZeppelinCommands: { addCategory: () => Promise<void> };
+  let openZeppelinCommandsRewire: any;
 
   let openStub: sinon.SinonStub<any[], any>;
 
@@ -60,23 +66,33 @@ describe('OpenZeppelinCommands tests', () => {
     testCategories = getTestCategories();
     selectedCategory = testCategories[numberOfCategory];
     testAssets = getTestAssetsWithDependencies(selectedCategory.assets);
+    const mockOpenZeppelinManifest = {
+      collectAssetsWithDependencies: (_assetIds: string[]) => testAssets,
+      getAssets: () => [] as IOZAsset[],
+      getBaseUrlToContractsSource: () => 'http://test.com',
+      getCategories: () => testCategories,
+      getCategoryApiDocumentationUrl: (_category: IOZContractCategory) => '',
+      getVersion: () => '1.0.0',
+    } as OpenZeppelinManifest;
 
-    const getWorkspaceRootMock = sinon.stub(workspace, 'getWorkspaceRoot');
+    const getWorkspaceRootMock = sinon.stub(helpers, 'getWorkspaceRoot');
     getWorkspaceRootMock.returns(path.join(__filename, '../../TruffleCommandsTests/testData'));
 
     sinon.stub(TruffleConfiguration.TruffleConfig.prototype, 'getConfiguration')
-      .returns({ contracts_directory: uuid.v4() } as TruffleConfiguration.IConfiguration);
+      .returns(Promise.resolve({ contracts_directory: uuid.v4() } as TruffleConfiguration.IConfiguration));
 
-    addAssetsToProjectJsonStub = sinon.stub(OpenZeppelinService, 'addAssetsToProjectJson');
-    getCategoriesStub = sinon.stub(OpenZeppelinService, 'getCategories')
-      .returns(testCategories);
-    collectAssetsWithDependenciesStub = sinon.stub(OpenZeppelinService, 'collectAssetsWithDependencies')
-      .returns(testAssets);
     getAssetsStatusStub = sinon.stub(OpenZeppelinService, 'getAssetsStatus');
-    downloadFilesStub = sinon.stub(OpenZeppelinService, 'downloadFiles');
-    generateMigrationsStub = sinon.stub(OpenZeppelinMigrationsService, 'generateMigrations');
-    getCategoryApiDocumentationUrlStub = sinon.stub(OpenZeppelinService, 'getCategoryApiDocumentationUrl')
-      .returns('testUrl');
+    downloadAssetsAsyncStub = sinon.stub(OpenZeppelinService, 'downloadAssetsAsync');
+    updateProjectJsonAsyncStub = sinon.stub(OpenZeppelinService, 'updateProjectJsonAsync')
+      .resolves();
+    generateMigrationsStub = sinon.stub(OpenZeppelinMigrationsService, 'generateMigrations')
+      .resolves();
+    getCategoriesStub = sinon.spy(mockOpenZeppelinManifest, 'getCategories');
+    collectAssetsWithDependenciesStub = sinon.spy(mockOpenZeppelinManifest, 'collectAssetsWithDependencies');
+    getCategoryApiDocumentationUrlStub = sinon.stub(mockOpenZeppelinManifest, 'getCategoryApiDocumentationUrl');
+
+    sinon.stub(openZeppelinHelper, 'tryGetCurrentOpenZeppelinVersionAsync').resolves('version');
+    sinon.stub(openZeppelinHelper, 'createManifestAsync').resolves(mockOpenZeppelinManifest);
 
     getAssetsStatusStub.returns({ existing: [], missing: testAssets });
 
@@ -99,25 +115,25 @@ describe('OpenZeppelinCommands tests', () => {
         state: PromiseState.fulfilled,
       });
     });
-    downloadFilesStub.resolves(testDownloadingResult);
+    downloadAssetsAsyncStub.resolves(testDownloadingResult);
 
     openStub = sinon.stub().resolves();
-    const openZeppelinCommandsRewire = rewire('../../src/commands/OpenZeppelinCommands');
+    openZeppelinCommandsRewire = rewire('../../src/commands/OpenZeppelinCommands');
     openZeppelinCommandsRewire.__set__('open', openStub);
-    openZeppelinCommands = openZeppelinCommandsRewire.__get__('OpenZeppelinCommands');
   });
 
   afterEach(() => {
     sinon.restore();
   });
 
-  it('should complete basic pipeline', async () => {
+  it('addCategory should complete basic pipeline', async () => {
     // Arrange
+    getCategoryApiDocumentationUrlStub.returns('testUrl');
     const wereDownloadedMessage = Constants.openZeppelin.wereDownloaded(selectedCategory.assets.length);
-    showInformationMessageStub.onCall(1).returns(Constants.openZeppelin.moreDetailsButtonTitle);
+    showInformationMessageStub.onCall(0).returns(Constants.openZeppelin.moreDetailsButtonTitle);
 
     // Act
-    await openZeppelinCommands.addCategory();
+    await openZeppelinCommandsRewire.OpenZeppelinCommands.addCategory();
 
     // Assert
     assert.strictEqual(getCategoriesStub.called, true, 'getCategories should be called.');
@@ -130,15 +146,16 @@ describe('OpenZeppelinCommands tests', () => {
       },
       'selectCategory should ask for category.',
     );
-    assert.strictEqual(collectAssetsWithDependenciesStub.calledOnce, true, 'collectAssetsWithDependencies should called once.');
+    assert.strictEqual(collectAssetsWithDependenciesStub.calledOnce,
+     true, 'collectAssetsWithDependencies should called once.');
     assert.deepStrictEqual(
       collectAssetsWithDependenciesStub.args[0][0],
       selectedCategory.assets,
       'collectAssetsWithDependencies should called once with asserts from selected category.',
     );
-    assert.strictEqual(downloadFilesStub.calledOnce, true, 'downloadFiles should be called');
-    assert.strictEqual(addAssetsToProjectJsonStub.called, true, 'addAssetsToProjectJson should be called');
-    assert.strictEqual(showInformationMessageStub.calledTwice, true, 'showInformationMessage should be called twice');
+    assert.strictEqual(downloadAssetsAsyncStub.calledOnce, true, 'downloadAssetsAsync should be called');
+    assert.strictEqual(showInformationMessageStub.calledTwice,
+      true, 'showInformationMessage should be called twice');
     assert.strictEqual(
       showInformationMessageStub.args[0][0],
       wereDownloadedMessage,
@@ -149,6 +166,7 @@ describe('OpenZeppelinCommands tests', () => {
       Constants.openZeppelin.exploreDownloadedContractsInfo,
       'should be displayed message with information about downloaded category',
     );
+    assert.strictEqual(updateProjectJsonAsyncStub.calledOnce, true, 'updateProjectJsonAsync should be called once');
     assert.strictEqual(
       getCategoryApiDocumentationUrlStub.calledOnce,
       true,
@@ -157,15 +175,15 @@ describe('OpenZeppelinCommands tests', () => {
     assert.strictEqual(generateMigrationsStub.called, true, 'generateMigrations should be called');
   });
 
-  it('should downloads selected category', async () => {
+  it('addCategory should downloads selected category', async () => {
     // Act
-    await openZeppelinCommands.addCategory();
+    await openZeppelinCommandsRewire.OpenZeppelinCommands.addCategory();
 
     // Assert
-    assert.strictEqual(downloadFilesStub.args[0][0], testAssets, 'downloadFiles should called for selected asset');
+    assert.strictEqual(downloadAssetsAsyncStub.args[0][1], testAssets, 'downloadAssetsAsync should called for selected asset');
   });
 
-  it('throws cancellation event when user don`t select category', async () => {
+  it('addCategory throws cancellation event when user don`t select category', async () => {
     // Arrange
     const notExistingCategoryName = 'notExistingCategoryName';
 
@@ -175,7 +193,7 @@ describe('OpenZeppelinCommands tests', () => {
 
     // Act and Assert
     await assert.rejects(
-      async () => await openZeppelinCommands.addCategory(),
+      async () => await openZeppelinCommandsRewire.OpenZeppelinCommands.addCategory(),
       CancellationEvent,
       'addCategory should throw cancellation event.');
     assert.strictEqual(getCategoriesStub.calledOnce, true, 'getCategories should called once.');
@@ -187,7 +205,7 @@ describe('OpenZeppelinCommands tests', () => {
     assert.strictEqual(withProgressStub.notCalled, true, 'withProgress should not called.');
   });
 
-  it('should ask for overwrite existing files and overwrite on positive answer', async () => {
+  it('addCategory should ask for overwrite existing files and overwrite on positive answer', async () => {
     // Arrange
     const existingAsset = testAssets.slice(3, 4);
     const missingAsset = testAssets.slice(0, 3);
@@ -199,20 +217,20 @@ describe('OpenZeppelinCommands tests', () => {
     showInformationMessageStub.onCall(0).returns(Constants.openZeppelin.replaceButtonTitle);
 
     // Act
-    await openZeppelinCommands.addCategory();
+    await openZeppelinCommandsRewire.OpenZeppelinCommands.addCategory();
 
     // Assert
-    assert.strictEqual(showInformationMessageStub.calledThrice, true, 'showQuickPick should called three times');
+    assert.strictEqual(showInformationMessageStub.calledTwice, true, 'showInformationMessage should called twice');
     assert.strictEqual(
       showInformationMessageStub.args[0][0],
       Constants.openZeppelin.alreadyExisted(existingAsset),
       'alreadyExisted message should displayed once.',
     );
-    assert.strictEqual(downloadFilesStub.args[0][1], true, 'downloading should be called with overwrite flag');
-    assert.strictEqual(downloadFilesStub.args[0][0].length, testAssets.length, 'downloading full asset of items');
+    assert.strictEqual(downloadAssetsAsyncStub.args[0][2], true, 'downloading should be called with overwrite flag');
+    assert.strictEqual(downloadAssetsAsyncStub.args[0][1].length, testAssets.length, 'downloading full asset of items');
   });
 
-  it('should ask for overwrite existed files and skip files on negative answer', async () => {
+  it('addCategory should ask for overwrite existed files and skip files on negative answer', async () => {
     // Arrange
     const existingAsset = testAssets.slice(3, 4);
     const missingAsset = testAssets.slice(0, 3);
@@ -224,26 +242,28 @@ describe('OpenZeppelinCommands tests', () => {
     showInformationMessageStub.onCall(0).returns(Constants.openZeppelin.skipButtonTitle);
 
     // Act
-    await openZeppelinCommands.addCategory();
+    await openZeppelinCommandsRewire.OpenZeppelinCommands.addCategory();
 
     // Assert
-    assert.strictEqual(showInformationMessageStub.calledThrice, true, 'showQuickPick should called three times.');
+    assert.strictEqual(showInformationMessageStub.calledTwice, true, 'showInformationMessage should called twice');
     assert.strictEqual(
       showInformationMessageStub.args[0][0],
       Constants.openZeppelin.alreadyExisted(existingAsset),
       'showQuickPick should called once.',
     );
-    assert.strictEqual(downloadFilesStub.args[0][1], false, 'downloading should be called without overwrite flag');
-    assert.strictEqual(downloadFilesStub.args[0][0].length, missingAsset.length, 'downloading only missing assets');
+    assert.strictEqual(downloadAssetsAsyncStub.args[0][2], false,
+      'downloading should be called without overwrite flag');
+    assert.strictEqual(downloadAssetsAsyncStub.args[0][1].length, missingAsset.length,
+      'downloading only missing assets');
   });
 
-  it('should show error message if some files failed on downloading and allow to retry', async () => {
+  it('addCategory should show error message if some files failed on downloading and allow to retry', async () => {
     // Arrange
     const rejectedAssets = [
       { asset: {} as IOZAsset, state: PromiseState.rejected },
       { asset: {} as IOZAsset, state: PromiseState.rejected },
     ];
-    downloadFilesStub.resolves([
+    downloadAssetsAsyncStub.resolves([
       { asset: {} as IOZAsset, state: PromiseState.fulfilled },
       ...rejectedAssets,
     ]);
@@ -252,7 +272,7 @@ describe('OpenZeppelinCommands tests', () => {
       .onCall(1).returns(Constants.openZeppelin.cancelButtonTitle);
 
     // Act
-    await openZeppelinCommands.addCategory();
+    await openZeppelinCommandsRewire.OpenZeppelinCommands.addCategory();
 
     // Assert
     assert.strictEqual(
@@ -260,10 +280,10 @@ describe('OpenZeppelinCommands tests', () => {
       Constants.openZeppelin.wereNotDownloaded(rejectedAssets.length),
       'showErrorMessageStub should called with exact message',
     );
-    assert.strictEqual(downloadFilesStub.calledTwice, true, 'downloadFiles should be retried');
+    assert.strictEqual(downloadAssetsAsyncStub.calledTwice, true, 'downloadFiles should be retried');
   });
 
-  it('should open documentation for chosen category after downloading', async () => {
+  it('addCategory should open documentation for chosen category after downloading', async () => {
     // Arrange
     const testDocumentationUrl = 'testUrl';
     getCategoryApiDocumentationUrlStub.returns(testDocumentationUrl);
@@ -271,23 +291,24 @@ describe('OpenZeppelinCommands tests', () => {
     showInformationMessageStub.onCall(1).returns(Constants.openZeppelin.moreDetailsButtonTitle);
 
     // Act
-    await openZeppelinCommands.addCategory();
+    await openZeppelinCommandsRewire.OpenZeppelinCommands.addCategory();
 
     // Assert
     assert.strictEqual(getCategoryApiDocumentationUrlStub.calledWithMatch(selectedCategory), true,
       'getCategoryApiDocumentationUrl should be called with chosen category');
     assert.strictEqual(openStub.calledWith(testDocumentationUrl), true,
       `open should be called with ${testDocumentationUrl}`);
-    assert.strictEqual(openStub.calledAfter(downloadFilesStub), true, 'open should be called after downloadFiles');
+    assert.strictEqual(openStub.calledAfter(downloadAssetsAsyncStub), true,
+    'open should be called after downloadFiles');
   });
 
-  it('should not ask and open category documentation if it doesn\'t exist', async () => {
+  it('addCategory should not ask and open category documentation if it doesn\'t exist', async () => {
     // Arrange
     getCategoryApiDocumentationUrlStub.returns(undefined);
     generateMigrationsStub.resolves();
 
     // Act
-    await openZeppelinCommands.addCategory();
+    await openZeppelinCommandsRewire.OpenZeppelinCommands.addCategory();
 
     // Assert
     assert.strictEqual(

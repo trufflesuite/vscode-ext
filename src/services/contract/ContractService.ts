@@ -3,6 +3,7 @@
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import { HttpService } from '..';
 import { Constants } from '../../Constants';
 import { getWorkspaceRoot, TruffleConfiguration } from '../../helpers';
 import { Contract } from './Contract';
@@ -12,54 +13,81 @@ export namespace ContractService {
     return path.basename(solidityFilePath, Constants.contractExtension.sol);
   }
 
-  export function getCompiledContractByContractFile(contractPath: string): Contract | null {
-    if (fs.pathExistsSync(contractPath)) {
-      const fileData = fs.readFileSync(contractPath, 'utf-8');
-      return new Contract(JSON.parse(fileData));
+  export async function getCompiledContractsMetadata(): Promise<Contract[]> {
+    const contractPaths = await getCompiledContractsPathsFromBuildDirectory();
+    const contractsMetadata = contractPaths.map((contractPath) => getCompiledContractMetadataByPath(contractPath));
+
+    return Promise.all(contractsMetadata).then((contracts) => {
+      return contracts.filter((contract) => contract !== null) as Contract[];
+    });
+  }
+
+  export async function getSolidityContractsFolderPath(): Promise<string> {
+    return getPathDirectory('contracts_directory');
+  }
+
+  export async function getMigrationFolderPath(): Promise<string> {
+    return getPathDirectory('migrations_directory');
+  }
+
+  export async function getDeployedBytecodeByAddress(host: string, address: string): Promise<string> {
+    const defaultBlock = 'latest';
+    const response = await HttpService.sendRPCRequest(host, Constants.rpcMethods.getCode, [ address, defaultBlock ]);
+
+    if (!response || response && response.error) {
+      const errorMessage = response && response.error ? response.error.message : '';
+      throw new Error(`getDeployedBytecodeByAddress failed. ${errorMessage}`);
     }
 
-    return null;
+    return response && response.result as string || '';
   }
 
-  export function getCompiledContractBySolidityFile(solidityFilePath: string): Contract | null {
-    const contractPath = getContractPaths(solidityFilePath)[0];
+  function getCompiledContractMetadataByPath(contractPath: string): Promise<Contract | null> {
+    if (fs.pathExistsSync(contractPath)) {
+      return new Promise((resolve, reject) => {
+        fs.readFile(contractPath, 'utf-8', (error, fileData) => {
+          if (error) {
+            reject(error);
+          } else {
+            const contractMetadata = JSON.parse(fileData);
 
-    return getCompiledContractByContractFile(contractPath);
+            if (contractMetadata.abi && contractMetadata.bytecode) {
+              resolve(new Contract(JSON.parse(fileData)));
+            } else {
+              resolve(null);
+            }
+          }
+        });
+      });
+    }
+
+    return Promise.resolve(null);
   }
 
-  export function getCompiledContractByContractName(contractName: string): Contract | null {
-    return getCompiledContractBySolidityFile(`${contractName}${Constants.contractExtension.sol}`);
-  }
-
-  export function getCompiledContracts(): Contract[] {
-    const contractPaths = getContractPaths();
-    const contracts = contractPaths
-      .map((contractPath) => getCompiledContractByContractFile(contractPath))
-      .filter((contract) => contract !== null);
-
-    return contracts as Contract[];
-  }
-
-  export function getContractPaths(solidityFilePath?: string): string[] {
-    const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
-    const truffleConfig = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
-    const configuration = truffleConfig.getConfiguration();
-    const buildDir = path.join(getWorkspaceRoot()!, configuration.contracts_build_directory);
-    const files: string[] = [];
+  async function getCompiledContractsPathsFromBuildDirectory(): Promise<string[]> {
+    const buildDir = await getPathDirectory('contracts_build_directory');
 
     if (!fs.pathExistsSync(buildDir)) {
       throw new Error(Constants.errorMessageStrings.BuildContractsDirIsNotExist(buildDir));
     }
 
-    if (solidityFilePath) {
-      const contractName = getContractNameBySolidityFile(solidityFilePath);
-      files.push(`${contractName}${Constants.contractExtension.json}`);
-    } else {
-      files.push(...fs.readdirSync(buildDir));
-    }
-
-    return files
+    return fs.readdirSync(buildDir)
+      .filter((file) => path.extname(file) === Constants.contractExtension.json)
       .map((file) => path.join(buildDir, file))
       .filter((file) => fs.lstatSync(file).isFile());
+  }
+
+  async function getPathDirectory(directory: string): Promise<string> {
+    const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
+    const truffleConfig = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
+    const configuration = await truffleConfig.getConfiguration();
+
+    const dir = (configuration as any)[directory];
+
+    if (dir && path.isAbsolute(dir)) {
+      return dir;
+    }
+
+    return path.join(getWorkspaceRoot()!, dir);
   }
 }

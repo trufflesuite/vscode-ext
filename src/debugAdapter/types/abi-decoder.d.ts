@@ -1,12 +1,15 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 declare module 'abi-decoder' {
 
-    interface Decoded {
-        name: string,
-        params: any[];
-    }
+  interface Decoded {
+    name: string,
+    params: any[];
+  }
 
-    function addABI(abi: []): void;
-    function decodeMethod(input: string): Decoded;
-    
-    export { addABI, decodeMethod }; 
+  function addABI(abi: []): void;
+  function decodeMethod(input: string): Decoded;
+
+  export { addABI, decodeMethod };
 }

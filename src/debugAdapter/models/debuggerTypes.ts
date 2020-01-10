@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { EVENT_TYPES } from '../constants/debugAdapter';
 

@@ -1,45 +1,48 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license.
+
 import { IInstruction } from '../models/IInstruction';
 
 export default class InstructionTreeNode {
-    private key: string;
-    private path: string;
-    private parent?: InstructionTreeNode;
+  private key: string;
+  private path: string;
+  private parent?: InstructionTreeNode;
 
-    constructor(key?: string, parent?: InstructionTreeNode, instructionData?: IInstruction) {
-        if (!key && (!instructionData || (!instructionData.pc && instructionData.pc !== 0))) {
-            throw new Error('Incorrect input params');
-        }
-
-        const nodeKey = instructionData
-            ? instructionData.pc.toString()
-            : (key || '');
-        this.key = nodeKey;
-        this.parent = parent;
-        this.path = this.generatePath(nodeKey, parent);
+  constructor(key?: string, parent?: InstructionTreeNode, instructionData?: IInstruction) {
+    if (!key && (!instructionData || (!instructionData.pc && instructionData.pc !== 0))) {
+      throw new Error('Incorrect input params');
     }
 
-    public getId(): string {
-        return this.path;
-    }
+    const nodeKey = instructionData
+      ? instructionData.pc.toString()
+      : (key || '');
+    this.key = nodeKey;
+    this.parent = parent;
+    this.path = this.generatePath(nodeKey, parent);
+  }
 
-    public getKey(): string {
-        return this.key;
-    }
+  public getId(): string {
+    return this.path;
+  }
 
-    public getParent(): InstructionTreeNode | undefined {
-        return this.parent;
-    }
+  public getKey(): string {
+    return this.key;
+  }
 
-    public getParentPaths(): string[] {
-        return this.path.split(/\//).slice(1, this.path.length - 1); // not take first empty element and last
-    }
+  public getParent(): InstructionTreeNode | undefined {
+    return this.parent;
+  }
 
-    public getPaths(): string[] {
-        return this.path.split(/\//).slice(1); // not take first empty element
-    }
+  public getParentPaths(): string[] {
+    return this.path.split(/\//).slice(1, this.path.length - 1); // not take first empty element and last
+  }
 
-    private generatePath(key: string, parent?: InstructionTreeNode) {
-        const parentPath = parent ? parent.path : '';
-        return `${parentPath}/${key}`;
-    }
+  public getPaths(): string[] {
+    return this.path.split(/\//).slice(1); // not take first empty element
+  }
+
+  private generatePath(key: string, parent?: InstructionTreeNode) {
+    const parentPath = parent ? parent.path : '';
+    return `${parentPath}/${key}`;
+  }
 }

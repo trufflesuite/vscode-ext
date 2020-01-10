@@ -5,8 +5,11 @@ import * as assert from 'assert';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as sinon from 'sinon';
+import { Constants } from '../src/Constants';
 import { TruffleConfiguration } from '../src/helpers';
-import * as workspace from '../src/helpers/workspace';
+import * as helpers from '../src/helpers';
+import * as commands from '../src/helpers/command';
+import { ICommandResult } from '../src/helpers/command';
 import * as testData from './testData/truffleConfigTestdata';
 
 describe('TruffleConfiguration helper', () => {
@@ -30,7 +33,7 @@ describe('TruffleConfiguration helper', () => {
     async () => {
       // Arrange
       const referencePath = path.normalize('w:/temp/truffle-config.js');
-      sinon.stub(workspace, 'getWorkspaceRoot').returns(path.normalize('w:/temp'));
+      sinon.stub(helpers, 'getWorkspaceRoot').returns(path.normalize('w:/temp'));
       const pathExistsStub = sinon.stub(fs, 'pathExistsSync').returns(true);
 
       // Act
@@ -44,7 +47,7 @@ describe('TruffleConfiguration helper', () => {
   it('getTruffleConfigUri throw an exception if path is not existed',
     async () => {
       // Arrange
-      sinon.stub(workspace, 'getWorkspaceRoot').returns('');
+      sinon.stub(helpers, 'getWorkspaceRoot').returns('');
       sinon.stub(fs, 'pathExistsSync').returns(false);
 
       // Act and Assert
@@ -193,6 +196,8 @@ describe('getConfiguration() in class TruffleConfig', () => {
   let readFileStub: sinon.SinonStub<any, any>;
 
   beforeEach(() => {
+    sinon.stub(helpers, 'getWorkspaceRoot').returns(path.normalize('w:/temp'));
+
     readFileStub = sinon.stub(fs, 'readFileSync');
 
     readFileStub.withArgs('path').returns(testData.referenceMnemonic);
@@ -203,84 +208,130 @@ describe('getConfiguration() in class TruffleConfig', () => {
     sinon.restore();
   });
 
-  it('getConfiguration returns default configuration',
-    async () => {
-      // Arrange
-      readFileStub.returns('');
-      const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+  it('getConfiguration returns configurations without directories and networks', async () => {
+    // Arrange
+    const { contracts_directory, contracts_build_directory, migrations_directory }
+      = Constants.truffleConfigDefaultDirectory;
+    const commandResult: ICommandResult = {
+      cmdOutput: '',
+      cmdOutputIncludingStderr: '',
+      code: 0,
+      messages: [{command: 'truffleConfig', message: '{}'}],
+    };
 
-      // Act
-      const result = truffleConfig.getConfiguration();
+    sinon.stub(commands, 'tryExecuteCommandInFork').returns(Promise.resolve(commandResult));
+    readFileStub.returns('');
+    const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
 
-      // Assert
-      assert.strictEqual(
-        result.contracts_build_directory,
-        path.normalize('build/contracts'),
-        'result should contain contracts build directory');
-      assert.strictEqual(
-        result.contracts_directory,
-        'contracts',
-        'result should contain contracts directory');
-      assert.strictEqual(
-        result.migrations_directory,
-        'migrations',
-        'result should contain migration build directory');
-      assert.deepStrictEqual(result.networks, undefined, 'result.networks should be undefined');
-    });
+    // Act
+    const result = await truffleConfig.getConfiguration();
 
-  it('getConfiguration returns configuration without required fields',
-    async () => {
-      // Arrange
-      readFileStub.returns(testData.referenceCfgContent);
-      const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+    // Assert
+    assert.strictEqual(
+      result.contracts_build_directory,
+      path.normalize(contracts_build_directory),
+      'result should contain contracts build directory');
+    assert.strictEqual(
+      result.contracts_directory,
+      contracts_directory,
+      'result should contain contracts directory');
+    assert.strictEqual(
+      result.migrations_directory,
+      migrations_directory,
+      'result should contain migration build directory');
+    assert.strictEqual(result.networks?.length, 0, 'result.networks should be empty array');
+  });
 
-      // Act
-      const result = truffleConfig.getConfiguration();
+  it('getConfiguration returns configurations with directories and without networks', async () => {
+    // Arrange
+    const expectedContractsBuildDirectory = '123';
+    const expectedContractsDirectory = '234';
+    const expectedMigrationsDirector = '345';
 
-      // Assert
-      assert.strictEqual(
-        result.contracts_build_directory,
-        path.normalize('build/contracts'),
-        'result should contain contracts build directory');
-      assert.strictEqual(
-        result.contracts_directory,
-        'contracts',
-        'result should contain contracts directory');
-      assert.strictEqual(
-        result.migrations_directory,
-        'migrations',
-        'result should contain migration build directory');
-      assert.deepStrictEqual(
-        result.networks,
-        testData.referenceConfiguration.networks,
-        'result.networks should be equal to test networks');
-    });
+    const commandResult: ICommandResult = {
+      cmdOutput: '',
+      cmdOutputIncludingStderr: '',
+      code: 0,
+      messages: [{command: 'truffleConfig',
+        message: `{"contracts_build_directory": "${expectedContractsBuildDirectory}", ` +
+          `"contracts_directory": "${expectedContractsDirectory}", ` +
+          `"migrations_directory": "${expectedMigrationsDirector}"}`}],
+    };
 
-  it('getConfiguration returns configuration with required fields',
-    async () => {
-      // Arrange
-      readFileStub.returns(testData.referenceCfgContentWithDirectories);
-      const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+    sinon.stub(commands, 'tryExecuteCommandInFork').returns(Promise.resolve(commandResult));
+    readFileStub.returns('');
+    const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
 
-      // Act
-      const result = truffleConfig.getConfiguration();
+    // Act
+    const result = await truffleConfig.getConfiguration();
 
-      // Assert
-      assert.strictEqual(
-        result.contracts_build_directory,
-        'build',
-        'result should contain contracts build directory');
-      assert.strictEqual(
-        result.contracts_directory,
-        'test_contracts',
-        'result should contain contracts test_contracts directory');
-      assert.strictEqual(
-        result.migrations_directory,
-        'test_migrations',
-        'result should contain contracts test_migrations directory');
-      assert.deepStrictEqual(
-        result.networks,
-        testData.referenceConfiguration.networks,
-        'result.networks should be equal to test networks');
-    });
+    // Assert
+    assert.strictEqual(
+      result.contracts_build_directory,
+      expectedContractsBuildDirectory,
+      'result should contain contracts build directory');
+    assert.strictEqual(
+      result.contracts_directory,
+      expectedContractsDirectory,
+      'result should contain contracts directory');
+    assert.strictEqual(
+      result.migrations_directory,
+      expectedMigrationsDirector,
+      'result should contain migration build directory');
+    assert.strictEqual(result.networks?.length, 0, 'result.networks should be empty array');
+  });
+
+  it('getConfiguration returns configurations with networks', async () => {
+    // Arrange
+    const testNetworkOptions = '{"development":{"host":"127.0.0.1","port":8545,"network_id":"*"}}';
+    const testNetwork = `{"networks": ${testNetworkOptions}}`;
+    const parseTestNetworkOptions = JSON.parse(testNetworkOptions);
+
+    const commandResult: ICommandResult = {
+      cmdOutput: '',
+      cmdOutputIncludingStderr: '',
+      code: 0,
+      messages: [{command: 'truffleConfig', message: testNetwork}],
+    };
+
+    sinon.stub(commands, 'tryExecuteCommandInFork').returns(Promise.resolve(commandResult));
+    readFileStub.returns('');
+    const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+
+    // Act
+    const result = await truffleConfig.getConfiguration();
+
+    // Assert
+    const networkKey = Object.keys(parseTestNetworkOptions)[0];
+    assert.strictEqual(result.networks?.length, 1, 'result.networks should not be empty array');
+    assert.strictEqual(
+      result.networks && result.networks[0].name,
+      networkKey,
+      'networks should have specific name');
+    assert.deepStrictEqual(
+      result.networks && result.networks[0].options,
+      parseTestNetworkOptions[networkKey],
+      'networks should have specific options');
+  });
+
+  it('getConfiguration throws error when truffle-config.js has incorrect format', async () => {
+    // Arrange
+    const commandResult: ICommandResult = {
+      cmdOutput: '',
+      cmdOutputIncludingStderr: '',
+      code: 0,
+      messages: [{command: 'truffleConfig', message: undefined}],
+    };
+
+    sinon.stub(commands, 'tryExecuteCommandInFork').returns(Promise.resolve(commandResult));
+    readFileStub.returns('');
+    const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+
+    // Act, Assert
+    try {
+      await truffleConfig.getConfiguration();
+    } catch (error) {
+      assert.strictEqual(error.message, Constants.errorMessageStrings.TruffleConfigHasIncorrectFormat, 'getConfiguration should throw error');
+    }
+  });
 });

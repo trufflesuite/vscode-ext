@@ -3,11 +3,12 @@
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import { OpenZeppelinService } from '..';
 import { Constants } from '../../Constants';
-import { getWorkspaceRoot } from '../../helpers';
-import { TruffleConfiguration } from '../../helpers/truffleConfig';
 import { Output } from '../../Output';
-import { IOZAsset, OpenZeppelinService, OZAssetType } from './OpenZeppelinService';
+import { ContractService } from '../../services';
+import { IOZAsset, OZAssetType } from './models';
+import { OpenZeppelinProjectJsonService } from './OpenZeppelinProjectJsonService';
 
 const migrationFilename = '99_deploy_openzeppelin.js';
 
@@ -35,40 +36,50 @@ export namespace OpenZeppelinMigrationsService {
 
 function generateDeclarationSection(items: IOZAsset[]): string {
   return items
-    .filter((asset: IOZAsset) => asset.type === OZAssetType.contract || asset.type === OZAssetType.library)
-    .map((asset: IOZAsset) => {
-      return `var ${path.basename(asset.id)} = artifacts.require("${path.parse(asset.name).name}");`;
-    })
+    .filter((asset: IOZAsset) =>
+    OpenZeppelinService.assetHasContracts(asset) || asset.type === OZAssetType.library)
+    .reduce((declarations: string[], asset: IOZAsset) => {
+      const contractNames = OpenZeppelinService.getContractsNamesFromAsset(asset);
+
+      return declarations.concat(
+        contractNames.map((contract) => `var ${contract} = artifacts.require("${contract}");`));
+    }, [])
     .join('\n');
 }
 
 function generateContractDeployerSection(items: IOZAsset[]): string {
   return items
-    .filter((asset: IOZAsset) => asset.type === OZAssetType.contract)
-    .map((asset: IOZAsset) => {
-      return `    deployer.deploy(${path.basename(asset.id)});`;
-    })
+    .filter((asset: IOZAsset) => OpenZeppelinService.assetHasContracts(asset))
+    .reduce((deployerSections: string[], asset: IOZAsset) => {
+      const contractNames = OpenZeppelinService.getContractsNamesFromAsset(asset);
+
+      return deployerSections
+        .concat(contractNames.map((contract) => `    deployer.deploy(${contract});`));
+    }, [])
     .join('\n');
 }
 
 function generateLibrariesDeployerSection(items: IOZAsset[]): string {
   return items
     .filter((asset: IOZAsset) => asset.type === OZAssetType.library)
-    .map((asset: IOZAsset) => {
-      return `    deployer.deploy(${path.basename(asset.id)});`;
-    })
+    .reduce((deployerSections: string[], asset: IOZAsset) => {
+      const libraryName = OpenZeppelinService.getContractNameByAssetName(asset);
+      const libraryDeploySection = `    deployer.deploy(${libraryName});`;
+      deployerSections.push(libraryDeploySection);
+      return deployerSections;
+    }, [])
     .join('\n');
 }
 
 async function generateLinkingSection(items: IOZAsset[]): Promise<string[]> {
   const librariesLinkingSection: string[] = [];
-  const contracts = items.filter((asset) => asset.type === OZAssetType.contract);
+  const contracts = items.filter((asset) => OpenZeppelinService.assetHasContracts(asset));
 
   for (const contract of contracts) {
     librariesLinkingSection.push(
       ...contractToLibraryLinkingSection(
         contract,
-        await OpenZeppelinService.getReferencesToLibraries(contract),
+        await OpenZeppelinProjectJsonService.getReferencesToLibrariesAsync(contract),
       ),
     );
   }
@@ -76,23 +87,19 @@ async function generateLinkingSection(items: IOZAsset[]): Promise<string[]> {
   return librariesLinkingSection;
 }
 
-function contractToLibraryLinkingSection(baseContract: IOZAsset, libraries: IOZAsset[]): string[] {
-  const librariesLinkingSection: string[] = [];
-  libraries.forEach((asset: IOZAsset) => {
-    librariesLinkingSection.push(`    deployer.link(${path.basename(asset.id)}, ${path.basename(baseContract.id)});`);
-  });
-  return librariesLinkingSection;
+function contractToLibraryLinkingSection(baseAsset: IOZAsset, libraries: IOZAsset[]): string[] {
+  const contractsNames = OpenZeppelinService.getContractsNamesFromAsset(baseAsset);
+  const librariesNames = libraries.map(OpenZeppelinService.getContractNameByAssetName);
+
+  return contractsNames.reduce((deployerLinks: string[], contractName: string) => {
+    return deployerLinks.concat(
+      librariesNames.map((libraryName) => (`    deployer.link(${libraryName}, ${contractName});`)));
+  }, []);
 }
 
 async function saveMigrationContent(content: string): Promise<void> {
-  const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
-  const truffleConfig = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
-  const configuration = truffleConfig.getConfiguration();
-  const migrationFilePath = configuration.migrations_directory;
-  const filePath = path.join(
-    getWorkspaceRoot()!,
-    migrationFilePath,
-    migrationFilename,
+  const migrationFolderPath = await ContractService.getMigrationFolderPath();
+  const filePath = path.join(migrationFolderPath, migrationFilename,
   );
 
   Output.outputLine(

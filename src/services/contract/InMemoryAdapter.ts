@@ -76,7 +76,7 @@ export class InMemoryAdapter extends AbstractAdapter {
     let networkMaps: NetworkMap[] = [];
 
     try {
-      contracts = ContractService.getCompiledContracts();
+      contracts = await ContractService.getCompiledContractsMetadata();
 
       if (contracts) {
         networkMaps = await NetworkService.getNetworkMaps();

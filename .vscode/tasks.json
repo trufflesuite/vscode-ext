@@ -1,0 +1,73 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build extension",
+      "type": "npm",
+      "script": "compile",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "group": "build"
+    },
+    {
+      "label": "Clean tests folder",
+      "type": "npm",
+      "script": "clean",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "group": "build"
+    },
+    {
+      "label": "Build extension with watcher",
+      "type": "npm",
+      "script": "watch",
+      "problemMatcher": "$tsc-watch",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "never"
+      },
+      "group": "build",
+      "dependsOn": [
+        "Clean tests folder"
+      ]
+    },
+    {
+      "label": "Install dependencies for Drizzle UI",
+      "type": "npm",
+      "script": "install",
+      "path": "drizzleUI/",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "group": "build"
+    },
+    {
+      "label": "Build Drizzle UI",
+      "type": "npm",
+      "script": "build:ext:dev",
+      "path": "drizzleUI/",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "group": "build"
+    },
+    {
+      "label": "Run extension with Drizzle UI",
+      "dependsOn": [
+        "Install dependencies for Drizzle UI",
+        "Build Drizzle UI",
+        "Build extension"
+      ]
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import { platform } from 'os';
 import * as helpers from '../../src/debugAdapter/helpers';
 
 describe('helpers unit tests', () => {
@@ -19,9 +20,15 @@ describe('helpers unit tests', () => {
     assert.strictEqual(groups[keyValue2][0], elC, 'group 2 should contain elC');
   });
 
-  getTestCasesForSortFilePaths().forEach((testCase) => {
-    sortFilePathTest(testCase.input, testCase.output);
-  });
+  if (platform() === 'win32') {
+    getTestCasesForSortFilePathsOnWindows().forEach((testCase) => {
+      sortFilePathTest(testCase.input, testCase.output);
+    });
+  } else {
+    getTestCasesForSortFilePathsOnUnix().forEach((testCase) => {
+      sortFilePathTest(testCase.input, testCase.output);
+    });
+  }
 
   function sortFilePathTest(input: string[], output: string[]) {
     it('sortFilePaths should return correct result', () => {
@@ -32,7 +39,7 @@ describe('helpers unit tests', () => {
     });
   }
 
-  function getTestCasesForSortFilePaths() {
+  function getTestCasesForSortFilePathsOnWindows() {
     return [
       {
         input: [
@@ -58,6 +65,39 @@ describe('helpers unit tests', () => {
           'A:\\B\\C\\a.ext',
           'A:/B/C/b.ext',
           'A:\\B\\C\\D\\A\\B\\b.ext',
+          'A:/B/C/E/a.ext',
+          'A:/B/C/E/F/a.ext',
+        ],
+      },
+    ];
+  }
+
+  function getTestCasesForSortFilePathsOnUnix() {
+    return [
+      {
+        input: [
+          'A:/B/C/b.ext',
+          'A:/B/C/D/a.ext',
+          'A:/B/C/a.ext',
+        ],
+        output: [
+          'A:/B/C/a.ext',
+          'A:/B/C/b.ext',
+          'A:/B/C/D/a.ext',
+        ],
+      },
+      {
+        input: [
+          'A:/B/C/E/a.ext',
+          'A:/B/C/b.ext',
+          'A:/B/C/E/F/a.ext',
+          'A:/B/C/a.ext',
+          'A:/B/C/D/A/B/b.ext',
+        ],
+        output: [
+          'A:/B/C/a.ext',
+          'A:/B/C/b.ext',
+          'A:/B/C/D/A/B/b.ext',
           'A:/B/C/E/a.ext',
           'A:/B/C/E/F/a.ext',
         ],

@@ -10,6 +10,7 @@ out/**
 !out/src/extension.js
 !out/src/debugger.js
 !out/src/web3ProviderResolver.js
+!out/src/checkTruffleConfigTemplate.js
 src/**
 test/**
 .editorconfig

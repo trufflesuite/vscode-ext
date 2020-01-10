@@ -7,65 +7,33 @@ import * as path from 'path';
 export const referenceMnemonic = 'some menmonic some menmonic some menmonic some menmonic some menmonic some menmonic';
 
 export const referenceCfgContent = 'const HDWalletProvider = require("truffle-hdwallet-provider");'
-  + 'module.exports = {'
-  + '  networks: {'
-  + '    development: {'
-  + '      host: "127.0.0.1",'
-  + '      port: 8545,'
-  + '      network_id: "*"'
-  + '    },'
-  + '    "localhost:123": {'
-  + '      from: "string",'
-  + '      gas: 2,'
-  + '      gasPrice: 3,'
-  + '      host: "127.0.0.1",'
-  + '      network_id: "*",'
-  + '      port: 123,'
-  + '      provider: new HDWalletProvider('
-  + '                        fs.readFileSync("path", "encoding"),'
-  + '                        "url"),'
-  + '      skipDryRun: true,'
-  + '      timeoutBlocks: 4,'
-  + '      websockets: false,'
-  + '    }'
-  + '  },'
-  + '  mocha: {},'
-  + '  compilers: {'
-  + '    solc: {}'
-  + '  }'
-  + '};';
-
-export const referenceCfgContentWithDirectories = 'const HDWalletProvider = require("truffle-hdwallet-provider");'
-  + 'module.exports = {'
-  + '  contracts_build_directory: "build",'
-  + '  contracts_directory: "test_contracts",'
-  + '  migrations_directory: "test_migrations",'
-  + '  networks: {'
-  + '    development: {'
-  + '      host: "127.0.0.1",'
-  + '      port: 8545,'
-  + '      network_id: "*"'
-  + '    },'
-  + '    "localhost:123": {'
-  + '      from: "string",'
-  + '      gas: 2,'
-  + '      gasPrice: 3,'
-  + '      host: "127.0.0.1",'
-  + '      network_id: "*",'
-  + '      port: 123,'
-  + '      provider: new HDWalletProvider('
-  + '                        fs.readFileSync("path", "encoding"),'
-  + '                        "url"),'
-  + '      skipDryRun: true,'
-  + '      timeoutBlocks: 4,'
-  + '      websockets: false,'
-  + '    }'
-  + '  },'
-  + '  mocha: {},'
-  + '  compilers: {'
-  + '    solc: {}'
-  + '  }'
-  + '};';
++ 'module.exports = {'
++ '  networks: {'
++ '    development: {'
++ '      host: "127.0.0.1",'
++ '      port: 8545,'
++ '      network_id: "*"'
++ '    },'
++ '    "localhost:123": {'
++ '      from: "string",'
++ '      gas: 2,'
++ '      gasPrice: 3,'
++ '      host: "127.0.0.1",'
++ '      network_id: "*",'
++ '      port: 123,'
++ '      provider: new HDWalletProvider('
++ '                        fs.readFileSync("path", "encoding"),'
++ '                        "url"),'
++ '      skipDryRun: true,'
++ '      timeoutBlocks: 4,'
++ '      websockets: false,'
++ '    }'
++ '  },'
++ '  mocha: {},'
++ '  compilers: {'
++ '    solc: {}'
++ '  }'
++ '};';
 
 export const referenceConfiguration = {
   contracts_build_directory: 'build\\contracts',
@@ -100,6 +68,21 @@ export const referenceConfiguration = {
       },
     },
   ],
+};
+
+export const testModuleWithoutDirectories = {
+  compilers: {
+    solc: {
+      version: '0.5.0',
+    },
+  },
+  mocha: {},
+  networks: {
+    development: {
+      host: '127.0.0.1',
+      network_id: '*',
+      port: 8545,
+    }},
 };
 
 const referenceAstPath = path.join(__dirname, 'referenceAstObject.json');
