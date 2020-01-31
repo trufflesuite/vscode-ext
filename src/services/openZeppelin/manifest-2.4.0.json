@@ -3,7 +3,6 @@
   "baseUri": "https://raw.githubusercontent.com/OpenZeppelin/openzeppelin-contracts/",
   "targetPoint": "cdf655f770cf8412fbd4d6aef3c55194a1233ef1/contracts/",
   "apiDocumentationBaseUri": "https://docs.openzeppelin.com/contracts/2.x/api",
-  "openZeppelinVersion": "2.4.0",
   "categories": [
     {
       "name": "Gas Station Network",
@@ -313,7 +312,23 @@
       "type": "abstractContract",
       "dependencies": [
         "ierc20"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC20Detailed": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "decimals",
+            "type": "uint8"
+          }
+        ]
+      }
     },
     {
       "id": "gsnrecipienterc20fee",
@@ -330,7 +345,33 @@
         "safeerc20",
         "erc20",
         "erc20detailed"
-      ]
+      ],
+      "requiredParameters": {
+        "GSNRecipientERC20Fee": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          }
+        ],
+        "__unstable__ERC20PrimaryAdmin": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "decimals",
+            "type": "uint8"
+          }
+        ]
+      }
     },
     {
       "id": "ecdsa",
@@ -346,7 +387,15 @@
       "dependencies": [
         "gsnrecipient",
         "ecdsa"
-      ]
+      ],
+      "requiredParameters": {
+        "GSNRecipientSignature": [
+          {
+            "name": "trustedSigner",
+            "type": "address"
+          }
+        ]
+      }
     },
     {
       "id": "roles",
@@ -432,7 +481,23 @@
         "safemath",
         "safeerc20",
         "reentrancyguard"
-      ]
+      ],
+      "requiredParameters": {
+        "Crowdsale": [
+          {
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "name": "token",
+            "type": "IERC20"
+          }
+        ]
+      }
     },
     {
       "id": "timedcrowdsale",
@@ -442,7 +507,19 @@
       "dependencies": [
         "safemath",
         "crowdsale"
-      ]
+      ],
+      "requiredParameters": {
+        "TimedCrowdsale": [
+          {
+            "name": "openingTime",
+            "type": "uint256"
+          },
+          {
+            "name": "closingTime",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "finalizablecrowdsale",
@@ -496,7 +573,15 @@
       "type": "contract",
       "dependencies": [
         "conditionalescrow"
-      ]
+      ],
+      "requiredParameters": {
+        "RefundEscrow": [
+          {
+            "name": "beneficiary",
+            "type": "address"
+          }
+        ]
+      }
     },
     {
       "id": "refundablecrowdsale",
@@ -508,7 +593,15 @@
         "safemath",
         "finalizablecrowdsale",
         "refundescrow"
-      ]
+      ],
+      "requiredParameters": {
+        "RefundableCrowdsale": [
+          {
+            "name": "goal",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "refundablepostdeliverycrowdsale",
@@ -537,7 +630,15 @@
         "safeerc20",
         "safemath",
         "math"
-      ]
+      ],
+      "requiredParameters": {
+        "AllowanceCrowdsale": [
+          {
+            "name": "tokenWallet",
+            "type": "address"
+          }
+        ]
+      }
     },
     {
       "id": "erc20mintable",
@@ -567,7 +668,19 @@
       "dependencies": [
         "timedcrowdsale",
         "safemath"
-      ]
+      ],
+      "requiredParameters": {
+        "IncreasingPriceCrowdsale": [
+          {
+            "name": "initialRate",
+            "type": "uint256"
+          },
+          {
+            "name": "finalRate",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "cappedcrowdsale",
@@ -577,7 +690,15 @@
       "dependencies": [
         "safemath",
         "crowdsale"
-      ]
+      ],
+      "requiredParameters": {
+        "CappedCrowdsale": [
+          {
+            "name": "cap",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "individuallycappedcrowdsale",
@@ -685,7 +806,27 @@
       "dependencies": [
         "ierc20",
         "allowancecrowdsale"
-      ]
+      ],
+      "requiredParameters": {
+        "AllowanceCrowdsaleImpl": [
+          {
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "name": "token",
+            "type": "IERC20"
+          },
+          {
+            "name": "tokenWallet",
+            "type": "address"
+          }
+        ]
+      }
     },
     {
       "id": "arrays",
@@ -703,7 +844,15 @@
       "type": "contract",
       "dependencies": [
         "arrays"
-      ]
+      ],
+      "requiredParameters": {
+        "ArraysImpl": [
+          {
+            "name": "_array",
+            "type": "uint256[]"
+          }
+        ]
+      }
     },
     {
       "id": "cappedcrowdsaleimpl",
@@ -713,7 +862,27 @@
       "dependencies": [
         "ierc20",
         "cappedcrowdsale"
-      ]
+      ],
+      "requiredParameters": {
+        "CappedCrowdsaleImpl": [
+          {
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "name": "token",
+            "type": "IERC20"
+          },
+          {
+            "name": "cap",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "capperrolemock",
@@ -770,7 +939,23 @@
       "type": "contract",
       "dependencies": [
         "crowdsale"
-      ]
+      ],
+      "requiredParameters": {
+        "CrowdsaleMock": [
+          {
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "name": "token",
+            "type": "IERC20"
+          }
+        ]
+      }
     },
     {
       "id": "ecdsamock",
@@ -791,7 +976,15 @@
       ],
       "dependencies": [
         "ierc165"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC165InterfacesSupported": [
+          {
+            "name": "interfaceIds",
+            "type": "bytes4[]"
+          }
+        ]
+      }
     },
     {
       "id": "erc165notsupported",
@@ -843,7 +1036,19 @@
       "type": "contract",
       "dependencies": [
         "erc20burnable"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC20BurnableMock": [
+          {
+            "name": "initialAccount",
+            "type": "address"
+          },
+          {
+            "name": "initialBalance",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "erc20detailedmock",
@@ -853,7 +1058,23 @@
       "dependencies": [
         "erc20",
         "erc20detailed"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC20DetailedMock": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "decimals",
+            "type": "uint8"
+          }
+        ]
+      }
     },
     {
       "id": "erc20metadata",
@@ -862,7 +1083,15 @@
       "type": "contract",
       "dependencies": [
         "ierc20"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC20Metadata": [
+          {
+            "name": "tokenURI_",
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "id": "erc20metadatamock",
@@ -872,7 +1101,15 @@
       "dependencies": [
         "erc20",
         "erc20metadata"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC20MetadataMock": [
+          {
+            "name": "tokenURI",
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "id": "minterrolemock",
@@ -900,7 +1137,19 @@
       "type": "contract",
       "dependencies": [
         "erc20"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC20Mock": [
+          {
+            "name": "initialAccount",
+            "type": "address"
+          },
+          {
+            "name": "initialBalance",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "erc20pausable",
@@ -929,7 +1178,19 @@
       "dependencies": [
         "erc20pausable",
         "pauserrolemock"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC20PausableMock": [
+          {
+            "name": "initialAccount",
+            "type": "address"
+          },
+          {
+            "name": "initialBalance",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "erc20snapshot",
@@ -950,7 +1211,19 @@
       "type": "contract",
       "dependencies": [
         "erc20snapshot"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC20SnapshotMock": [
+          {
+            "name": "initialAccount",
+            "type": "address"
+          },
+          {
+            "name": "initialBalance",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "ierc721",
@@ -1022,7 +1295,19 @@
         "erc721",
         "ierc721metadata",
         "erc165"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC721Metadata": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "id": "erc721full",
@@ -1033,7 +1318,19 @@
         "erc721",
         "erc721enumerable",
         "erc721metadata"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC721Full": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "id": "erc721mintable",
@@ -1075,7 +1372,19 @@
         "erc721mintable",
         "erc721metadatamintable",
         "erc721burnable"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC721FullMock": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "id": "erc721gsnrecipientmock",
@@ -1086,7 +1395,15 @@
         "erc721",
         "gsnrecipient",
         "gsnrecipientsignature"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC721GSNRecipientMock": [
+          {
+            "name": "trustedSigner",
+            "type": "address"
+          }
+        ]
+      }
     },
     {
       "id": "erc721mintableburnableimpl",
@@ -1136,7 +1453,19 @@
       "type": "contract",
       "dependencies": [
         "ierc721receiver"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC721ReceiverMock": [
+          {
+            "name": "retval",
+            "type": "bytes4"
+          },
+          {
+            "name": "reverts",
+            "type": "bool"
+          }
+        ]
+      }
     },
     {
       "id": "ierc777",
@@ -1170,7 +1499,23 @@
         "safemath",
         "address",
         "ierc1820registry"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC777": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "defaultOperators",
+            "type": "address[]"
+          }
+        ]
+      }
     },
     {
       "id": "erc777mock",
@@ -1180,7 +1525,31 @@
       "dependencies": [
         "context",
         "erc777"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC777Mock": [
+          {
+            "name": "initialHolder",
+            "type": "address"
+          },
+          {
+            "name": "initialBalance",
+            "type": "uint256"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "defaultOperators",
+            "type": "address[]"
+          }
+        ]
+      }
     },
     {
       "id": "erc777senderrecipientmock",
@@ -1210,7 +1579,31 @@
       "dependencies": [
         "ierc20",
         "finalizablecrowdsale"
-      ]
+      ],
+      "requiredParameters": {
+        "FinalizableCrowdsaleImpl": [
+          {
+            "name": "openingTime",
+            "type": "uint256"
+          },
+          {
+            "name": "closingTime",
+            "type": "uint256"
+          },
+          {
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "name": "token",
+            "type": "IERC20"
+          }
+        ]
+      }
     },
     {
       "id": "gsnrecipienterc20feemock",
@@ -1220,7 +1613,19 @@
       "dependencies": [
         "gsnrecipient",
         "gsnrecipienterc20fee"
-      ]
+      ],
+      "requiredParameters": {
+        "GSNRecipientERC20FeeMock": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "id": "gsnrecipientmock",
@@ -1240,7 +1645,15 @@
       "dependencies": [
         "gsnrecipient",
         "gsnrecipientsignature"
-      ]
+      ],
+      "requiredParameters": {
+        "GSNRecipientSignatureMock": [
+          {
+            "name": "trustedSigner",
+            "type": "address"
+          }
+        ]
+      }
     },
     {
       "id": "increasingpricecrowdsaleimpl",
@@ -1250,7 +1663,35 @@
       "dependencies": [
         "increasingpricecrowdsale",
         "safemath"
-      ]
+      ],
+      "requiredParameters": {
+        "IncreasingPriceCrowdsaleImpl": [
+          {
+            "name": "openingTime",
+            "type": "uint256"
+          },
+          {
+            "name": "closingTime",
+            "type": "uint256"
+          },
+          {
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "name": "token",
+            "type": "IERC20"
+          },
+          {
+            "name": "initialRate",
+            "type": "uint256"
+          },
+          {
+            "name": "finalRate",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "individuallycappedcrowdsaleimpl",
@@ -1261,7 +1702,23 @@
         "ierc20",
         "individuallycappedcrowdsale",
         "capperrolemock"
-      ]
+      ],
+      "requiredParameters": {
+        "IndividuallyCappedCrowdsaleImpl": [
+          {
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "name": "token",
+            "type": "IERC20"
+          }
+        ]
+      }
     },
     {
       "id": "mathmock",
@@ -1289,7 +1746,23 @@
       "dependencies": [
         "erc20mintable",
         "mintedcrowdsale"
-      ]
+      ],
+      "requiredParameters": {
+        "MintedCrowdsaleImpl": [
+          {
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "name": "token",
+            "type": "ERC20Mintable"
+          }
+        ]
+      }
     },
     {
       "id": "ownable",
@@ -1326,7 +1799,23 @@
       "dependencies": [
         "erc20",
         "pausablecrowdsale"
-      ]
+      ],
+      "requiredParameters": {
+        "PausableCrowdsaleImpl": [
+          {
+            "name": "_rate",
+            "type": "uint256"
+          },
+          {
+            "name": "_wallet",
+            "type": "address"
+          },
+          {
+            "name": "_token",
+            "type": "ERC20"
+          }
+        ]
+      }
     },
     {
       "id": "pausablemock",
@@ -1346,7 +1835,31 @@
       "dependencies": [
         "ierc20",
         "postdeliverycrowdsale"
-      ]
+      ],
+      "requiredParameters": {
+        "PostDeliveryCrowdsaleImpl": [
+          {
+            "name": "openingTime",
+            "type": "uint256"
+          },
+          {
+            "name": "closingTime",
+            "type": "uint256"
+          },
+          {
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "name": "token",
+            "type": "IERC20"
+          }
+        ]
+      }
     },
     {
       "id": "pullpayment",
@@ -1393,7 +1906,35 @@
       "dependencies": [
         "ierc20",
         "refundablecrowdsale"
-      ]
+      ],
+      "requiredParameters": {
+        "RefundableCrowdsaleImpl": [
+          {
+            "name": "openingTime",
+            "type": "uint256"
+          },
+          {
+            "name": "closingTime",
+            "type": "uint256"
+          },
+          {
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "name": "token",
+            "type": "IERC20"
+          },
+          {
+            "name": "goal",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "refundablepostdeliverycrowdsaleimpl",
@@ -1403,7 +1944,35 @@
       "dependencies": [
         "ierc20",
         "refundablepostdeliverycrowdsale"
-      ]
+      ],
+      "requiredParameters": {
+        "RefundablePostDeliveryCrowdsaleImpl": [
+          {
+            "name": "openingTime",
+            "type": "uint256"
+          },
+          {
+            "name": "closingTime",
+            "type": "uint256"
+          },
+          {
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "name": "token",
+            "type": "IERC20"
+          },
+          {
+            "name": "goal",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "rolesmock",
@@ -1428,7 +1997,15 @@
         "context",
         "ierc20",
         "safeerc20"
-      ]
+      ],
+      "requiredParameters": {
+        "SafeERC20Wrapper": [
+          {
+            "name": "token",
+            "type": "IERC20"
+          }
+        ]
+      }
     },
     {
       "id": "safemathmock",
@@ -1495,7 +2072,31 @@
       "dependencies": [
         "ierc20",
         "timedcrowdsale"
-      ]
+      ],
+      "requiredParameters": {
+        "TimedCrowdsaleImpl": [
+          {
+            "name": "openingTime",
+            "type": "uint256"
+          },
+          {
+            "name": "closingTime",
+            "type": "uint256"
+          },
+          {
+            "name": "rate",
+            "type": "uint256"
+          },
+          {
+            "name": "wallet",
+            "type": "address"
+          },
+          {
+            "name": "token",
+            "type": "IERC20"
+          }
+        ]
+      }
     },
     {
       "id": "whitelistadminrolemock",
@@ -1515,7 +2116,23 @@
         "ierc20",
         "whitelistcrowdsale",
         "crowdsale"
-      ]
+      ],
+      "requiredParameters": {
+        "WhitelistCrowdsaleImpl": [
+          {
+            "name": "_rate",
+            "type": "uint256"
+          },
+          {
+            "name": "_wallet",
+            "type": "address"
+          },
+          {
+            "name": "_token",
+            "type": "IERC20"
+          }
+        ]
+      }
     },
     {
       "id": "whitelistedrolemock",
@@ -1534,7 +2151,19 @@
       "dependencies": [
         "context",
         "safemath"
-      ]
+      ],
+      "requiredParameters": {
+        "PaymentSplitter": [
+          {
+            "name": "payees",
+            "type": "address[]"
+          },
+          {
+            "name": "shares",
+            "type": "uint256[]"
+          }
+        ]
+      }
     },
     {
       "id": "erc20capped",
@@ -1543,7 +2172,15 @@
       "type": "contract",
       "dependencies": [
         "erc20mintable"
-      ]
+      ],
+      "requiredParameters": {
+        "ERC20Capped": [
+          {
+            "name": "cap",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "tokentimelock",
@@ -1552,7 +2189,23 @@
       "type": "contract",
       "dependencies": [
         "safeerc20"
-      ]
+      ],
+      "requiredParameters": {
+        "TokenTimelock": [
+          {
+            "name": "token",
+            "type": "IERC20"
+          },
+          {
+            "name": "beneficiary",
+            "type": "address"
+          },
+          {
+            "name": "releaseTime",
+            "type": "uint256"
+          }
+        ]
+      }
     },
     {
       "id": "erc721holder",
@@ -1574,5 +2227,6 @@
         "ierc721metadata"
       ]
     }
-  ]
+  ],
+  "openZeppelinVersion": "2.4.0"
 }

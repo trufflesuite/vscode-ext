@@ -6,6 +6,7 @@ import * as path from 'path';
 import { HttpService } from '..';
 import { Constants } from '../../Constants';
 import { getWorkspaceRoot, TruffleConfiguration } from '../../helpers';
+import { Telemetry } from '../../TelemetryClient';
 import { Contract } from './Contract';
 
 export namespace ContractService {
@@ -68,7 +69,7 @@ export namespace ContractService {
     const buildDir = await getPathDirectory('contracts_build_directory');
 
     if (!fs.pathExistsSync(buildDir)) {
-      throw new Error(Constants.errorMessageStrings.BuildContractsDirIsNotExist(buildDir));
+      throw new Error(Constants.errorMessageStrings.BuildContractsDirDoesNotExist(Telemetry.obfuscate(buildDir)));
     }
 
     return fs.readdirSync(buildDir)

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import open = require('open');
+import * as open from 'open';
 import { ProgressLocation, window } from 'vscode';
 import { Constants } from '../Constants';
 import { openZeppelinHelper, showQuickPick } from '../helpers';
@@ -36,11 +36,16 @@ export namespace OpenZeppelinCommands {
     const downloadedAssets
       = await downloadOZFiles(baseUrl, assetsStatuses.existing, assetsStatuses.missing, fullAssetWithDependencies);
 
-    await OpenZeppelinService.updateProjectJsonAsync(manifest.getVersion(), category, downloadedAssets);
+    const mergedAssets = await OpenZeppelinService.mergeAssetsWithExisting(downloadedAssets);
+
+    await OpenZeppelinService.updateProjectJsonAsync(manifest.getVersion(), category, mergedAssets);
 
     openDocumentationUrl(manifest.getCategoryApiDocumentationUrl(category));
 
     Telemetry.sendEvent('OpenZeppelinCommands.addCategory.generateMigrations');
+
+    await openZeppelinHelper.defineContractRequiredParameters();
+
     await OpenZeppelinMigrationsService.generateMigrations(await OpenZeppelinService.getAllDownloadedAssetsAsync());
   }
 }

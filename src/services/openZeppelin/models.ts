@@ -24,6 +24,13 @@ export interface IOZAsset {
   type?: OZAssetType;
   contracts?: string[];
   dependencies: string[];
+  requiredParameters?: { [key: string]: IOZContractParameter[] };
+}
+
+export interface IOZContractParameter {
+  name: string;
+  type: string;
+  value?: string;
 }
 
 export interface IProjectMetadata {

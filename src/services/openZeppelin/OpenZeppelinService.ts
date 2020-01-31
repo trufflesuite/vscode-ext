@@ -119,7 +119,7 @@ export namespace OpenZeppelinService {
     updatedProjectJson = await OpenZeppelinProjectJsonService
       .addCategoryToProjectJsonAsync(category, false, updatedProjectJson);
     updatedProjectJson = await OpenZeppelinProjectJsonService
-      .addAssetsToProjectJsonAsync(assets, false, updatedProjectJson);
+      .addAssetsToProjectJsonAsync(assets, updatedProjectJson);
 
     return OpenZeppelinProjectJsonService.storeProjectJsonAsync(updatedProjectJson);
   }
@@ -134,6 +134,30 @@ export namespace OpenZeppelinService {
     }
     if (asset.contracts && asset.contracts.length) {
       return asset.contracts.map((contract) => contract);
+    }
+
+    return [];
+  }
+
+  export function getContractParametersFromAsset(asset: IOZAsset, contractName: string): string[] {
+    if (asset.requiredParameters) {
+      const parameters = asset.requiredParameters[contractName];
+
+      if (parameters) {
+        return parameters.reduce((arr: string[], param) => {
+          if (param.value) {
+            if (param.type === 'string') {
+              arr.push(`"${param.value}"`);
+            } else if (param.type.match(Constants.validationRegexps.types.simpleArray)) {
+              arr.push(getArrayParameterValue(param.value, param.type));
+            } else {
+              arr.push(param.value);
+            }
+          }
+
+          return arr;
+        }, []);
+      }
     }
 
     return [];
@@ -205,7 +229,8 @@ export namespace OpenZeppelinService {
     }
 
     try {
-      await createNewProjectJsonAsync(newManifest.getVersion(), newAssets, tempNewOzFolder);
+      const mergedAssets = await mergeAssetsWithExisting(newAssets);
+      await createNewProjectJsonAsync(newManifest.getVersion(), mergedAssets, tempNewOzFolder);
     } catch {
       throwOpenZeppelinUpgradeException(userTmpFolderPath);
     }
@@ -224,6 +249,38 @@ export namespace OpenZeppelinService {
     }
 
     Telemetry.sendEvent('OpenZeppelinService.updateOpenZeppelinContractsAsync.finished');
+  }
+
+  export async function getAssetsWithParameters(): Promise<IOZAsset[]> {
+    const currentAssets = await getAllDownloadedAssetsAsync();
+
+    return currentAssets.filter((asset) => !!asset.requiredParameters);
+  }
+
+  export async function mergeAssetsWithExisting(currentAssets: IOZAsset[]): Promise<IOZAsset[]> {
+    const assetsWithParameters = await OpenZeppelinService.getAssetsWithParameters();
+
+    return currentAssets.map((asset) => {
+      if (asset.requiredParameters) {
+        const assetWithParameters = assetsWithParameters.find((element) => element.id === asset.id);
+        if (assetWithParameters && assetWithParameters.requiredParameters) {
+          for (const [currentContractName, currentContractParameters] of Object.entries(asset.requiredParameters)) {
+            const existedContractParameters = assetWithParameters.requiredParameters[currentContractName];
+            if (existedContractParameters) {
+              for (const parameter of currentContractParameters) {
+                const param = existedContractParameters.find((existedContractParameter) =>
+                  existedContractParameter.name === parameter.name &&
+                  existedContractParameter.type === parameter.type);
+                if (param) {
+                  parameter.value = param.value;
+                }
+              }
+            }
+          }
+        }
+      }
+      return asset;
+    });
   }
 }
 
@@ -285,7 +342,7 @@ async function moveProjectJsonAsync(nonUserProjectFolder: string, folderIsDestin
 async function createNewProjectJsonAsync(version: string, assets: IOZAsset[], folder: string): Promise<void> {
   let projectJson = OpenZeppelinProjectJsonService.getProjectJson();
   projectJson = await OpenZeppelinProjectJsonService.addVersionToProjectJsonAsync(version, false, projectJson);
-  projectJson = await OpenZeppelinProjectJsonService.addAssetsToProjectJsonAsync(assets, false, projectJson, true);
+  projectJson = await OpenZeppelinProjectJsonService.addAssetsToProjectJsonAsync(assets, projectJson);
   const newPath = path.join(folder, OpenZeppelinProjectJsonService.getProjectJsonFileName());
 
   return OpenZeppelinProjectJsonService.storeProjectJsonAsync(projectJson, newPath);
@@ -324,4 +381,14 @@ async function downloadNewVersionOfAssetsAsync(
   }
 
   return { isDownloadSucceed: true, newAssets };
+}
+
+function getArrayParameterValue(value: string, type: string): string {
+  if (type !== 'string[]') {
+    return value;
+  }
+
+  const elements = value.slice(1, value.length - 1).split(',');
+  const values = elements?.map((element) => `"${element.trim()}"`);
+  return `[${values?.join(', ')}]`;
 }

@@ -3,9 +3,9 @@
   "displayName": "Azure Blockchain Development Kit for Ethereum",
   "description": "Develop, deploy debug and manage your Azure Blockchain Service solution",
   "publisher": "AzBlockchain",
-  "preview": true,
+  "preview": false,
   "icon": "images/blockchain-service-logo.png",
-  "version": "0.1.13",
+  "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum"
@@ -57,6 +57,7 @@
     "onCommand:azureBlockchainService.signInToInfuraAccount",
     "onCommand:azureBlockchainService.signOutOfInfuraAccount",
     "onCommand:azureBlockchainService.generateToken",
+    "onCommand:azureBlockchainService.openAtAzurePortal",
     "onDebug"
   ],
   "contributes": {
@@ -204,6 +205,11 @@
         "command": "azureBlockchainService.generateToken",
         "title": "Generate token",
         "category": "Azure Blockchain"
+      },
+      {
+        "command": "azureBlockchainService.openAtAzurePortal",
+        "title": "Open at Azure Portal",
+        "category": "Azure Blockchain"
       }
     ],
     "breakpoints": [
@@ -275,6 +281,10 @@
         {
           "when": "false",
           "command": "openZeppelin.addCategory"
+        },
+        {
+          "when": "false",
+          "command": "azureBlockchainService.openAtAzurePortal"
         }
       ],
       "view/title": [
@@ -325,6 +335,16 @@
         {
           "command": "azureBlockchainService.copyRPCEndpointAddress",
           "when": "view == AzureBlockchain && viewItem == localnetwork",
+          "group": "azureBlockchain-0@0"
+        },
+        {
+          "command": "azureBlockchainService.openAtAzurePortal",
+          "when": "view == AzureBlockchain && viewItem == input",
+          "group": "azureBlockchain-0@0"
+        },
+        {
+          "command": "azureBlockchainService.openAtAzurePortal",
+          "when": "view == AzureBlockchain && viewItem == output",
           "group": "azureBlockchain-0@0"
         }
       ],

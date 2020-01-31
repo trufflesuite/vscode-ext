@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 export * from './AzureResourceExplorer';
+export * from './BlockchainDataManagerResourceExplorer';
 export * from './ConsortiumResourceExplorer';
 export * from './InfuraResourceExplorer';
 export * from './LocalResourceExplorer';

@@ -7,855 +7,303 @@ import * as msrestazure from 'ms-rest-azure';
 import * as sinon from 'sinon';
 import * as uuid from 'uuid';
 import * as vscode from 'vscode';
-import { AzureBlockchainServiceClient } from '../src/ARMBlockchain';
+import { AzureBlockchainServiceClient } from '../src/ARMBlockchain/AzureBlockchainServiceClient';
 import { Constants } from '../src/Constants';
 import { vscodeEnvironment } from '../src/helpers';
 import { Output } from '../src/Output';
 
-describe('AzureBlockchainServiceClient', () => {
+describe('Unit tests for AzureBlockchainServiceClient', () => {
   let credentials: ServiceClientCredentials;
   let subscriptionId: string;
   let resourceGroup: string;
   let baseUri: string;
-  let apiVersion: string;
   let memberName: string;
+  let bdmName: string;
   let transactionNode: string;
   const azureBlockchainServiceClient = require('../src/ARMBlockchain/AzureBlockchainServiceClient');
   const defaultResponseBody = '{ "message": "default response body" }';
   let callbackFunction: (error: Error | null, result?: any) => void;
+  let callbackFunctionSpy: any;
+  let options: msrestazure.AzureServiceClientOptions;
+  let body: string;
+  let resultElement: string;
 
   before(() => {
     credentials = {
       signRequest: () => undefined,
     };
     callbackFunction = (_error: Error | null, _result?: any) => undefined;
+    options = {};
+    body = uuid.v4();
+    resultElement = uuid.v4();
   });
 
   beforeEach(() => {
     subscriptionId = uuid.v4();
     resourceGroup = uuid.v4();
     baseUri = uuid.v4();
-    apiVersion = uuid.v4();
     memberName = uuid.v4();
+    bdmName = uuid.v4();
     transactionNode = uuid.v4();
     sinon.stub(azureBlockchainServiceClient.__proto__, 'constructor');
+
+    callbackFunctionSpy = sinon.spy(callbackFunction);
   });
 
   afterEach(() => {
     sinon.restore();
   });
 
-  describe('Unit tests', () => {
-    let options: msrestazure.AzureServiceClientOptions;
-    let body: string;
-    let resultElement: string;
+  describe('constructor', () => {
+    it('AzureBlockchainServiceClient was created.', async () => {
+      // Arrange, Act
+      const serviceClient = new azureBlockchainServiceClient.AzureBlockchainServiceClient(
+        credentials,
+        subscriptionId,
+        resourceGroup,
+        baseUri,
+        options,
+      );
 
-    before(() => {
-      options = {};
-      body = uuid.v4();
-      resultElement = uuid.v4();
+      // Assert
+      assert.notStrictEqual(serviceClient, undefined, 'serviceClient should not be undefined');
+      assert.strictEqual(
+        serviceClient.constructor.name,
+        AzureBlockchainServiceClient.name,
+        `serviceClient name should be equal to ${AzureBlockchainServiceClient.name}`);
     });
 
-    describe('constructor', () => {
-      it('AzureBlockchainServiceClient was created.', async () => {
-        // Arrange, Act
-        const serviceClient = new azureBlockchainServiceClient.AzureBlockchainServiceClient(
-          credentials,
-          subscriptionId,
-          resourceGroup,
-          baseUri,
-          apiVersion,
-          options,
-        );
+    describe('invalid subscriptionId', () => {
+      const invalidSubscriptions = [String.Empty, null, undefined, ''];
+      invalidSubscriptions.forEach(async (subscription) => {
+        it(`AzureBlockchainServiceClient constructor throws error when subscriptionId is ${subscription}.`,
+        async () => {
+          // Arrange
+          let serviceClient;
 
-        // Assert
-        assert.notStrictEqual(serviceClient, undefined, 'serviceClient should not be undefined');
-        assert.strictEqual(
-          serviceClient.constructor.name,
-          AzureBlockchainServiceClient.name,
-          `serviceClient name should be equal to ${AzureBlockchainServiceClient.name}`);
-      });
+          // Act
+          const action = () => {
+            serviceClient = new azureBlockchainServiceClient.AzureBlockchainServiceClient(
+              credentials,
+              subscription,
+              resourceGroup,
+              baseUri,
+              options,
+            );
+          };
 
-      describe('invalid subscriptionId', () => {
-        const invalidSubscriptions = [String.Empty, null, undefined, ''];
-        invalidSubscriptions.forEach(async (subscription) => {
-          it(`AzureBlockchainServiceClient constructor throws error when subscriptionId is ${subscription}.`,
-          async () => {
-            // Arrange
-            let serviceClient;
-
-            // Act
-            const action = () => {
-              serviceClient = new azureBlockchainServiceClient.AzureBlockchainServiceClient(
-                credentials,
-                subscription,
-                resourceGroup,
-                baseUri,
-                apiVersion,
-                options,
-              );
-            };
-
-            // Assert
-            assert.throws(
-              action,
-              Error,
-              Constants.errorMessageStrings.VariableShouldBeDefined('subscriptionId'));
-            assert.strictEqual(serviceClient, undefined, 'serviceClient should be undefined');
-          });
-        });
-      });
-
-      describe('invalid credentials', () => {
-        const invalidCredentials = [null, undefined];
-        invalidCredentials.forEach(async (credential) => {
-          it(`AzureBlockchainServiceClient constructor throws error when credentials is ${credential}.`,
-          async () => {
-            // Arrange
-            let serviceClient;
-
-            // Act
-            const action = () => {
-              serviceClient = new azureBlockchainServiceClient.AzureBlockchainServiceClient(
-                credential,
-                subscriptionId,
-                resourceGroup,
-                baseUri,
-                apiVersion,
-                options,
-              );
-            };
-
-            // Assert
-            assert.throws(
-              action,
-              Error,
-              Constants.errorMessageStrings.VariableShouldBeDefined('credentials'));
-            assert.strictEqual(serviceClient, undefined, 'serviceClient should be undefined');
-          });
+          // Assert
+          assert.throws(
+            action,
+            Error,
+            Constants.errorMessageStrings.VariableShouldBeDefined('subscriptionId'));
+          assert.strictEqual(serviceClient, undefined, 'serviceClient should be undefined');
         });
       });
     });
 
-    describe('Public methods.', () => {
-      let serviceClient: AzureBlockchainServiceClient;
-      let pipelineMock: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], {}>;
-      let sendRequestToAzureMock: sinon.SinonStub<any[], any>;
-      let outputMock: sinon.SinonMock;
-      let outputLineMock: sinon.SinonExpectation;
-      let openExternalSpy: sinon.SinonSpy<[vscode.Uri], Thenable<boolean>>;
-      let windowMock: sinon.SinonMock;
-      let showErrorMessageMock: sinon.SinonExpectation;
+    describe('invalid credentials', () => {
+      const invalidCredentials = [null, undefined];
+      invalidCredentials.forEach(async (credential) => {
+        it(`AzureBlockchainServiceClient constructor throws error when credentials is ${credential}.`,
+        async () => {
+          // Arrange
+          let serviceClient;
 
-      beforeEach(() => {
-        serviceClient = new azureBlockchainServiceClient.AzureBlockchainServiceClient(
-          credentials,
-          subscriptionId,
-          resourceGroup,
-          baseUri,
-          apiVersion,
-          options,
-        );
-        // @ts-ignore
-        pipelineMock = sinon.stub(serviceClient, 'pipeline');
-        sendRequestToAzureMock = sinon.stub(serviceClient, 'sendRequestToAzure' as any);
-        openExternalSpy = sinon.stub(vscodeEnvironment, 'openExternal');
-        outputMock = sinon.mock(Output);
-        outputLineMock = outputMock.expects('outputLine');
-        windowMock = sinon.mock(vscode.window);
-        showErrorMessageMock = windowMock.expects('showErrorMessage');
-      });
+          // Act
+          const action = () => {
+            serviceClient = new azureBlockchainServiceClient.AzureBlockchainServiceClient(
+              credential,
+              subscriptionId,
+              resourceGroup,
+              baseUri,
+              options,
+            );
+          };
 
-      afterEach(() => {
-        sendRequestToAzureMock.restore();
-        pipelineMock.restore();
-        openExternalSpy.restore();
-        outputMock.restore();
-        windowMock.restore();
-      });
-
-      it('createProject shows error when request failed.', async () => {
-        // Arrange
-        const response = sinon.stub();
-        const error = { message: uuid.v4() };
-
-        pipelineMock.callsFake((...args: any[]): {} => {
-          return args[1](error, response, defaultResponseBody);
+          // Assert
+          assert.throws(
+            action,
+            Error,
+            Constants.errorMessageStrings.VariableShouldBeDefined('credentials'));
+          assert.strictEqual(serviceClient, undefined, 'serviceClient should be undefined');
         });
-
-        // Act
-        await serviceClient.createConsortium(memberName, body);
-
-        // Assert
-        assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-        assert.strictEqual(
-          outputLineMock.calledOnceWithExactly(Constants.outputChannel.azureBlockchainServiceClient, error.message),
-          true,
-          'outputLine should called once with correct arguments');
-        assert.strictEqual(openExternalSpy.notCalled, true, 'openExternal should not called');
-      });
-
-      describe('createProject shows error when response is not success.', () => {
-        const statusCodes = [103, 300, 400, 498];
-        statusCodes.forEach(async (statusCode) => {
-          it(`response status code is ${statusCode}.`, async () => {
-            // Arrange
-            const response = {statusCode, statusMessage: uuid.v4()};
-            let callbackSpy: any;
-            pipelineMock.callsFake((...args: any[]): {} => {
-              callbackSpy = sinon.spy(args[1]);
-              return callbackSpy(null, response, defaultResponseBody);
-            });
-
-            // Act
-            await serviceClient.createConsortium(memberName, body);
-
-            // Assert
-            assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-            assert.strictEqual(callbackSpy.args[0][0], null, 'callback function should called with correct arguments');
-            assert.strictEqual(
-              outputLineMock.calledOnceWithExactly(
-                Constants.outputChannel.azureBlockchainServiceClient,
-                `${response.statusMessage}(${response.statusCode}): ${defaultResponseBody}`),
-              true,
-              'outputLine should called once with correct arguments');
-            assert.strictEqual(openExternalSpy.notCalled, true, 'openExternal should not called');
-            assert.strictEqual(
-              showErrorMessageMock.calledOnceWithExactly(
-                Constants.executeCommandMessage.failedToRunCommand('CreateConsortium')),
-              true,
-              'showErrorMessage should called once with correct arguments');
-          });
-        });
-      });
-
-      describe('createProject does not show error when response is success.', () => {
-        const statusCodes = [200, 207, 226];
-        statusCodes.forEach(async (statusCode) => {
-          it(`response status code is ${statusCode}.`, async () => {
-            // Arrange
-            const response = {statusCode, statusMessage: uuid.v4()};
-            let callbackSpy: any;
-            pipelineMock.callsFake((...args: any[]): {} => {
-              callbackSpy = sinon.spy(args[1]);
-              return callbackSpy(null, response, defaultResponseBody);
-            });
-
-            // Act
-            await serviceClient.createConsortium(memberName, body);
-
-            // Assert
-            assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-            assert.strictEqual(callbackSpy.args[0][0], null, 'callback function should called with correct arguments');
-            assert.strictEqual(outputLineMock.notCalled, true, 'outputLine should not called');
-            assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
-            assert.strictEqual(openExternalSpy.calledOnce, true, 'openExternal should called once');
-            assert.strictEqual(
-              openExternalSpy.args[0][0] instanceof vscode.Uri,
-              true,
-              'openExternal should called with correct arguments');
-          });
-        });
-      });
-
-      it('getMembers returns error.', async () => {
-        // Arrange
-        const consortiumName = 'consortiumName';
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-        const error = new Error(uuid.v4());
-        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
-          return args[1](error);
-        });
-
-        // Act
-        await serviceClient.getMembers(consortiumName, callbackFunctionSpy);
-
-        // Assert
-        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(error),
-          true,
-          'callbackFunction should called once with correct arguments');
-      });
-
-      it('getMembers does not return error.', async () => {
-        // Arrange
-        const consortiumName = 'consortiumName';
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
-          return args[1](null, resultElement);
-        });
-
-        // Act
-        await serviceClient.getMembers(consortiumName, callbackFunctionSpy);
-
-        // Assert
-        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(null, resultElement),
-          true,
-          'callbackFunction should called once with correct arguments');
-      });
-
-      it('getConsortia returns error.', async () => {
-        // Arrange
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-        const error = new Error(uuid.v4());
-        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
-          return args[1](error);
-        });
-
-        // Act
-        await serviceClient.getConsortia(callbackFunctionSpy);
-
-        // Assert
-        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(error),
-          true,
-          'callbackFunction should called once with correct arguments');
-      });
-
-      it('getConsortia does not return error.', async () => {
-        // Arrange
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
-          return args[1](null, resultElement);
-        });
-
-        // Act
-        await serviceClient.getConsortia(callbackFunctionSpy);
-
-        // Assert
-        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(null, resultElement),
-          true,
-          'callbackFunction should called once with correct arguments');
-      });
-
-      it('getTransactionNodes returns error.', async () => {
-        // Arrange
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-        const error = new Error(uuid.v4());
-        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
-          return args[1](error);
-        });
-
-        // Act
-        await serviceClient.getTransactionNodes(memberName, callbackFunctionSpy);
-
-        // Assert
-        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(error),
-          true,
-          'callbackFunction should called once with correct arguments');
-      });
-
-      it('getTransactionNodes does not return error.', async () => {
-        // Arrange
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
-          return args[1](null, resultElement);
-        });
-
-        // Act
-        await serviceClient.getTransactionNodes(memberName, callbackFunctionSpy);
-
-        // Assert
-        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(null, resultElement),
-          true,
-          'callbackFunction should called once with correct arguments');
-      });
-
-      it('getTransactionNodeAccessKeys returns error.', async () => {
-        // Arrange
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-        const error = new Error(uuid.v4());
-        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
-          return args[1](error);
-        });
-
-        // Act
-        await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy);
-
-        // Assert
-        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(error),
-          true,
-          'callbackFunction should called once with correct arguments');
-      });
-
-      it('getTransactionNodeAccessKeys does not return error.', async () => {
-        // Arrange
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
-          return args[1](null, resultElement);
-        });
-
-        // Act
-        await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy);
-
-        // Assert
-        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(null, resultElement),
-          true,
-          'callbackFunction should called once with correct arguments');
-      });
-
-      it('getSkus returns error.', async () => {
-        // Arrange
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-        const error = new Error(uuid.v4());
-        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
-          return args[1](error);
-        });
-
-        // Act
-        await serviceClient.getSkus(callbackFunctionSpy);
-
-        // Assert
-        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(error),
-          true,
-          'callbackFunction should called once with correct arguments');
-      });
-
-      it('getSkus does not return error.', async () => {
-        // Arrange
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
-          return args[1](null, resultElement);
-        });
-
-        // Act
-        await serviceClient.getSkus(callbackFunctionSpy);
-
-        // Assert
-        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
-        assert.strictEqual(
-          callbackFunctionSpy.calledOnceWithExactly(null, resultElement),
-          true,
-          'callbackFunction should called once with correct arguments');
       });
     });
   });
 
-  describe('Integration tests', () => {
-    const incorrectResponseBody = uuid.v4();
+  describe('Public methods.', () => {
+    let serviceClient: AzureBlockchainServiceClient;
+    let pipelineMock: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], {}>;
+    let sendRequestToAzureMock: sinon.SinonStub<any[], any>;
+    let outputMock: sinon.SinonMock;
+    let outputLineMock: sinon.SinonExpectation;
+    let openExternalSpy: sinon.SinonSpy<[vscode.Uri], Thenable<boolean>>;
     let windowMock: sinon.SinonMock;
     let showErrorMessageMock: sinon.SinonExpectation;
-    let pipelineMock: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], {}>;
-    let serviceClient: AzureBlockchainServiceClient;
 
     beforeEach(() => {
-      windowMock = sinon.mock(vscode.window);
-      showErrorMessageMock = windowMock.expects('showErrorMessage');
-      const specialOptions = {
-        acceptLanguage: uuid.v4(),
-        generateClientRequestId: true,
-      };
       serviceClient = new azureBlockchainServiceClient.AzureBlockchainServiceClient(
         credentials,
         subscriptionId,
         resourceGroup,
         baseUri,
-        apiVersion,
-        specialOptions,
+        options,
       );
       // @ts-ignore
       pipelineMock = sinon.stub(serviceClient, 'pipeline');
+      sendRequestToAzureMock = sinon.stub(serviceClient, 'sendRequestToAzure' as any);
+      openExternalSpy = sinon.stub(vscodeEnvironment, 'openExternal');
+      outputMock = sinon.mock(Output);
+      outputLineMock = outputMock.expects('outputLine');
+      windowMock = sinon.mock(vscode.window);
+      showErrorMessageMock = windowMock.expects('showErrorMessage');
     });
 
     afterEach(() => {
-      windowMock.restore();
+      sendRequestToAzureMock.restore();
       pipelineMock.restore();
+      openExternalSpy.restore();
+      outputMock.restore();
+      windowMock.restore();
     });
 
-    function assertRequestFailed(error: any, callbackFunctionSpy: sinon.SinonSpy<[Error | null, any?], void>): void {
+    it('createConsortium shows error when request failed.', async () => {
+      // Arrange
+      const response = sinon.stub();
+      const error = { message: uuid.v4() };
+
+      pipelineMock.callsFake((...args: any[]): {} => {
+        return args[1](error, response, defaultResponseBody);
+      });
+
+      // Act
+      await serviceClient.createConsortium(memberName, body);
+
+      // Assert
       assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
       assert.strictEqual(
-        showErrorMessageMock.calledOnceWithExactly(error.message),
+        outputLineMock.calledOnceWithExactly(Constants.outputChannel.azureBlockchainServiceClient, error.message),
         true,
-        'showErrorMessage should called once with correct arguments');
-      assert.strictEqual(
-        callbackFunctionSpy.calledOnceWithExactly(error as Error),
-        true,
-        'callbackFunction should called once with correct arguments');
-    }
+        'outputLine should called once with correct arguments');
+      assert.strictEqual(openExternalSpy.notCalled, true, 'openExternal should not called');
+    });
 
-    function assertResponseNotSuccess(
-      callbackFunctionSpy: sinon.SinonSpy<[Error | null, any?], void>,
-      pipelineCallbackSpy: sinon.SinonSpy)
-    : void {
-      assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-      assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
-      assert.strictEqual(callbackFunctionSpy.calledOnce, true, 'callbackFunction should called once');
-      assert.strictEqual(
-        callbackFunctionSpy.args[0][0] instanceof Error,
-        true,
-        'callbackFunction should called with correct arguments');
-      assert.strictEqual(pipelineCallbackSpy.calledOnce, true, 'pipelineCallback should called once');
-      assert.strictEqual(
-        pipelineCallbackSpy.args[0][0],
-        null,
-        'callback function should called with correct arguments');
-    }
-
-    function assertResponseSuccess(
-      callbackFunctionSpy: sinon.SinonSpy<[Error | null, any?], void>,
-      pipelineCallbackSpy: sinon.SinonSpy,
-      parsedResult: any)
-    : void {
-      assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
-      assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
-      assert.strictEqual(
-        callbackFunctionSpy.calledOnceWithExactly(null, parsedResult),
-        true,
-        'callbackFunction should called once with correct arguments');
-      assert.strictEqual(pipelineCallbackSpy.calledOnce, true, 'pipelineCallback should called once');
-      assert.strictEqual(
-        pipelineCallbackSpy.args[0][0],
-      null,
-      'callback function should called with correct arguments');
-    }
-
-    describe('getMembers', () => {
-      it('shows error when request failed.', async () => {
-        // Arrange
-        const consortiumName = 'consortiumName';
-        const response = sinon.stub();
-        const error = { message: uuid.v4() };
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-
-        pipelineMock.callsFake((...args: any[]): {} => {
-          return args[1](error, response, defaultResponseBody);
-        });
-
-        // Act
-        await serviceClient.getMembers(consortiumName, callbackFunctionSpy);
-
-        // Assert
-        assertRequestFailed(error, callbackFunctionSpy);
-      });
-
-      describe('throws error when response is not success.', () => {
-        const responseData = [
-          [400, defaultResponseBody],
-          [103, defaultResponseBody],
-          [530, defaultResponseBody],
-          [200, incorrectResponseBody]];
-        responseData.forEach(async (response) => {
-          it(`response status code is ${response[0]} and response body is ${JSON.stringify(response[1])}.`,
-          async () => {
-            // Arrange
-            const consortiumName = 'consortiumName';
-            const res = {statusCode: response[0]};
-            const callbackFunctionSpy = sinon.spy(callbackFunction);
-            let pipelineCallbackSpy: any;
-
-            pipelineMock.callsFake((...args: any[]): {} => {
-              pipelineCallbackSpy = sinon.spy(args[1]);
-              return pipelineCallbackSpy(null, res, response[1]);
-            });
-
-            // Act
-            await serviceClient.getMembers(consortiumName, callbackFunctionSpy);
-
-            // Assert
-            assertResponseNotSuccess(callbackFunctionSpy, pipelineCallbackSpy);
+    describe('createConsortium shows error when response is not success.', () => {
+      const statusCodes = [103, 300, 400, 498];
+      statusCodes.forEach(async (statusCode) => {
+        it(`response status code is ${statusCode}.`, async () => {
+          // Arrange
+          const response = {statusCode, statusMessage: uuid.v4()};
+          let callbackSpy: any;
+          pipelineMock.callsFake((...args: any[]): {} => {
+            callbackSpy = sinon.spy(args[1]);
+            return callbackSpy(null, response, defaultResponseBody);
           });
+
+          // Act
+          await serviceClient.createConsortium(memberName, body);
+
+          // Assert
+          assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
+          assert.strictEqual(callbackSpy.args[0][0], null, 'callback function should called with correct arguments');
+          assert.strictEqual(
+            outputLineMock.calledOnceWithExactly(
+              Constants.outputChannel.azureBlockchainServiceClient,
+              `${response.statusMessage}(${response.statusCode}): ${defaultResponseBody}`),
+            true,
+            'outputLine should called once with correct arguments');
+          assert.strictEqual(openExternalSpy.notCalled, true, 'openExternal should not called');
+          assert.strictEqual(
+            showErrorMessageMock.calledOnceWithExactly(
+              Constants.executeCommandMessage.failedToRunCommand('CreateConsortium')),
+            true,
+            'showErrorMessage should called once with correct arguments');
         });
-      });
-
-      it('does not throw error when response is success.', async () => {
-         // Arrange
-         const consortiumName = 'consortiumName';
-         const res = {statusCode: 200};
-         const callbackFunctionSpy = sinon.spy(callbackFunction);
-         const parsedResult = JSON.parse(defaultResponseBody);
-         let pipelineCallbackSpy: any;
-
-         pipelineMock.callsFake((...args: any[]): {} => {
-           pipelineCallbackSpy = sinon.spy(args[1]);
-           return pipelineCallbackSpy(null, res, defaultResponseBody);
-         });
-
-         // Act
-         await serviceClient.getMembers(consortiumName, callbackFunctionSpy);
-
-         // Assert
-         assertResponseSuccess(callbackFunctionSpy, pipelineCallbackSpy, parsedResult);
       });
     });
 
-    describe('getTransactionNodes', () => {
-      it('shows error when request failed.', async () => {
-        // Arrange
-        const response = sinon.stub();
-        const error = { message: uuid.v4() };
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-
-        pipelineMock.callsFake((...args: any[]): {} => {
-          return args[1](error, response, defaultResponseBody);
-        });
-
-        // Act
-        await serviceClient.getTransactionNodes(memberName, callbackFunctionSpy);
-
-        // Assert
-        assertRequestFailed(error, callbackFunctionSpy);
-      });
-
-      describe('throws error when response is not success.', () => {
-        const responseData = [
-          [400, defaultResponseBody],
-          [103, defaultResponseBody],
-          [530, defaultResponseBody],
-          [200, incorrectResponseBody]];
-        responseData.forEach(async (response) => {
-          it(`response status code is ${response[0]} and response body is ${JSON.stringify(response[1])}.`,
-          async () => {
-            // Arrange
-            const res = {statusCode: response[0]};
-            const callbackFunctionSpy = sinon.spy(callbackFunction);
-            let pipelineCallbackSpy: any;
-
-            pipelineMock.callsFake((...args: any[]): {} => {
-              pipelineCallbackSpy = sinon.spy(args[1]);
-              return pipelineCallbackSpy(null, res, response[1]);
-            });
-
-            // Act
-            await serviceClient.getTransactionNodes(memberName, callbackFunctionSpy);
-
-            // Assert
-            assertResponseNotSuccess(callbackFunctionSpy, pipelineCallbackSpy);
+    describe('createConsortium does not show error when response is success.', () => {
+      const statusCodes = [200, 207, 226];
+      statusCodes.forEach(async (statusCode) => {
+        it(`response status code is ${statusCode}.`, async () => {
+          // Arrange
+          const response = {statusCode, statusMessage: uuid.v4()};
+          let callbackSpy: any;
+          pipelineMock.callsFake((...args: any[]): {} => {
+            callbackSpy = sinon.spy(args[1]);
+            return callbackSpy(null, response, defaultResponseBody);
           });
+
+          // Act
+          await serviceClient.createConsortium(memberName, body);
+
+          // Assert
+          assert.strictEqual(pipelineMock.calledOnce, true, 'pipeline should called once');
+          assert.strictEqual(callbackSpy.args[0][0], null, 'callback function should called with correct arguments');
+          assert.strictEqual(outputLineMock.notCalled, true, 'outputLine should not called');
+          assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
+          assert.strictEqual(openExternalSpy.calledOnce, true, 'openExternal should called once');
+          assert.strictEqual(
+            openExternalSpy.args[0][0] instanceof vscode.Uri,
+            true,
+            'openExternal should called with correct arguments');
         });
-      });
-
-      it('does not throw error when response is success.', async () => {
-         // Arrange
-         const res = {statusCode: 200};
-         const callbackFunctionSpy = sinon.spy(callbackFunction);
-         const parsedResult = JSON.parse(defaultResponseBody);
-         let pipelineCallbackSpy: any;
-
-         pipelineMock.callsFake((...args: any[]): {} => {
-           pipelineCallbackSpy = sinon.spy(args[1]);
-           return pipelineCallbackSpy(null, res, defaultResponseBody);
-         });
-
-         // Act
-         await serviceClient.getTransactionNodes(memberName, callbackFunctionSpy);
-
-         // Assert
-         assertResponseSuccess(callbackFunctionSpy, pipelineCallbackSpy, parsedResult);
       });
     });
 
-    describe('getTransactionNodeAccessKeys', () => {
-      it('shows error when request failed.', async () => {
-        // Arrange
-        const response = sinon.stub();
-        const error = { message: uuid.v4() };
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
+    const listOfMethod = [
+      { callback: async () => await serviceClient.getMembers('consortiumName', callbackFunctionSpy),
+        methodName: 'getMembers' },
+      { callback: async () => await serviceClient.getConsortia(callbackFunctionSpy),
+        methodName: 'getConsortia' },
+      { callback: async () => await serviceClient.getTransactionNodes(memberName, callbackFunctionSpy),
+        methodName: 'getTransactionNodes' },
+      { callback: async () =>
+          await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy),
+        methodName: 'getTransactionNodeAccessKeys' },
+      { callback: async () => await serviceClient.getSkus(callbackFunctionSpy),
+        methodName: 'getSkus' },
+      { callback: async () => await serviceClient.getBlockchainDataManagers(callbackFunctionSpy),
+        methodName: 'getBlockchainDataManagers' },
+      { callback: async () => await serviceClient.getBlockchainDataManagerApplications(bdmName, callbackFunctionSpy),
+        methodName: 'getBlockchainDataManagerpplications' },
+    ];
 
-        pipelineMock.callsFake((...args: any[]): {} => {
-          return args[1](error, response, defaultResponseBody);
+    listOfMethod.forEach((method) => {
+      it(`${method.methodName} returns error.`, async () => {
+        // Arrange
+        const error = new Error(uuid.v4());
+        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
+          return args[1](error);
         });
 
         // Act
-        await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy);
+        await method.callback();
 
         // Assert
-        assertRequestFailed(error, callbackFunctionSpy);
+        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
+        assert.strictEqual(
+          callbackFunctionSpy.calledOnceWithExactly(error),
+          true,
+          'callbackFunction should called once with correct arguments');
       });
 
-      describe('throws error when response is not success.', () => {
-        const responseData = [
-          [400, defaultResponseBody],
-          [103, defaultResponseBody],
-          [530, defaultResponseBody],
-          [200, incorrectResponseBody]];
-        responseData.forEach(async (response) => {
-          it(`response status code is ${response[0]} and response body is ${JSON.stringify(response[1])}.`,
-          async () => {
-            // Arrange
-            const res = {statusCode: response[0]};
-            const callbackFunctionSpy = sinon.spy(callbackFunction);
-            let pipelineCallbackSpy: any;
-
-            pipelineMock.callsFake((...args: any[]): {} => {
-              pipelineCallbackSpy = sinon.spy(args[1]);
-              return pipelineCallbackSpy(null, res, response[1]);
-            });
-
-            // Act
-            await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy);
-
-            // Assert
-            assertResponseNotSuccess(callbackFunctionSpy, pipelineCallbackSpy);
-          });
-        });
-      });
-
-      it('does not throw error when response is success.', async () => {
-         // Arrange
-         const res = {statusCode: 200};
-         const callbackFunctionSpy = sinon.spy(callbackFunction);
-         const parsedResult = JSON.parse(defaultResponseBody);
-         let pipelineCallbackSpy: any;
-
-         pipelineMock.callsFake((...args: any[]): {} => {
-           pipelineCallbackSpy = sinon.spy(args[1]);
-           return pipelineCallbackSpy(null, res, defaultResponseBody);
-         });
-
-         // Act
-         await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy);
-
-         // Assert
-         assertResponseSuccess(callbackFunctionSpy, pipelineCallbackSpy, parsedResult);
-      });
-    });
-
-    describe('getSkus', () => {
-      it('shows error when request failed.', async () => {
+      it(`${method.methodName} does not return error.`, async () => {
         // Arrange
-        const response = sinon.stub();
-        const error = { message: uuid.v4() };
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-
-        pipelineMock.callsFake((...args: any[]): {} => {
-          return args[1](error, response, defaultResponseBody);
+        sendRequestToAzureMock.callsFake((...args: any[]): {} => {
+          return args[1](null, resultElement);
         });
 
         // Act
-        await serviceClient.getSkus(callbackFunctionSpy);
+        await method.callback();
 
         // Assert
-        assertRequestFailed(error, callbackFunctionSpy);
-      });
-
-      describe('throws error when response is not success.', () => {
-        const responseData = [
-          [400, defaultResponseBody],
-          [103, defaultResponseBody],
-          [530, defaultResponseBody],
-          [200, incorrectResponseBody]];
-        responseData.forEach(async (response) => {
-          it(`response status code is ${response[0]} and response body is ${JSON.stringify(response[1])}.`,
-          async () => {
-            // Arrange
-            const res = {statusCode: response[0]};
-            const callbackFunctionSpy = sinon.spy(callbackFunction);
-            let pipelineCallbackSpy: any;
-
-            pipelineMock.callsFake((...args: any[]): {} => {
-              pipelineCallbackSpy = sinon.spy(args[1]);
-              return pipelineCallbackSpy(null, res, response[1]);
-            });
-
-            // Act
-            await serviceClient.getSkus(callbackFunctionSpy);
-
-            // Assert
-            assertResponseNotSuccess(callbackFunctionSpy, pipelineCallbackSpy);
-          });
-        });
-      });
-
-      it('does not throw error when response is success.', async () => {
-         // Arrange
-         const res = {statusCode: 200};
-         const callbackFunctionSpy = sinon.spy(callbackFunction);
-         const parsedResult = JSON.parse(defaultResponseBody);
-         let pipelineCallbackSpy: any;
-
-         pipelineMock.callsFake((...args: any[]): {} => {
-           pipelineCallbackSpy = sinon.spy(args[1]);
-           return pipelineCallbackSpy(null, res, defaultResponseBody);
-         });
-
-         // Act
-         await serviceClient.getSkus(callbackFunctionSpy);
-
-         // Assert
-         assertResponseSuccess(callbackFunctionSpy, pipelineCallbackSpy, parsedResult);
-      });
-    });
-
-    describe('getConsortia', () => {
-      it('shows error when request failed.', async () => {
-        // Arrange
-        const response = sinon.stub();
-        const error = { message: uuid.v4() };
-        const callbackFunctionSpy = sinon.spy(callbackFunction);
-
-        pipelineMock.callsFake((...args: any[]): {} => {
-          return args[1](error, response, defaultResponseBody);
-        });
-
-        // Act
-        await serviceClient.getConsortia(callbackFunctionSpy);
-
-        // Assert
-        assertRequestFailed(error, callbackFunctionSpy);
-      });
-
-      describe('throws error when response is not success.', () => {
-        const responseData = [
-          [400, defaultResponseBody],
-          [103, defaultResponseBody],
-          [530, defaultResponseBody],
-          [200, incorrectResponseBody]];
-        responseData.forEach(async (response) => {
-          it(`response status code is ${response[0]} and response body is ${JSON.stringify(response[1])}.`,
-          async () => {
-            // Arrange
-            const res = {statusCode: response[0]};
-            const callbackFunctionSpy = sinon.spy(callbackFunction);
-            let pipelineCallbackSpy: any;
-
-            pipelineMock.callsFake((...args: any[]): {} => {
-              pipelineCallbackSpy = sinon.spy(args[1]);
-              return pipelineCallbackSpy(null, res, response[1]);
-            });
-
-            // Act
-            await serviceClient.getConsortia(callbackFunctionSpy);
-
-            // Assert
-            assertResponseNotSuccess(callbackFunctionSpy, pipelineCallbackSpy);
-          });
-        });
-      });
-
-      it('does not throw error when response is success.', async () => {
-         // Arrange
-         const res = {statusCode: 200};
-         const callbackFunctionSpy = sinon.spy(callbackFunction);
-         const parsedResult = JSON.parse(defaultResponseBody);
-         let pipelineCallbackSpy: any;
-
-         pipelineMock.callsFake((...args: any[]): {} => {
-           pipelineCallbackSpy = sinon.spy(args[1]);
-           return pipelineCallbackSpy(null, res, defaultResponseBody);
-         });
-
-         // Act
-         await serviceClient.getConsortia(callbackFunctionSpy);
-
-         // Assert
-         assertResponseSuccess(callbackFunctionSpy, pipelineCallbackSpy, parsedResult);
+        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
+        assert.strictEqual(
+          callbackFunctionSpy.calledOnceWithExactly(null, resultElement),
+          true,
+          'callbackFunction should called once with correct arguments');
       });
     });
   });

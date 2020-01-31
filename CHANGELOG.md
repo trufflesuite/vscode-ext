@@ -2,6 +2,22 @@
 
 All notable changes to the "azure blockchain" extension will be documented in this file.
 
+## 0.1.14
+
+### Enhancements
+
+- Added UI to handle required parameters for OpenZeppelin contract deployment.
+- Added Blockchain Data Manager to the core view for connecting to existing instances.
+
+### Fixes
+
+- Cleanup of obfuscation for build directory path.
+- Merge of public PR for url checker to include basic auth.
+
+### Internal Improvements
+
+- Refactoring custom build directory code.
+
 ## 0.1.13
 
 ### Enhancements

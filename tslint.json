@@ -40,7 +40,8 @@
   "linterOptions": {
     "exclude": [
       "node_modules/**",
-      "src/**/*.d.ts"
+      "src/**/*.d.ts",
+      "src/helpers/checkTruffleConfigTemplate.js"
     ]
   },
   "defaultSeverity": "warning"

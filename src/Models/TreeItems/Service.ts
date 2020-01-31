@@ -8,6 +8,7 @@ export type ServiceTypes =
   ItemType.AZURE_BLOCKCHAIN_SERVICE |
   ItemType.LOCAL_SERVICE |
   ItemType.INFURA_SERVICE |
+  ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE |
   ItemType.COMMAND;
 
 export abstract class Service extends ExtensionItem {

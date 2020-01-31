@@ -37,7 +37,7 @@ describe('OpenZeppelinHelper', () => {
   it('shouldUpgradeOpenZeppelinAsync should return true if current and latest versions differ and confirm dialog is true', async () => {
     sinon.stub(OpenZeppelinService, 'getCurrentOpenZeppelinVersionAsync').resolves('current');
     sinon.stub(OpenZeppelinService, 'getLatestOpenZeppelinVersionAsync').resolves('latest');
-    sinon.stub(helpers, 'showConfirmDialogToUpdateOpenZeppelin').resolves(true);
+    sinon.stub(helpers, 'showConfirmationDialog').resolves(true);
 
     const openZeppelinHelperRewire = rewire('../src/helpers/openZeppelinHelper');
 

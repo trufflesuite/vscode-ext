@@ -54,7 +54,10 @@ function generateContractDeployerSection(items: IOZAsset[]): string {
       const contractNames = OpenZeppelinService.getContractsNamesFromAsset(asset);
 
       return deployerSections
-        .concat(contractNames.map((contract) => `    deployer.deploy(${contract});`));
+        .concat(contractNames.map((contract) => {
+          const contractParameters = OpenZeppelinService.getContractParametersFromAsset(asset, contract);
+          return `    deployer.deploy(${[contract, ...contractParameters].join(', ')});`;
+        }));
     }, [])
     .join('\n');
 }

@@ -28,7 +28,7 @@ import {
   TreeService,
 } from './services';
 import { Telemetry } from './TelemetryClient';
-import { ProjectView } from './ViewItems';
+import { NetworkNodeView, ProjectView } from './ViewItems';
 
 import { DebuggerConfiguration } from './debugAdapter/configuration/debuggerConfiguration';
 
@@ -117,6 +117,8 @@ export async function activate(context: ExtensionContext) {
     async (viewItem: ProjectView) => {
       await tryExecute(() => ServiceCommands.disconnectProject(viewItem));
     });
+  const openAtAzurePortal = commands.registerCommand('azureBlockchainService.openAtAzurePortal',
+    async (viewItem: NetworkNodeView) => ServiceCommands.openAtAzurePortal(viewItem));
   //#endregion
 
   //#region Infura commands
@@ -131,8 +133,8 @@ export async function activate(context: ExtensionContext) {
     async () => {
       await tryExecute(() => InfuraCommands.showProjectsFromAccount());
     });
-
   //#endregion
+
   //#region contract commands
   const showSmartContractPage = commands.registerCommand(
     'azureBlockchainService.showSmartContractPage',
@@ -209,6 +211,7 @@ export async function activate(context: ExtensionContext) {
     signOutOfInfuraAccount,
     showProjectsFromInfuraAccount,
     openZeppelinAddCategory,
+    openAtAzurePortal,
   ];
   context.subscriptions.push(...subscriptions);
 

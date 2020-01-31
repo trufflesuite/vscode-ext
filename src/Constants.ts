@@ -170,8 +170,8 @@ export class Constants {
   };
 
   public static confirmationDialogResult = {
-    no: 'no',
-    yes: 'yes',
+    no: 'No',
+    yes: 'Yes',
   };
 
   public static mnemonicConstants = {
@@ -203,7 +203,116 @@ export class Constants {
     valueOrDefault: Constants.getMessageValueOrDefault,
   };
 
+  public static treeItemData = {
+    group: {
+      azure: {
+        member: {
+          contextValue: 'member',
+          iconPath: { dark: '', light: '' },
+        },
+      },
+      bdm: {
+        input: {
+          contextValue: 'inputGroup',
+          iconPath: { dark: '', light: '' },
+          label: 'Inputs',
+        },
+        output: {
+          contextValue: 'outputGroup',
+          iconPath: { dark: '', light: '' },
+          label: 'Outputs',
+        },
+      },
+    },
+    network: {
+      azure: {
+        contextValue: 'network',
+        iconPath: { dark: '', light: '' },
+      },
+      bdm: {
+        application: {
+          contextValue: 'bdmApplication',
+          iconPath: { dark: '', light: '' },
+        },
+        input: {
+          contextValue: 'input',
+          iconPath: { dark: '', light: '' },
+        },
+        output: {
+          contextValue: 'output',
+          iconPath: { dark: '', light: '' },
+        },
+      },
+      default: {
+        contextValue: 'network',
+        iconPath: { dark: '', light: '' },
+      },
+      infura: {
+        contextValue: 'network',
+        iconPath: { dark: '', light: '' },
+      },
+      local: {
+        contextValue: 'localnetwork',
+        iconPath: { dark: '', light: '' },
+      },
+    },
+    project: {
+      azure: {
+        contextValue: 'project',
+        iconPath: { dark: '', light: '' },
+      },
+      bdm: {
+        contextValue: 'project',
+        iconPath: { dark: '', light: '' },
+      },
+      default: {
+        contextValue: 'project',
+        iconPath: { dark: '', light: '' },
+      },
+      infura: {
+        contextValue: 'project',
+        iconPath: { dark: '', light: '' },
+      },
+      local: {
+        contextValue: 'localproject',
+        iconPath: { dark: '', light: '' },
+      },
+    },
+    service: {
+      azure: {
+        contextValue: 'service',
+        iconPath: { dark: '', light: '' },
+        label: 'Azure Blockchain Service',
+        prefix: 'abs',
+      },
+      bdm: {
+        contextValue: 'service',
+        iconPath: { dark: '', light: '' },
+        label: 'Blockchain Data Manager',
+        prefix: 'bdm',
+      },
+      default: {
+        contextValue: 'service',
+        iconPath: { dark: '', light: '' },
+        label: 'Default Service',
+      },
+      infura: {
+        contextValue: 'service',
+        iconPath: { dark: '', light: '' },
+        label: 'Infura Service',
+        prefix: 'inf',
+      },
+      local: {
+        contextValue: 'service',
+        iconPath: { dark: '', light: '' },
+        label: 'Local Service',
+        prefix: 'loc',
+      },
+    },
+  };
+
   public static validationRegexps = {
+    array: /^\[.*\]$/g,
     forbiddenChars: {
       dotAtTheEnd: /^(?=.*[.]$).*$/g,
       networkName: /[^0-9a-z]/g,
@@ -217,12 +326,21 @@ export class Constants {
     isUrl: /^(?:http(s)?:\/\/)?[\w:@.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/igm,
     lowerCaseLetter: /(?=.*[a-z]).*/g,
     moduleExportsTemplate: /{(.*)}$/g,
+    onlyNumber: /^(-\d+|\d+)$/g,
     // tslint:disable-next-line: max-line-length
     port: /^([1-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/,
     specialChars: {
       consortiumMemberName: /^(?=^[a-z])[a-z0-9]+$/g,
       password: /[!@$^&()+=?\/<>|[\]{}_:.\\~]/g,
       resourceGroupName: /[-\w.()]/g,
+    },
+    types: {
+      simpleArray: /\w+\[\]/g,
+      simpleMapping: /^\[.+\]$/g,
+      solidityAddress: /^(0x)[a-zA-Z0-9]{40}$/g,
+      solidityInt: /^int\d+$/g,
+      solidityInteger: /u*int\d*/g,
+      solidityUint: /^uint\d+$/g,
     },
     upperCaseLetter: /(?=.*[A-Z]).*/g,
   };
@@ -232,6 +350,9 @@ export class Constants {
   };
 
   public static validationMessages = {
+    arrayElementsShouldBeValid: (elementsType: string) => {
+      return `Array elements should have valid value of type ${elementsType}`;
+    },
     forbiddenChars: {
       dotAtTheEnd: "Input value must not have '.' at the end.",
       networkName: 'Invalid name. Name can contain only lowercase letters and numbers.',
@@ -266,8 +387,18 @@ export class Constants {
     projectIdAlreadyExists: 'Network with project ID already exists.',
     resourceGroupAlreadyExists: Constants.getMessageResourceGroupAlreadyExist,
     unresolvedSymbols: Constants.getMessageInputHasUnresolvedSymbols,
+    valueCanSafelyStoreUpToBits: (pow: string) => {
+      return `Value can only safely store up to ${pow} bits`;
+    },
     valueCannotBeEmpty: 'Value cannot be empty.',
+    valueShouldBeArray: 'Value should be the array and enclosed in \[ \]',
+    valueShouldBeBool: 'Value should be true or false.',
+    valueShouldBeNumber: 'Value should be a number.',
     valueShouldBeNumberOrEmpty: 'Value should be a number or empty.',
+    valueShouldBePositiveAndCanSafelyStoreUpToBits: (pow: string) => {
+      return `Value should be positive and can only safely store up to ${pow} bits`;
+    },
+    valueShouldBeSolidityAddress: 'Value should be the correct solidity address.',
   };
 
   public static placeholders = {
@@ -277,6 +408,7 @@ export class Constants {
     generateMnemonic: 'Generate mnemonic',
     pasteMnemonic: 'Paste mnemonic',
     resourceGroupName: 'Resource Group Name',
+    selectBlockchainDataManagerInstance: 'Select Blockchain Data Manager instance',
     selectConsortium: 'Select consortium',
     selectDeployDestination: 'Select deploy destination',
     selectDestination: 'Select destination',
@@ -292,76 +424,6 @@ export class Constants {
     selectSubscription: 'Select subscription',
     selectTypeOfSolidityProject: 'Select type of solidity project',
     setupMnemonic: 'Setup mnemonic',
-  };
-
-  public static treeItemData = {
-    member: {
-      azure: {
-        contextValue: 'member',
-        iconPath: { dark: '', light: ''},
-      },
-    },
-    network: {
-      azure: {
-        contextValue: 'network',
-        iconPath: { dark: '', light: ''},
-      },
-      default: {
-        contextValue: 'network',
-        iconPath: { dark: '', light: ''},
-      },
-      infura: {
-        contextValue: 'network',
-        iconPath: { dark: '', light: ''},
-      },
-      local: {
-        contextValue: 'localnetwork',
-        iconPath: { dark: '', light: ''},
-      },
-    },
-    project: {
-      azure: {
-        contextValue: 'project',
-        iconPath: { dark: '', light: ''},
-      },
-      default: {
-        contextValue: 'project',
-        iconPath: { dark: '', light: ''},
-      },
-      infura: {
-        contextValue: 'project',
-        iconPath: { dark: '', light: ''},
-      },
-      local: {
-        contextValue: 'localproject',
-        iconPath: { dark: '', light: ''},
-      },
-    },
-    service: {
-      azure: {
-        contextValue: 'service',
-        iconPath: { dark: '', light: ''},
-        label: 'Azure Blockchain Service',
-        prefix: 'abs',
-      },
-      default: {
-        contextValue: 'service',
-        iconPath: { dark: '', light: ''},
-        label: 'Default Service',
-      },
-      infura: {
-        contextValue: 'service',
-        iconPath: { dark: '', light: ''},
-        label: 'Infura Service',
-        prefix: 'inf',
-      },
-      local: {
-        contextValue: 'service',
-        iconPath: { dark: '', light: ''},
-        label: 'Local Service',
-        prefix: 'loc',
-      },
-    },
   };
 
   // More information see here
@@ -444,7 +506,7 @@ export class Constants {
     AstIsEmpty: 'enums could not be extracted, current AST is empty',
     BuildContractsBeforeGenerating: 'Please build contracts before generating',
     BuildContractsDirIsEmpty: Constants.getMessageContractsBuildDirectoryIsEmpty,
-    BuildContractsDirIsNotExist: Constants.getMessageContractsBuildDirectoryIsNotExist,
+    BuildContractsDirDoesNotExist: Constants.getMessageContractsBuildDirectoryDoesNotExist,
     CompiledContractIsMissing: 'Compiled contract is missing for solidity file.',
     DirectoryIsNotEmpty: 'Directory is not empty. Open another one?',
     ErrorWhileExecutingCommand: 'Error while executing command: ',
@@ -543,17 +605,30 @@ export class Constants {
   public static azureApps = {
     AzureFunction: { label: 'Azure Function', serviceType: 2, outputDir: 'generatedAzureFunction' },
     FlowApp: { label: 'Flow App', serviceType: 0, outputDir: 'generatedFlowApp' },
-    LogicApp: { label: 'Logic App', serviceType: 1, outputDir: 'generatedLogicApp'},
+    LogicApp: { label: 'Logic App', serviceType: 1, outputDir: 'generatedLogicApp' },
+  };
+
+  public static azureApiVersions = {
+    preview20180601: '2018-06-01-preview',
+    preview20190601: '2019-06-01-preview',
   };
 
   public static azureResourceExplorer = {
     contentType: 'application/json',
-    portalBasUri: 'https://portal.azure.com/#@microsoft.onmicrosoft.com',
+    portalBasUri: 'https://ms.portal.azure.com/#@microsoft.onmicrosoft.com',
+    portalBladeUri: 'https://ms.portal.azure.com/#blade/ManagedLedgerExtension/TransactionNodeMenuBlade',
     providerName: 'Microsoft.Blockchain',
     requestAcceptLanguage: 'en-US',
-    requestApiVersion: '2018-06-01-preview',
     requestBaseUri: 'https://management.azure.com',
     resourceType: 'blockchainMembers',
+  };
+
+  public static solidityTypes = {
+    address: 'address',
+    bool: 'bool',
+    int: 'int',
+    string: 'string',
+    uint: 'uint',
   };
 
   public static firstOZVersion = '2.3.0';
@@ -563,6 +638,9 @@ export class Constants {
   public static openZeppelin = {
     cancelButtonTitle: 'Cancel',
     contractsUpgradeIsFailed: 'Upgrade of OpenZeppelin contracts has failed',
+    contactParameterInformation(contractName: string, parameterName: string, parameterType: string) {
+      return `Contract: ${contractName}. Parameter: ${parameterName}: ${parameterType}`;
+    },
     descriptionDownloadingFailed: 'Description downloading failed',
     downloadingContractsFromOpenZeppelin: 'Downloading contracts from OpenZeppelin',
     exploreDownloadedContractsInfo: 'Explore more information about the contracts downloaded',
@@ -574,8 +652,10 @@ export class Constants {
     replaceButtonTitle: 'Replace',
     retryButtonTitle: 'Retry',
     retryDownloading: 'Retry downloading',
+    saveSpecifiedParameters: 'Not all contract parameters were defined. Do you want to save the progress?',
     selectCategoryForDownloading: 'Select category for downloading',
     skipButtonTitle: 'Skip files',
+    specifyContractParameters: 'Some contracts have parameters required for deploy. Do you want to specify them?',
     upgradeOpenZeppelin: 'Upgrading OpenZeppelin',
     hashCalculationFailed(errorMessage: string): string {
       return `Error while calculating file hash. Message: ${errorMessage}`;
@@ -588,8 +668,8 @@ export class Constants {
     },
     alreadyExisted(existing: IOZAsset[]): string {
       return `OpenZeppelin: (${existing.length}) files already exist on disk: `
-          + existing.slice(0, 3).map((contract) => contract.name).join(' ')
-          + (existing.length > 3 ? '...' : '');
+        + existing.slice(0, 3).map((contract) => contract.name).join(' ')
+        + (existing.length > 3 ? '...' : '');
     },
     invalidHashMessage(contractPath: string): string {
       return `${contractPath} - invalid hash`;
@@ -608,7 +688,7 @@ export class Constants {
     },
     invalidVersionDialog(version: string, location: string, lastVersion: string) {
       return `There is invalid OpenZeppelin version (${version}) in ${location}. ` +
-         `Do you want to use the latest one (${lastVersion})?`;
+        `Do you want to use the latest one (${lastVersion})?`;
     },
   };
 
@@ -623,9 +703,19 @@ export class Constants {
     this.infuraFileResponse.path = context.asAbsolutePath(path.join('resources', 'codeFlowResult', 'index.html'));
     this.infuraFileResponse.css = context.asAbsolutePath(path.join('resources', 'codeFlowResult', 'main.css'));
 
-    this.treeItemData.member.azure.iconPath = {
+    this.treeItemData.group.azure.member.iconPath = {
       dark: context.asAbsolutePath(path.join('resources/dark', 'ABS-member.svg')),
       light: context.asAbsolutePath(path.join('resources/light', 'ABS-member.svg')),
+    };
+
+    this.treeItemData.group.bdm.input.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'BlockchainDataManagerGroupInput.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'BlockchainDataManagerGroupInput.svg')),
+    };
+
+    this.treeItemData.group.bdm.output.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'BlockchainDataManagerGroupOutput.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'BlockchainDataManagerGroupOutput.svg')),
     };
 
     this.treeItemData.network.default.iconPath = {
@@ -636,6 +726,21 @@ export class Constants {
     this.treeItemData.network.azure.iconPath = {
       dark: context.asAbsolutePath(path.join('resources/dark', 'ABNetwork.svg')),
       light: context.asAbsolutePath(path.join('resources/light', 'ABNetwork.svg')),
+    };
+
+    this.treeItemData.network.bdm.application.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'BlockchainDataManagerApplication.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'BlockchainDataManagerApplication.svg')),
+    };
+
+    this.treeItemData.network.bdm.input.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'ABNetwork.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'ABNetwork.svg')),
+    };
+
+    this.treeItemData.network.bdm.output.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'BlockchainDataManagerOutput.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'BlockchainDataManagerOutput.svg')),
     };
 
     this.treeItemData.network.infura.iconPath = {
@@ -653,6 +758,11 @@ export class Constants {
       light: context.asAbsolutePath(path.join('resources/light', 'ABS-consortium.svg')),
     };
 
+    this.treeItemData.project.bdm.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'BlockchainDataManager-service_and_project.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'BlockchainDataManager-service_and_project.svg')),
+    };
+
     this.treeItemData.project.infura.iconPath = {
       dark: context.asAbsolutePath(path.join('resources/dark', 'InfuraProject.svg')),
       light: context.asAbsolutePath(path.join('resources/light', 'InfuraProject.svg')),
@@ -666,6 +776,11 @@ export class Constants {
     this.treeItemData.service.azure.iconPath = {
       dark: context.asAbsolutePath(path.join('resources/dark', 'ABS-service.svg')),
       light: context.asAbsolutePath(path.join('resources/light', 'ABS-service.svg')),
+    };
+
+    this.treeItemData.service.bdm.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'BlockchainDataManager-service_and_project.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'BlockchainDataManager-service_and_project.svg')),
     };
 
     this.treeItemData.service.infura.iconPath = {
@@ -697,8 +812,8 @@ export class Constants {
     return `Contracts build directory "${buildDirPath}" is empty.`;
   }
 
-  private static getMessageContractsBuildDirectoryIsNotExist(buildDirPath: string): string {
-    return `Contracts build directory "${buildDirPath}" is not exist.`;
+  private static getMessageContractsBuildDirectoryDoesNotExist(buildDirPath: string): string {
+    return `Contracts build directory "${buildDirPath}" does not exist.`;
   }
 
   private static getMessageNetworkAlreadyExist(networkName: string): string {

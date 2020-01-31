@@ -3,10 +3,10 @@
 
 import { Constants } from '../../Constants';
 import { ItemType } from '../ItemType';
-import { ExtensionItem } from './ExtensionItem';
+import { Group } from './Group';
 
-export class Member extends ExtensionItem {
+export class Member extends Group {
   constructor(label: string) {
-    super(ItemType.MEMBER, label, Constants.treeItemData.member.azure);
+    super(ItemType.MEMBER, label, Constants.treeItemData.group.azure.member);
   }
 }
