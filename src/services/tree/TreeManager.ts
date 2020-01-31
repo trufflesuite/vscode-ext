@@ -6,6 +6,7 @@ import { Constants } from '../../Constants';
 import { ItemFactory } from '../../Models';
 import {
   AzureBlockchainService,
+  BlockchainDataManagerService,
   Command,
   IExtensionItem,
   InfuraService,
@@ -101,7 +102,12 @@ class ExtensionTreeManager {
       infuraService = new InfuraService();
     }
 
-    return [ azureBlockchainService, infuraService, localService];
+    let bdmService = items.find((item) => item instanceof BlockchainDataManagerService);
+    if (!bdmService) {
+      bdmService = new BlockchainDataManagerService();
+    }
+
+    return [ azureBlockchainService, infuraService, localService, bdmService];
   }
 }
 

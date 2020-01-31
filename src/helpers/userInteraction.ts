@@ -55,7 +55,7 @@ export async function showConfirmPaidOperationDialog() {
     validateInput: DialogResultValidator.validateConfirmationResult,
   });
 
-  if (answer.toLowerCase() !== Constants.confirmationDialogResult.yes) {
+  if (answer.toLowerCase() !== Constants.confirmationDialogResult.yes.toLowerCase()) {
     Telemetry.sendEvent(
       'userInteraction.showConfirmPaidOperationDialog.userCancellation',
       { prompt: Constants.placeholders.confirmPaidOperation });
@@ -117,11 +117,12 @@ export async function saveTextInFile(
   return file.fsPath;
 }
 
-export async function showConfirmDialogToUpdateOpenZeppelin(): Promise<boolean> {
+export async function showConfirmationDialog(message: string): Promise<boolean> {
   const answer = await window.showInformationMessage(
-    Constants.openZeppelin.newVersionAvailable,
+    message,
     Constants.confirmationDialogResult.yes,
-    Constants.confirmationDialogResult.no);
+    Constants.confirmationDialogResult.no,
+  );
 
   return answer === Constants.confirmationDialogResult.yes;
 }

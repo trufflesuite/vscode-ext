@@ -9,16 +9,20 @@ import { Constants } from '../Constants';
 import { vscodeEnvironment } from '../helpers';
 import { Output } from '../Output';
 import { Telemetry } from '../TelemetryClient';
+import { BlockchainDataManagerResource } from './Operations/BlockchainDataManagerResource';
 import { ConsortiumResource } from './Operations/ConsortiumResource';
 import { MemberResource } from './Operations/MemberResource';
 import { SkuResource } from './Operations/SkuResources';
 import { TransactionNodeResource } from './Operations/TransactionNodeResource';
+
+const { preview20180601, preview20190601 } = Constants.azureApiVersions;
 
 export class AzureBlockchainServiceClient extends AzureServiceClient {
   public memberResource: MemberResource;
   public transactionNodeResource: TransactionNodeResource;
   public consortiumResource: ConsortiumResource;
   public skuResource: SkuResource;
+  public bdmResource: BlockchainDataManagerResource;
 
   constructor(
     credentials: ServiceClientCredentials | UserTokenCredentials,
@@ -26,7 +30,6 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     public readonly resourceGroup: string,
     public readonly location: string,
     public readonly baseUri: string,
-    public readonly apiVersion: string,
     public readonly options: AzureServiceClientOptions,
   ) {
     super(credentials, options);
@@ -49,10 +52,11 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     this.transactionNodeResource = new TransactionNodeResource(this);
     this.consortiumResource = new ConsortiumResource(this);
     this.skuResource = new SkuResource(this);
+    this.bdmResource = new BlockchainDataManagerResource(this);
   }
 
   public async createConsortium(memberName: string, body: string): Promise<void> {
-    const url = this.getUrl(memberName, true, true);
+    const url = this.getUrl(memberName, preview20180601, true, true);
     const urlDetailsOfConsortium = url.slice(url.indexOf('subscriptions'), url.lastIndexOf(memberName)) + memberName;
 
     const httpRequest = this.getHttpRequest(url, 'PUT', body);
@@ -78,8 +82,40 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     });
   }
 
+  public getBlockchainDataManagers(callback: (error: Error | null, result?: any) => void): Promise<void> {
+    const url = this.getUrl('watchers', preview20190601, true, false);
+
+    const httpRequest = this.getHttpRequest(url, 'GET');
+    return this.sendRequestToAzure(httpRequest, callback);
+  }
+
+  public getBlockchainDataManagerApplications(bdmName: string, callback: (error: Error | null, result?: any) => void)
+  : Promise<void> {
+    const url =
+      this.getUrl(`watchers/${bdmName}/artifacts`, preview20190601, true, false);
+
+    const httpRequest = this.getHttpRequest(url, 'GET');
+    return this.sendRequestToAzure(httpRequest, callback);
+  }
+
+  public getBlockchainDataManagerInputs(bdmName: string, callback: (error: Error | null, result?: any) => void)
+  : Promise<void> {
+    const url = this.getUrl(`watchers/${bdmName}/inputs`, preview20190601, true, false);
+
+    const httpRequest = this.getHttpRequest(url, 'GET');
+    return this.sendRequestToAzure(httpRequest, callback);
+  }
+
+  public getBlockchainDataManagerOutputs(bdmName: string, callback: (error: Error | null, result?: any) => void)
+  : Promise<void> {
+    const url = this.getUrl(`watchers/${bdmName}/outputs`, preview20190601, true, false);
+
+    const httpRequest = this.getHttpRequest(url, 'GET');
+    return this.sendRequestToAzure(httpRequest, callback);
+  }
+
   public getMembers(memberName: string, callback: (error: Error | null, result?: any) => void): Promise<void> {
-    const url = this.getUrl(`${memberName}/ConsortiumMembers`, true, true);
+    const url = this.getUrl(`${memberName}/ConsortiumMembers`, preview20180601, true, true);
 
     const httpRequest = this.getHttpRequest(url, 'GET');
 
@@ -87,7 +123,7 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
   }
 
   public getConsortia(callback: (error: Error | null, result?: any) => void): Promise<void> {
-    const url = this.getUrl('', true, true);
+    const url = this.getUrl('', preview20180601, true, true);
 
     const httpRequest = this.getHttpRequest(url, 'GET');
 
@@ -95,7 +131,7 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
   }
 
   public getTransactionNodes(memberName: string, callback: (error: Error | null, result?: any) => void): Promise<void> {
-    const url = this.getUrl(`${memberName}/transactionNodes`, true, true);
+    const url = this.getUrl(`${memberName}/transactionNodes`, preview20180601, true, true);
 
     const httpRequest = this.getHttpRequest(url, 'GET');
 
@@ -111,7 +147,7 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
       ? `${memberName}/listApikeys`
       : `${memberName}/transactionNodes/${nodeName}/listApikeys`;
 
-    const url = this.getUrl(mainPartOfUrl, true, true);
+    const url = this.getUrl(mainPartOfUrl, preview20180601, true, true);
 
     const httpRequest = this.getHttpRequest(url, 'POST');
 
@@ -119,7 +155,7 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
   }
 
   public getSkus(callback: (error: Error | null, result?: any) => void): Promise<void> {
-    const url = this.getUrl('skus');
+    const url = this.getUrl('skus', preview20180601);
 
     const httpRequest = this.getHttpRequest(url, 'GET');
 
@@ -180,7 +216,7 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     nameAvailable: boolean,
     reason: string,
   }> {
-    const url = this.getUrl(`locations/${this.location}/checkNameAvailability`);
+    const url = this.getUrl(`locations/${this.location}/checkNameAvailability`, preview20180601);
 
     const request = this.getHttpRequest(
       url,
@@ -202,12 +238,16 @@ export class AzureBlockchainServiceClient extends AzureServiceClient {
     });
   }
 
-  private getUrl(mainPartOfUrl: string, useResourceGroup: boolean = false, useBlockchainMembers: boolean = false)
+  private getUrl(
+    mainPartOfUrl: string,
+    apiVersion: string,
+    useResourceGroup: boolean = false,
+    useBlockchainMembers: boolean = false)
   : string {
     const resourceGroup = useResourceGroup ? `resourceGroups/${this.resourceGroup}/` : '';
     const blockchainMember = useBlockchainMembers ? 'blockchainMembers/' : '';
 
     return `${this.baseUri}/subscriptions/${this.subscriptionId}/${resourceGroup}` +
-      `providers/Microsoft.Blockchain/${blockchainMember}${mainPartOfUrl}?api-version=${this.apiVersion}`;
+      `providers/Microsoft.Blockchain/${blockchainMember}${mainPartOfUrl}?api-version=${apiVersion}`;
   }
 }

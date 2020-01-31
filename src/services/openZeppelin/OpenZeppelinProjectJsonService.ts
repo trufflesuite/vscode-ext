@@ -62,27 +62,18 @@ export namespace OpenZeppelinProjectJsonService {
 
   export async function addAssetsToProjectJsonAsync(
     downloadedAssets: IOZAsset[],
-    makePersist: boolean = true,
-    updatingProjectMetadata?: IProjectMetadata,
-    overWrite: boolean = false)
+    projectMetadata: IProjectMetadata)
   : Promise<IProjectMetadata> {
-    const projectMetadata = updatingProjectMetadata || await getProjectJson();
     const newStored: IOZAsset[] = [];
     newStored.push(...downloadedAssets);
 
-    if (!overWrite) {
-      projectMetadata.openZeppelin.assets.forEach((storedAsset) => {
-        if (!downloadedAssets.some((downloaded) => downloaded.id === storedAsset.id)) {
-          newStored.push(storedAsset);
-        }
-      });
-    }
+    projectMetadata.openZeppelin.assets.forEach((storedAsset) => {
+      if (!downloadedAssets.some((downloaded) => downloaded.id === storedAsset.id)) {
+        newStored.push(storedAsset);
+      }
+    });
 
     projectMetadata.openZeppelin.assets = newStored;
-
-    if (makePersist) {
-      await storeProjectJsonAsync(projectMetadata);
-    }
 
     return projectMetadata;
   }

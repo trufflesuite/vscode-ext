@@ -22,7 +22,7 @@ import {
 } from '../helpers';
 import { IDeployDestination, ItemType } from '../Models';
 import { NetworkForContractItem } from '../Models/QuickPickItems/NetworkForContractItem';
-import { LocalService } from '../Models/TreeItems';
+import { AzureBlockchainProject, InfuraProject, LocalProject, LocalService } from '../Models/TreeItems';
 import { Project } from '../Models/TreeItems';
 import { Output } from '../Output';
 import {
@@ -76,6 +76,8 @@ export namespace TruffleCommands {
   export async function deployContracts(): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandStarted');
 
+    await checkOpenZeppelinIfUsed();
+
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
     const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri);
     const truffleDeployDestinations = await getTruffleDeployDestinations(truffleConfigsUri);
@@ -101,7 +103,6 @@ export namespace TruffleCommands {
       { url: Telemetry.obfuscate(command.description || '') },
     );
 
-    await checkOpenZeppelinIfUsed();
     await command.cmd();
 
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandFinished');
@@ -228,6 +229,7 @@ async function checkOpenZeppelinIfUsed(): Promise<void> {
     }
 
     await validateOpenZeppelinContracts();
+    await openZeppelinHelper.defineContractRequiredParameters();
   }
 }
 
@@ -279,7 +281,9 @@ async function validateOpenZeppelinContracts(): Promise<void> {
     const errorMsg = Constants.validationMessages.openZeppelinFilesAreInvalid(invalidContractsPaths);
     const error = new Error(errorMsg);
     window.showErrorMessage(errorMsg);
-    Telemetry.sendException(error);
+    const obfuscatedPaths = invalidContractsPaths.map((invalidContractsPath) =>
+      Telemetry.obfuscate(invalidContractsPath));
+    Telemetry.sendException(new Error(Constants.validationMessages.openZeppelinFilesAreInvalid(obfuscatedPaths)));
     throw error;
   }
 }
@@ -336,7 +340,12 @@ async function getProjectDeployDestinationItems(projects: Project[], truffleConf
 : Promise<IDeployDestinationItem[]> {
   const destinations: IDeployDestination[] = [];
 
-  for (const project of projects) {
+  const filteredProjects = projects.filter((project) =>
+    project instanceof AzureBlockchainProject ||
+    project instanceof InfuraProject ||
+    project instanceof LocalProject);
+
+  for (const project of filteredProjects) {
     const projectDestinations = await project.getDeployDestinations();
     destinations.push(...projectDestinations);
   }
@@ -361,8 +370,7 @@ async function getTruffleDeployFunction(
   port?: number)
   : Promise<() => Promise<void>> {
   const treeProjectNames = await getTreeProjectNames();
-  if (port !== undefined &&
-    (treeProjectNames.includes(name) || name === Constants.localhostName)) {
+  if (port !== undefined && (treeProjectNames.includes(name) || name === Constants.localhostName)) {
     Telemetry.sendEvent('TruffleCommands.getTruffleDeployFunction.returnDeployToLocalGanache');
     return deployToLocalGanache.bind(undefined, name, truffleConfigPath, port);
   }

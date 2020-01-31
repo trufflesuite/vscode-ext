@@ -87,7 +87,6 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
       resourceGroupItem.label,
       resourceGroupItem.description,
       Constants.azureResourceExplorer.requestBaseUri,
-      Constants.azureResourceExplorer.requestApiVersion,
       {
         acceptLanguage: Constants.azureResourceExplorer.requestAcceptLanguage,
         filters: [],

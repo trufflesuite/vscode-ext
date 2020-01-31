@@ -81,10 +81,10 @@ export class LogicAppGenerator {
     const files: string[] = [];
 
     if (!fs.pathExistsSync(buildDir)) {
-      Telemetry.sendException(new Error(Constants.errorMessageStrings.BuildContractsDirIsNotExist(
+      Telemetry.sendException(new Error(Constants.errorMessageStrings.BuildContractsDirDoesNotExist(
         Telemetry.obfuscate(buildDir),
       )));
-      throw new Error(Constants.errorMessageStrings.BuildContractsDirIsNotExist(buildDir));
+      throw new Error(Constants.errorMessageStrings.BuildContractsDirDoesNotExist(buildDir));
     }
 
     if (filePath) {

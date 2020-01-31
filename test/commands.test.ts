@@ -171,4 +171,70 @@ describe('Commands helper', () => {
         return undefined;
       });
   });
+
+  describe('tryExecuteCommandInFork', () => {
+    const modulePath = 'some_path';
+    const messageData = { command: 'truffleConfig', message: "{ result: 'some message data' }" };
+
+    let childProcessMock: sinon.SinonMock;
+    let processMock: cp.ChildProcess;
+
+    beforeEach(() => {
+      processMock = new events.EventEmitter() as cp.ChildProcess;
+      processMock.stdout = new events.EventEmitter() as stream.Readable;
+      processMock.stderr = new events.EventEmitter() as stream.Readable;
+      processMock.stdin = new stream.Writable();
+      childProcessMock = sinon.mock(cp);
+    });
+
+    afterEach(() => {
+      sinon.restore();
+    });
+
+    it('tryExecuteCommandInFork should return correct result', async () => {
+      // Arrange
+      const forkMock = childProcessMock.expects('fork').returns(processMock);
+
+      // Act
+      const commandResultPromise = outputCommandHelper.tryExecuteCommandInFork('workingDirectory', modulePath, '');
+
+      await new Promise<void>(async (resolve) => {
+        setTimeout(async () => {
+          await processMock.emit('message', messageData);
+          await processMock.emit('exit', 0);
+          resolve();
+        }, 500);
+      });
+
+      const commandResult = await commandResultPromise;
+
+      // Assert
+      assert.strictEqual(
+        commandResult.messages && commandResult.messages[0],
+        messageData,
+        'commandResult.messages should be equal to test data');
+      assert.strictEqual(forkMock.calledOnce, true, 'fork should called once');
+    });
+
+    it('tryExecuteCommandInFork should rejected on error', async () => {
+      // Arrange
+      sinon.replace(cp, 'fork', () => { throw new Error(); });
+
+      // Act
+      const action = async () => {
+        return await outputCommandHelper.tryExecuteCommandInFork('workingDirectory', modulePath, '');
+      };
+
+      await new Promise<void>(async (resolve) => {
+        setTimeout(async () => {
+          await processMock.emit('message', messageData);
+          await processMock.emit('exit', 0);
+          resolve();
+        }, 500);
+      });
+
+      // Assert
+      await assert.rejects(action);
+    });
+  });
 });

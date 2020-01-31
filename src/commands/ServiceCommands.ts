@@ -1,12 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import * as open from 'open';
 import { Constants } from '../Constants';
 import { showQuickPick } from '../helpers';
 import { ItemType } from '../Models';
 import {
   AzureBlockchainProject,
   AzureBlockchainService,
+  BlockchainDataManagerProject,
+  BlockchainDataManagerService,
   InfuraProject,
   InfuraService,
   LocalProject,
@@ -15,10 +18,15 @@ import {
   Service,
   ServiceTypes,
 } from '../Models/TreeItems';
-import { ConsortiumResourceExplorer, InfuraResourceExplorer, LocalResourceExplorer } from '../resourceExplorers';
+import {
+  BlockchainDataManagerResourceExplorer,
+  ConsortiumResourceExplorer,
+  InfuraResourceExplorer,
+  LocalResourceExplorer,
+} from '../resourceExplorers';
 import { GanacheService, TreeManager } from '../services';
 import { Telemetry } from '../TelemetryClient';
-import { ProjectView } from '../ViewItems';
+import { NetworkNodeView, ProjectView } from '../ViewItems';
 
 interface IServiceDestination {
   cmd: (service: Service) => Promise<Project>;
@@ -71,6 +79,11 @@ export namespace ServiceCommands {
         itemType: ItemType.INFURA_SERVICE,
         label: Constants.treeItemData.service.infura.label,
       },
+      {
+        cmd: connectBlockchainDataManagerProject,
+        itemType: ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE,
+        label: Constants.treeItemData.service.bdm.label,
+      },
     ];
 
     const project = await execute(serviceDestinations);
@@ -92,6 +105,10 @@ export namespace ServiceCommands {
 
     await TreeManager.removeItem(viewItem.extensionItem);
     Telemetry.sendEvent('ServiceCommands.disconnectProject.commandFinished');
+  }
+
+  export function openAtAzurePortal(viewItem: NetworkNodeView): void {
+    open(viewItem.extensionItem.url.href);
   }
 }
 
@@ -179,4 +196,17 @@ async function getExistingNames(service: LocalService): Promise<string[]> {
 async function getExistingPorts(service: LocalService): Promise<number[]> {
   const localProjects = service.getChildren() as LocalProject[];
   return localProjects.map((item) => item.port);
+}
+
+// ------------ BLOCKCHAIN DATA MANAGER ------------ //
+
+async function connectBlockchainDataManagerProject(service: BlockchainDataManagerService)
+: Promise<BlockchainDataManagerProject> {
+  const bdmResourceExplorer = new BlockchainDataManagerResourceExplorer();
+  return bdmResourceExplorer.selectProject(await getExistingBlockchainDataManager(service));
+}
+
+async function getExistingBlockchainDataManager(service: BlockchainDataManagerService): Promise<string[]> {
+  const bdmProjects = service.getChildren() as BlockchainDataManagerProject[];
+  return bdmProjects.map((item) => item.label);
 }

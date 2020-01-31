@@ -276,10 +276,8 @@ export namespace TruffleConfiguration {
 
   async function getTruffleMetadata(): Promise<IConfiguration> {
     const truffleConfigTemplatePath = path.join(__dirname, 'checkTruffleConfigTemplate.js');
-    const truffleConfigPath =
-      path.relative(path.dirname(truffleConfigTemplatePath), path.join(getWorkspaceRoot()!, 'truffle-config.js'));
 
-    const result = await tryExecuteCommandInFork(getWorkspaceRoot()!, truffleConfigTemplatePath, truffleConfigPath);
+    const result = await tryExecuteCommandInFork(getWorkspaceRoot()!, truffleConfigTemplatePath);
     const truffleConfigObject = result.messages!.find((message) => message.command === 'truffleConfig');
 
     if (!truffleConfigObject || !truffleConfigObject.message) {
@@ -512,9 +510,17 @@ export namespace TruffleConfiguration {
     const { contracts_directory, contracts_build_directory, migrations_directory }
       = Constants.truffleConfigDefaultDirectory;
 
-    truffleConfig.contracts_directory = truffleConfig.contracts_directory || contracts_directory;
-    truffleConfig.contracts_build_directory = truffleConfig.contracts_build_directory || contracts_build_directory;
-    truffleConfig.migrations_directory = truffleConfig.migrations_directory || migrations_directory;
+    if (!truffleConfig.hasOwnProperty('contracts_directory')) {
+      truffleConfig.contracts_directory = contracts_directory;
+    }
+
+    if (!truffleConfig.hasOwnProperty('contracts_build_directory')) {
+      truffleConfig.contracts_build_directory = contracts_build_directory;
+    }
+
+    if (!truffleConfig.hasOwnProperty('migrations_directory')) {
+      truffleConfig.migrations_directory = migrations_directory;
+    }
 
     const arrayNetwork: INetwork[] = [];
 

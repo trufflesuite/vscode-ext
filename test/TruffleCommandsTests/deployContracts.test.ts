@@ -13,12 +13,18 @@ import { Constants } from '../../src/Constants';
 import * as helpers from '../../src/helpers';
 import { openZeppelinHelper, TruffleConfiguration } from '../../src/helpers';
 import * as commands from '../../src/helpers/command';
-import { CancellationEvent } from '../../src/Models';
+import { CancellationEvent, ItemType } from '../../src/Models';
 import {
   AzureBlockchainNetworkNode,
   AzureBlockchainProject,
   AzureBlockchainService,
+  BlockchainDataManagerNetworkNode,
+  BlockchainDataManagerProject,
+  BlockchainDataManagerService,
   IExtensionItem,
+  InfuraNetworkNode,
+  InfuraProject,
+  InfuraService,
   LocalNetworkNode,
   LocalProject,
   LocalService,
@@ -26,7 +32,7 @@ import {
   Service,
 } from '../../src/Models/TreeItems';
 import { ConsortiumResourceExplorer } from '../../src/resourceExplorers';
-import { GanacheService, MnemonicRepository, TreeManager } from '../../src/services';
+import { GanacheService, MnemonicRepository, OpenZeppelinMigrationsService, TreeManager } from '../../src/services';
 import { OpenZeppelinService } from '../../src/services';
 import { OZContractValidated } from '../../src/services/openZeppelin/models';
 import { TestConstants } from '../TestConstants';
@@ -82,6 +88,8 @@ describe('TruffleCommands', () => {
 
       beforeEach(async () => {
         sinon.stub(helpers.openZeppelinHelper, 'tryGetCurrentOpenZeppelinVersionAsync');
+        sinon.stub(helpers.openZeppelinHelper, 'defineContractRequiredParameters');
+        sinon.stub(OpenZeppelinMigrationsService, 'generateMigrations');
         getWorkspaceRootMock = sinon.stub(helpers, 'getWorkspaceRoot');
 
         requiredMock = sinon.mock(helpers.required);
@@ -564,6 +572,28 @@ describe('TruffleCommands', () => {
           'installTruffleHdWalletProvider should not be called');
       });
 
+      it('Blockchain Data Manager should be ignored in deploy destination list', async () => {
+        // Arrange
+        let isBDMExist = false;
+        const { local } = TestConstants.consortiumTestNames;
+        checkAppsSilentMock.returns(true);
+        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
+        executeCommandMock.returns(uuid.v4());
+
+        const networkNodeName = getDeployName(service.local.prefix, local, local);
+
+        showQuickPickMock.onCall(0).callsFake((items: any) => {
+          isBDMExist = items.some((item: any) => item.detail === Constants.treeItemData.service.bdm.label);
+          return items.find((item: any) => item.label === networkNodeName);
+        });
+
+        // Act
+        await TruffleCommands.deployContracts();
+
+        // Assert
+        assert.strictEqual(isBDMExist, false, 'deploy destination list should not have Blockchain Data Manager');
+      });
+
       describe('validating openZeppelin contracts before deploy', () => {
         beforeEach(() => {
           checkAppsSilentMock.resolves(true);
@@ -637,6 +667,8 @@ async function createTestServicesItems(): Promise<Service[]> {
 
   const azureBlockchainService = new AzureBlockchainService();
   const localService = new LocalService();
+  const infuraService = new InfuraService();
+  const bdmService = new BlockchainDataManagerService();
 
   const azureBlockchainProject = new AzureBlockchainProject(
     azureNames.consortium,
@@ -657,10 +689,26 @@ async function createTestServicesItems(): Promise<Service[]> {
   const localNetworkNode = new LocalNetworkNode(defaultLabel, defaultUrl, '*');
   localProject.addChild(localNetworkNode);
 
+  const infuraProject = new InfuraProject(uuid.v4(), uuid.v4());
+  const infuraNetworkNode = new InfuraNetworkNode(uuid.v4(), uuid.v4(), uuid.v4());
+  infuraProject.addChild(infuraNetworkNode);
+
+  const bdmProject = new BlockchainDataManagerProject(uuid.v4(), uuid.v4(), uuid.v4());
+  const bdmNetworkNode = new BlockchainDataManagerNetworkNode(
+    uuid.v4(),
+    '*',
+    uuid.v4(),
+    uuid.v4(),
+    ItemType.BLOCKCHAIN_DATA_MANAGER_APPLICATION,
+    uuid.v4());
+  bdmProject.addChild(bdmNetworkNode);
+
   azureBlockchainService.addChild(azureBlockchainProject);
   localService.addChild(localProject);
+  infuraService.addChild(infuraProject);
+  bdmService.addChild(bdmProject);
 
-  services.push(azureBlockchainService, localService);
+  services.push(azureBlockchainService, localService, infuraService, bdmService);
 
   return services;
 }

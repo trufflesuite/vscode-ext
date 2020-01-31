@@ -8,10 +8,11 @@ import * as uuid from 'uuid';
 import * as vscode from 'vscode';
 import { Constants } from '../../../src/Constants';
 import { ItemType } from '../../../src/Models';
-import { AzureBlockchainProject, AzureBlockchainService, Project, Service, ServiceTypes } from '../../../src/Models/TreeItems';
-import { ConsortiumResourceExplorer } from '../../../src/resourceExplorers';
+import { AzureBlockchainProject, AzureBlockchainService, BlockchainDataManagerProject, InfuraProject, Project } from '../../../src/Models/TreeItems';
+import { BlockchainDataManagerResourceExplorer, ConsortiumResourceExplorer, InfuraResourceExplorer } from '../../../src/resourceExplorers';
 import { GanacheService, TreeManager } from '../../../src/services';
 import { AzureAccountHelper } from '../../testHelpers/AzureAccountHelper';
+const { project } = Constants.treeItemData;
 
 describe('Service Commands', () => {
   let defaultConsortiumName: string;
@@ -42,12 +43,12 @@ describe('Service Commands', () => {
 
     describe('connectProject returns project', () => {
       let selectedDestination: any;
-      let getItemStub: sinon.SinonStub<[ServiceTypes], Service>;
       let addChildStub: sinon.SinonStub<any, any>;
       let showQuickPickMock: sinon.SinonStub<any[], any>;
       let showInputBoxMock: sinon.SinonExpectation;
       let selectConsortiumMock: any;
       let startGanacheServerStub: any;
+      let selectProjectMock: any;
 
       beforeEach(() => {
         vscodeWindowMock = sinon.mock(vscode.window);
@@ -60,7 +61,7 @@ describe('Service Commands', () => {
         sinon.stub(GanacheService, 'getPortStatus')
           .resolves(GanacheService.PortStatus.FREE);
 
-        getItemStub = sinon.stub(TreeManager, 'getItem')
+        sinon.stub(TreeManager, 'getItem')
           .callsFake(() => {
             const azureBlockchainService = new AzureBlockchainService();
             addChildStub = sinon.stub(azureBlockchainService, 'addChild');
@@ -76,13 +77,10 @@ describe('Service Commands', () => {
               [defaultMemberName],
             )),
           );
+        sinon.stub(vscode.extensions, 'getExtension').returns(AzureAccountHelper.mockExtension);
       });
 
       afterEach(() => {
-        startGanacheServerStub.restore();
-        selectConsortiumMock.restore();
-        getItemStub.restore();
-        vscodeWindowMock.restore();
         sinon.restore();
       });
 
@@ -130,7 +128,7 @@ describe('Service Commands', () => {
         assertAfterEachTest(
           result,
           ItemType.LOCAL_PROJECT,
-          Constants.treeItemData.project.local.contextValue,
+          project.local.contextValue,
           expectedLabel,
         );
         assert.strictEqual(showInputBoxMock.called, true, 'showInputBox should be called');
@@ -142,9 +140,6 @@ describe('Service Commands', () => {
 
       it('for Azure Blockchain Service destination.', async () => {
         // Arrange
-        const getExtensionMock = sinon.stub(vscode.extensions, 'getExtension')
-          .returns(AzureAccountHelper.mockExtension);
-
         showQuickPickMock.callsFake(async (...args: any[]) => {
           const destination = args[0].find((x: any) => x.itemType === ItemType.AZURE_BLOCKCHAIN_SERVICE);
           selectedDestination = destination;
@@ -160,16 +155,69 @@ describe('Service Commands', () => {
         assertAfterEachTest(
           result,
           ItemType.AZURE_BLOCKCHAIN_PROJECT,
-          Constants.treeItemData.project.default.contextValue,
+          project.azure.contextValue,
           defaultConsortiumName,
         );
         assert.strictEqual(startGanacheServerStub.notCalled, true, 'startGanacheServer command should not be called');
-        assert.strictEqual(
-          selectConsortiumMock.calledOnce,
-          true,
-          'selectProject should be called once');
+        assert.strictEqual(selectConsortiumMock.calledOnce, true, 'selectProject should be called once');
+      });
 
-        getExtensionMock.restore();
+      it('for Infura Service destination.', async () => {
+        // Arrange
+        const label = uuid.v4.toString();
+        selectProjectMock = sinon.stub(InfuraResourceExplorer.prototype, 'selectProject');
+        const infuraProject = new InfuraProject(label, uuid.v4());
+        selectProjectMock.returns(infuraProject);
+
+        showQuickPickMock.callsFake(async (...args: any[]) => {
+          const destination = args[0].find((x: any) => x.itemType === ItemType.INFURA_SERVICE);
+          selectedDestination = destination;
+          selectedDestination.cmd = sinon.spy(destination.cmd);
+
+          return selectedDestination;
+        });
+
+        // Act
+        const result = await serviceCommandsRewire.ServiceCommands.connectProject();
+
+        // Assert
+        assertAfterEachTest(
+          result,
+          ItemType.INFURA_PROJECT,
+          project.infura.contextValue,
+          label,
+        );
+        assert.strictEqual(startGanacheServerStub.notCalled, true, 'startGanacheServer command should not be called');
+        assert.strictEqual(selectProjectMock.calledOnce, true, 'selectProject should be called once');
+      });
+
+      it('for Blockchain Data Manager Service destination.', async () => {
+        // Arrange
+        const label = uuid.v4.toString();
+        selectProjectMock = sinon.stub(BlockchainDataManagerResourceExplorer.prototype, 'selectProject');
+        const bdmProject = new BlockchainDataManagerProject(label, uuid.v4(), uuid.v4());
+        selectProjectMock.returns(bdmProject);
+
+        showQuickPickMock.callsFake(async (...args: any[]) => {
+          const destination = args[0].find((x: any) => x.itemType === ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE);
+          selectedDestination = destination;
+          selectedDestination.cmd = sinon.spy(destination.cmd);
+
+          return selectedDestination;
+        });
+
+        // Act
+        const result = await serviceCommandsRewire.ServiceCommands.connectProject();
+
+        // Assert
+        assertAfterEachTest(
+          result,
+          ItemType.BLOCKCHAIN_DATA_MANAGER_PROJECT,
+          project.bdm.contextValue,
+          label,
+        );
+        assert.strictEqual(startGanacheServerStub.notCalled, true, 'startGanacheServer command should not be called');
+        assert.strictEqual(selectProjectMock.calledOnce, true, 'selectProject should be called once');
       });
     });
   });

@@ -15,7 +15,7 @@ export class IsConfirmationValue implements IRule {
   }
 
   public validate(value: string): string | null {
-    const isConfirmationValue = this.yesNoOptions.includes(value.toLowerCase());
+    const isConfirmationValue = this.yesNoOptions.map((option) => option.toLowerCase()).includes(value.toLowerCase());
     return isConfirmationValue ? null : Constants.validationMessages.invalidConfirmationResult;
   }
 }
