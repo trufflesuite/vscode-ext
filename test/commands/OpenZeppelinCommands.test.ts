@@ -176,6 +176,12 @@ describe('OpenZeppelinCommands tests', () => {
   });
 
   it('addCategory should downloads selected category', async () => {
+    // Arrange
+    const showQuickPick = sinon.stub(helpers, 'showQuickPick');
+    showQuickPick.callsFake(async (...args: any[]) => {
+      return args[0];
+    });
+
     // Act
     await openZeppelinCommandsRewire.OpenZeppelinCommands.addCategory();
 

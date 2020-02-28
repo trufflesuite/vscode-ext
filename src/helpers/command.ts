@@ -131,7 +131,7 @@ export async function executeCommandInFork(workingDirectory: string | undefined,
 }
 
 export function forkProcess(workingDirectory: string | undefined, modulePath: string, args: string[]): ChildProcess {
-  const options: ForkOptions = { cwd: workingDirectory || tmpdir(), silent: true };
+  const options: ForkOptions = { cwd: workingDirectory || tmpdir(), silent: true, env: {}, execArgv: [] };
   return fork(modulePath, args, options);
 }
 
@@ -198,7 +198,7 @@ export function tryExecuteCommandInForkAsync(
     });
 
     childProcess.on('error', reject);
-    childProcess.on('exit', (code: number) => {
+    childProcess.on('close', (code: number) => {
       resolve({ cmdOutput, cmdOutputIncludingStderr, code, messages });
     });
   });

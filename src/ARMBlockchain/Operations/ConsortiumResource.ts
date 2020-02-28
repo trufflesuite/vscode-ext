@@ -12,7 +12,15 @@ export class ConsortiumResource {
     const body = ConsortiumMapper.getBodyForCreateQuorumMember(bodyParams);
 
     // TODO: need receive result
-    return this.client.createConsortium(memberName, JSON.stringify(body));
+    return new Promise((resolve, reject) => {
+      return this.client.createConsortium(memberName, JSON.stringify(body), (error: Error | null, result?: any) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(Object.assign([], result));
+        }
+      });
+    });
   }
 
   public async checkExistence(name: string): Promise<{
@@ -23,13 +31,18 @@ export class ConsortiumResource {
     return this.client.checkExistence(name, 'Microsoft.Blockchain/consortiums');
   }
 
-  public async getListOfConsortia(): Promise<IAzureConsortiumDto[]> {
+  public async getConsortiaList(): Promise<IAzureConsortiumDto[]> {
     return new Promise((resolve, reject) => {
       return this.client.getConsortia((error: Error | null, result?: any) => {
         if (error) {
           reject(error);
         } else {
-          resolve(result.value.map((res: IAzureMemberDto) => res.properties));
+          resolve(result.value.map((res: IAzureMemberDto) => {
+            const azureMember  = res.properties;
+            azureMember.location = res.location;
+
+            return azureMember;
+          }));
         }
       });
     });

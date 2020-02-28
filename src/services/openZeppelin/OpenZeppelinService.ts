@@ -282,6 +282,10 @@ export namespace OpenZeppelinService {
       return asset;
     });
   }
+
+  export async function getOpenZeppelinFolderPath(): Promise<string> {
+    return path.join(await ContractService.getSolidityContractsFolderPath(), openZeppelinFolderName);
+  }
 }
 
 function getOzContractsFromProjectMetadata(
@@ -316,10 +320,6 @@ function getOriginalHash(ozContractPath: string, openZeppelinSubfolder: string, 
     return originalAsset.hash;
   }
   return '';
-}
-
-async function getOpenZeppelinFolderPath(): Promise<string> {
-  return path.join(await ContractService.getSolidityContractsFolderPath(), openZeppelinFolderName);
 }
 
 async function moveFolderAsync(folderPath: string, newLocationPath: string): Promise<void> {

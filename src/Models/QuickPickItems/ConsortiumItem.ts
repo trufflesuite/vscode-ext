@@ -8,6 +8,7 @@ export class ConsortiumItem implements QuickPickItem {
   public readonly memberName: string;
   public readonly resourceGroup: string;
   public readonly subscriptionId: string;
+  public readonly location: string;
   public readonly url?: string;
 
   public readonly label: string;
@@ -17,12 +18,14 @@ export class ConsortiumItem implements QuickPickItem {
     subscriptionId: string,
     resourceGroup: string,
     memberName: string,
+    location: string,
     url?: string,
   ) {
     this.consortiumName = consortiumName;
     this.subscriptionId = subscriptionId;
     this.resourceGroup = resourceGroup;
     this.memberName = memberName;
+    this.location = location;
     this.url = url;
 
     this.label = consortiumName;

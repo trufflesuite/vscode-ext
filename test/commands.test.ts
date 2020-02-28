@@ -201,7 +201,7 @@ describe('Commands helper', () => {
       await new Promise<void>(async (resolve) => {
         setTimeout(async () => {
           await processMock.emit('message', messageData);
-          await processMock.emit('exit', 0);
+          await processMock.emit('close', 0);
           resolve();
         }, 500);
       });

@@ -97,7 +97,7 @@ describe('OpenZeppelinService', () => {
 
     openZeppelinServiceRewire.__set__('downloadNewVersionOfAssetsAsync',
       () => ({ isDownloadSucceed: true, newAssets }));
-    openZeppelinServiceRewire.__set__('getOpenZeppelinFolderPath', () => '');
+    openZeppelinServiceRewire.__set__('OpenZeppelinService.getOpenZeppelinFolderPath', () => Promise.resolve(''));
     openZeppelinServiceRewire.__set__('createNewProjectJsonAsync', sinon.stub().resolves());
     openZeppelinServiceRewire.__set__('moveFolderAsync', sinon.stub().resolves());
     openZeppelinServiceRewire.__set__('moveProjectJsonAsync', sinon.stub().resolves());

@@ -10,14 +10,9 @@ import { Validator } from './validator';
 const debounce = new Debounce();
 
 export namespace AzureBlockchainServiceValidator {
-  const {
-    specialChars,
-    forbiddenChars,
-  } = Constants.validationRegexps;
-
-  const {
-    unresolvedSymbols,
-  } = Constants.validationMessages;
+  const { specialChars, forbiddenChars } = Constants.validationRegexps;
+  const { unresolvedSymbols } = Constants.validationMessages;
+  const { azureBlockchainResourceName, resourceGroup } = Constants.lengthParam;
 
   export async function validateAccessPassword(password: string): Promise<string | null> {
     return new Validator(password)
@@ -29,7 +24,7 @@ export namespace AzureBlockchainServiceValidator {
       .hasNoForbiddenChar(
         forbiddenChars.password,
         unresolvedSymbols(Constants.validationMessages.forbiddenChars.password))
-      .inLengthRange(Constants.minPasswordLength, Constants.maxPasswordLength)
+      .inLengthRange(Constants.lengthParam.password.min, Constants.lengthParam.password.max)
       .getErrors();
   }
 
@@ -47,7 +42,7 @@ export namespace AzureBlockchainServiceValidator {
       .hasNoForbiddenChar(
         forbiddenChars.resourceGroupName,
         unresolvedSymbols(Constants.validationMessages.forbiddenChars.resourceGroupName))
-      .inLengthRange(Constants.minResourceGroupLength, Constants.maxResourceGroupLength)
+      .inLengthRange(resourceGroup.min, resourceGroup.max)
       .getErrors();
 
     if (errors) {
@@ -63,46 +58,19 @@ export namespace AzureBlockchainServiceValidator {
     return await debounce.debounced(timeOverFunction);
   }
 
-  export async function validateConsortiumName(
-    name: string,
-    consortiumResource: ConsortiumResource,
-  ): Promise<string | null> {
+  export async function validateAzureBlockchainResourceName(name: string, resource: ConsortiumResource | MemberResource)
+  : Promise<string | null> {
     const errors = new Validator(name)
       .isNotEmpty()
-      .hasSpecialChar(specialChars.consortiumMemberName)
-      .inLengthRange(Constants.minConsortiumAndMemberLength, Constants.maxConsortiumAndMemberLength)
+      .hasSpecialChar(specialChars.azureBlockchainResourceName)
+      .inLengthRange(azureBlockchainResourceName.min, azureBlockchainResourceName.max)
       .getErrors();
 
     if (errors) {
       return Constants.validationMessages.invalidAzureName;
     }
 
-    const timeOverFunction = buildTimeOverFunction(
-      name,
-      consortiumResource.checkExistence.bind(consortiumResource),
-    );
-
-    return await debounce.debounced(timeOverFunction);
-  }
-
-  export async function validateMemberName(
-    name: string,
-    memberResource: MemberResource,
-  ) {
-    const errors = new Validator(name)
-      .isNotEmpty()
-      .hasSpecialChar(specialChars.consortiumMemberName)
-      .inLengthRange(Constants.minConsortiumAndMemberLength, Constants.maxConsortiumAndMemberLength)
-      .getErrors();
-
-    if (errors) {
-      return Constants.validationMessages.invalidAzureName;
-    }
-
-    const timeOverFunction = buildTimeOverFunction(
-      name,
-      memberResource.checkExistence.bind(memberResource),
-    );
+    const timeOverFunction = buildTimeOverFunction(name, resource.checkExistence.bind(resource));
 
     return await debounce.debounced(timeOverFunction);
   }

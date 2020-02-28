@@ -10,12 +10,6 @@ import { AzureBlockchainServiceClient } from '../src/ARMBlockchain';
 
 describe('Integration tests for AzureBlockchainServiceClient', () => {
   let credentials: ServiceClientCredentials;
-  let subscriptionId: string;
-  let resourceGroup: string;
-  let baseUri: string;
-  let memberName: string;
-  let bdmName: string;
-  let transactionNode: string;
   const azureBlockchainServiceClient = require('../src/ARMBlockchain/AzureBlockchainServiceClient');
   const defaultResponseBody = '{ "message": "default response body" }';
   let callbackFunction: (error: Error | null, result?: any) => void;
@@ -35,12 +29,6 @@ describe('Integration tests for AzureBlockchainServiceClient', () => {
   });
 
   beforeEach(() => {
-    subscriptionId = uuid.v4();
-    resourceGroup = uuid.v4();
-    baseUri = uuid.v4();
-    memberName = uuid.v4();
-    bdmName = uuid.v4();
-    transactionNode = uuid.v4();
     sinon.stub(azureBlockchainServiceClient.__proto__, 'constructor');
 
     windowMock = sinon.mock(vscode.window);
@@ -51,9 +39,9 @@ describe('Integration tests for AzureBlockchainServiceClient', () => {
     };
     serviceClient = new azureBlockchainServiceClient.AzureBlockchainServiceClient(
       credentials,
-      subscriptionId,
-      resourceGroup,
-      baseUri,
+      uuid.v4(),
+      uuid.v4(),
+      uuid.v4(),
       specialOptions,
     );
     // @ts-ignore
@@ -116,10 +104,10 @@ describe('Integration tests for AzureBlockchainServiceClient', () => {
   const listOfMethod = [
     { callback: async () => await serviceClient.getMembers('consortiumName', callbackFunctionSpy),
       methodName: 'getMembers' },
-    { callback: async () => await serviceClient.getTransactionNodes(memberName, callbackFunctionSpy),
+    { callback: async () => await serviceClient.getTransactionNodes(uuid.v4(), callbackFunctionSpy),
       methodName: 'getTransactionNodes' },
     { callback: async () =>
-        await serviceClient.getTransactionNodeAccessKeys(memberName, transactionNode, callbackFunctionSpy),
+        await serviceClient.getTransactionNodeAccessKeys(uuid.v4(), uuid.v4(), callbackFunctionSpy),
       methodName: 'getTransactionNodeAccessKeys' },
     { callback: async () => await serviceClient.getSkus(callbackFunctionSpy),
       methodName: 'getSkus' },
@@ -127,8 +115,22 @@ describe('Integration tests for AzureBlockchainServiceClient', () => {
       methodName: 'getConsortia' },
     { callback: async () => await serviceClient.getBlockchainDataManagers(callbackFunctionSpy),
       methodName: 'getBlockchainDataManagers' },
-    { callback: async () => await serviceClient.getBlockchainDataManagerApplications(bdmName, callbackFunctionSpy),
+    { callback: async () => await serviceClient.getBlockchainDataManagerOutputs(uuid.v4(), callbackFunctionSpy),
+      methodName: 'getBlockchainDataManagerOutputs' },
+    { callback: async () => await serviceClient.getBlockchainDataManagerInputs(uuid.v4(), callbackFunctionSpy),
+      methodName: 'getBlockchainDataManagerInputs' },
+    { callback: async () => await serviceClient.getBlockchainDataManagerApplications(uuid.v4(), callbackFunctionSpy),
       methodName: 'getBlockchainDataManagerApplications' },
+    { callback: async () => await serviceClient.createBlockchainDataManager(uuid.v4(), '{}', callbackFunctionSpy),
+      methodName: 'createBlockchainDataManager' },
+    { callback: async () =>
+      await serviceClient.createBlockchainDataManagerInput(uuid.v4(), uuid.v4(), '{}', callbackFunctionSpy),
+      methodName: 'createBlockchainDataManagerInput' },
+    { callback: async () =>
+      await serviceClient.createBlockchainDataManagerOutput(uuid.v4(), uuid.v4(), '{}', callbackFunctionSpy),
+      methodName: 'createBlockchainDataManagerOutput' },
+    { callback: async () => await serviceClient.removeBlockchainDataManager(uuid.v4(), callbackFunctionSpy),
+      methodName: 'removeBlockchainDataManager' },
   ];
 
   listOfMethod.forEach((method) => {

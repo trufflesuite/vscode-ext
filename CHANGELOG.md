@@ -2,7 +2,20 @@
 
 All notable changes to the "azure blockchain" extension will be documented in this file.
 
-## 0.1.14
+## 1.1.0
+
+### Enhancements
+
+- Implement BDM core operations
+
+### Fixes
+
+- Fixed error when adding Mocks category from OpenZeppelin
+- Removed unnecessary notifications when deploying to removed networks
+
+### Internal Improvements
+
+## 1.0.0
 
 ### Enhancements
 

@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import { Constants } from '../../Constants';
+import { Telemetry } from '../../TelemetryClient';
 import { IDeployDestination } from '../IDeployDestination';
 import { ItemType } from '../ItemType';
 import { AzureBlockchainNetworkNode } from './AzureBlockchainNetworkNode';
@@ -55,8 +56,16 @@ export class AzureBlockchainProject extends Project {
   }
 
   private async getNetworkNode(deployName: string, node: AzureBlockchainNetworkNode): Promise<IDeployDestination> {
+    let description = '';
+
+    try {
+      description = await node.getRPCAddress();
+    } catch (error) {
+      Telemetry.sendException(error);
+    }
+
     return {
-      description: await node.getRPCAddress(),
+      description,
       detail: service.azure.label,
       getTruffleNetwork: async () => {
         const truffleNetwork = await node.getTruffleNetwork();

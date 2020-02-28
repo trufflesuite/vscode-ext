@@ -98,7 +98,8 @@ async function downloadFileSetWithProgress(
 
   async function downloadFileSet(_assets: IOZAsset[])
   : Promise<IOZAsset[]> {
-    const results = await OpenZeppelinService.downloadAssetsAsync(baseUri, _assets, overwrite);
+    const openZeppelinFolder = await OpenZeppelinService.getOpenZeppelinFolderPath();
+    const results = await OpenZeppelinService.downloadAssetsAsync(baseUri, _assets, overwrite, openZeppelinFolder);
 
     let downloaded = results
       .filter((result) => result.state === PromiseState.fulfilled)

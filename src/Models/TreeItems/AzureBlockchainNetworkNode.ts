@@ -2,10 +2,8 @@
 // Licensed under the MIT license.
 
 import { URL } from 'url';
-import { window } from 'vscode';
 import { Constants } from '../../Constants';
 import { ConsortiumResourceExplorer } from '../../resourceExplorers';
-import { Telemetry } from '../../TelemetryClient';
 import { ItemType } from '../ItemType';
 import { MnemonicNetworkNode } from './MnemonicNetworkNode';
 
@@ -37,21 +35,15 @@ export class AzureBlockchainNetworkNode extends MnemonicNetworkNode {
 
   public async getRPCAddress(): Promise<string> {
     const url = new URL(this.url.toString());
+    const consortiumResourceExplorer = new ConsortiumResourceExplorer();
+    const keys = await consortiumResourceExplorer.getAccessKeys(this);
 
-    try {
-      const consortiumResourceExplorer = new ConsortiumResourceExplorer();
-      const keys = await consortiumResourceExplorer.getAccessKeys(this);
-
-      // Check key[0], because methods returns array[2] every time.
-      // If ABS item doesn't ready yet then keys = [null, null]
-      if (keys[0]) {
-        return `${url.origin}/${keys[0]}`;
-      }
-    } catch (error) {
-      Telemetry.sendException(error);
+    // Check key[0], because methods returns array[2] every time.
+    // If ABS item doesn't ready yet then keys = [null, null]
+    if (keys[0]) {
+      return `${url.origin}/${keys[0]}`;
     }
 
-    window.showInformationMessage(Constants.informationMessage.absItemNotReady);
     return '';
   }
 
