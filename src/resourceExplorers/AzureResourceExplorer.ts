@@ -46,9 +46,15 @@ export class AzureResourceExplorer {
     }
   }
 
-  public async getOrSelectLocationItem(subscriptionItem: SubscriptionItem): Promise<LocationItem> {
+  public async getOrSelectLocationItem(subscriptionItem: SubscriptionItem, certainLocation?: string[])
+  : Promise<LocationItem> {
+    const locationItems = await this.getLocationItems(subscriptionItem);
+    const filteredLocations = certainLocation?.length
+      ? locationItems.filter((location) => certainLocation.includes(location.description))
+      : locationItems;
+
     return showQuickPick(
-      this.getLocationItems(subscriptionItem),
+      filteredLocations,
       { placeHolder: Constants.paletteLabels.selectConsortiumRegion, ignoreFocusOut: true },
     );
   }

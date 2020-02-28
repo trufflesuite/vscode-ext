@@ -21,8 +21,8 @@ describe('Consortium Resource Explorer', () => {
     sinon.restore();
   });
 
-  const getListMemberStub = async (): Promise<IAzureConsortiumMemberDto[]> => [];
-  const getListTransactionNodeStub = async (): Promise<IAzureTransactionNodeDto[]> => [];
+  const getMemberListStub = async (): Promise<IAzureConsortiumMemberDto[]> => [];
+  const getTransactionNodeListStub = async (): Promise<IAzureTransactionNodeDto[]> => [];
   const azureSession = {
     credentials: {
       signRequest(): void { return; },
@@ -53,7 +53,7 @@ describe('Consortium Resource Explorer', () => {
 
   const subscriptionItem = new SubscriptionItem('', uuid.v4(), azureSession);
   const resourceGroupItem = new ResourceGroupItem();
-  const consortiumItem = new ConsortiumItem('', '', '', '');
+  const consortiumItem = new ConsortiumItem('', '', '', '', '');
 
   const showQuickPickStub = sinon.stub();
   showQuickPickStub
@@ -75,13 +75,13 @@ describe('Consortium Resource Explorer', () => {
       label: uuid.v4(),
     } as ResourceGroupItem;
 
-    sinon.stub(MemberResource.prototype, 'getListMember').returns(getListMemberStub());
-    sinon.stub(TransactionNodeResource.prototype, 'getListTransactionNode').returns(getListTransactionNodeStub());
+    sinon.stub(MemberResource.prototype, 'getMemberList').returns(getMemberListStub());
+    sinon.stub(TransactionNodeResource.prototype, 'getTransactionNodeList').returns(getTransactionNodeListStub());
     sinon.replace(helpers, 'showQuickPick', showQuickPickStub);
 
     const consortiumResourceExplorerRequire = require('../src/resourceExplorers/ConsortiumResourceExplorer');
     const consortiumResourceExplorer = consortiumResourceExplorerRequire.ConsortiumResourceExplorer;
-    sinon.stub(consortiumResourceExplorer.prototype, 'getConsortiumItems').returns(getListOfConsortia());
+    sinon.stub(consortiumResourceExplorer.prototype, 'getConsortiumItems').returns(getConsortiaList());
 
     sinon.stub(consortiumResourceExplorer.prototype, 'waitForLogin').returns(Promise.resolve(true));
     sinon.stub(consortiumResourceExplorer.prototype, 'getSubscriptionItems')
@@ -109,27 +109,21 @@ describe('Consortium Resource Explorer', () => {
 
   it('loadConsortiumItems returns unselected consortia', async () => {
     // Arrange
-    const subItemTest = {
-      subscriptionId: uuid.v4(),
-    } as SubscriptionItem;
-    const rgItemTest = {
-      label: uuid.v4(),
-    } as ResourceGroupItem;
-
     const excludedItemsTest = [consortiumNameList.consortium1];
-    const listOfConsortia = getListOfConsortia();
-    const expectedNumberOfConsortia = (await listOfConsortia)
+    const consortiaList = getConsortiaList();
+    const expectedNumberOfConsortia = (await consortiaList)
       .filter((consortium) => !excludedItemsTest.includes(consortium.consortium))
       .length;
 
     const consortiumResourceExplorerRequire = require('../src/resourceExplorers/ConsortiumResourceExplorer');
     const consortiumResourceExplorer = consortiumResourceExplorerRequire.ConsortiumResourceExplorer;
     sinon.stub(consortiumResourceExplorer.prototype, 'getAzureClient')
-      .returns({ consortiumResource: { getListOfConsortia: () => listOfConsortia }});
+      .returns({ consortiumResource: { getConsortiaList: () => consortiaList }});
+    const azureClientMock = consortiumResourceExplorer.prototype.getAzureClient();
 
     // Act
     const result
-      = await consortiumResourceExplorer.prototype.loadConsortiumItems(subItemTest, rgItemTest, excludedItemsTest);
+      = await consortiumResourceExplorer.prototype.loadConsortiumItems(azureClientMock, excludedItemsTest);
 
     // Assert
     assert.strictEqual(
@@ -147,7 +141,7 @@ describe('Consortium Resource Explorer', () => {
     const consortiumResourceExplorerRequire = require('../src/resourceExplorers/ConsortiumResourceExplorer');
     const consortiumResourceExplorer = consortiumResourceExplorerRequire.ConsortiumResourceExplorer;
     sinon.stub(consortiumResourceExplorer.prototype, 'getAzureClient')
-      .returns({ memberResource: { getListMember: async () => await getListOfMembers() }});
+      .returns({ memberResource: { getMemberList: async () => await getMemberList() }});
     const azureClientMock = consortiumResourceExplorer.prototype.getAzureClient();
 
     // Act
@@ -162,17 +156,16 @@ describe('Consortium Resource Explorer', () => {
 
   it('loadTransactionNodeItems returns transaction nodes for member', async () => {
     // Arrange
-    const expectedTransactionNode = await getListOfTransactionNode();
+    const expectedTransactionNode = await getTransactionNodeList();
 
     const consortiumResourceExplorerRequire = require('../src/resourceExplorers/ConsortiumResourceExplorer');
     const consortiumResourceExplorer = consortiumResourceExplorerRequire.ConsortiumResourceExplorer;
     sinon.stub(consortiumResourceExplorer.prototype, 'getAzureClient')
-      .returns({ transactionNodeResource: { getListTransactionNode: async () => await getListOfTransactionNode() }});
+      .returns({ transactionNodeResource: { getTransactionNodeList: async () => await getTransactionNodeList() }});
     const azureClientMock = consortiumResourceExplorer.prototype.getAzureClient();
 
     // Act
-    const result = await consortiumResourceExplorer.prototype
-      .loadTransactionNodeItems(azureClientMock, uuid.v4(), uuid.v4(), uuid.v4());
+    const result = await consortiumResourceExplorer.prototype.loadTransactionNodeItems(azureClientMock, uuid.v4());
 
     // Assert
     // We should remember about default transaction node, because of it we use + 1
@@ -187,12 +180,11 @@ describe('Consortium Resource Explorer', () => {
     const consortiumResourceExplorerRequire = require('../src/resourceExplorers/ConsortiumResourceExplorer');
     const consortiumResourceExplorer = consortiumResourceExplorerRequire.ConsortiumResourceExplorer;
     sinon.stub(consortiumResourceExplorer.prototype, 'getAzureClient')
-      .returns({ transactionNodeResource: { getListTransactionNode: () => { throw Error(); }}});
+      .returns({ transactionNodeResource: { getTransactionNodeList: () => { throw Error(); }}});
     const azureClientMock = consortiumResourceExplorer.prototype.getAzureClient();
 
     // Act
-    const result = await consortiumResourceExplorer.prototype
-      .loadTransactionNodeItems(azureClientMock, uuid.v4(), uuid.v4(), uuid.v4());
+    const result = await consortiumResourceExplorer.prototype.loadTransactionNodeItems(azureClientMock, uuid.v4());
 
     // Assert
     assert.strictEqual(result.length, 0, 'loadTransactionNodeItems should return empty array.');
@@ -200,11 +192,6 @@ describe('Consortium Resource Explorer', () => {
 
   it('getAzureConsortium returns consortium with member which has transaction nodes', async () => {
     // Arrange
-    const consortiumItems = {
-      consortiumName: 'consortiumName',
-      resourceGroup: uuid.v4(),
-      subscriptionId: uuid.v4(),
-    } as ConsortiumItem;
     const subItemTest = {
       subscriptionId: uuid.v4(),
     } as SubscriptionItem;
@@ -213,22 +200,22 @@ describe('Consortium Resource Explorer', () => {
     } as ResourceGroupItem;
 
     const azureClient = {
-      memberResource: { getListMember: async () => await getListOfMembers() },
-      transactionNodeResource: { getListTransactionNode: async () => await  getListOfTransactionNode() },
+      memberResource: { getMemberList: async () => await getMemberList() },
+      transactionNodeResource: { getTransactionNodeList: async () => await  getTransactionNodeList() },
     };
 
     const consortiumResourceExplorerRequire = require('../src/resourceExplorers/ConsortiumResourceExplorer');
     const consortiumResourceExplorer = consortiumResourceExplorerRequire.ConsortiumResourceExplorer;
     sinon.stub(consortiumResourceExplorer.prototype, 'getAzureClient').returns(azureClient);
 
-    const expectedNumberOfMembers = (await getListOfMembers())
+    const expectedNumberOfMembers = (await getMemberList())
       .filter((mem: IAzureConsortiumMemberDto) => mem.status === Constants.consortiumMemberStatuses.ready).length;
     // We should remember about default transaction node, because of it we use + 1
-    const expectedNumberOfTransactionNodes = (await getListOfTransactionNode()).length + 1;
+    const expectedNumberOfTransactionNodes = (await getTransactionNodeList()).length + 1;
 
     // Act
     const result
-      = await consortiumResourceExplorer.prototype.getAzureConsortium(consortiumItems, subItemTest, rgItemTest);
+      = await consortiumResourceExplorer.prototype.getAzureConsortium(azureClient, subItemTest, rgItemTest);
 
     // Assert
     const members = result.getChildren();
@@ -243,12 +230,13 @@ describe('Consortium Resource Explorer', () => {
     consortium3: 'consortium3',
   };
 
-  async function getListOfConsortia(): Promise<IAzureConsortiumDto[]> {
+  async function getConsortiaList(): Promise<IAzureConsortiumDto[]> {
     return [{
       consortium: consortiumNameList.consortium1,
       consortiumManagementAccountAddress: uuid.v4(),
       consortiumManagementAccountPassword: uuid.v4(),
       dns: uuid.v4(),
+      location: uuid.v4(),
       password: uuid.v4(),
       protocol: uuid.v4(),
       provisioningState: uuid.v4(),
@@ -264,6 +252,7 @@ describe('Consortium Resource Explorer', () => {
       consortiumManagementAccountAddress: uuid.v4(),
       consortiumManagementAccountPassword: uuid.v4(),
       dns: uuid.v4(),
+      location: uuid.v4(),
       password: uuid.v4(),
       protocol: uuid.v4(),
       provisioningState: uuid.v4(),
@@ -279,6 +268,7 @@ describe('Consortium Resource Explorer', () => {
       consortiumManagementAccountAddress: uuid.v4(),
       consortiumManagementAccountPassword: uuid.v4(),
       dns: uuid.v4(),
+      location: uuid.v4(),
       password: uuid.v4(),
       protocol: uuid.v4(),
       provisioningState: uuid.v4(),
@@ -291,7 +281,7 @@ describe('Consortium Resource Explorer', () => {
     }];
   }
 
-  async function getListOfMembers(): Promise<IAzureConsortiumMemberDto[]> {
+  async function getMemberList(): Promise<IAzureConsortiumMemberDto[]> {
     return [{
       dateModified: uuid.v4(),
       displayName: uuid.v4(),
@@ -312,7 +302,7 @@ describe('Consortium Resource Explorer', () => {
     }];
   }
 
-  async function getListOfTransactionNode(): Promise<IAzureTransactionNodeDto[]> {
+  async function getTransactionNodeList(): Promise<IAzureTransactionNodeDto[]> {
     return [{
       id: uuid.v4(),
       location: uuid.v4(),

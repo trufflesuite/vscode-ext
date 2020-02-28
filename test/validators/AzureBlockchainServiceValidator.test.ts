@@ -7,6 +7,8 @@ import sinon = require('sinon');
 import { Constants } from '../../src/Constants';
 import { AzureBlockchainServiceValidator } from '../../src/validators/AzureBlockchainServiceValidator';
 
+const { azureBlockchainResourceName, password, resourceGroup } = Constants.lengthParam;
+
 describe('Azure Blockchain Service Validator', () => {
   const emptyValues = ['', ' '];
   const {
@@ -24,11 +26,11 @@ describe('Azure Blockchain Service Validator', () => {
   describe('Unit tests', () => {
 
     describe('accessPasswordValidator', () => {
-      emptyValues.forEach((password) => {
-        it(`returns error message when password is empty: '${password}'`, async () => {
+      emptyValues.forEach((testPassword) => {
+        it(`returns error message when password is empty: '${testPassword}'`, async () => {
           // Arrange, Act
           const result
-            = await AzureBlockchainServiceValidator.validateAccessPassword(password) as string;
+            = await AzureBlockchainServiceValidator.validateAccessPassword(testPassword) as string;
 
           // Assert
           assert.strictEqual(result.includes(valueCannotBeEmpty), true, 'empty password should be invalid');
@@ -93,7 +95,7 @@ describe('Azure Blockchain Service Validator', () => {
           'password with forbidden char should be invalid');
       });
 
-      const invalidPasswordLengthList = [Constants.minPasswordLength - 1, Constants.maxPasswordLength + 1];
+      const invalidPasswordLengthList = [password.min - 1, password.max + 1];
 
       invalidPasswordLengthList.forEach((length) => {
         it(`returns error message when password has invalid length: '${length}'`, async () => {
@@ -108,7 +110,7 @@ describe('Azure Blockchain Service Validator', () => {
           // Assert
           assert.strictEqual(
             result,
-            lengthRange(Constants.minPasswordLength, Constants.maxPasswordLength),
+            lengthRange(password.min, password.max),
             `password with length: ${length} should be invalid`);
         });
       });
@@ -130,7 +132,7 @@ describe('Azure Blockchain Service Validator', () => {
           true,
           'error should have forbidden chars message');
         assert.strictEqual(result.includes(
-          lengthRange(Constants.minPasswordLength, Constants.maxPasswordLength)),
+          lengthRange(password.min, password.max)),
           true,
           'error should have length message');
       });
@@ -143,11 +145,11 @@ describe('Azure Blockchain Service Validator', () => {
         azureBlockchainServiceValidator = rewire('../../src/validators/AzureBlockchainServiceValidator');
       });
 
-      emptyValues.forEach((resourceGroup) => {
-        it(`returns error message when resource group name (${resourceGroup}) is empty`, async () => {
+      emptyValues.forEach((testResourceGroup) => {
+        it(`returns error message when resource group name (${testResourceGroup}) is empty`, async () => {
           // Arrange, Act
           const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
-            .validateResourceGroupName(resourceGroup, {
+            .validateResourceGroupName(testResourceGroup, {
               checkExistence: sinon.stub().returns(Promise.resolve(true)),
             });
 
@@ -191,13 +193,13 @@ describe('Azure Blockchain Service Validator', () => {
         });
       });
 
-      const resourceGroupLengthList = [Constants.minResourceGroupLength - 1, Constants.maxResourceGroupLength + 1];
+      const resourceGroupLengthList = [resourceGroup.min - 1, resourceGroup.max + 1];
 
       resourceGroupLengthList.forEach((length) => {
         it(`returns error message when resource group name has invalid length: '${length}'`, async () => {
           // Arrange
           const mainSymbols = 'a';
-          const invalidResourceGroup = mainSymbols.repeat(Constants.maxResourceGroupLength + 1);
+          const invalidResourceGroup = mainSymbols.repeat(resourceGroup.max + 1);
 
           // Act
           const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
@@ -248,7 +250,7 @@ describe('Azure Blockchain Service Validator', () => {
         });
       });
 
-      const resourceGroupHasValidLengthList = [Constants.minResourceGroupLength, Constants.maxResourceGroupLength];
+      const resourceGroupHasValidLengthList = [resourceGroup.min, resourceGroup.max];
 
       resourceGroupHasValidLengthList.forEach((length) => {
         it(`resource group name should be valid with length: ${length}`, async () => {
@@ -268,7 +270,7 @@ describe('Azure Blockchain Service Validator', () => {
       });
     });
 
-    describe('validateConsortiumName', () => {
+    describe('validateAzureBlockchainResourceName', () => {
       let azureBlockchainServiceValidator: any;
 
       before(() => {
@@ -279,7 +281,7 @@ describe('Azure Blockchain Service Validator', () => {
         it(`returns error message when consortium name (${consortiumName}) is empty`, async () => {
           // Arrange, Act
           const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
-            .validateConsortiumName(consortiumName, {
+            .validateAzureBlockchainResourceName(consortiumName, {
               checkExistence: sinon.stub().returns(Promise.resolve(true)),
             });
 
@@ -289,8 +291,8 @@ describe('Azure Blockchain Service Validator', () => {
       });
 
       const consortiumNameLengthList = [
-        Constants.minConsortiumAndMemberLength - 1,
-        Constants.maxConsortiumAndMemberLength + 1,
+        azureBlockchainResourceName.min - 1,
+        azureBlockchainResourceName.max + 1,
       ];
 
       consortiumNameLengthList.forEach((length) => {
@@ -301,7 +303,7 @@ describe('Azure Blockchain Service Validator', () => {
 
           // Act
           const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
-            .validateConsortiumName(invalidConsortiumName, {
+            .validateAzureBlockchainResourceName(invalidConsortiumName, {
               checkExistence: sinon.stub().returns(Promise.resolve(false)),
             });
 
@@ -316,7 +318,7 @@ describe('Azure Blockchain Service Validator', () => {
         it(`returns error message when consortium name ('${name}') has upper case letter`, async () => {
           // Arrange, Act
           const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
-            .validateConsortiumName(name, {
+            .validateAzureBlockchainResourceName(name, {
               checkExistence: sinon.stub().returns(Promise.resolve(false)),
             });
 
@@ -331,7 +333,7 @@ describe('Azure Blockchain Service Validator', () => {
         it(`returns error message when consortium name ('${name}') has digit at first place`, async () => {
           // Arrange, Act
           const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
-            .validateConsortiumName(name, {
+            .validateAzureBlockchainResourceName(name, {
               checkExistence: sinon.stub().returns(Promise.resolve(false)),
             });
 
@@ -346,7 +348,7 @@ describe('Azure Blockchain Service Validator', () => {
 
         // Act
         const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
-          .validateConsortiumName(invalidConsortiumName, {
+          .validateAzureBlockchainResourceName(invalidConsortiumName, {
             checkExistence: sinon.stub().returns(Promise.resolve(false)),
           });
 
@@ -358,15 +360,15 @@ describe('Azure Blockchain Service Validator', () => {
         'aa',
         'a1',
         'a1a',
-        'a'.repeat(Constants.maxConsortiumAndMemberLength),
-        'a'.repeat(Constants.minConsortiumAndMemberLength),
+        'a'.repeat(azureBlockchainResourceName.max),
+        'a'.repeat(azureBlockchainResourceName.min),
       ];
 
       validConsortiumNames.forEach((name) => {
         it(`consortium name (${name}) should be valid`, async () => {
           // Arrange, Act
           const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
-            .validateConsortiumName(name, {
+            .validateAzureBlockchainResourceName(name, {
               checkExistence: sinon.stub().returns(Promise.resolve({
                 message: null,
                 nameAvailable: true,
@@ -380,7 +382,7 @@ describe('Azure Blockchain Service Validator', () => {
       });
     });
 
-    describe('validateMemberName', () => {
+    describe('validateAzureBlockchainResourceName', () => {
       let azureBlockchainServiceValidator: any;
 
       before(() => {
@@ -391,7 +393,7 @@ describe('Azure Blockchain Service Validator', () => {
         it(`returns error message when member name (${memberName}) is empty`, async () => {
           // Arrange,  Act
           const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
-            .validateMemberName(memberName, {
+            .validateAzureBlockchainResourceName(memberName, {
               checkExistence: sinon.stub().returns(Promise.resolve(true)),
             });
 
@@ -401,8 +403,8 @@ describe('Azure Blockchain Service Validator', () => {
       });
 
       const memberNameLengthList = [
-        Constants.minConsortiumAndMemberLength - 1,
-        Constants.maxConsortiumAndMemberLength + 1,
+        azureBlockchainResourceName.min - 1,
+        azureBlockchainResourceName.max + 1,
       ];
 
       memberNameLengthList.forEach((length) => {
@@ -413,7 +415,7 @@ describe('Azure Blockchain Service Validator', () => {
 
           // Act
           const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
-            .validateMemberName(invalidMemberName, {
+            .validateAzureBlockchainResourceName(invalidMemberName, {
               checkExistence: sinon.stub().returns(Promise.resolve(false)),
             });
 
@@ -428,7 +430,7 @@ describe('Azure Blockchain Service Validator', () => {
         it(`returns error message when member name ('${name}') has upper case letter`, async () => {
           // Arrange, Act
           const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
-            .validateMemberName(name, {
+            .validateAzureBlockchainResourceName(name, {
               checkExistence: sinon.stub().returns(Promise.resolve(false)),
             });
 
@@ -443,7 +445,7 @@ describe('Azure Blockchain Service Validator', () => {
         it(`returns error message when member name ('${name}') has digit at first place`, async () => {
           // Arrange, Act
           const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
-            .validateMemberName(name, {
+            .validateAzureBlockchainResourceName(name, {
               checkExistence: sinon.stub().returns(Promise.resolve(false)),
             });
 
@@ -458,7 +460,7 @@ describe('Azure Blockchain Service Validator', () => {
 
         // Act
         const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
-          .validateMemberName(invalidMemberName, {
+          .validateAzureBlockchainResourceName(invalidMemberName, {
             checkExistence: sinon.stub().returns(Promise.resolve(false)),
           });
 
@@ -470,15 +472,15 @@ describe('Azure Blockchain Service Validator', () => {
         'aa',
         'a1',
         'a1a',
-        'a'.repeat(Constants.maxConsortiumAndMemberLength),
-        'a'.repeat(Constants.minConsortiumAndMemberLength),
+        'a'.repeat(azureBlockchainResourceName.max),
+        'a'.repeat(azureBlockchainResourceName.min),
       ];
 
       validMemberNames.forEach((name) => {
         it(`member name (${name}) should be valid`, async () => {
           // Arrange, Act
           const result = await azureBlockchainServiceValidator.AzureBlockchainServiceValidator
-            .validateMemberName(name, {
+            .validateAzureBlockchainResourceName(name, {
               checkExistence: sinon.stub().returns(Promise.resolve({
                 message: null,
                 nameAvailable: true,

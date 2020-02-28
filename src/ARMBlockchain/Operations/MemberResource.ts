@@ -3,34 +3,17 @@
 
 import { IAzureConsortiumMemberDto } from '..';
 import { AzureBlockchainServiceClient } from '../AzureBlockchainServiceClient';
-import { IAzureMemberAccessKeysDto } from '../AzureDto/AccessKeysDto';
 
 export class MemberResource {
   constructor(private readonly client: AzureBlockchainServiceClient) {}
 
-  public getListMember(memberName: string): Promise<IAzureConsortiumMemberDto[]> {
+  public getMemberList(memberName: string): Promise<IAzureConsortiumMemberDto[]> {
     return new Promise((resolve, reject) => {
       return this.client.getMembers(memberName, (error: Error | null, result?: any) => {
         if (error) {
           reject(error);
         } else {
           resolve(Object.assign([], result.value));
-        }
-      });
-    });
-  }
-
-  public getTransactionNodeAccessKeys(memberName: string, nodeName: string): Promise<IAzureMemberAccessKeysDto> {
-    return new Promise((resolve, reject) => {
-      return this.client.getTransactionNodeAccessKeys(
-        memberName,
-        nodeName,
-        (error: Error | null, result?: any,
-      ) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result);
         }
       });
     });

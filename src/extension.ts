@@ -98,7 +98,7 @@ export async function activate(context: ExtensionContext) {
     await tryExecute(() => TruffleCommands.writeAbiToBuffer(uri));
   });
   const copyRPCEndpointAddress = commands.registerCommand('azureBlockchainService.copyRPCEndpointAddress',
-    async (viewItem: ProjectView) => {
+    async (viewItem: NetworkNodeView) => {
       await tryExecute(() => TruffleCommands.writeRPCEndpointAddressToBuffer(viewItem));
     });
   const getPrivateKeyFromMnemonic = commands.registerCommand('azureBlockchainService.getPrivateKey', async () => {

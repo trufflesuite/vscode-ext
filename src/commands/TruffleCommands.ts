@@ -36,7 +36,7 @@ import {
 } from '../services';
 import { OZContractValidated } from '../services/openZeppelin/models';
 import { Telemetry } from '../TelemetryClient';
-import { ProjectView } from '../ViewItems';
+import { NetworkNodeView } from '../ViewItems';
 import { ServiceCommands } from './ServiceCommands';
 
 interface IDeployDestinationItem {
@@ -162,16 +162,25 @@ export namespace TruffleCommands {
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
   }
 
-  export async function writeRPCEndpointAddressToBuffer(projectView: ProjectView): Promise<void> {
+  export async function writeRPCEndpointAddressToBuffer(networkNodeView: NetworkNodeView): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.writeRPCEndpointAddressToBuffer.commandStarted');
-    const rpcEndpointAddress = await projectView.extensionItem.getRPCAddress();
-    Telemetry.sendEvent('TruffleCommands.writeRPCEndpointAddressToBuffer.getRPCAddress',
-      { data: Telemetry.obfuscate(rpcEndpointAddress) },
-    );
+    try {
+      const rpcEndpointAddress = await networkNodeView.extensionItem.getRPCAddress();
+      Telemetry.sendEvent('TruffleCommands.writeRPCEndpointAddressToBuffer.getRPCAddress',
+        { data: Telemetry.obfuscate(rpcEndpointAddress) },
+      );
 
-    if (rpcEndpointAddress) {
-      await vscodeEnvironment.writeToClipboard(rpcEndpointAddress);
-      window.showInformationMessage(Constants.informationMessage.rpcEndpointCopiedToClipboard);
+      if (rpcEndpointAddress) {
+        await vscodeEnvironment.writeToClipboard(rpcEndpointAddress);
+        window.showInformationMessage(Constants.informationMessage.rpcEndpointCopiedToClipboard);
+      } else {
+        window.showInformationMessage(
+          Constants.informationMessage.networkIsNotReady(networkNodeView.extensionItem.constructor.name));
+      }
+    } catch (error) {
+      Telemetry.sendException(error);
+      window.showErrorMessage(Constants.errorMessageStrings.BlockchainItemIsUnavailable(
+        networkNodeView.extensionItem.constructor.name));
     }
   }
 

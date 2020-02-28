@@ -1,16 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import * as open from 'open';
 import { ProgressLocation, QuickPickItem, window } from 'vscode';
 import {
-  AzureBlockchainServiceClient,
-  ConsortiumResource,
   IAzureConsortiumDto,
   IAzureConsortiumMemberDto,
   ICreateQuorumMember,
   ISkuDto,
-  MemberResource,
 } from '../ARMBlockchain';
+import { AzureBlockchainServiceClient } from '../ARMBlockchain/AzureBlockchainServiceClient';
 import { Constants } from '../Constants';
 import { showInputBox, showQuickPick } from '../helpers';
 import { ConsortiumItem, LocationItem, ResourceGroupItem, SkuItem, SubscriptionItem } from '../Models/QuickPickItems';
@@ -20,14 +19,15 @@ import { AzureBlockchainServiceValidator } from '../validators/AzureBlockchainSe
 import { AzureResourceExplorer } from './AzureResourceExplorer';
 
 export class ConsortiumResourceExplorer extends AzureResourceExplorer {
-  public async createProject(_existingProjects: string[] = []): Promise<AzureBlockchainProject> {
+  public async createProject(): Promise<AzureBlockchainProject> {
     Telemetry.sendEvent('ConsortiumResourceExplorer.createProject');
     await this.waitForLogin();
 
     const subscriptionItem = await this.getOrSelectSubscriptionItem();
     const resourceGroupItem = await this.getOrCreateResourceGroupItem(subscriptionItem);
+    const azureClient = await this.getAzureClient(subscriptionItem, resourceGroupItem);
 
-    return this.createAzureConsortium(subscriptionItem, resourceGroupItem);
+    return this.createAzureConsortium(azureClient, subscriptionItem);
   }
 
   public async selectProject(existingProjects: string[] = []): Promise<AzureBlockchainProject> {
@@ -36,18 +36,19 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
 
     const subscriptionItem = await this.getOrSelectSubscriptionItem();
     const resourceGroupItem = await this.getOrCreateResourceGroupItem(subscriptionItem);
+    const azureClient = await this.getAzureClient(subscriptionItem, resourceGroupItem);
 
     const pick = await showQuickPick(
-      this.getConsortiumItems(subscriptionItem, resourceGroupItem, existingProjects),
+      this.getConsortiumItems(azureClient, existingProjects),
       { placeHolder: Constants.placeholders.selectConsortium, ignoreFocusOut: true },
     );
 
     if (pick instanceof ConsortiumItem) {
       Telemetry.sendEvent('ConsortiumResourceExplorer.selectProject.selectAzureBlockchainProject');
-      return this.getAzureConsortium(pick, subscriptionItem, resourceGroupItem);
+      return this.getAzureConsortium(azureClient, pick);
     } else {
       Telemetry.sendEvent('ConsortiumResourceExplorer.selectProject.createAzureBlockchainProject');
-      return this.createAzureConsortium(subscriptionItem, resourceGroupItem);
+      return this.createAzureConsortium(azureClient, subscriptionItem);
     }
   }
 
@@ -74,82 +75,44 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
       new ResourceGroupItem(resourceGroup),
     );
 
-    const accessKeys = await azureClient.memberResource.getTransactionNodeAccessKeys(memberName, transactionNodeName);
+    const accessKeys =
+      await azureClient.transactionNodeResource.getTransactionNodeAccessKeys(memberName, transactionNodeName);
 
     return accessKeys.keys.map((key) => key.value);
   }
 
-  private async getAzureClient(subscriptionItem: SubscriptionItem, resourceGroupItem: ResourceGroupItem)
-    : Promise<AzureBlockchainServiceClient> {
-    return new AzureBlockchainServiceClient(
-      subscriptionItem.session.credentials,
-      subscriptionItem.subscriptionId,
-      resourceGroupItem.label,
-      resourceGroupItem.description,
-      Constants.azureResourceExplorer.requestBaseUri,
-      {
-        acceptLanguage: Constants.azureResourceExplorer.requestAcceptLanguage,
-        filters: [],
-        generateClientRequestId: true,
-        longRunningOperationRetryTimeout: 30,
-        noRetryPolicy: false,
-        requestOptions: {
-          customHeaders: {},
-        },
-        rpRegistrationRetryTimeout: 30,
-      },
-    );
-  }
-
-  private async getConsortiumItems(
-    subscriptionItem: SubscriptionItem,
-    resourceGroupItem: ResourceGroupItem,
-    excludedItems?: string[],
-  ): Promise<QuickPickItem[]> {
-    const items: QuickPickItem[] = [];
-    const createConsortiumItem: QuickPickItem = { label: '$(plus) Create Consortium' };
-    const consortiumItems = await this.loadConsortiumItems(subscriptionItem, resourceGroupItem, excludedItems);
-
-    items.push(createConsortiumItem, ...consortiumItems);
-
-    return items;
-  }
-
-  private async loadConsortiumItems(
-    subscriptionItem: SubscriptionItem,
-    resourceGroupItem: ResourceGroupItem,
+  public async loadConsortiumItems(
+    azureClient: AzureBlockchainServiceClient,
     excludedItems: string[] = [],
   ): Promise<ConsortiumItem[]> {
-    const azureClient = await this.getAzureClient(subscriptionItem, resourceGroupItem);
-    const consortia: IAzureConsortiumDto[] = await azureClient.consortiumResource.getListOfConsortia();
+    const consortia: IAzureConsortiumDto[] = await azureClient.consortiumResource.getConsortiaList();
 
     return consortia
       .filter((item) => !excludedItems.includes(item.consortium))
       .map((consortium) => new ConsortiumItem(
         consortium.consortium,
-        subscriptionItem.subscriptionId,
-        resourceGroupItem.label,
+        azureClient.subscriptionId,
+        azureClient.resourceGroup,
         consortium.userName,
+        consortium.location,
         consortium.dns,
       ))
       .sort((a, b) => a.label.localeCompare(b.label));
   }
 
-  private async loadMemberItems(azureClient: AzureBlockchainServiceClient, memberName: string)
+  public async loadMemberItems(azureClient: AzureBlockchainServiceClient, memberName: string)
   : Promise<IAzureConsortiumMemberDto[]> {
-    const members: IAzureConsortiumMemberDto[] = await azureClient.memberResource.getListMember(memberName);
+    const members: IAzureConsortiumMemberDto[] = await azureClient.memberResource.getMemberList(memberName);
 
     return members.filter((member) => member.status === Constants.consortiumMemberStatuses.ready);
   }
 
-  private async loadTransactionNodeItems(
-    azureClient: AzureBlockchainServiceClient,
-    subscriptionId: string,
-    resourceGroup: string,
-    memberName: string,
-  ): Promise<AzureBlockchainNetworkNode[]> {
+  public async loadTransactionNodeItems(azureClient: AzureBlockchainServiceClient, memberName: string)
+  : Promise<AzureBlockchainNetworkNode[]> {
+    const { subscriptionId, resourceGroup} = azureClient;
+
     try {
-      const transactionNodes = await azureClient.transactionNodeResource.getListTransactionNode(memberName);
+      const transactionNodes = await azureClient.transactionNodeResource.getTransactionNodeList(memberName);
       const networkNodes = transactionNodes.map((tn) => {
         return this.getTransactionNetworkNode(tn.name, subscriptionId, resourceGroup, memberName);
       });
@@ -162,42 +125,19 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
     }
   }
 
-  private async getAzureConsortium(
-    consortiumItems: ConsortiumItem,
+  public async createAzureConsortium(
+    azureClient: AzureBlockchainServiceClient,
     subscriptionItem: SubscriptionItem,
-    resourceGroupItem: ResourceGroupItem,
-  ): Promise<AzureBlockchainProject> {
-    const { consortiumName, subscriptionId, resourceGroup, memberName } = consortiumItems;
+    certainLocation?: string[])
+  : Promise<AzureBlockchainProject> {
+    const consortiumName = await this.getConsortiumName(azureClient);
+    const memberName = await this.getConsortiumMemberName(azureClient);
 
-    const azureClient = await this.getAzureClient(subscriptionItem, resourceGroupItem);
-    const memberItems = await this.loadMemberItems(azureClient, memberName);
-
-    const azureMembers = await Promise.all(memberItems.map(async (memberItem) => {
-      const transactionNodeItems
-      = await this.loadTransactionNodeItems(azureClient, subscriptionId, resourceGroup, memberItem.name);
-
-      const member = new Member(memberItem.name);
-      member.setChildren(transactionNodeItems);
-
-      return member;
-    }));
-
-    const azureConsortium
-      = new AzureBlockchainProject(consortiumName, subscriptionId, resourceGroup, azureMembers.map((mem) => mem.label));
-    azureConsortium.setChildren(azureMembers);
-
-    return azureConsortium;
-  }
-
-  private async createAzureConsortium(subscriptionItem: SubscriptionItem, resourceGroupItem: ResourceGroupItem)
-    : Promise<AzureBlockchainProject> {
-    const azureClient = await this.getAzureClient(subscriptionItem, resourceGroupItem);
-    const consortiumName = await this.getConsortiumName(azureClient.consortiumResource);
-    const memberName = await this.getConsortiumMemberName(azureClient.memberResource);
     const protocol = await this.getOrSelectConsortiumProtocol();
     const memberPassword = await this.getConsortiumMemberPassword();
     const consortiumPassword = await this.getConsortiumPassword();
-    const region = await this.getOrSelectLocationItem(subscriptionItem);
+
+    const region = await this.getOrSelectLocationItem(subscriptionItem, certainLocation);
     const sku = await this.getOrSelectSku(azureClient, region);
 
     const bodyParams: ICreateQuorumMember = {
@@ -216,9 +156,10 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
       location: ProgressLocation.Window,
       title: Constants.statusBarMessages.creatingConsortium,
     }, async () => {
-      await azureClient.consortiumResource.createConsortium(memberName, bodyParams);
-      const subscriptionId = subscriptionItem.subscriptionId;
-      const resourceGroup = resourceGroupItem.label;
+      await this.createConsortium(azureClient, memberName, bodyParams);
+
+      const subscriptionId = azureClient.subscriptionId;
+      const resourceGroup = azureClient.resourceGroup;
 
       const azureMember = new Member(memberName);
       const defaultNetworkNode = this.getTransactionNetworkNode(memberName, subscriptionId, resourceGroup, memberName);
@@ -231,31 +172,42 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
     });
   }
 
-  private async getConsortiumName(consortiumResource: ConsortiumResource): Promise<string> {
-    return showInputBox({
-      ignoreFocusOut: true,
-      prompt: Constants.paletteLabels.enterConsortiumName,
-      validateInput: async (name) => {
-        return window.withProgress({
-          location: ProgressLocation.Notification,
-          title: Constants.informationMessage.consortiumNameValidating,
-        }, async () => AzureBlockchainServiceValidator.validateConsortiumName(name, consortiumResource));
-      },
-    });
+  private async getAzureConsortium(azureClient: AzureBlockchainServiceClient, consortiumItems: ConsortiumItem)
+  : Promise<AzureBlockchainProject> {
+    const { consortiumName, subscriptionId, resourceGroup, memberName } = consortiumItems;
+
+    const memberItems = await this.loadMemberItems(azureClient, memberName);
+
+    const azureMembers = await Promise.all(memberItems.map(async (memberItem) => {
+      const transactionNodeItems
+      = await this.loadTransactionNodeItems(azureClient, memberItem.name);
+
+      const member = new Member(memberItem.name);
+      member.setChildren(transactionNodeItems);
+
+      return member;
+    }));
+
+    const azureConsortium
+      = new AzureBlockchainProject(consortiumName, subscriptionId, resourceGroup, azureMembers.map((mem) => mem.label));
+    azureConsortium.setChildren(azureMembers);
+
+    return azureConsortium;
   }
 
-  private async getConsortiumMemberName(memberResource: MemberResource): Promise<string> {
-    return showInputBox({
-      ignoreFocusOut: true,
-      prompt: Constants.paletteLabels.enterMemberName,
-      validateInput: async (name) => {
-        return window.withProgress({
-            location: ProgressLocation.Notification,
-            title: Constants.informationMessage.memberNameValidating,
-          },
-          async () => AzureBlockchainServiceValidator.validateMemberName(name, memberResource));
-      },
-    });
+  private getConsortiumName(azureClient: AzureBlockchainServiceClient): Promise<string> {
+    return this.getAzureBlockchainServiceName(
+      Constants.paletteLabels.enterConsortiumName,
+      Constants.informationMessage.consortiumNameValidating,
+      (name) =>
+        AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(name, azureClient.consortiumResource));
+  }
+
+  private getConsortiumMemberName(azureClient: AzureBlockchainServiceClient): Promise<string> {
+    return this.getAzureBlockchainServiceName(
+      Constants.paletteLabels.enterMemberName,
+      Constants.informationMessage.memberNameValidating,
+      (name) => AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(name, azureClient.memberResource));
   }
 
   private async getOrSelectConsortiumProtocol(): Promise<string> {
@@ -270,7 +222,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
     return pick.label;
   }
 
-  private async getConsortiumMemberPassword(): Promise<string> {
+  private getConsortiumMemberPassword(): Promise<string> {
     return showInputBox({
       ignoreFocusOut: true,
       password: true,
@@ -279,7 +231,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
     });
   }
 
-  private async getConsortiumPassword(): Promise<string> {
+  private getConsortiumPassword(): Promise<string> {
     return showInputBox({
       ignoreFocusOut: true,
       password: true,
@@ -325,5 +277,64 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
       resourceGroup,
       memberName,
       );
+  }
+
+  private async getAzureClient(subscriptionItem: SubscriptionItem, resourceGroupItem: ResourceGroupItem)
+    : Promise<AzureBlockchainServiceClient> {
+    return new AzureBlockchainServiceClient(
+      subscriptionItem.session.credentials,
+      subscriptionItem.subscriptionId,
+      resourceGroupItem.label,
+      resourceGroupItem.description,
+      Constants.azureResourceExplorer.requestBaseUri,
+      {
+        acceptLanguage: Constants.azureResourceExplorer.requestAcceptLanguage,
+        filters: [],
+        generateClientRequestId: true,
+        longRunningOperationRetryTimeout: 30,
+        noRetryPolicy: false,
+        requestOptions: {
+          customHeaders: {},
+        },
+        rpRegistrationRetryTimeout: 30,
+      },
+    );
+  }
+
+  private async getConsortiumItems(azureClient: AzureBlockchainServiceClient, excludedItems?: string[])
+  : Promise<QuickPickItem[]> {
+    const items: QuickPickItem[] = [];
+    const createConsortiumItem: QuickPickItem = { label: '$(plus) Create Consortium' };
+    const consortiumItems = await this.loadConsortiumItems(azureClient, excludedItems);
+
+    items.push(createConsortiumItem, ...consortiumItems);
+
+    return items;
+  }
+
+  private async createConsortium(
+    azureClient: AzureBlockchainServiceClient,
+    memberName: string,
+    bodyParams: ICreateQuorumMember)
+  : Promise<void> {
+    await azureClient.consortiumResource.createConsortium(memberName, bodyParams);
+    open(`${Constants.azureResourceExplorer.portalBasUri}/resource/subscriptions/${azureClient.subscriptionId}` +
+      `/resourceGroups/${azureClient.resourceGroup}/providers/Microsoft.Blockchain/blockchainMembers/${memberName}`);
+  }
+
+  private getAzureBlockchainServiceName(
+    prompt: string,
+    notificationTitle: string,
+    validateInput: (value: string) => Promise<string | undefined | null>)
+  : Promise<string> {
+    return showInputBox({
+      ignoreFocusOut: true,
+      prompt,
+      validateInput: async (name) => {
+        return window.withProgress(
+          { location: ProgressLocation.Notification, title: notificationTitle },
+          async () => validateInput(name));
+      },
+    });
   }
 }

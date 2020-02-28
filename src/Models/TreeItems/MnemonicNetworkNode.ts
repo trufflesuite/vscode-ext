@@ -1,9 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import { window } from 'vscode';
 import { Constants, RequiredApps } from '../../Constants';
 import { saveTextInFile, showInputBox, showQuickPick, TruffleConfiguration } from '../../helpers';
 import { MnemonicRepository } from '../../services/MnemonicRepository'; // Should be full path since cycle dependencies
+import { Telemetry } from '../../TelemetryClient';
 import { NetworkNode } from './NetworkNode';
 
 export abstract class MnemonicNetworkNode extends NetworkNode {
@@ -11,12 +13,21 @@ export abstract class MnemonicNetworkNode extends NetworkNode {
     const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
     const config = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
     const network = await super.getTruffleNetwork();
-    const targetURL = await this.getRPCAddress();
     const mnemonic = await this.getMnemonic();
-
     const { fs, fsPackageName, hdwalletProvider } = Constants.truffleConfigRequireNames;
     await config.importPackage(fs, fsPackageName);
     await config.importPackage(hdwalletProvider, RequiredApps.hdwalletProvider);
+
+    let targetURL = '';
+    try {
+      targetURL = await this.getRPCAddress();
+
+      if (!targetURL) {
+        window.showInformationMessage(Constants.informationMessage.networkIsNotReady(this.constructor.name));
+      }
+    } catch (error) {
+      Telemetry.sendException(error);
+    }
 
     network.options.provider = {
       mnemonic: mnemonic.path,

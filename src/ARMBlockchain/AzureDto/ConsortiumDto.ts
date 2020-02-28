@@ -15,4 +15,5 @@ export interface IAzureConsortiumDto {
   consortiumManagementAccountPassword: string;
   rootContractAddress: string;
   publicKey: string;
+  location: string;
 }

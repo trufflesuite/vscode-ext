@@ -57,6 +57,7 @@ export class Constants {
 
   public static defaultTruffleBox = 'Azure-Samples/Blockchain-Ethereum-Template';
   public static defaultDebounceTimeout = 300;
+  public static defaultInputNameInBdm = 'transaction-node';
 
   public static infuraHost = 'infura.io';
   public static localhost = '127.0.0.1';
@@ -68,12 +69,33 @@ export class Constants {
   public static ganacheRetryTimeout = 2000; // milliseconds
   public static ganacheRetryAttempts = 5;
 
-  public static minPasswordLength = 12;
-  public static maxPasswordLength = 72;
-  public static minResourceGroupLength = 1;
-  public static maxResourceGroupLength = 90;
-  public static minConsortiumAndMemberLength = 2;
-  public static maxConsortiumAndMemberLength = 20;
+  public static azureBlockchainResourceName = {
+    eventGrid: 'Event Grid',
+    transactionNode: 'Transaction Node',
+  };
+
+  public static lengthParam = {
+    azureBlockchainResourceName: {
+      max: 20,
+      min: 2,
+    },
+    bdmName: {
+      max: 20,
+      min: 1,
+    },
+    eventGridName: {
+      max: 50,
+      min: 3,
+    },
+    password: {
+      max: 72,
+      min: 12,
+    },
+    resourceGroup: {
+      max: 90,
+      min: 1,
+    },
+  };
 
   public static requiredVersions: { [key: string]: string | { min: string, max: string } } = {
     [RequiredApps.ganache]: {
@@ -184,13 +206,18 @@ export class Constants {
   };
 
   public static paletteLabels = {
+    enterBlockchainDataManagerName: 'Enter blockchain data manager name',
+    enterConnectionName: 'Enter connection name',
     enterConsortiumManagementPassword: 'Enter consortium management password',
     enterConsortiumName: 'Enter consortium name',
+    enterEventGridName: 'Enter event grid name',
     enterInfuraProjectName: 'Enter project name',
     enterLocalProjectName: 'Enter local project name',
     enterLocalProjectPort: 'Enter local port number',
     enterMemberName: 'Enter member name',
     enterMemberPassword: 'Enter member password',
+    enterTransactionNodeName: 'Enter transaction node name',
+    enterTransactionNodePassword: 'Enter transaction node password',
     enterTruffleBoxName: 'Enter pre-built Truffle project',
     enterUserEmail: 'Enter user email address',
     enterUserName: 'Enter user name',
@@ -316,6 +343,7 @@ export class Constants {
     forbiddenChars: {
       dotAtTheEnd: /^(?=.*[.]$).*$/g,
       networkName: /[^0-9a-z]/g,
+      outboundConnectionName: /^(\d|[a-z])+$/g,
       password: /[#`*"'\-%;,]/g,
       resourceGroupName: /[#`*"'%;,!@$^&+=?\/<>|[\]{}:\\~]/g,
     },
@@ -330,9 +358,14 @@ export class Constants {
     // tslint:disable-next-line: max-line-length
     port: /^([1-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/,
     specialChars: {
-      consortiumMemberName: /^(?=^[a-z])[a-z0-9]+$/g,
+      azureBlockchainResourceName: /^(?=^[a-z])[a-z0-9]+$/g,
+      bdmName:
+        new RegExp(`^([a-z0-9]){${Constants.lengthParam.bdmName.min},${Constants.lengthParam.bdmName.max}}$`, 'g'),
+      eventGridName: new RegExp(`^([a-zA-Z0-9\-]){${Constants.lengthParam.eventGridName.min},${Constants.lengthParam.eventGridName.max}}$`, 'g'),
       password: /[!@$^&()+=?\/<>|[\]{}_:.\\~]/g,
       resourceGroupName: /[-\w.()]/g,
+      transactionNodeName:
+        new RegExp(`^(?=^[a-z])[a-z0-9]{${Constants.lengthParam.azureBlockchainResourceName.min},${Constants.lengthParam.azureBlockchainResourceName.max}}$`, 'g'),
     },
     types: {
       simpleArray: /\w+\[\]/g,
@@ -353,9 +386,12 @@ export class Constants {
     arrayElementsShouldBeValid: (elementsType: string) => {
       return `Array elements should have valid value of type ${elementsType}`;
     },
+    bdmNameAlreadyExists: 'Blockchain Data Manager name already exists.',
+    eventGridAlreadyExists: 'Event Grid name already exists.',
     forbiddenChars: {
       dotAtTheEnd: "Input value must not have '.' at the end.",
       networkName: 'Invalid name. Name can contain only lowercase letters and numbers.',
+      outboundConnectionName: 'Outbound connection must contain only lowercase letters and numbers.',
       password: "'#', '`', '*', '\"', ''', '-', '%', ',', ';'",
       // tslint:disable-next-line: max-line-length
       resourceGroupName: "'#', '`', '*', '\"', ''', '\%', ';', ',', '!', '@', '$', '^', '&', '+', '=', '?', '\/', '<', '>', '|', '[', '\]', '{', '}', ':', '\\', '~'",
@@ -363,14 +399,19 @@ export class Constants {
     forbiddenSymbols: 'Provided name has forbidden symbols.',
     infuraProjectInvalidName: 'Project name must be at least 3 characters and should have alphanumeric, space, and the symbols "-", "_", ":".',
     invalidAzureName: 'Invalid name. Name can contain only lowercase letters and numbers. ' +
-      `The first character must be a letter. Length must be between ${Constants.minConsortiumAndMemberLength} ` +
-      `and ${Constants.maxConsortiumAndMemberLength} characters.`,
+      `The first character must be a letter. Length must be between ${Constants.lengthParam.azureBlockchainResourceName.min} ` +
+      `and ${Constants.lengthParam.azureBlockchainResourceName.max} characters.`,
+    invalidBlockchainDataManagerName:
+      'The Blockchain Data Manager name is invalid. Name can contain only lowercase letters and numbers. Length must ' +
+      `be between ${Constants.lengthParam.bdmName.min} and ${Constants.lengthParam.bdmName.max} characters.`,
     invalidConfirmationResult: '\'yes\' or \'no\'',
+    invalidEventGridName: 'The Event Grid name is invalid. Name can contain only letters, numbers and dashes. ' +
+      `Length must be between ${Constants.lengthParam.eventGridName.min} and ${Constants.lengthParam.eventGridName.max} characters.`,
     invalidHostAddress: 'Invalid host address',
     invalidPort: 'Invalid port.',
     invalidResourceGroupName: 'Resource group names only allow alphanumeric characters, periods,' +
       'underscores, hyphens and parenthesis and cannot end in a period. ' +
-      `Length must be between ${Constants.minResourceGroupLength} and ${Constants.maxResourceGroupLength} characters.`,
+      `Length must be between ${Constants.lengthParam.resourceGroup.min} and ${Constants.lengthParam.resourceGroup.max} characters.`,
     lengthRange: Constants.getMessageLengthRange,
     nameAlreadyInUse: 'This name is already in use. Choose another one.',
     noDigits: 'Password should have at least one digit.',
@@ -386,6 +427,7 @@ export class Constants {
     projectAlreadyExistsOnInfura: 'Project already exist with the same name on Infura.',
     projectIdAlreadyExists: 'Network with project ID already exists.',
     resourceGroupAlreadyExists: Constants.getMessageResourceGroupAlreadyExist,
+    transactionNodeNameAlreadyExists: 'Transaction Node name already exists.',
     unresolvedSymbols: Constants.getMessageInputHasUnresolvedSymbols,
     valueCanSafelyStoreUpToBits: (pow: string) => {
       return `Value can only safely store up to ${pow} bits`;
@@ -412,9 +454,11 @@ export class Constants {
     selectConsortium: 'Select consortium',
     selectDeployDestination: 'Select deploy destination',
     selectDestination: 'Select destination',
+    selectEventGrid: 'Select event grid',
     selectGanacheServer: 'Select Ganache server',
     selectInfuraProject: 'Select Infura project',
     selectInfuraProjectAvailability: 'Select Infura project availability',
+    selectMember: 'Select member',
     selectMnemonicExtractKey: 'Select mnemonic to extract key',
     selectMnemonicStorage: 'Select mnemonic storage',
     selectNewProjectPath: 'Select new project path',
@@ -422,6 +466,7 @@ export class Constants {
     selectResourceGroup: 'Select a resource group',
     selectRgLocation: 'Select a location to create your Resource Group in...',
     selectSubscription: 'Select subscription',
+    selectTransactionNode: 'Select transaction node',
     selectTypeOfSolidityProject: 'Select type of solidity project',
     setupMnemonic: 'Setup mnemonic',
   };
@@ -467,7 +512,9 @@ export class Constants {
   public static statusBarMessages = {
     buildingContracts: 'Building contracts',
     checkingRequirementDependencies: 'Checking requirement dependencies version',
+    creatingBlockchainDataManager: 'Creating new Blockchain Data Manager',
     creatingConsortium: 'Creating new consortium',
+    creatingEventGrid: 'Creating new event grid',
     creatingProject: 'Creating new project',
     deployingContracts: (destination: string) => {
       return `Deploying contracts to '${destination}'`;
@@ -495,8 +542,12 @@ export class Constants {
   };
 
   public static uiCommandStrings = {
+    createBlockchainDataManagerProject: '$(plus) Create Blockchain Data Manager Project',
+    createConsortium: '$(plus) Create Consortium',
+    createEventGrid: '$(plus) Create Event Grid',
     createInfuraProject: '$(plus) Create Infura Project',
     createProject: '$(plus) Create a new network',
+    createTransactionNode: '$(plus) Create Transaction Node',
     deployToConsortium: 'Deploy to consortium',
   };
 
@@ -504,9 +555,10 @@ export class Constants {
     // TODO names to lower case
     ActionAborted: 'Action aborted',
     AstIsEmpty: 'enums could not be extracted, current AST is empty',
+    BlockchainItemIsUnavailable: Constants.getNetworkIsNotAvailableMessage,
     BuildContractsBeforeGenerating: 'Please build contracts before generating',
-    BuildContractsDirIsEmpty: Constants.getMessageContractsBuildDirectoryIsEmpty,
     BuildContractsDirDoesNotExist: Constants.getMessageContractsBuildDirectoryDoesNotExist,
+    BuildContractsDirIsEmpty: Constants.getMessageContractsBuildDirectoryIsEmpty,
     CompiledContractIsMissing: 'Compiled contract is missing for solidity file.',
     DirectoryIsNotEmpty: 'Directory is not empty. Open another one?',
     ErrorWhileExecutingCommand: 'Error while executing command: ',
@@ -537,7 +589,6 @@ export class Constants {
   };
 
   public static informationMessage = {
-    absItemNotReady: 'Azure Blockchain Service item is not ready yet. Please wait.',
     cancelButton: 'Cancel',
     consortiumDoesNotHaveMemberWithUrl: 'Consortium does not have member with url',
     consortiumNameValidating: 'Consortium name validating...',
@@ -552,15 +603,17 @@ export class Constants {
     installButton: 'Install',
     invalidRequiredVersion: 'Required app is not installed or has an old version.',
     memberNameValidating: 'Member name validating...',
-    newProjectCreationFinished: 'New project was created successfully',
-    newProjectCreationStarted: 'New project creation is started',
+    networkIsNotReady: Constants.getNetworkIsNotReadyMessage,
     openButton: 'Open',
     privateKeyWasCopiedToClipboard: 'Private key was copied to clipboard',
+    provisioningResource: (name: string) => `${name} is provisioning. The provisioning status can be viewed in the Azure portal. ` +
+      'You may return and complete this process once the provisioning is complete.',
     requiresDependency: 'This project deployment requires the truffle-hdwallet-provider.',
     rpcEndpointCopiedToClipboard: 'RPCEndpointAddress copied to clipboard',
     seeDetailsRequirementsPage: 'Please see details on the Requirements Page',
     signInButton: 'Sign In',
     transactionBytecodeWasCopiedToClipboard: 'Transaction Bytecode was copied to clipboard',
+    transactionNodeNameValidating: 'Transaction Node name validating...',
   };
 
   public static infuraCredentials = {
@@ -611,6 +664,21 @@ export class Constants {
   public static azureApiVersions = {
     preview20180601: '2018-06-01-preview',
     preview20190601: '2019-06-01-preview',
+    preview20200101: '2020-01-01-preview',
+  };
+
+  public static provisioningState = {
+    failed: 'Failed',
+    stopped: 'Stopped',
+    succeeded: 'Succeeded',
+    updating: 'Updating',
+  };
+
+  public static availableBlockchainDataManagerLocations = ['eastus', 'westeurope'];
+
+  public static azureProviders = {
+    blockchain: 'Microsoft.Blockchain',
+    eventGrid: 'Microsoft.EventGrid',
   };
 
   public static azureResourceExplorer = {
@@ -794,6 +862,10 @@ export class Constants {
     };
   }
 
+  public static getTransactionNodeName(memberName: string, transactionNodeName: string): string {
+    return memberName === transactionNodeName ? Constants.defaultInputNameInBdm : transactionNodeName;
+  }
+
   private static getMessageChildAlreadyConnected(consortium: string): string {
     return `Connection to '${consortium}' already exists`;
   }
@@ -839,5 +911,23 @@ export class Constants {
   private static getMessageOpenZeppelinFilesAreInvalid(invalidFilePaths: string[]): string {
     return `OpenZeppelin files have been modified or removed:
       ${invalidFilePaths.join('; ')}. Please revert changes or download them again.`;
+  }
+
+  private static getNetworkIsNotReadyMessage(itemType: string) {
+    switch (itemType) {
+      case 'AzureBlockchainNetworkNode':
+        return 'Azure Blockchain Service item is not ready yet. Please wait.';
+      default:
+        return 'Blockchain item is not ready yet. Please wait.';
+    }
+  }
+
+  private static getNetworkIsNotAvailableMessage(itemType: string) {
+    switch (itemType) {
+      case 'AzureBlockchainNetworkNode':
+        return 'Azure Blockchain Service item is unavailable.';
+      default:
+        return 'Blockchain item is unavailable.';
+    }
   }
 }
