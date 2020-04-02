@@ -1,22 +1,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import * as path from 'path';
 import {
   debug,
   DebugConfiguration,
   QuickPickItem,
   workspace,
 } from 'vscode';
-
-import * as path from 'path';
 import { DEBUG_TYPE } from '../debugAdapter/constants/debugAdapter';
 import { DebugNetwork } from '../debugAdapter/debugNetwork';
 import { TransactionProvider } from '../debugAdapter/transaction/transactionProvider';
 import { Web3Wrapper } from '../debugAdapter/web3Wrapper';
 import { showInputBox, showQuickPick } from '../helpers/userInteraction';
+import { Telemetry } from '../TelemetryClient';
 
 export namespace DebuggerCommands {
   export async function startSolidityDebugger() {
+    Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandStarted');
     const workingDirectory = getWorkingDirectory();
     if (!workingDirectory) {
       return;
@@ -40,14 +41,18 @@ export namespace DebuggerCommands {
 
       const txHash = txHashSelection.label;
       const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
-      debug.startDebugging(undefined, config);
+      debug.startDebugging(undefined, config).then(() => {
+          Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandFinished');
+        });
     } else {
       // if remote network then require txHash
       const placeHolder = 'Type the transaction hash you want to debug (0x...)';
       const txHash = await showInputBox({ placeHolder });
       if (txHash) {
         const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
-        debug.startDebugging(undefined, config);
+        debug.startDebugging(undefined, config).then(() => {
+          Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandFinished');
+        });
       }
     }
   }

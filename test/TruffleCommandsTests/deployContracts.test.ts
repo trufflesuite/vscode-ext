@@ -699,6 +699,7 @@ async function createTestServicesItems(): Promise<Service[]> {
     '*',
     uuid.v4(),
     uuid.v4(),
+    [],
     ItemType.BLOCKCHAIN_DATA_MANAGER_APPLICATION,
     uuid.v4());
   bdmProject.addChild(bdmNetworkNode);

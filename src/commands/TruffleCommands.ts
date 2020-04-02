@@ -16,6 +16,7 @@ import {
   showConfirmPaidOperationDialog,
   showIgnorableNotification,
   showQuickPick,
+  telemetryHelper,
   TruffleConfig,
   TruffleConfiguration,
   vscodeEnvironment,
@@ -480,8 +481,20 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
           RequiredApps.truffle, 'migrate', '--reset', '--network', networkName,
         );
         Output.outputLine(Constants.outputChannel.azureBlockchain, Constants.informationMessage.deploySucceeded);
+        Telemetry.sendEvent(
+          'TruffleCommands.deployToNetwork.deployedSuccessfully',
+          {
+            destination: telemetryHelper.mapNetworkName(networkName),
+          },
+        );
       } catch (error) {
         Output.outputLine(Constants.outputChannel.azureBlockchain, Constants.informationMessage.deployFailed);
+        Telemetry.sendEvent(
+          'TruffleCommands.deployToNetwork.deployedFailed',
+          {
+            destination: telemetryHelper.mapNetworkName(networkName),
+          },
+        );
         throw error;
       }
 

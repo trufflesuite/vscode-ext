@@ -75,6 +75,24 @@ export namespace AzureBlockchainServiceValidator {
     return await debounce.debounced(timeOverFunction);
   }
 
+  export function validateBDMApplicationName(name: string, existingNames: string[]) {
+    const errors = new Validator(name)
+      .isNotEmpty()
+      .hasSpecialChar(specialChars.azureBlockchainResourceName)
+      .inLengthRange(azureBlockchainResourceName.min, azureBlockchainResourceName.max)
+      .getErrors();
+
+    if (errors) {
+      return Constants.validationMessages.invalidBDMApplicationName;
+    }
+
+    if (existingNames.includes(name)) {
+      return Constants.validationMessages.bdmApplicationNameExist;
+    }
+
+    return null;
+  }
+
   function buildTimeOverFunction(
     name: string,
     checkExistence: (name: string) => Promise<any>,

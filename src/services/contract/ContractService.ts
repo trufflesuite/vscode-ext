@@ -31,6 +31,10 @@ export namespace ContractService {
     return getPathDirectory('migrations_directory');
   }
 
+  export async function getBuildFolderPath(): Promise<string> {
+    return getPathDirectory('contracts_build_directory');
+  }
+
   export async function getDeployedBytecodeByAddress(host: string, address: string): Promise<string> {
     const defaultBlock = 'latest';
     const response = await HttpService.sendRPCRequest(host, Constants.rpcMethods.getCode, [ address, defaultBlock ]);
@@ -66,7 +70,7 @@ export namespace ContractService {
   }
 
   async function getCompiledContractsPathsFromBuildDirectory(): Promise<string[]> {
-    const buildDir = await getPathDirectory('contracts_build_directory');
+    const buildDir = await getBuildFolderPath();
 
     if (!fs.pathExistsSync(buildDir)) {
       throw new Error(Constants.errorMessageStrings.BuildContractsDirDoesNotExist(Telemetry.obfuscate(buildDir)));

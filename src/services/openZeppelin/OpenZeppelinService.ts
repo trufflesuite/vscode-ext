@@ -44,7 +44,8 @@ export namespace OpenZeppelinService {
       const projectMetadata = await OpenZeppelinProjectJsonService.getProjectJson();
       currentVersion = projectMetadata.openZeppelin.version || Constants.firstOZVersion;
     } else {
-      const { defaultValue, userValue } = await userSettings.getConfigurationAsync(Constants.ozVersionUserSettingsKey);
+      const { defaultValue, userValue } =
+        await userSettings.getConfigurationAsync(Constants.userSettings.ozVersionUserSettingsKey);
       currentVersion = userValue || defaultValue;
     }
 
@@ -64,12 +65,12 @@ export namespace OpenZeppelinService {
     if (location === CurrentOpenZeppelinVersionLocation.projectJson) {
       await OpenZeppelinProjectJsonService.addVersionToProjectJsonAsync(version);
     } else {
-      await userSettings.updateConfigurationAsync(Constants.ozVersionUserSettingsKey, version);
+      await userSettings.updateConfigurationAsync(Constants.userSettings.ozVersionUserSettingsKey, version);
     }
   }
 
   export async function getLatestOpenZeppelinVersionAsync(): Promise<string> {
-    const { defaultValue } = await userSettings.getConfigurationAsync(Constants.ozVersionUserSettingsKey);
+    const { defaultValue } = await userSettings.getConfigurationAsync(Constants.userSettings.ozVersionUserSettingsKey);
     return defaultValue;
   }
 

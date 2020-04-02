@@ -8,3 +8,4 @@ export * from './EventGridResourceExplorer';
 export * from './InfuraResourceExplorer';
 export * from './LocalResourceExplorer';
 export * from './InfuraResourceExplorer';
+export * from './StorageAccountResourceExplorer';

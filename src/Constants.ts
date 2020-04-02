@@ -58,6 +58,7 @@ export class Constants {
   public static defaultTruffleBox = 'Azure-Samples/Blockchain-Ethereum-Template';
   public static defaultDebounceTimeout = 300;
   public static defaultInputNameInBdm = 'transaction-node';
+  public static containerAzureBlockchainExtension = 'container-azureblockchainextension';
 
   public static infuraHost = 'infura.io';
   public static localhost = '127.0.0.1';
@@ -130,6 +131,7 @@ export class Constants {
   };
 
   public static globalStateKeys = {
+    azureBlockchainExtensionVersion: 'azureBlockchainExtensionVersion',
     infuraCredentialsCacheKey: 'InfuraCache',
     infuraExcludedProjectsListKey: 'InfuraExcludedProjects',
     mnemonicStorageKey: 'mnemonicStorage',
@@ -142,17 +144,18 @@ export class Constants {
   };
 
   public static webViewPages = {
+    changelog: {
+      changelogPath: '',
+      path: '',
+      showOnStartup: 'showOnStartupChangelog',
+      title: 'Azure Blockchain Development Kit for Ethereum Changelog',
+      viewType: 'changelog',
+    },
     contractUI: {
       path: '',
       showOnStartup: 'showOnStartupContractUI',
       title: 'Smart Contract UI',
       viewType: 'contractUIPage',
-    },
-    generateToken: {
-      path: '',
-      showOnStartup: 'showOnStartupGenerateToken',
-      title: 'Generate Token',
-      viewType: 'generateTokenPage',
     },
     requirements: {
       path: '',
@@ -171,6 +174,7 @@ export class Constants {
   public static contractExtension = {
     json: '.json',
     sol: '.sol',
+    txt: '.txt',
   };
 
   public static networkProtocols = {
@@ -206,6 +210,7 @@ export class Constants {
   };
 
   public static paletteLabels = {
+    enterApplicationName: 'Enter application name',
     enterBlockchainDataManagerName: 'Enter blockchain data manager name',
     enterConnectionName: 'Enter connection name',
     enterConsortiumManagementPassword: 'Enter consortium management password',
@@ -289,7 +294,7 @@ export class Constants {
         iconPath: { dark: '', light: '' },
       },
       bdm: {
-        contextValue: 'project',
+        contextValue: 'bdmproject',
         iconPath: { dark: '', light: '' },
       },
       default: {
@@ -386,6 +391,7 @@ export class Constants {
     arrayElementsShouldBeValid: (elementsType: string) => {
       return `Array elements should have valid value of type ${elementsType}`;
     },
+    bdmApplicationNameExist: 'Blockchain Data Manager Application name already exists.',
     bdmNameAlreadyExists: 'Blockchain Data Manager name already exists.',
     eventGridAlreadyExists: 'Event Grid name already exists.',
     forbiddenChars: {
@@ -401,6 +407,8 @@ export class Constants {
     invalidAzureName: 'Invalid name. Name can contain only lowercase letters and numbers. ' +
       `The first character must be a letter. Length must be between ${Constants.lengthParam.azureBlockchainResourceName.min} ` +
       `and ${Constants.lengthParam.azureBlockchainResourceName.max} characters.`,
+    invalidBDMApplicationName: 'The Blockchain Data Manager Application name is invalid. Name can contain only lowercase letters and numbers. Length must ' +
+      `be between ${Constants.lengthParam.bdmName.min} and ${Constants.lengthParam.bdmName.max} characters.`,
     invalidBlockchainDataManagerName:
       'The Blockchain Data Manager name is invalid. Name can contain only lowercase letters and numbers. Length must ' +
       `be between ${Constants.lengthParam.bdmName.min} and ${Constants.lengthParam.bdmName.max} characters.`,
@@ -452,6 +460,7 @@ export class Constants {
     resourceGroupName: 'Resource Group Name',
     selectBlockchainDataManagerInstance: 'Select Blockchain Data Manager instance',
     selectConsortium: 'Select consortium',
+    selectContract: 'Select contract',
     selectDeployDestination: 'Select deploy destination',
     selectDestination: 'Select destination',
     selectEventGrid: 'Select event grid',
@@ -461,6 +470,7 @@ export class Constants {
     selectMember: 'Select member',
     selectMnemonicExtractKey: 'Select mnemonic to extract key',
     selectMnemonicStorage: 'Select mnemonic storage',
+    selectNetwork: 'Select network',
     selectNewProjectPath: 'Select new project path',
     selectProjects: 'Select Projects',
     selectResourceGroup: 'Select a resource group',
@@ -512,10 +522,15 @@ export class Constants {
   public static statusBarMessages = {
     buildingContracts: 'Building contracts',
     checkingRequirementDependencies: 'Checking requirement dependencies version',
+    createBDMApplication: 'Creating BDM app',
+    createBlobs: 'Creating blobs',
+    createContainer: 'Creating container',
+    createStorageAccount: 'Creating storage account',
     creatingBlockchainDataManager: 'Creating new Blockchain Data Manager',
     creatingConsortium: 'Creating new consortium',
     creatingEventGrid: 'Creating new event grid',
     creatingProject: 'Creating new project',
+    deleteBlobs: 'Deleting blobs',
     deployingContracts: (destination: string) => {
       return `Deploying contracts to '${destination}'`;
     },
@@ -560,17 +575,20 @@ export class Constants {
     BuildContractsDirDoesNotExist: Constants.getMessageContractsBuildDirectoryDoesNotExist,
     BuildContractsDirIsEmpty: Constants.getMessageContractsBuildDirectoryIsEmpty,
     CompiledContractIsMissing: 'Compiled contract is missing for solidity file.',
+    ContractNotDeployed: 'Contracts are not deployed. Please deploy first.',
     DirectoryIsNotEmpty: 'Directory is not empty. Open another one?',
     ErrorWhileExecutingCommand: 'Error while executing command: ',
     FetchingDeployedBytecodeIsFailed: 'An error occurred while fetching bytecode from network',
     GetMessageChildAlreadyConnected: Constants.getMessageChildAlreadyConnected,
     GitIsNotInstalled: 'Git is not installed',
+    IncorrectInputUrl: 'Incorrect input url',
     InfuraUnauthorized: 'Unauthorized: please sign in with Infura account.',
     InvalidContract: 'This file is not a valid contract.',
     InvalidMnemonic: 'Invalid mnemonic',
     LoadServiceTreeFailed: 'Load service tree has failed.',
     MnemonicFileHaveNoText: 'Mnemonic file have no text',
     NetworkAlreadyExist: Constants.getMessageNetworkAlreadyExist,
+    NetworkIsNotAvailable: 'The network the contract is deployed to is not available. Please deploy again.',
     NetworkNotFound: Constants.getMessageNetworkNotFound,
     NewProjectCreationFailed: 'Command createProject has failed.',
     NoContractBody: 'No contract body in AST',
@@ -579,6 +597,8 @@ export class Constants {
       'at the bottom left corner and choose Select All',
     PleaseRenameOldStyleTruffleConfig: 'Please rename file "truffle.js" to "truffle-config.js"',
     RequiredAppsAreNotInstalled: 'To run command you should install required apps',
+    SolidityContractsNotFound: 'Solidity contracts were not found',
+    SubscriptionNotFound: 'Can not find available subscription.',
     ThereAreNoMnemonics: 'There are no mnemonics',
     TruffleConfigHasIncorrectFormat: '"truffle-config.js" has incorrect format',
     TruffleConfigIsNotExist: 'Truffle configuration file not found',
@@ -589,7 +609,13 @@ export class Constants {
   };
 
   public static informationMessage = {
+    bdm: {
+      bdmApplicationNotReady: 'Creations of BDM application and dependent resources were started. You can view the status in the status bar below. ' +
+        'Please do not close vscode until it is ready. Once ready it will be added to the tree.',
+      contractMustBeDeployedForBDMApplication: 'The contract must be compiled and deployed before a BDM application can be created.',
+    },
     cancelButton: 'Cancel',
+    compileAndDeployButton: 'Compile and deploy',
     consortiumDoesNotHaveMemberWithUrl: 'Consortium does not have member with url',
     consortiumNameValidating: 'Consortium name validating...',
     contractNotDeployed: 'Contract not deployed yet.',
@@ -665,10 +691,13 @@ export class Constants {
     preview20180601: '2018-06-01-preview',
     preview20190601: '2019-06-01-preview',
     preview20200101: '2020-01-01-preview',
+    20190601: '2019-06-01',
   };
 
   public static provisioningState = {
+    creating: 'Creating',
     failed: 'Failed',
+    resolvingDns: 'ResolvingDns',
     stopped: 'Stopped',
     succeeded: 'Succeeded',
     updating: 'Updating',
@@ -679,6 +708,7 @@ export class Constants {
   public static azureProviders = {
     blockchain: 'Microsoft.Blockchain',
     eventGrid: 'Microsoft.EventGrid',
+    storage: 'Microsoft.Storage',
   };
 
   public static azureResourceExplorer = {
@@ -689,6 +719,7 @@ export class Constants {
     requestAcceptLanguage: 'en-US',
     requestBaseUri: 'https://management.azure.com',
     resourceType: 'blockchainMembers',
+    xMsBlockBlobType: 'BlockBlob',
   };
 
   public static solidityTypes = {
@@ -701,7 +732,16 @@ export class Constants {
 
   public static firstOZVersion = '2.3.0';
   public static allOpenZeppelinVersions = ['2.3.0', '2.4.0'];
-  public static ozVersionUserSettingsKey = 'azureBlockchainService.openZeppelin.version';
+
+  public static userSettings = {
+    ozVersionUserSettingsKey: 'azureBlockchainService.openZeppelin.version',
+    storageAccountUserSettingsKey: 'azureBlockchainService.storageAccount.name',
+  };
+
+  public static bdmApplicationRequestParameters = {
+    artifactType: 'EthereumSmartContract',
+    queryTargetTypes: ['ContractProperties', 'ContractEvents'],
+  };
 
   public static openZeppelin = {
     cancelButtonTitle: 'Cancel',
@@ -766,8 +806,9 @@ export class Constants {
     this.webViewPages.contractUI.path = context.asAbsolutePath(path.join('resources', 'drizzle', 'index.html'));
     this.webViewPages.welcome.path = context.asAbsolutePath(path.join('resources', 'welcome', 'index.html'));
     this.webViewPages.requirements.path = context.asAbsolutePath(path.join('resources', 'welcome', 'prereqs.html'));
-    this.webViewPages.generateToken.path = context.asAbsolutePath(
-      path.join('resources', 'tokenui', 'generateToken.html'));
+    this.webViewPages.changelog.path = context.asAbsolutePath(
+      path.join('resources', 'welcome', 'changelog.html'));
+    this.webViewPages.changelog.changelogPath = context.asAbsolutePath(path.join('CHANGELOG.md'));
     this.infuraFileResponse.path = context.asAbsolutePath(path.join('resources', 'codeFlowResult', 'index.html'));
     this.infuraFileResponse.css = context.asAbsolutePath(path.join('resources', 'codeFlowResult', 'main.css'));
 

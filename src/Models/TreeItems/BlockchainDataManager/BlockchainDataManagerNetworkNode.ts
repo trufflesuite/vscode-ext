@@ -11,12 +11,14 @@ const { application, input, output } = Constants.treeItemData.network.bdm;
 export class BlockchainDataManagerNetworkNode extends NetworkNode {
   public readonly subscriptionId: string;
   public readonly resourceGroup: string;
+  public readonly fileUrls: string[];
 
   constructor(
     label: string,
     networkId: number | string,
     subscriptionId: string,
     resourceGroup: string,
+    fileUrls: string[],
     itemType: ItemType.BLOCKCHAIN_DATA_MANAGER_APPLICATION |
       ItemType.BLOCKCHAIN_DATA_MANAGER_INPUT |
       ItemType.BLOCKCHAIN_DATA_MANAGER_OUTPUT,
@@ -36,6 +38,7 @@ export class BlockchainDataManagerNetworkNode extends NetworkNode {
 
     this.subscriptionId = subscriptionId;
     this.resourceGroup = resourceGroup;
+    this.fileUrls = fileUrls;
   }
 
   public toJSON(): { [key: string]: any } {
@@ -43,6 +46,7 @@ export class BlockchainDataManagerNetworkNode extends NetworkNode {
 
     obj.subscriptionId = this.subscriptionId;
     obj.resourceGroup = this.resourceGroup;
+    obj.fileUrls = this.fileUrls;
 
     return obj;
   }

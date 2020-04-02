@@ -74,6 +74,17 @@ export class AzureResourceExplorer {
     return true;
   }
 
+  public async getSubscriptionItem(subscriptionId: string): Promise<SubscriptionItem> {
+    const subscriptions = await this.getSubscriptionItems();
+    const subscription = subscriptions.find((sub) => sub.subscriptionId === subscriptionId);
+
+    if (!subscription) {
+      throw new Error(Constants.errorMessageStrings.SubscriptionNotFound);
+    }
+
+    return subscription;
+  }
+
   private async getSubscriptionItems(): Promise<SubscriptionItem[]> {
     await this._accountApi.waitForFilters();
 

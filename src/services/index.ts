@@ -16,3 +16,4 @@ export * from './openZeppelin/OpenZeppelinService';
 export * from './openZeppelin/OpenZeppelinMigrationsService';
 export * from './infuraService/InfuraServiceClient';
 export * from './openZeppelin/OpenZeppelinProjectJsonService';
+export * from './storageAccountService/BlobServiceClient';

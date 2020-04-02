@@ -41,7 +41,7 @@ class ExtensionContractDB {
 
   public async getContractInstances(contractName: string): Promise<ContractInstance[]> {
     if (this.adapter) {
-      return this.adapter.getContractInstances(contractName);
+      return [...(await this.adapter.getContractInstances(contractName))]; // get a copy of original array
     }
 
     return [];

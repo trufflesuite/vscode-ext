@@ -1,13 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
+import * as fs from 'fs-extra';
 import * as open from 'open';
+import * as path from 'path';
 import { ProgressLocation, QuickPickItem, window } from 'vscode';
 import {
   BlockchainDataManagerResource,
+  IAzureBlockchainDataManagerApplicationDto,
   IAzureBlockchainDataManagerDto,
   IAzureBlockchainDataManagerInputDto,
   IAzureBlockchainDataManagerOutputDto,
+  ICreateBlockchainDataManagerApplicationDto,
   ICreateBlockchainDataManagerDto,
   ICreateBlockchainDataManagerInputDto,
   ICreateBlockchainDataManagerOutputDto,
@@ -16,6 +20,7 @@ import {
 } from '../ARMBlockchain';
 import { AzureBlockchainServiceClient } from '../ARMBlockchain/AzureBlockchainServiceClient';
 import { EventGridManagementClient } from '../ARMBlockchain/EventGridManagementClient';
+import { TruffleCommands } from '../commands/TruffleCommands';
 import { Constants, NotificationOptions } from '../Constants';
 import {
   showInputBox,
@@ -38,11 +43,13 @@ import {
   BlockchainDataManagerNetworkNode,
   BlockchainDataManagerProject,
 } from '../Models/TreeItems';
+import { ContractDB, ContractInstanceWithMetadata, ContractService, TreeManager } from '../services';
 import { Telemetry } from '../TelemetryClient';
 import { AzureBlockchainServiceValidator } from '../validators/AzureBlockchainServiceValidator';
 import { AzureResourceExplorer } from './AzureResourceExplorer';
 import { ConsortiumResourceExplorer } from './ConsortiumResourceExplorer';
 import { EventGridResourceExplorer } from './EventGridResourceExplorer';
+import { StorageAccountResourceExplorer } from './StorageAccountResourceExplorer';
 
 export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer {
   public async selectProject(
@@ -118,6 +125,180 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
       selectedEventGrid.url);
   }
 
+  public async deleteBDMApplication(
+    bdmLabel: string,
+    application: BlockchainDataManagerNetworkNode,
+    storageAccountResourceExplorer: StorageAccountResourceExplorer,
+  ): Promise<void> {
+    const { label, subscriptionId, resourceGroup, fileUrls } = application;
+
+    const subscriptionItem = await this.getSubscriptionItem(subscriptionId);
+    const azureClient = await this.getAzureClient(subscriptionItem, new ResourceGroupItem(resourceGroup));
+
+    await azureClient.bdmResource.deleteBlockchainDataManagerApplication(bdmLabel, label);
+
+    await TreeManager.removeItem(application);
+
+    const localFilePaths = await ContractService.getBuildFolderPath();
+    await storageAccountResourceExplorer.deleteBlobs(fileUrls, subscriptionId, resourceGroup, localFilePaths);
+  }
+
+  public async createNewBDMApplication(
+    selectedBDM: BlockchainDataManagerProject,
+    storageAccountResourceExplorer: StorageAccountResourceExplorer,
+  ): Promise<void> {
+    const solidityContractsFolderPath = await ContractService.getSolidityContractsFolderPath();
+    const contracts = this.getFiles(solidityContractsFolderPath, Constants.contractExtension.sol);
+
+    if (!contracts || !contracts.length) {
+      throw new Error(Constants.errorMessageStrings.SolidityContractsNotFound);
+    }
+
+    const contract = await showQuickPick(
+      contracts.map((c) => ({ label: path.parse(c).name })) as QuickPickItem[],
+      { ignoreFocusOut: true, placeHolder: Constants.placeholders.selectContract });
+
+    const contractInstances = await ContractDB.getContractInstances(contract.label);
+
+    if (!contractInstances.length) {
+      await this.compiledAndDeployContracts();
+    }
+
+    const instance = contractInstances[contractInstances.length - 1] as ContractInstanceWithMetadata;
+
+    if (!instance.provider || !instance.address) {
+      throw new Error(Constants.errorMessageStrings.NetworkIsNotAvailable);
+    }
+
+    const abi = JSON.stringify(instance.contract.abi);
+
+    const [byteCode, applicationName] = await Promise.all([
+      ContractService.getDeployedBytecodeByAddress(instance.provider.host, instance!.address),
+      this.getBDMApplicationName(selectedBDM, contract.label),
+    ]);
+
+    window.showInformationMessage(Constants.informationMessage.bdm.bdmApplicationNotReady);
+
+    const [abiUrl, bytecodeUrl] =
+      await this.getBlobUrls(applicationName, storageAccountResourceExplorer, selectedBDM, [abi, byteCode]);
+
+    return this.createBDMApplication(applicationName, selectedBDM, bytecodeUrl, abiUrl);
+  }
+
+  private getFiles(dir: string, filetype: string): string[] {
+    const files: string[] = [];
+    const directoryFiles = fs.readdirSync(dir);
+
+    directoryFiles.map((file) => {
+      const name = path.join(dir, file);
+
+      if (fs.statSync(name).isDirectory()) {
+        files.push(...this.getFiles(name, filetype));
+      } else if (!filetype || path.extname(file) === filetype) {
+        files.push(file);
+      }
+    });
+
+    return files;
+  }
+
+  private async getBlobUrls(
+    applicationName: string,
+    storageAccountResourceExplorer: StorageAccountResourceExplorer,
+    bdm: BlockchainDataManagerProject,
+    content: string[],
+  ): Promise<string[]> {
+    const abiFileName = `${bdm.label}_${applicationName}_abi${Constants.contractExtension.json}`;
+    const bytecodeFileName = `${bdm.label}_${applicationName}_bytecode${Constants.contractExtension.txt}`;
+    const localFilePaths = await ContractService.getBuildFolderPath();
+
+    return storageAccountResourceExplorer.getFileBlobUrls(
+      content,
+      [abiFileName, bytecodeFileName],
+      localFilePaths,
+      bdm.subscriptionId,
+      bdm.resourceGroup);
+  }
+
+  private async createBDMApplication(
+    applicationName: string,
+    selectedBDM: BlockchainDataManagerProject,
+    bytecodeUrl: string,
+    abiUrl: string,
+  ): Promise<void> {
+    await window.withProgress(
+      { location: ProgressLocation.Window, title: Constants.statusBarMessages.createBDMApplication},
+      async () => {
+      const application =
+        await this.createBlockchainDataManagerApplication(applicationName, selectedBDM, bytecodeUrl, abiUrl);
+
+      selectedBDM.addChild(new BlockchainDataManagerNetworkNode(
+        application.name,
+        '*',
+        selectedBDM.subscriptionId,
+        selectedBDM.resourceGroup,
+        [bytecodeUrl, abiUrl],
+        ItemType.BLOCKCHAIN_DATA_MANAGER_APPLICATION,
+        `${Constants.azureResourceExplorer.portalBasUri}${application.id}`,
+      ));
+    });
+  }
+
+  private async compiledAndDeployContracts(): Promise<void> {
+    const answer = await window.showErrorMessage(
+      Constants.informationMessage.bdm.contractMustBeDeployedForBDMApplication,
+      Constants.informationMessage.compileAndDeployButton,
+      Constants.informationMessage.cancelButton,
+    );
+
+    if (answer === Constants.informationMessage.compileAndDeployButton) {
+      await TruffleCommands.deployContracts();
+    }
+
+    throw new CancellationEvent();
+  }
+
+  private async createBlockchainDataManagerApplication(
+    applicationName: string,
+    bdm: BlockchainDataManagerProject,
+    bytecodeUrl: string,
+    abiUrl: string,
+  ): Promise<IAzureBlockchainDataManagerApplicationDto> {
+    const subscriptionItem = await this.getSubscriptionItem(bdm.subscriptionId);
+    const azureClient = await this.getAzureClient(subscriptionItem, new ResourceGroupItem(bdm.resourceGroup));
+
+    const body: ICreateBlockchainDataManagerApplicationDto = {
+      properties: {
+        artifactType: Constants.bdmApplicationRequestParameters.artifactType,
+        content: {
+          abiFileUrl: abiUrl,
+          bytecodeFileUrl: bytecodeUrl,
+          queryTargetTypes: Constants.bdmApplicationRequestParameters.queryTargetTypes,
+        },
+      },
+    };
+
+    return azureClient.bdmResource.createBlockchainDataManagerApplication(bdm.label, applicationName, body);
+  }
+
+  private async getBDMApplicationName(bdm: BlockchainDataManagerProject, contractName: string)
+  : Promise<string> {
+    const subscriptionItem = await this.getSubscriptionItem(bdm.subscriptionId);
+    const azureClient = await this.getAzureClient(subscriptionItem, new ResourceGroupItem(bdm.resourceGroup));
+
+    const applicationList = await azureClient.bdmResource.getBlockchainDataManagerApplicationList(bdm.label);
+    const existingNames = applicationList.map((application) => application.name);
+
+    return showInputBox({
+      ignoreFocusOut: true,
+      prompt: Constants.paletteLabels.enterApplicationName,
+      validateInput: async (name) => {
+        return AzureBlockchainServiceValidator.validateBDMApplicationName(name, existingNames);
+      },
+      value: contractName.toLowerCase(),
+    });
+  }
+
   private async getBlockchainDataManagerInstanceItems(
     azureClient: AzureBlockchainServiceClient,
     excludedItems: string[] = [])
@@ -177,6 +358,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     const bdmApplicationList = await azureClient.bdmResource.getBlockchainDataManagerApplicationList(bdmName);
 
     return bdmApplicationList.map((application) => {
+      const { abiFileUrl, bytecodeFileUrl } = application.properties.content;
       const indexRemovingRoute = application.id.lastIndexOf('/artifacts');
       const url = `${Constants.azureResourceExplorer.portalBasUri}/resource${application.id.slice(0, indexRemovingRoute)}/blockchainapplications`;
 
@@ -185,6 +367,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
         '*',
         subscriptionId,
         resourceGroup,
+        [abiFileUrl, bytecodeFileUrl],
         ItemType.BLOCKCHAIN_DATA_MANAGER_APPLICATION,
         url);
       });
@@ -201,6 +384,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
         '*',
         subscriptionId,
         resourceGroup,
+        [],
         ItemType.BLOCKCHAIN_DATA_MANAGER_INPUT,
         this.getTransactionNodeExternalUrl(input.properties.dataSource.resourceId));
     });
@@ -228,6 +412,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
           '*',
           subscriptionId,
           resourceGroup,
+          [],
           ItemType.BLOCKCHAIN_DATA_MANAGER_OUTPUT,
           url);
     });
