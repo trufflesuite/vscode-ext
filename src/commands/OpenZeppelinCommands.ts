@@ -12,7 +12,7 @@ import { Telemetry } from '../TelemetryClient';
 
 export namespace OpenZeppelinCommands {
   export async function addCategory(): Promise<void> {
-    Telemetry.sendEvent('OpenZeppelinCommands.addCategory');
+    Telemetry.sendEvent('OpenZeppelinCommands.addCategory.commandStarted');
 
     const currentOZVersion = await openZeppelinHelper.tryGetCurrentOpenZeppelinVersionAsync();
     const manifest = await openZeppelinHelper.createManifestAsync(currentOZVersion);
@@ -47,6 +47,8 @@ export namespace OpenZeppelinCommands {
     await openZeppelinHelper.defineContractRequiredParameters();
 
     await OpenZeppelinMigrationsService.generateMigrations(await OpenZeppelinService.getAllDownloadedAssetsAsync());
+
+    Telemetry.sendEvent('OpenZeppelinCommands.addCategory.commandFinished');
   }
 }
 

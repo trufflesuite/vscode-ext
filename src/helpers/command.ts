@@ -205,3 +205,37 @@ export function tryExecuteCommandInForkAsync(
 
   return { childProcess, result };
 }
+
+export async function awaiter<T>(
+  action: () => Promise<any>,
+  stateRequest: () => Promise<T>,
+  isRequestProcessing: (entity: T) => boolean,
+  callback: (entity: T) => Promise<any>,
+  interval: number,
+): Promise<any> {
+  let entity: T | null = null;
+  await action();
+
+  do {
+    if (entity) {
+      await new Promise((resolve) => setTimeout(resolve, interval));
+    }
+
+    let retry = 3;
+
+    while (true) {
+      try {
+        entity = await stateRequest();
+        break;
+      } catch (error) {
+        if (retry < 0) {
+          throw error;
+        }
+        retry--;
+      }
+    }
+
+  } while (isRequestProcessing(entity));
+
+  await callback(entity);
+}

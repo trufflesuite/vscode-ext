@@ -114,6 +114,19 @@ export class AzureBlockchainServiceClient extends BaseClient {
     return this.sendRequestToAzure(httpRequest, callback);
   }
 
+  public createBlockchainDataManagerApplication(
+    bdmName: string,
+    applicationName: string,
+    body: string,
+    callback: (error: Error | null, result?: any) => void)
+  : Promise<void> {
+    const url = this.getUrl(`watchers/${bdmName}/artifacts/${applicationName}`, preview20190601, true, false);
+
+    const httpRequest = this.getHttpRequest(url, 'PUT', body);
+
+    return this.sendRequestToAzure(httpRequest, callback);
+  }
+
   public removeBlockchainDataManager(bdmName: string, callback: (error: Error | null, result?: any) => void)
   : Promise<void> {
     const url = this.getUrl(`watchers/${bdmName}`, preview20190601, true, false);
@@ -132,10 +145,34 @@ export class AzureBlockchainServiceClient extends BaseClient {
 
   public getBlockchainDataManagerApplications(bdmName: string, callback: (error: Error | null, result?: any) => void)
   : Promise<void> {
-    const url =
-      this.getUrl(`watchers/${bdmName}/artifacts`, preview20190601, true, false);
+    const url = this.getUrl(`watchers/${bdmName}/artifacts`, preview20190601, true, false);
 
     const httpRequest = this.getHttpRequest(url, 'GET');
+
+    return this.sendRequestToAzure(httpRequest, callback);
+  }
+
+  public getBlockchainDataManagerApplication(
+    bdmName: string,
+    applicationName: string,
+    callback: (error: Error | null, result?: any) => void)
+  : Promise<void> {
+    const url = this.getUrl(`watchers/${bdmName}/artifacts/${applicationName}`, preview20190601, true, false);
+
+    const httpRequest = this.getHttpRequest(url, 'GET');
+
+    return this.sendRequestToAzure(httpRequest, callback);
+  }
+
+  public deleteBlockchainDataManagerApplication(
+    bdmName: string,
+    applicationName: string,
+    callback: (error: Error | null, result?: any) => void)
+  : Promise<void> {
+    const url =
+      this.getUrl(`watchers/${bdmName}/artifacts/${applicationName}`, preview20190601, true, false);
+
+    const httpRequest = this.getHttpRequest(url, 'DELETE');
     return this.sendRequestToAzure(httpRequest, callback);
   }
 

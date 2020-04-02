@@ -17,7 +17,7 @@ import { Constants } from './Constants';
 import { CommandContext, isWorkspaceOpen, openZeppelinHelper, required, setCommandContext } from './helpers';
 import { CancellationEvent } from './Models';
 import { Output } from './Output';
-import { RequirementsPage, WelcomePage } from './pages';
+import { ChangelogPage, RequirementsPage, WelcomePage } from './pages';
 import {
   AdapterType,
   ContractDB,
@@ -50,8 +50,10 @@ export async function activate(context: ExtensionContext) {
 
   const welcomePage = new WelcomePage(context);
   const requirementsPage = new RequirementsPage(context);
+  const changelogPage = new ChangelogPage(context);
 
   await welcomePage.checkAndShow();
+  await changelogPage.checkAndShow();
 
   //#region azureBlockchain extension commands
   const refresh = commands.registerCommand('azureBlockchainService.refresh', (element) => {
@@ -100,7 +102,7 @@ export async function activate(context: ExtensionContext) {
   const copyRPCEndpointAddress = commands.registerCommand('azureBlockchainService.copyRPCEndpointAddress',
     async (viewItem: NetworkNodeView) => {
       await tryExecute(() => TruffleCommands.writeRPCEndpointAddressToBuffer(viewItem));
-    });
+  });
   const getPrivateKeyFromMnemonic = commands.registerCommand('azureBlockchainService.getPrivateKey', async () => {
     await tryExecute(() => TruffleCommands.getPrivateKeyFromMnemonic());
   });
@@ -141,11 +143,12 @@ export async function activate(context: ExtensionContext) {
     async (contractPath: Uri) => {
       await tryExecute(() => ContractCommands.showSmartContractPage(context, contractPath));
     });
-  const generateToken = commands.registerCommand(
-    'azureBlockchainService.generateToken',
-    async () => {
-      await tryExecute(() => ContractCommands.generateToken(context));
-    });
+  const createNewBDMApplication = commands.registerCommand('azureBlockchainService.createNewBDMApplication',
+    async (viewItem: ProjectView) => {
+      await tryExecute(() => ServiceCommands.createNewBDMApplication(viewItem));
+  });
+  const deleteBDMApplication = commands.registerCommand('azureBlockchainService.deleteBDMApplication',
+    async (viewItem: NetworkNodeView) => await tryExecute(() =>  ServiceCommands.deleteBDMApplication(viewItem)));
   //#endregion
 
   //#region open zeppelin commands
@@ -187,13 +190,14 @@ export async function activate(context: ExtensionContext) {
     showWelcomePage,
     showRequirementsPage,
     showSmartContractPage,
-    generateToken,
     refresh,
     newSolidityProject,
     buildContracts,
     deployContracts,
+    createNewBDMApplication,
     createProject,
     connectProject,
+    deleteBDMApplication,
     disconnectProject,
     copyByteCode,
     copyDeployedByteCode,

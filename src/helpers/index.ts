@@ -8,6 +8,7 @@ import * as gitHelper from './git';
 import * as openZeppelinHelper from './openZeppelinHelper';
 import { required } from './required';
 import * as shell from './shell';
+import * as telemetryHelper from './telemetry';
 import { TruffleConfiguration } from './truffleConfig';
 import * as userSettings from './userSettings';
 import * as vscodeEnvironment from './vscodeEnvironment';
@@ -35,6 +36,7 @@ export {
   setCommandContext,
   shell,
   spawnProcess,
+  telemetryHelper,
   TruffleConfig,
   TruffleConfiguration,
   userSettings,

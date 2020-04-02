@@ -11,6 +11,7 @@ export class BlockchainDataManagerNetworkNodeItemCreator extends NetworkNodeItem
     requiredFields.push(...[
       { fieldName: 'subscriptionId', type: 'string' },
       { fieldName: 'resourceGroup', type: 'string' },
+      { fieldName: 'fileUrls', type: 'array' },
     ]);
 
     return requiredFields;
@@ -21,6 +22,7 @@ export class BlockchainDataManagerNetworkNodeItemCreator extends NetworkNodeItem
       ...super.getAdditionalConstructorArguments(obj),
       obj.subscriptionId,
       obj.resourceGroup,
+      obj.fileUrls,
       obj.itemType,
     ];
   }
@@ -31,10 +33,12 @@ export class BlockchainDataManagerNetworkNodeItemCreator extends NetworkNodeItem
     networkId: string,
     subscriptionId: string,
     resourceGroup: string,
+    fileUrls: string[],
     itemType: ItemType.BLOCKCHAIN_DATA_MANAGER_APPLICATION |
       ItemType.BLOCKCHAIN_DATA_MANAGER_INPUT |
       ItemType.BLOCKCHAIN_DATA_MANAGER_OUTPUT,
   ): BlockchainDataManagerNetworkNode {
-    return new BlockchainDataManagerNetworkNode(label, networkId, subscriptionId, resourceGroup, itemType, url);
+    return (
+      new BlockchainDataManagerNetworkNode(label, networkId, subscriptionId, resourceGroup, fileUrls, itemType, url));
   }
 }

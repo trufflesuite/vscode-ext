@@ -5,11 +5,12 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { Uri, window } from 'vscode';
 import { Constants } from '../Constants';
-import { getWorkspaceRoot, showIgnorableNotification, TruffleConfiguration } from '../helpers';
+import { getWorkspaceRoot, showIgnorableNotification } from '../helpers';
 import { showInputBox, showQuickPick } from '../helpers/userInteraction';
 import { ResourceGroupItem, SubscriptionItem } from '../Models/QuickPickItems';
 import { Output } from '../Output';
 import { AzureResourceExplorer } from '../resourceExplorers';
+import { ContractService } from '../services';
 import { Telemetry } from '../TelemetryClient';
 import { buildContract } from './AbiDeserialiser';
 import './Nethereum.Generators.DuoCode';
@@ -74,10 +75,8 @@ export class LogicAppGenerator {
   }
 
   private async getContractsPath(filePath?: Uri): Promise<string[]> {
-    const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
-    const truffleConfig = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
-    const configuration = await truffleConfig.getConfiguration();
-    const buildDir = path.join(getWorkspaceRoot()!, configuration.contracts_build_directory);
+    const buildDir = await ContractService.getBuildFolderPath();
+
     const files: string[] = [];
 
     if (!fs.pathExistsSync(buildDir)) {

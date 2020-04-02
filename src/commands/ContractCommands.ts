@@ -4,7 +4,6 @@
 import { commands, ExtensionContext, Uri, window } from 'vscode';
 import { Constants } from '../Constants';
 import { CancellationEvent } from '../Models';
-import { GenerateToken } from '../pages';
 import { ContractUI } from '../pages/ContractUI';
 import { ContractDB, ContractService } from '../services';
 import { Telemetry } from '../TelemetryClient';
@@ -47,14 +46,5 @@ export namespace ContractCommands {
 
     await contractPage.show();
     Telemetry.sendEvent('ContractCommands.showSmartContract.commandFinished');
-  }
-
-  export async function generateToken(context: ExtensionContext): Promise<void> {
-    Telemetry.sendEvent('ContractCommands.generateToken.commandStarted');
-
-    const contractPage = new GenerateToken(context);
-
-    await contractPage.show();
-    Telemetry.sendEvent('ContractCommands.generateToken.commandFinished');
   }
 }

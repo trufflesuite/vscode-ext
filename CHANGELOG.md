@@ -2,6 +2,23 @@
 
 All notable changes to the "azure blockchain" extension will be documented in this file.
 
+## 1.2.0
+
+### Enhancements
+
+- Add the ability to create new Blockchain Applications for Blockchain Data Manager
+- Remove token menu and UI from extension
+- Add changelog popup on extension upgrade
+
+### Fixes
+
+- Fix issue with broken code generation when using custom build directories
+- Fix issue with OpenZeppelin contracts not showing as valid contracts for Blockchain Data Manager applications
+
+### Internal Improvements
+
+- Updates to telemetry for ABS deployments
+
 ## 1.1.0
 
 ### Enhancements

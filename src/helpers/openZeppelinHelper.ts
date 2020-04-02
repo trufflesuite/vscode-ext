@@ -58,7 +58,7 @@ export async function upgradeOpenZeppelinUserSettingsAsync() {
   const latestVersion = await OpenZeppelinService.getLatestOpenZeppelinVersionAsync();
 
   Telemetry.sendEvent('OpenZeppelinService.updateOpenZeppelin.userSettings');
-  return userSettings.updateConfigurationAsync(Constants.ozVersionUserSettingsKey, latestVersion);
+  return userSettings.updateConfigurationAsync(Constants.userSettings.ozVersionUserSettingsKey, latestVersion);
 }
 
 export async function upgradeOpenZeppelinContractsAsync()

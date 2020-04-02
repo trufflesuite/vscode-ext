@@ -2,6 +2,8 @@
 // Licensed under the MIT license.
 
 import * as assert from 'assert';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 import * as sinon from 'sinon';
 import * as uuid from 'uuid';
 import * as vscode from 'vscode';
@@ -14,9 +16,11 @@ import {
   IAzureTransactionNodeDto,
   IEventGridDto,
 } from '../src/ARMBlockchain';
+import { TruffleCommands } from '../src/commands/TruffleCommands';
 import { Constants } from '../src/Constants';
 import * as helpers from '../src/helpers';
 import { CancellationEvent } from '../src/Models/CancellationEvent';
+import { ItemType } from '../src/Models/ItemType';
 import {
   BlockchainDataManagerInstanceItem,
   ConsortiumItem,
@@ -25,7 +29,10 @@ import {
   SubscriptionItem,
   TransactionNodeItem,
 } from '../src/Models/QuickPickItems';
-import { BlockchainDataManagerNetworkNode } from '../src/Models/TreeItems';
+import { BlockchainDataManagerNetworkNode, BlockchainDataManagerProject } from '../src/Models/TreeItems';
+import { StorageAccountResourceExplorer } from '../src/resourceExplorers/StorageAccountResourceExplorer';
+import { ContractDB, ContractInstanceWithMetadata, ContractService, TreeManager } from '../src/services';
+import { Contract } from '../src/services/contract/Contract';
 import { AzureAccountHelper } from './testHelpers/AzureAccountHelper';
 
 describe('Blockchain Data Manager Resource Explorer', () => {
@@ -111,6 +118,281 @@ describe('Blockchain Data Manager Resource Explorer', () => {
         true,
         'getBlockchainDataManagerInstance should not called');
       assert.strictEqual(createProjectStub.calledOnce, true, 'createProjectStub should called');
+    });
+
+    it('deleteBDMApplication should executed all methods for delete BDM application', async () => {
+      // Arrange
+      const azureExplorer = {
+        bdmResource: { deleteBlockchainDataManagerApplication: async () => Promise.resolve() }};
+
+      const deleteBlobsStub =
+        sinon.stub(StorageAccountResourceExplorer.prototype, 'deleteBlobs').returns(Promise.resolve());
+      const removeItemStub = sinon.stub(TreeManager, 'removeItem');
+      const deleteBlockchainDataManagerApplicationSpy = sinon.spy(azureExplorer.bdmResource, 'deleteBlockchainDataManagerApplication');
+      sinon.stub(ContractService, 'getBuildFolderPath');
+      sinon.stub(blockchainDataManagerResourceExplorer.prototype, 'getAzureClient')
+        .returns(Promise.resolve(azureExplorer));
+      sinon.stub(blockchainDataManagerResourceExplorer.prototype, 'getSubscriptionItem').returns(Promise.resolve());
+
+      const bdmLabel = uuid.v4();
+      const fileUrls = [uuid.v4(), uuid.v4()];
+      const subscriptionId = uuid.v4();
+      const resourceGroup = uuid.v4();
+      const application = new BlockchainDataManagerNetworkNode(
+        uuid.v4(),
+        uuid.v4(),
+        subscriptionId,
+        resourceGroup,
+        fileUrls,
+        ItemType.BLOCKCHAIN_DATA_MANAGER_APPLICATION,
+        uuid.v4());
+
+      // Act
+      await blockchainDataManagerResourceExplorer.prototype
+        .deleteBDMApplication(bdmLabel, application, new StorageAccountResourceExplorer());
+
+      // Assert
+      assert.strictEqual(deleteBlockchainDataManagerApplicationSpy.calledOnce, true, 'deleteBlockchainDataManagerApplication should be called');
+      assert.strictEqual(removeItemStub.calledOnce, true, 'removeItem should be called');
+      assert.strictEqual(deleteBlobsStub.calledOnce, true, 'deleteBlobs should be called');
+      assert.strictEqual(deleteBlobsStub.calledOnce, true, 'deleteBlobs should be called');
+    });
+
+    describe('createNewBDMApplication', () => {
+      let getSolidityContractsFolderPathStub: any;
+      let getDeployedBytecodeByAddressStub: sinon.SinonStub<[string, string], Promise<string>>;
+      let getBDMApplicationNameStub: sinon.SinonStub<any[], any>;
+      let getBlobUrlsStub: sinon.SinonStub<any[], any>;
+      let createBDMApplicationStub: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], unknown>;
+
+      beforeEach(() => {
+        sinon.stub(fs, 'statSync').returns({ isDirectory: () => false} as fs.Stats);
+        sinon.stub(vscode.window, 'showInformationMessage');
+        getSolidityContractsFolderPathStub = sinon.stub(ContractService, 'getSolidityContractsFolderPath')
+          .returns(Promise.resolve(''));
+        getDeployedBytecodeByAddressStub = sinon.stub(ContractService, 'getDeployedBytecodeByAddress')
+          .returns(Promise.resolve(uuid.v4()));
+        getBDMApplicationNameStub = sinon.stub(blockchainDataManagerResourceExplorer.prototype, 'getBDMApplicationName')
+          .returns(Promise.resolve(uuid.v4()));
+        getBlobUrlsStub = sinon.stub(blockchainDataManagerResourceExplorer.prototype, 'getBlobUrls')
+          .returns(Promise.resolve([uuid.v4(), uuid.v4()]));
+        createBDMApplicationStub = sinon.stub(blockchainDataManagerResourceExplorer.prototype, 'createBDMApplication');
+      });
+
+      afterEach(() => {
+        sinon.reset();
+      });
+
+      it('should executed all methods for delete BDM application', async () => {
+        // Arrange
+        const blockchainDataManagerProject = new BlockchainDataManagerProject(uuid.v4(), uuid.v4(), uuid.v4());
+        const contractDirectory = ['File1.sol', 'File2.txt', 'File3.sol'];
+
+        const testContractFilePath = path.join(__dirname, 'testData', 'enumTestContract.json');
+        const fileData = fs.readFileSync(testContractFilePath, 'utf-8');
+        const contract = new Contract(JSON.parse(fileData));
+        contract.networks.testNetworkKey = { address: uuid.v4() };
+        const instanceTest =
+          new ContractInstanceWithMetadata(contract, { id: 'testNetworkKey' }, { host: uuid.v4()});
+
+        const expectedSolFiles = 2;
+        let countSolFiles = 0;
+
+        sinon.stub(fs, 'readdirSync').returns(contractDirectory as any[]);
+        sinon.stub(helpers, 'showQuickPick').callsFake((...args: any[]) => {
+          countSolFiles = args.length;
+          return args[0];
+        });
+
+        sinon.stub(ContractDB, 'getContractInstances').returns(Promise.resolve([instanceTest]));
+
+        // Act
+        await blockchainDataManagerResourceExplorer.prototype
+          .createNewBDMApplication(blockchainDataManagerProject, new StorageAccountResourceExplorer());
+
+        // Assert
+        assert.strictEqual(getSolidityContractsFolderPathStub.calledOnce, true, 'getSolidityContractsFolderPath should be called');
+        assert.strictEqual(countSolFiles, expectedSolFiles, 'showQuickPick should show only solidity files');
+        assert.strictEqual(getDeployedBytecodeByAddressStub.calledOnce, true, 'getDeployedBytecodeByAddressStub should be called');
+        assert.strictEqual(getBDMApplicationNameStub.calledOnce, true, 'getBDMApplicationName should be called');
+        assert.strictEqual(getBlobUrlsStub.calledOnce, true, 'getBlobUrls should be called');
+        assert.strictEqual(createBDMApplicationStub.calledOnce, true, 'createBDMApplication should be called');
+      });
+
+      it('throws error when contract directory does not have solidity files', async () => {
+        // Arrange
+        const blockchainDataManagerProject = new BlockchainDataManagerProject(uuid.v4(), uuid.v4(), uuid.v4());
+        const contractDirectory = ['File1.txt', 'File2.txt', 'File3.txt'];
+
+        sinon.stub(fs, 'readdirSync').returns(contractDirectory as any[]);
+        sinon.stub(helpers, 'showQuickPick');
+        sinon.stub(ContractDB, 'getContractInstances');
+
+        try {
+          // Act
+          await blockchainDataManagerResourceExplorer.prototype
+            .createNewBDMApplication(blockchainDataManagerProject, new StorageAccountResourceExplorer());
+        } catch (error) {
+          // Assert
+          assert.strictEqual(error.message, Constants.errorMessageStrings.SolidityContractsNotFound, 'error should be specific');
+          assert.strictEqual(getSolidityContractsFolderPathStub.calledOnce, true, 'getSolidityContractsFolderPath should be called');
+          assert.strictEqual(getDeployedBytecodeByAddressStub.calledOnce, false, 'getDeployedBytecodeByAddressStub should not called');
+          assert.strictEqual(getBDMApplicationNameStub.calledOnce, false, 'getBDMApplicationName should not called');
+          assert.strictEqual(getBlobUrlsStub.calledOnce, false, 'getBlobUrls should not called');
+          assert.strictEqual(createBDMApplicationStub.calledOnce, false, 'createBDMApplication should not called');
+        }
+      });
+
+      it('throws error when contract does not have instance and not to deploy them', async () => {
+        // Arrange
+        const blockchainDataManagerProject = new BlockchainDataManagerProject(uuid.v4(), uuid.v4(), uuid.v4());
+        const contractDirectory = ['File1.sol', 'File2.txt', 'File3.sol'];
+
+        const expectedSolFiles = 2;
+        let countSolFiles = 0;
+
+        sinon.stub(fs, 'readdirSync').returns(contractDirectory as any[]);
+        sinon.stub(helpers, 'showQuickPick').callsFake((...args: any[]) => {
+          countSolFiles = args.length;
+          return args[0];
+        });
+
+        sinon.stub(ContractDB, 'getContractInstances').returns(Promise.resolve([]));
+        const deployContractsStub = sinon.stub(TruffleCommands, 'deployContracts');
+        sinon.stub(vscode.window, 'showErrorMessage').callsFake((...args: any[]) => {
+          return args[1];
+        });
+
+        try {
+          // Act
+          await blockchainDataManagerResourceExplorer.prototype
+            .createNewBDMApplication(blockchainDataManagerProject, new StorageAccountResourceExplorer());
+        } catch (error) {
+          // Assert
+          assert.strictEqual(error.name, CancellationEvent.name, 'error should be specific');
+          assert.strictEqual(countSolFiles, expectedSolFiles, 'showQuickPick should show only solidity files');
+          assert.strictEqual(getSolidityContractsFolderPathStub.calledOnce, true, 'getSolidityContractsFolderPath should be called');
+          assert.strictEqual(deployContractsStub.calledOnce, true, 'deployContractsStub should be called');
+          assert.strictEqual(getDeployedBytecodeByAddressStub.calledOnce, false, 'getDeployedBytecodeByAddressStub should not called');
+          assert.strictEqual(getBDMApplicationNameStub.calledOnce, false, 'getBDMApplicationName should not called');
+          assert.strictEqual(getBlobUrlsStub.calledOnce, false, 'getBlobUrls should not called');
+          assert.strictEqual(createBDMApplicationStub.calledOnce, false, 'createBDMApplication should not called');
+        }
+      });
+
+      it('throws error when contract does not have instance and deploy them', async () => {
+        // Arrange
+        const blockchainDataManagerProject = new BlockchainDataManagerProject(uuid.v4(), uuid.v4(), uuid.v4());
+        const contractDirectory = ['File1.sol', 'File2.txt', 'File3.sol'];
+
+        const expectedSolFiles = 2;
+        let countSolFiles = 0;
+
+        sinon.stub(fs, 'readdirSync').returns(contractDirectory as any[]);
+        sinon.stub(helpers, 'showQuickPick').callsFake((...args: any[]) => {
+          countSolFiles = args.length;
+          return args[0];
+        });
+
+        sinon.stub(ContractDB, 'getContractInstances').returns(Promise.resolve([]));
+        const deployContractsStub = sinon.stub(TruffleCommands, 'deployContracts');
+        sinon.stub(vscode.window, 'showErrorMessage').callsFake((...args: any[]) => {
+          return args[2];
+        });
+
+        try {
+          // Act
+          await blockchainDataManagerResourceExplorer.prototype
+            .createNewBDMApplication(blockchainDataManagerProject, new StorageAccountResourceExplorer());
+        } catch (error) {
+          // Assert
+          assert.strictEqual(error.name, CancellationEvent.name, 'error should be specific');
+          assert.strictEqual(countSolFiles, expectedSolFiles, 'showQuickPick should show only solidity files');
+          assert.strictEqual(getSolidityContractsFolderPathStub.calledOnce, true, 'getSolidityContractsFolderPath should be called');
+          assert.strictEqual(deployContractsStub.calledOnce, false, 'deployContractsStub should not called');
+          assert.strictEqual(getDeployedBytecodeByAddressStub.calledOnce, false, 'getDeployedBytecodeByAddressStub should not called');
+          assert.strictEqual(getBDMApplicationNameStub.calledOnce, false, 'getBDMApplicationName should not called');
+          assert.strictEqual(getBlobUrlsStub.calledOnce, false, 'getBlobUrls should not called');
+          assert.strictEqual(createBDMApplicationStub.calledOnce, false, 'createBDMApplication should not called');
+        }
+      });
+
+      it('throws error when contract instance does not have provider', async () => {
+        // Arrange
+        const blockchainDataManagerProject = new BlockchainDataManagerProject(uuid.v4(), uuid.v4(), uuid.v4());
+        const contractDirectory = ['File1.sol', 'File2.txt', 'File3.sol'];
+
+        const testContractFilePath = path.join(__dirname, 'testData', 'enumTestContract.json');
+        const fileData = fs.readFileSync(testContractFilePath, 'utf-8');
+        const contract = new Contract(JSON.parse(fileData));
+        contract.networks.testNetworkKey = { address: uuid.v4() };
+        const instanceTest =
+          new ContractInstanceWithMetadata(contract, { id: 'testNetworkKey' }, null);
+
+        const expectedSolFiles = 2;
+        let countSolFiles = 0;
+
+        sinon.stub(fs, 'readdirSync').returns(contractDirectory as any[]);
+        sinon.stub(helpers, 'showQuickPick').callsFake((...args: any[]) => {
+          countSolFiles = args.length;
+          return args[0];
+        });
+
+        sinon.stub(ContractDB, 'getContractInstances').returns(Promise.resolve([instanceTest]));
+
+        try {
+          // Act
+          await blockchainDataManagerResourceExplorer.prototype
+            .createNewBDMApplication(blockchainDataManagerProject, new StorageAccountResourceExplorer());
+        } catch (error) {
+          // Assert
+          assert.strictEqual(error.message, Constants.errorMessageStrings.NetworkIsNotAvailable, 'error should be specific');
+          assert.strictEqual(countSolFiles, expectedSolFiles, 'showQuickPick should show only solidity files');
+          assert.strictEqual(getSolidityContractsFolderPathStub.calledOnce, true, 'getSolidityContractsFolderPath should be called');
+          assert.strictEqual(getDeployedBytecodeByAddressStub.calledOnce, false, 'getDeployedBytecodeByAddressStub should not called');
+          assert.strictEqual(getBDMApplicationNameStub.calledOnce, false, 'getBDMApplicationName should not called');
+          assert.strictEqual(getBlobUrlsStub.calledOnce, false, 'getBlobUrls should not called');
+          assert.strictEqual(createBDMApplicationStub.calledOnce, false, 'createBDMApplication should not called');
+        }
+      });
+
+      it('throws error when contract instance does not have address', async () => {
+        // Arrange
+        const blockchainDataManagerProject = new BlockchainDataManagerProject(uuid.v4(), uuid.v4(), uuid.v4());
+        const contractDirectory = ['File1.sol', 'File2.txt', 'File3.sol'];
+
+        const testContractFilePath = path.join(__dirname, 'testData', 'enumTestContract.json');
+        const fileData = fs.readFileSync(testContractFilePath, 'utf-8');
+        const contract = new Contract(JSON.parse(fileData));
+        const instanceTest =
+          new ContractInstanceWithMetadata(contract, { id: 'testNetworkKey' }, { host: uuid.v4()});
+
+        const expectedSolFiles = 2;
+        let countSolFiles = 0;
+
+        sinon.stub(fs, 'readdirSync').returns(contractDirectory as any[]);
+        sinon.stub(helpers, 'showQuickPick').callsFake((...args: any[]) => {
+          countSolFiles = args.length;
+          return args[0];
+        });
+
+        sinon.stub(ContractDB, 'getContractInstances').returns(Promise.resolve([instanceTest]));
+
+        try {
+          // Act
+          await blockchainDataManagerResourceExplorer.prototype
+            .createNewBDMApplication(blockchainDataManagerProject, new StorageAccountResourceExplorer());
+        } catch (error) {
+          // Assert
+          assert.strictEqual(error.message, Constants.errorMessageStrings.NetworkIsNotAvailable, 'error should be specific');
+          assert.strictEqual(countSolFiles, expectedSolFiles, 'showQuickPick should show only solidity files');
+          assert.strictEqual(getSolidityContractsFolderPathStub.calledOnce, true, 'getSolidityContractsFolderPath should be called');
+          assert.strictEqual(getDeployedBytecodeByAddressStub.calledOnce, false, 'getDeployedBytecodeByAddressStub should not called');
+          assert.strictEqual(getBDMApplicationNameStub.calledOnce, false, 'getBDMApplicationName should not called');
+          assert.strictEqual(getBlobUrlsStub.calledOnce, false, 'getBlobUrls should not called');
+          assert.strictEqual(createBDMApplicationStub.calledOnce, false, 'createBDMApplication should not called');
+        }
+      });
     });
 
     describe('createProject', () => {
@@ -520,6 +802,7 @@ describe('Blockchain Data Manager Resource Explorer', () => {
           new TransactionNodeItem('transactionnode2', uuid.v4(), uuid.v4()),
         ];
       });
+
       describe('should return error when transaction node name does not correct', () => {
         const incorrectConnectionName = ['', 'a', 'aA', 'aaaaaaaaaaaaaaaaaaaa1', 'a_1', '1a'];
         incorrectConnectionName.forEach((name) => {
@@ -582,6 +865,7 @@ describe('Blockchain Data Manager Resource Explorer', () => {
           new EventGridItem('eventgrid2', uuid.v4()),
         ];
       });
+
       describe('should return error when event grid name does not correct', () => {
         const incorrectConnectionName = ['', 'aa', 'aA', 'aaaaaaaaaa1111111111aaaaaaaaaa1111111111aaaaaaaaaa1', 'a_1'];
         incorrectConnectionName.forEach((name) => {

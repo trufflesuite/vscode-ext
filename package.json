@@ -5,7 +5,7 @@
   "publisher": "AzBlockchain",
   "preview": false,
   "icon": "images/blockchain-service-logo.png",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum"
@@ -56,8 +56,9 @@
     "onCommand:openZeppelin.addCategory",
     "onCommand:azureBlockchainService.signInToInfuraAccount",
     "onCommand:azureBlockchainService.signOutOfInfuraAccount",
-    "onCommand:azureBlockchainService.generateToken",
     "onCommand:azureBlockchainService.openAtAzurePortal",
+    "onCommand:azureBlockchainService.createNewBDMApplication",
+    "onCommand:azureBlockchainService.deleteBDMApplication",
     "onDebug"
   ],
   "contributes": {
@@ -73,6 +74,10 @@
           "type": "string",
           "default": "2.4.0",
           "scope": "The latest Open Zeppelin version"
+        },
+        "azureBlockchainService.storageAccount.name": {
+          "type": "string",
+          "scope": "Storage Account name"
         }
       }
     },
@@ -202,13 +207,18 @@
         "category": "Azure Blockchain"
       },
       {
-        "command": "azureBlockchainService.generateToken",
-        "title": "Generate token",
+        "command": "azureBlockchainService.openAtAzurePortal",
+        "title": "Open at Azure Portal",
         "category": "Azure Blockchain"
       },
       {
-        "command": "azureBlockchainService.openAtAzurePortal",
-        "title": "Open at Azure Portal",
+        "command": "azureBlockchainService.createNewBDMApplication",
+        "title": "Create Blockchain Application",
+        "category": "Azure Blockchain"
+      },
+      {
+        "command": "azureBlockchainService.deleteBDMApplication",
+        "title": "Delete Blockchain Application",
         "category": "Azure Blockchain"
       }
     ],
@@ -256,10 +266,6 @@
         },
         {
           "when": "false",
-          "command": "azureBlockchainService.generateToken"
-        },
-        {
-          "when": "false",
           "command": "contract.copyByteCode"
         },
         {
@@ -285,6 +291,14 @@
         {
           "when": "false",
           "command": "azureBlockchainService.openAtAzurePortal"
+        },
+        {
+          "when": "false",
+          "command": "azureBlockchainService.deleteBDMApplication"
+        },
+        {
+          "when": "false",
+          "command": "azureBlockchainService.createNewBDMApplication"
         }
       ],
       "view/title": [
@@ -328,6 +342,11 @@
           "group": "azureBlockchain-0@0"
         },
         {
+          "command": "azureBlockchainService.disconnectProject",
+          "when": "view == AzureBlockchain && viewItem == bdmproject",
+          "group": "azureBlockchain-0@0"
+        },
+        {
           "command": "azureBlockchainService.copyRPCEndpointAddress",
           "when": "view == AzureBlockchain && viewItem == network",
           "group": "azureBlockchain-0@0"
@@ -345,6 +364,16 @@
         {
           "command": "azureBlockchainService.openAtAzurePortal",
           "when": "view == AzureBlockchain && viewItem == output",
+          "group": "azureBlockchain-0@0"
+        },
+        {
+          "command": "azureBlockchainService.createNewBDMApplication",
+          "when": "view == AzureBlockchain && viewItem == bdmproject",
+          "group": "azureBlockchain-1@1"
+        },
+        {
+          "command": "azureBlockchainService.deleteBDMApplication",
+          "when": "view == AzureBlockchain && viewItem == bdmApplication",
           "group": "azureBlockchain-0@0"
         }
       ],
@@ -407,11 +436,6 @@
         {
           "when": "resourceLangId == solidity",
           "command": "openZeppelin.addCategory",
-          "group": "8_buildContractGroup"
-        },
-        {
-          "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.generateToken",
           "group": "8_buildContractGroup"
         }
       ]
@@ -546,7 +570,7 @@
     "rewire": "^4.0.1",
     "sinon": "^7.3.2",
     "truffle": "^5.0.14",
-    "ts-loader": "^6.0.2",
+    "ts-loader": "6.2.1",
     "tslint": "^5.18.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "^3.3.1",

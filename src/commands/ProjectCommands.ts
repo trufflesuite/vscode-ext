@@ -79,16 +79,27 @@ async function chooseNewProjectDir(): Promise<string> {
 }
 
 async function createNewEmptyProject(projectPath: string): Promise<void> {
-  Telemetry.sendEvent('ProjectCommands.createNewEmptyProject.baseProject');
+  Telemetry.sendEvent('ProjectCommands.createNewEmptyProject.started');
 
-  return createProject(projectPath, Constants.defaultTruffleBox);
+  await createProject(projectPath, Constants.defaultTruffleBox);
+
+  Telemetry.sendEvent('ProjectCommands.createNewEmptyProject.finished');
 }
 
 async function createProjectFromTruffleBox(projectPath: string): Promise<void> {
-  Telemetry.sendEvent('ProjectCommands.createProjectFromTruffleBox.customProject');
   const truffleBoxName = await getTruffleBoxName();
 
-  return createProject(projectPath, truffleBoxName);
+  Telemetry.sendEvent(
+    'ProjectCommands.createProjectFromTruffleBox.started',
+    { truffleBoxName },
+  );
+
+  await createProject(projectPath, truffleBoxName);
+
+  Telemetry.sendEvent(
+    'ProjectCommands.createProjectFromTruffleBox.finished',
+    { truffleBoxName },
+  );
 }
 
 async function createProject(projectPath: string, truffleBoxName: string): Promise<void> {

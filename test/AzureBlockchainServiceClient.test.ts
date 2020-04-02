@@ -94,6 +94,15 @@ describe('Unit tests for AzureBlockchainServiceClient', () => {
         methodName: 'createBlockchainDataManagerOutput' },
       { callback: async () => await serviceClient.removeBlockchainDataManager(uuid.v4(), callbackFunctionSpy),
         methodName: 'removeBlockchainDataManager' },
+      { callback: async () => await serviceClient
+          .createBlockchainDataManagerApplication(uuid.v4(), uuid.v4(), uuid.v4(), callbackFunctionSpy),
+        methodName: 'createBlockchainDataManagerApplication' },
+      { callback: async () => await serviceClient
+          .getBlockchainDataManagerApplication(uuid.v4(), uuid.v4(), callbackFunctionSpy),
+        methodName: 'getBlockchainDataManagerApplication' },
+      { callback: async () => await serviceClient
+          .deleteBlockchainDataManagerApplication(uuid.v4(), uuid.v4(), callbackFunctionSpy),
+        methodName: 'deleteBlockchainDataManagerApplication' },
     ];
 
     listOfMethod.forEach((method) => {
@@ -165,7 +174,7 @@ describe('Unit tests for AzureBlockchainServiceClient', () => {
           // Act
           await method.callback();
 
-          // Assertv
+          // Assert
           assert.strictEqual(showErrorMessageMock.calledOnce, true, 'showErrorMessage should called once');
           assert.strictEqual(
             callbackFunctionSpy.calledOnceWithExactly(error),
@@ -186,7 +195,7 @@ describe('Unit tests for AzureBlockchainServiceClient', () => {
               // Act
               await method.callback();
 
-              // Assertv
+              // Assert
               assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not called');
               assert.strictEqual(callbackFunctionSpy.calledOnce, true, 'callbackFunction should called once');
             });

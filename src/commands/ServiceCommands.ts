@@ -3,11 +3,12 @@
 
 import * as open from 'open';
 import { Constants } from '../Constants';
-import { showQuickPick } from '../helpers';
+import { showQuickPick, telemetryHelper } from '../helpers';
 import { ItemType } from '../Models';
 import {
   AzureBlockchainProject,
   AzureBlockchainService,
+  BlockchainDataManagerNetworkNode,
   BlockchainDataManagerProject,
   BlockchainDataManagerService,
   InfuraProject,
@@ -23,6 +24,7 @@ import {
   ConsortiumResourceExplorer,
   InfuraResourceExplorer,
   LocalResourceExplorer,
+  StorageAccountResourceExplorer,
 } from '../resourceExplorers';
 import { GanacheService, TreeManager } from '../services';
 import { Telemetry } from '../TelemetryClient';
@@ -62,7 +64,14 @@ export namespace ServiceCommands {
     ];
 
     const project = await execute(serviceDestinations);
-    Telemetry.sendEvent('ServiceCommands.createProject.commandFinished');
+
+    Telemetry.sendEvent(
+      'ServiceCommands.createProject.commandFinished',
+      {
+        itemType: telemetryHelper.mapItemType(project.itemType),
+      },
+    );
+
     return project;
   }
 
@@ -92,7 +101,14 @@ export namespace ServiceCommands {
     ];
 
     const project = await execute(serviceDestinations);
-    Telemetry.sendEvent('ServiceCommands.connectProject.commandFinished');
+
+    Telemetry.sendEvent(
+      'ServiceCommands.connectProject.commandFinished',
+      {
+        itemType: telemetryHelper.mapItemType(project.itemType),
+      },
+    );
+
     return project;
   }
 
@@ -114,6 +130,36 @@ export namespace ServiceCommands {
 
   export function openAtAzurePortal(viewItem: NetworkNodeView): void {
     open(viewItem.extensionItem.url.href);
+  }
+
+  export async function deleteBDMApplication(viewItem: NetworkNodeView): Promise<void> {
+    Telemetry.sendEvent('ServiceCommands.deleteBDMApplication.commandStarted');
+
+    const application = viewItem.extensionItem;
+    const selectedBDM = application.getParent() as BlockchainDataManagerProject;
+
+    const bdmResourceExplorer = new BlockchainDataManagerResourceExplorer();
+    const storageAccountResourceExplorer = new StorageAccountResourceExplorer();
+
+    await bdmResourceExplorer.deleteBDMApplication(
+      selectedBDM.label,
+      application as BlockchainDataManagerNetworkNode,
+      storageAccountResourceExplorer);
+
+    Telemetry.sendEvent('ServiceCommands.deleteBDMApplication.commandFinished');
+  }
+
+  export async function createNewBDMApplication(viewItem: ProjectView): Promise<void> {
+    Telemetry.sendEvent('ServiceCommands.createNewBDMApplication.commandStarted');
+
+    const selectedBDM = viewItem.extensionItem as BlockchainDataManagerProject;
+
+    const bdmResourceExplorer = new BlockchainDataManagerResourceExplorer();
+    const storageAccountResourceExplorer = new StorageAccountResourceExplorer();
+
+    await bdmResourceExplorer
+      .createNewBDMApplication(selectedBDM as BlockchainDataManagerProject, storageAccountResourceExplorer);
+    Telemetry.sendEvent('ServiceCommands.createNewBDMApplication.commandFinished');
   }
 }
 
