@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-import { commands, ExtensionContext, Uri, window, workspace } from 'vscode';
+import { commands, ExtensionContext, Uri, window } from 'vscode';
 import {
   ContractCommands,
   DebuggerCommands,
@@ -10,7 +10,6 @@ import {
   LogicAppCommands,
   OpenZeppelinCommands,
   ProjectCommands,
-  sdkCoreCommands,
   ServiceCommands,
   TruffleCommands,
 } from './commands';
@@ -45,7 +44,6 @@ export async function activate(context: ExtensionContext) {
   MnemonicRepository.initialize(context.globalState);
   TreeManager.initialize(context.globalState);
   TreeService.initialize('AzureBlockchain');
-  await sdkCoreCommands.initialize(context.globalState);
 
   setCommandContext(CommandContext.Enabled, true);
   setCommandContext(CommandContext.IsWorkspaceOpen, isWorkspaceOpen());
@@ -86,11 +84,11 @@ export async function activate(context: ExtensionContext) {
   const newSolidityProject = commands.registerCommand('truffle.newSolidityProject', async () => {
     await tryExecute(() => ProjectCommands.newSolidityProject());
   });
-  const buildContracts = commands.registerCommand('azureBlockchainService.buildContracts', async () => {
-    await tryExecute(() => sdkCoreCommands.build());
+  const buildContracts = commands.registerCommand('truffle.buildContracts', async () => {
+    await tryExecute(() => TruffleCommands.buildContracts());
   });
-  const deployContracts = commands.registerCommand('azureBlockchainService.deployContracts', async () => {
-    await tryExecute(() => sdkCoreCommands.deploy());
+  const deployContracts = commands.registerCommand('truffle.deployContracts', async () => {
+    await tryExecute(() => TruffleCommands.deployContracts());
   });
   const copyByteCode = commands.registerCommand('contract.copyByteCode', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeBytecodeToBuffer(uri));
@@ -188,14 +186,6 @@ export async function activate(context: ExtensionContext) {
   });
   //#endregion
 
-  //#region other subscriptions
-  const changeCoreSdkConfigurationListener = workspace.onDidChangeConfiguration(async (event) => {
-    if (event.affectsConfiguration(Constants.userSettings.coreSdkSettingsKey)) {
-      await sdkCoreCommands.initialize(context.globalState);
-    }
-  });
-  //#endregion
-
   const subscriptions = [
     showWelcomePage,
     showRequirementsPage,
@@ -226,7 +216,6 @@ export async function activate(context: ExtensionContext) {
     showProjectsFromInfuraAccount,
     openZeppelinAddCategory,
     openAtAzurePortal,
-    changeCoreSdkConfigurationListener,
   ];
   context.subscriptions.push(...subscriptions);
 

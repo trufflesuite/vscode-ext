@@ -28,18 +28,10 @@
       "./src/debugger/types"
     ]
   },
-  "include": [
-    "src/**/*.js",
-    "src/**/*.ts",
-    "src/**/*.json",
-    "test/**/*.js",
-    "test/**/*.ts",
-    "test/**/*.json"
-  ],
+  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.json", "test/**/*.js", "test/**/*.ts", "test/**/*.json"],
   "exclude": [
     "node_modules",
     ".vscode-test",
-    "drizzleUI",
-    "ui-test"
+    "drizzleUI"
   ]
 }

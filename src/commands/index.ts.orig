@@ -10,4 +10,3 @@ export * from './OpenZeppelinCommands';
 export * from './ProjectCommands';
 export * from './ServiceCommands';
 export * from './TruffleCommands';
-export * from './SdkCoreCommands';

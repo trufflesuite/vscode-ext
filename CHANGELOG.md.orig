@@ -2,24 +2,6 @@
 
 All notable changes to the "azure blockchain" extension will be documented in this file.
 
-## 1.3.0
-
-### Enhancements
-
-- Add version 2.5 of OpenZeppelin contracts to the extension
-- Added new code generator for logic apps
-- Added new code generator for flow apps
-- Adding initial code for decoupling frameworks from UI to support partner extensions better
-
-### Fixes
-
-- Fixed loader error for typescript in webpack (packaging error)
-- Fixed some unit test issues
-
-### Internal Improvements
-
-- Improving package locks for specific core packages to help with stability
-
 ## 1.2.0
 
 ### Enhancements

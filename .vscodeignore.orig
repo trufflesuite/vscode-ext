@@ -13,7 +13,6 @@ out/**
 !out/src/checkTruffleConfigTemplate.js
 src/**
 test/**
-ui-test/**
 .editorconfig
 .gitignore
 .npmignore
