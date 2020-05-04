@@ -5,7 +5,7 @@
   "publisher": "AzBlockchain",
   "preview": false,
   "icon": "images/blockchain-service-logo.png",
-  "version": "1.3.0",
+  "version": "1.2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum"
@@ -41,8 +41,8 @@
     "onCommand:contract.copyABI",
     "onCommand:truffle.createLocalUI",
     "onCommand:truffle.newSolidityProject",
-    "onCommand:azureBlockchainService.buildContracts",
-    "onCommand:azureBlockchainService.deployContracts",
+    "onCommand:truffle.buildContracts",
+    "onCommand:truffle.deployContracts",
     "onCommand:azureBlockchainService.generateReportPublishingWorkflows",
     "onCommand:azureBlockchainService.generateMicroservicesWorkflows",
     "onCommand:azureBlockchainService.generateEventPublishingWorkflows",
@@ -72,21 +72,12 @@
         },
         "azureBlockchainService.openZeppelin.version": {
           "type": "string",
-          "default": "2.5.0",
+          "default": "2.4.0",
           "scope": "The latest Open Zeppelin version"
         },
         "azureBlockchainService.storageAccount.name": {
           "type": "string",
           "scope": "Storage Account name"
-        },
-        "azureBlockchainService.coreSDK": {
-          "type": "string",
-          "scope": "Core SDK for extensions backend",
-          "default": "Truffle",
-          "enum": [
-            "Truffle",
-            "OpenZeppelin"
-          ]
         }
       }
     },
@@ -146,12 +137,12 @@
         "category": "Azure Blockchain"
       },
       {
-        "command": "azureBlockchainService.buildContracts",
+        "command": "truffle.buildContracts",
         "title": "Build Contracts",
         "category": "Azure Blockchain"
       },
       {
-        "command": "azureBlockchainService.deployContracts",
+        "command": "truffle.deployContracts",
         "title": "Deploy Contracts",
         "category": "Azure Blockchain"
       },
@@ -287,11 +278,11 @@
         },
         {
           "when": "azureBlockchainService:isWorkspaceOpen",
-          "command": "azureBlockchainService.buildContracts"
+          "command": "truffle.buildContracts"
         },
         {
           "when": "azureBlockchainService:isWorkspaceOpen",
-          "command": "azureBlockchainService.deployContracts"
+          "command": "truffle.deployContracts"
         },
         {
           "when": "false",
@@ -389,7 +380,7 @@
       "explorer/context": [
         {
           "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.buildContracts",
+          "command": "truffle.buildContracts",
           "group": "8_buildContractGroup"
         },
         {
@@ -399,12 +390,12 @@
         },
         {
           "when": "resourceLangId == json",
-          "command": "azureBlockchainService.deployContracts",
+          "command": "truffle.deployContracts",
           "group": "8_buildContractGroup"
         },
         {
           "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.deployContracts",
+          "command": "truffle.deployContracts",
           "group": "8_buildContractGroup"
         },
         {
@@ -568,7 +559,7 @@
     "@types/sinon": "^7.0.11",
     "@types/uuid": "^3.4.4",
     "@types/vscode": "^1.36.1",
-    "copy-webpack-plugin": "5.1.1",
+    "copy-webpack-plugin": "^5.0.3",
     "decache": "^4.5.1",
     "glob": "^7.1.4",
     "husky": "^2.4.0",
@@ -579,15 +570,15 @@
     "rewire": "^4.0.1",
     "sinon": "^7.3.2",
     "truffle": "^5.0.14",
-    "ts-loader": "7.0.2",
+    "ts-loader": "6.2.1",
     "tslint": "^5.18.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "3.8.3",
+    "typescript": "^3.3.1",
     "vscode-debugadapter": "^1.33.0",
     "vscode-debugprotocol": "^1.33.0",
     "vscode-test": "^1.2.0",
-    "webpack": "4.43.0",
-    "webpack-cli": "3.3.11"
+    "webpack": "^4.35.3",
+    "webpack-cli": "^3.3.6"
   },
   "dependencies": {
     "@truffle/debug-utils": "1.0.19",
@@ -609,9 +600,8 @@
     "request-promise": "^4.2.4",
     "semver": "^6.0.0",
     "uuid": "^3.3.2",
-    "vscode-azureextensionui": "^0.29.12",
-    "vscode-extension-telemetry": "^0.1.1",
-    "solidity-parser-antlr": "^0.4.11"
+    "vscode-azureextensionui": "^0.25.1",
+    "vscode-extension-telemetry": "^0.1.1"
   },
   "extensionDependencies": [
     "JuanBlanco.solidity",

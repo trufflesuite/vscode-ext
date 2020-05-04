@@ -51,6 +51,21 @@
       "cwd": "${workspaceFolder}",
       "program": "${workspaceFolder}/out/src/debugger.js",
       "args": [ "--server=4711" ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Ui tests",
+      "program": "${workspaceFolder}/ui-test/node_modules/vscode-extension-tester/out/cli.js",
+      "args": [
+          "run-tests",
+          "ui-test/out/*.test.js",
+          "-s",
+          "ui-test/test-resources"
+      ],
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/ui-test/out/*/*.js"],
+      "preLaunchTask": "Prepare resources for ui-tests"
     }
   ],
   "compounds": [

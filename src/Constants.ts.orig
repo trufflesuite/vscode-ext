@@ -134,7 +134,6 @@ export class Constants {
     azureBlockchainExtensionVersion: 'azureBlockchainExtensionVersion',
     infuraCredentialsCacheKey: 'InfuraCache',
     infuraExcludedProjectsListKey: 'InfuraExcludedProjects',
-    isNotifiedAboutOZSdk: 'isNotifiedAboutOZSdk',
     mnemonicStorageKey: 'mnemonicStorage',
     serviceResourceKey: 'treeContent',
   };
@@ -199,11 +198,6 @@ export class Constants {
   public static confirmationDialogResult = {
     no: 'No',
     yes: 'Yes',
-  };
-
-  public static installationDialogResult = {
-    cancel: 'Cancel',
-    install: 'Install',
   };
 
   public static mnemonicConstants = {
@@ -584,8 +578,6 @@ export class Constants {
     ContractNotDeployed: 'Contracts are not deployed. Please deploy first.',
     DirectoryIsNotEmpty: 'Directory is not empty. Open another one?',
     ErrorWhileExecutingCommand: 'Error while executing command: ',
-    ExtensionNotInstalled: (extensionName: string) =>
-      `Please install ${extensionName} extension or change user settings to use another extension`,
     FetchingDeployedBytecodeIsFailed: 'An error occurred while fetching bytecode from network',
     GetMessageChildAlreadyConnected: Constants.getMessageChildAlreadyConnected,
     GitIsNotInstalled: 'Git is not installed',
@@ -602,7 +594,7 @@ export class Constants {
     NoContractBody: 'No contract body in AST',
     NoSubscriptionFound: 'No subscription found.',
     NoSubscriptionFoundClick: 'No subscription found, click an Azure account ' +
-    'at the bottom left corner and choose Select All',
+      'at the bottom left corner and choose Select All',
     PleaseRenameOldStyleTruffleConfig: 'Please rename file "truffle.js" to "truffle-config.js"',
     RequiredAppsAreNotInstalled: 'To run command you should install required apps',
     SolidityContractsNotFound: 'Solidity contracts were not found',
@@ -639,7 +631,6 @@ export class Constants {
     memberNameValidating: 'Member name validating...',
     networkIsNotReady: Constants.getNetworkIsNotReadyMessage,
     openButton: 'Open',
-    ozFrameworkIsAvailableNow: 'You can now use OpenZeppelin framework as well as Truffle',
     privateKeyWasCopiedToClipboard: 'Private key was copied to clipboard',
     provisioningResource: (name: string) => `${name} is provisioning. The provisioning status can be viewed in the Azure portal. ` +
       'You may return and complete this process once the provisioning is complete.',
@@ -649,8 +640,6 @@ export class Constants {
     signInButton: 'Sign In',
     transactionBytecodeWasCopiedToClipboard: 'Transaction Bytecode was copied to clipboard',
     transactionNodeNameValidating: 'Transaction Node name validating...',
-    unsupportedVersionOfExternalExtension: (name: string, currentVersion: string, supportedVersion: string) =>
-      `You try to use "${name}" extension of version ${currentVersion}, but current supported vesrion is ${supportedVersion}.`,
   };
 
   public static infuraCredentials = {
@@ -742,10 +731,9 @@ export class Constants {
   };
 
   public static firstOZVersion = '2.3.0';
-  public static allOpenZeppelinVersions = ['2.3.0', '2.4.0', '2.5.0'];
+  public static allOpenZeppelinVersions = ['2.3.0', '2.4.0'];
 
   public static userSettings = {
-    coreSdkSettingsKey: 'azureBlockchainService.coreSDK',
     ozVersionUserSettingsKey: 'azureBlockchainService.openZeppelin.version',
     storageAccountUserSettingsKey: 'azureBlockchainService.storageAccount.name',
   };
@@ -753,11 +741,6 @@ export class Constants {
   public static bdmApplicationRequestParameters = {
     artifactType: 'EthereumSmartContract',
     queryTargetTypes: ['ContractProperties', 'ContractEvents'],
-  };
-
-  public static coreSdk = {
-    openZeppelin: 'OpenZeppelin',
-    truffle: 'Truffle',
   };
 
   public static openZeppelin = {
@@ -814,18 +797,6 @@ export class Constants {
     invalidVersionDialog(version: string, location: string, lastVersion: string) {
       return `There is invalid OpenZeppelin version (${version}) in ${location}. ` +
         `Do you want to use the latest one (${lastVersion})?`;
-    },
-  };
-
-  // TODO: add real extensions information when they will be released
-  public static externalExtensions: Record<string, any> = {
-    OpenZeppelin: {
-      commands: {
-        buildContracts: 'oz.build.command',
-        deployContracts: 'oz.deploy.command',
-      },
-      name: 'openZeppelin.extension.name',
-      supportedVersion: '1.0.0',
     },
   };
 

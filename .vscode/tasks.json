@@ -68,6 +68,18 @@
         "Build Drizzle UI",
         "Build extension"
       ]
+    },
+    {
+      "label": "Prepare resources for ui-tests",
+      "type": "npm",
+      "script": "prepare-ui-test",
+      "path": "ui-test/",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "group": "test"
     }
   ]
 }
