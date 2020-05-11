@@ -1,11 +1,11 @@
 {
   "name": "azure-blockchain",
-  "displayName": "Azure Blockchain Development Kit for Ethereum",
-  "description": "Develop, deploy debug and manage your Azure Blockchain Service solution",
+  "displayName": "Blockchain Development Kit for Ethereum",
+  "description": "Develop, deploy, debug and manage your Ethereum based blockchain solutions",
   "publisher": "AzBlockchain",
   "preview": false,
   "icon": "images/blockchain-service-logo.png",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum"
@@ -63,7 +63,7 @@
   ],
   "contributes": {
     "configuration": {
-      "title": "Azure Blockchain Development Kit for Ethereum",
+      "title": "Blockchain Development Kit for Ethereum",
       "properties": {
         "azureBlockchainService.ignoreLongRunningTaskNotification": {
           "type": "boolean",
@@ -94,32 +94,32 @@
       {
         "command": "azureBlockchainService.generateMicroservicesWorkflows",
         "title": "Generate Microservices for Smart Contracts",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.generateDataPublishingWorkflows",
         "title": "Generate Data Publishing Workflows for Smart Contracts",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.generateReportPublishingWorkflows",
         "title": "Generate Report Publishing Workflows for Smart Contracts",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.generateEventPublishingWorkflows",
         "title": "Generate Event Publishing Workflows for Smart Contracts",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.showWelcomePage",
         "title": "Show Welcome Page",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.refresh",
         "title": "Refresh",
-        "category": "Azure Blockchain",
+        "category": "Blockchain",
         "icon": {
           "light": "resources/light/refresh.svg",
           "dark": "resources/dark/refresh.svg"
@@ -128,107 +128,107 @@
       {
         "command": "contract.copyByteCode",
         "title": "Copy Constructor Bytecode",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "contract.copyDeployedByteCode",
         "title": "Copy Transaction Bytecode",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "contract.copyABI",
         "title": "Copy Contract ABI",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "truffle.newSolidityProject",
         "title": "New Solidity Project",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.buildContracts",
         "title": "Build Contracts",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.deployContracts",
         "title": "Deploy Contracts",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.connectProject",
         "title": "Connect to network",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.showSmartContractPage",
         "title": "Show Smart Contract Interaction Page",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.copyRPCEndpointAddress",
         "title": "Copy RPC Endpoint Address",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.createProject",
         "title": "Create a new network",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.disconnectProject",
         "title": "Disconnect",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.startGanacheServer",
         "title": "Start Ganache Server",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.stopGanacheServer",
         "title": "Stop Ganache Server",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.signInToInfuraAccount",
         "title": "Sign in to Infura account",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.signOutOfInfuraAccount",
         "title": "Sign out of Infura account",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.getPrivateKey",
         "title": "Retrieve private key",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "extension.truffle.debugTransaction",
         "title": "Debug Transaction",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "openZeppelin.addCategory",
         "title": "Add contracts from OpenZeppelin",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.openAtAzurePortal",
         "title": "Open at Azure Portal",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.createNewBDMApplication",
         "title": "Create Blockchain Application",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       },
       {
         "command": "azureBlockchainService.deleteBDMApplication",
         "title": "Delete Blockchain Application",
-        "category": "Azure Blockchain"
+        "category": "Blockchain"
       }
     ],
     "breakpoints": [
@@ -453,7 +453,7 @@
       "explorer": [
         {
           "id": "AzureBlockchain",
-          "name": "Azure Blockchain"
+          "name": "Blockchain Networks"
         }
       ],
       "debug": [
