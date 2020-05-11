@@ -2,6 +2,17 @@
 
 All notable changes to the "azure blockchain" extension will be documented in this file.
 
+## 1.3.1
+
+### Enhancements
+
+- Updated README.md with changes for updated branding.
+- Rebranding commands and UI elements.
+
+### Fixes
+
+### Internal Improvements
+
 ## 1.3.0
 
 ### Enhancements
