@@ -2,6 +2,17 @@
 
 All notable changes to the "azure blockchain" extension will be documented in this file.
 
+## 1.4.0
+
+### Enhancements
+
+### Fixes
+
+- Updated API calls for webviews to using updated APIs ([#42](https://github.com/microsoft/vscode-azure-blockchain-ethereum/issues/42) by [@mjbvz](https://github.com/mjbvz))
+- Bumped version of VS Code core to support to 1.44.1 and internal vscode type def (1.39.0)
+
+### Internal Improvements
+
 ## 1.3.1
 
 ### Enhancements
