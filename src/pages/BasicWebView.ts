@@ -62,24 +62,18 @@ export abstract class BasicWebView {
       this.context.globalState.update(this.config.showOnStartup, await this.setShowOnStartupFlagAtFirstTime());
     }
 
-    Telemetry.sendEvent(
-      Constants.telemetryEvents.webPages.showWebPage,
-      {
-        trigger: 'auto',
-        viewType: this.config.viewType,
-      },
-    );
+    Telemetry.sendEvent(Constants.telemetryEvents.webPages.showWebPage, {
+      trigger: 'auto',
+      viewType: this.config.viewType,
+    });
     return this.createAndShow();
   }
 
   public async show() {
-    Telemetry.sendEvent(
-      Constants.telemetryEvents.webPages.showWebPage,
-      {
-        trigger: 'manual',
-        viewType: this.config.viewType,
-      },
-    );
+    Telemetry.sendEvent(Constants.telemetryEvents.webPages.showWebPage, {
+      trigger: 'manual',
+      viewType: this.config.viewType,
+    });
     return this.createAndShow();
   }
 
@@ -108,10 +102,13 @@ export abstract class BasicWebView {
   protected abstract async setShowOnStartupFlagAtFirstTime(): Promise<boolean>;
 
   protected async getHtmlForWebview(): Promise<string> {
-    const rootPath = this.rootPath.with({ scheme: 'vscode-resource' }).toString();
-    const html = await fs.readFile(this.config.path, 'utf8');
+    if (this.panel) {
+      const rootPath = this.panel.webview.asWebviewUri(this.rootPath).toString();
+      const html = await fs.readFile(this.config.path, 'utf8');
 
-    return html.replace(/{{root}}/g, rootPath);
+      return html.replace(/{{root}}/g, rootPath);
+    }
+    return '';
   }
 
   protected async receiveMessage(message: { [key: string]: any }): Promise<void> {
@@ -148,7 +145,7 @@ export abstract class BasicWebView {
       Telemetry.sendEvent(
         Constants.telemetryEvents.webPages.disposeWebPage,
         { viewType: this.config.viewType },
-        { duration },
+        { duration }
       );
     }
 

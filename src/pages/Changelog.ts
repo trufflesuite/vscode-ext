@@ -43,11 +43,14 @@ export class ChangelogPage extends BasicWebView {
   }
 
   protected async getHtmlForWebview(): Promise<string> {
-    const resourcePath = this.rootPath.with({ scheme: 'vscode-resource' }).toString();
-    const html = await fs.readFile(this.config.path, 'utf8');
-    const content = await fs.readFile(Constants.webViewPages.changelog.changelogPath, 'utf8');
-    const htmlContent = await commands.executeCommand('markdown.api.render', content) as string;
+    if (this.panel) {
+      const resourcePath = this.panel.webview.asWebviewUri(this.rootPath).toString();
+      const html = await fs.readFile(this.config.path, 'utf8');
+      const content = await fs.readFile(Constants.webViewPages.changelog.changelogPath, 'utf8');
+      const htmlContent = await commands.executeCommand('markdown.api.render', content) as string;
 
-    return html.replace(/{{root}}/g, resourcePath).replace(/{{content}}/g, htmlContent);
+      return html.replace(/{{root}}/g, resourcePath).replace(/{{content}}/g, htmlContent);
+    }
+    return '';
   }
 }
