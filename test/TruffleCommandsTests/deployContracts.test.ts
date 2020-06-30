@@ -128,7 +128,7 @@ describe('TruffleCommands', () => {
 
         mnemonicRepositoryMock = sinon.mock(MnemonicRepository);
         getMnemonicMock = mnemonicRepositoryMock.expects('getMnemonic').returns(TestConstants.testMnemonic);
-        getAllMnemonicPathsMock = mnemonicRepositoryMock.expects('getAllMnemonicPaths').returns([] as string []);
+        getAllMnemonicPathsMock = mnemonicRepositoryMock.expects('getAllMnemonicPaths').returns([] as string[]);
         saveMnemonicPathMock = mnemonicRepositoryMock.expects('saveMnemonicPath');
 
         writeFileSyncMock = sinon.stub(fs, 'writeFileSync');
@@ -613,7 +613,7 @@ describe('TruffleCommands', () => {
         it('should pass when openZeppelin contracts are valid', async () => {
           // Arrange
           projectJsonExistsStub.returns(true);
-          openZeppelinvalidateContractsAsyncMock.resolves([ new OZContractValidated('1', true, true) ]);
+          openZeppelinvalidateContractsAsyncMock.resolves([new OZContractValidated('1', true, true)]);
 
           // Act
           await TruffleCommands.deployContracts();
@@ -625,7 +625,7 @@ describe('TruffleCommands', () => {
         it('should throw error when downloaded openZeppelin contract has invalid hash', async () => {
           // Arrange
           projectJsonExistsStub.returns(true);
-          openZeppelinvalidateContractsAsyncMock.resolves([ new OZContractValidated('1', true, false) ]);
+          openZeppelinvalidateContractsAsyncMock.resolves([new OZContractValidated('1', true, false)]);
 
           // Act and Assert
           await assert.rejects(TruffleCommands.deployContracts(), Error);
@@ -634,7 +634,7 @@ describe('TruffleCommands', () => {
         it('should throw error when downloaded openZeppelin contract doesn\'t exist on the disk', async () => {
           // Arrange
           projectJsonExistsStub.returns(true);
-          openZeppelinvalidateContractsAsyncMock.resolves([ new OZContractValidated('1', false) ]);
+          openZeppelinvalidateContractsAsyncMock.resolves([new OZContractValidated('1', false)]);
 
           // Act and Assert
           await assert.rejects(TruffleCommands.deployContracts(), Error);
@@ -725,14 +725,13 @@ function getTestTruffleNetworks(): TruffleConfiguration.INetwork[] {
       port: 8545,
     },
   },
-  {
-    name: TestConstants.servicesNames.testNetwork,
-    options: {
-      gas: 4712388,
-      gasPrice: 100000000000,
-      network_id: 2,
-    },
-  });
+    {
+      name: TestConstants.servicesNames.testNetwork,
+      options: {
+        gasPrice: 100000000000,
+        network_id: 2,
+      },
+    });
 
   return networks;
 }

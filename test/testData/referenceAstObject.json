@@ -1,1 +1,530 @@
-{"type":"Program","start":0,"end":565,"body":[{"type":"VariableDeclaration","start":0,"end":62,"declarations":[{"type":"VariableDeclarator","start":6,"end":61,"id":{"type":"Identifier","start":6,"end":22,"name":"HDWalletProvider"},"init":{"type":"CallExpression","start":25,"end":61,"callee":{"type":"Identifier","start":25,"end":32,"name":"require"},"arguments":[{"type":"Literal","start":33,"end":60,"value":"truffle-hdwallet-provider","raw":"\"truffle-hdwallet-provider\""}]}}],"kind":"const"},{"type":"ExpressionStatement","start":62,"end":565,"expression":{"type":"AssignmentExpression","start":62,"end":564,"operator":"=","left":{"type":"MemberExpression","start":62,"end":76,"object":{"type":"Identifier","start":62,"end":68,"name":"module"},"property":{"type":"Identifier","start":69,"end":76,"name":"exports"},"computed":false},"right":{"type":"ObjectExpression","start":79,"end":564,"properties":[{"type":"Property","start":82,"end":521,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":82,"end":90,"name":"networks"},"value":{"type":"ObjectExpression","start":92,"end":521,"properties":[{"type":"Property","start":97,"end":178,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":97,"end":108,"name":"development"},"value":{"type":"ObjectExpression","start":110,"end":178,"properties":[{"type":"Property","start":117,"end":134,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":117,"end":121,"name":"host"},"value":{"type":"Literal","start":123,"end":134,"value":"127.0.0.1","raw":"\"127.0.0.1\""},"kind":"init"},{"type":"Property","start":141,"end":151,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":141,"end":145,"name":"port"},"value":{"type":"Literal","start":147,"end":151,"value":8545,"raw":"8545"},"kind":"init"},{"type":"Property","start":158,"end":173,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":158,"end":168,"name":"network_id"},"value":{"type":"Literal","start":170,"end":173,"value":"*","raw":"\"*\""},"kind":"init"}]},"kind":"init"},{"type":"Property","start":183,"end":518,"method":false,"shorthand":false,"computed":false,"key":{"type":"Literal","start":183,"end":198,"value":"localhost:123","raw":"\"localhost:123\""},"value":{"type":"ObjectExpression","start":200,"end":518,"properties":[{"type":"Property","start":207,"end":221,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":207,"end":211,"name":"from"},"value":{"type":"Literal","start":213,"end":221,"value":"string","raw":"\"string\""},"kind":"init"},{"type":"Property","start":228,"end":234,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":228,"end":231,"name":"gas"},"value":{"type":"Literal","start":233,"end":234,"value":2,"raw":"2"},"kind":"init"},{"type":"Property","start":241,"end":252,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":241,"end":249,"name":"gasPrice"},"value":{"type":"Literal","start":251,"end":252,"value":3,"raw":"3"},"kind":"init"},{"type":"Property","start":259,"end":276,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":259,"end":263,"name":"host"},"value":{"type":"Literal","start":265,"end":276,"value":"127.0.0.1","raw":"\"127.0.0.1\""},"kind":"init"},{"type":"Property","start":283,"end":298,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":283,"end":293,"name":"network_id"},"value":{"type":"Literal","start":295,"end":298,"value":"*","raw":"\"*\""},"kind":"init"},{"type":"Property","start":305,"end":314,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":305,"end":309,"name":"port"},"value":{"type":"Literal","start":311,"end":314,"value":123,"raw":"123"},"kind":"init"},{"type":"Property","start":321,"end":442,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":321,"end":329,"name":"provider"},"value":{"type":"NewExpression","start":331,"end":442,"callee":{"type":"Identifier","start":335,"end":351,"name":"HDWalletProvider"},"arguments":[{"type":"CallExpression","start":376,"end":411,"callee":{"type":"MemberExpression","start":376,"end":391,"object":{"type":"Identifier","start":376,"end":378,"name":"fs"},"property":{"type":"Identifier","start":379,"end":391,"name":"readFileSync"},"computed":false},"arguments":[{"type":"Literal","start":392,"end":398,"value":"path","raw":"\"path\""},{"type":"Literal","start":400,"end":410,"value":"encoding","raw":"\"encoding\""}]},{"type":"Literal","start":436,"end":441,"value":"url","raw":"\"url\""}]},"kind":"init"},{"type":"Property","start":449,"end":465,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":449,"end":459,"name":"skipDryRun"},"value":{"type":"Literal","start":461,"end":465,"value":true,"raw":"true"},"kind":"init"},{"type":"Property","start":472,"end":488,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":472,"end":485,"name":"timeoutBlocks"},"value":{"type":"Literal","start":487,"end":488,"value":4,"raw":"4"},"kind":"init"},{"type":"Property","start":495,"end":512,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":495,"end":505,"name":"websockets"},"value":{"type":"Literal","start":507,"end":512,"value":false,"raw":"false"},"kind":"init"}]},"kind":"init"}]},"kind":"init"},{"type":"Property","start":524,"end":533,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":524,"end":529,"name":"mocha"},"value":{"type":"ObjectExpression","start":531,"end":533,"properties":[]},"kind":"init"},{"type":"Property","start":536,"end":563,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":536,"end":545,"name":"compilers"},"value":{"type":"ObjectExpression","start":547,"end":563,"properties":[{"type":"Property","start":552,"end":560,"method":false,"shorthand":false,"computed":false,"key":{"type":"Identifier","start":552,"end":556,"name":"solc"},"value":{"type":"ObjectExpression","start":558,"end":560,"properties":[]},"kind":"init"}]},"kind":"init"}]}}}],"sourceType":"module"}
+{
+  "type": "Program",
+  "start": 0,
+  "end": 552,
+  "body": [
+    {
+      "type": "VariableDeclaration",
+      "start": 0,
+      "end": 62,
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "start": 6,
+          "end": 61,
+          "id": {
+            "type": "Identifier",
+            "start": 6,
+            "end": 22,
+            "name": "HDWalletProvider"
+          },
+          "init": {
+            "type": "CallExpression",
+            "start": 25,
+            "end": 61,
+            "callee": {
+              "type": "Identifier",
+              "start": 25,
+              "end": 32,
+              "name": "require"
+            },
+            "arguments": [
+              {
+                "type": "Literal",
+                "start": 33,
+                "end": 60,
+                "value": "truffle-hdwallet-provider",
+                "raw": "\"truffle-hdwallet-provider\""
+              }
+            ]
+          }
+        }
+      ],
+      "kind": "const"
+    },
+    {
+      "type": "ExpressionStatement",
+      "start": 62,
+      "end": 552,
+      "expression": {
+        "type": "AssignmentExpression",
+        "start": 62,
+        "end": 551,
+        "operator": "=",
+        "left": {
+          "type": "MemberExpression",
+          "start": 62,
+          "end": 76,
+          "object": {
+            "type": "Identifier",
+            "start": 62,
+            "end": 68,
+            "name": "module"
+          },
+          "property": {
+            "type": "Identifier",
+            "start": 69,
+            "end": 76,
+            "name": "exports"
+          },
+          "computed": false
+        },
+        "right": {
+          "type": "ObjectExpression",
+          "start": 79,
+          "end": 551,
+          "properties": [
+            {
+              "type": "Property",
+              "start": 82,
+              "end": 508,
+              "method": false,
+              "shorthand": false,
+              "computed": false,
+              "key": {
+                "type": "Identifier",
+                "start": 82,
+                "end": 90,
+                "name": "networks"
+              },
+              "value": {
+                "type": "ObjectExpression",
+                "start": 92,
+                "end": 508,
+                "properties": [
+                  {
+                    "type": "Property",
+                    "start": 97,
+                    "end": 178,
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 97,
+                      "end": 108,
+                      "name": "development"
+                    },
+                    "value": {
+                      "type": "ObjectExpression",
+                      "start": 110,
+                      "end": 178,
+                      "properties": [
+                        {
+                          "type": "Property",
+                          "start": 117,
+                          "end": 134,
+                          "method": false,
+                          "shorthand": false,
+                          "computed": false,
+                          "key": {
+                            "type": "Identifier",
+                            "start": 117,
+                            "end": 121,
+                            "name": "host"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "start": 123,
+                            "end": 134,
+                            "value": "127.0.0.1",
+                            "raw": "\"127.0.0.1\""
+                          },
+                          "kind": "init"
+                        },
+                        {
+                          "type": "Property",
+                          "start": 141,
+                          "end": 151,
+                          "method": false,
+                          "shorthand": false,
+                          "computed": false,
+                          "key": {
+                            "type": "Identifier",
+                            "start": 141,
+                            "end": 145,
+                            "name": "port"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "start": 147,
+                            "end": 151,
+                            "value": 8545,
+                            "raw": "8545"
+                          },
+                          "kind": "init"
+                        },
+                        {
+                          "type": "Property",
+                          "start": 158,
+                          "end": 173,
+                          "method": false,
+                          "shorthand": false,
+                          "computed": false,
+                          "key": {
+                            "type": "Identifier",
+                            "start": 158,
+                            "end": 168,
+                            "name": "network_id"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "start": 170,
+                            "end": 173,
+                            "value": "*",
+                            "raw": "\"*\""
+                          },
+                          "kind": "init"
+                        }
+                      ]
+                    },
+                    "kind": "init"
+                  },
+                  {
+                    "type": "Property",
+                    "start": 183,
+                    "end": 505,
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Literal",
+                      "start": 183,
+                      "end": 198,
+                      "value": "localhost:123",
+                      "raw": "\"localhost:123\""
+                    },
+                    "value": {
+                      "type": "ObjectExpression",
+                      "start": 200,
+                      "end": 505,
+                      "properties": [
+                        {
+                          "type": "Property",
+                          "start": 207,
+                          "end": 221,
+                          "method": false,
+                          "shorthand": false,
+                          "computed": false,
+                          "key": {
+                            "type": "Identifier",
+                            "start": 207,
+                            "end": 211,
+                            "name": "from"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "start": 213,
+                            "end": 221,
+                            "value": "string",
+                            "raw": "\"string\""
+                          },
+                          "kind": "init"
+                        },
+                        {
+                          "type": "Property",
+                          "start": 228,
+                          "end": 239,
+                          "method": false,
+                          "shorthand": false,
+                          "computed": false,
+                          "key": {
+                            "type": "Identifier",
+                            "start": 228,
+                            "end": 236,
+                            "name": "gasPrice"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "start": 238,
+                            "end": 239,
+                            "value": 3,
+                            "raw": "3"
+                          },
+                          "kind": "init"
+                        },
+                        {
+                          "type": "Property",
+                          "start": 246,
+                          "end": 263,
+                          "method": false,
+                          "shorthand": false,
+                          "computed": false,
+                          "key": {
+                            "type": "Identifier",
+                            "start": 246,
+                            "end": 250,
+                            "name": "host"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "start": 252,
+                            "end": 263,
+                            "value": "127.0.0.1",
+                            "raw": "\"127.0.0.1\""
+                          },
+                          "kind": "init"
+                        },
+                        {
+                          "type": "Property",
+                          "start": 270,
+                          "end": 285,
+                          "method": false,
+                          "shorthand": false,
+                          "computed": false,
+                          "key": {
+                            "type": "Identifier",
+                            "start": 270,
+                            "end": 280,
+                            "name": "network_id"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "start": 282,
+                            "end": 285,
+                            "value": "*",
+                            "raw": "\"*\""
+                          },
+                          "kind": "init"
+                        },
+                        {
+                          "type": "Property",
+                          "start": 292,
+                          "end": 301,
+                          "method": false,
+                          "shorthand": false,
+                          "computed": false,
+                          "key": {
+                            "type": "Identifier",
+                            "start": 292,
+                            "end": 296,
+                            "name": "port"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "start": 298,
+                            "end": 301,
+                            "value": 123,
+                            "raw": "123"
+                          },
+                          "kind": "init"
+                        },
+                        {
+                          "type": "Property",
+                          "start": 308,
+                          "end": 429,
+                          "method": false,
+                          "shorthand": false,
+                          "computed": false,
+                          "key": {
+                            "type": "Identifier",
+                            "start": 308,
+                            "end": 316,
+                            "name": "provider"
+                          },
+                          "value": {
+                            "type": "NewExpression",
+                            "start": 318,
+                            "end": 429,
+                            "callee": {
+                              "type": "Identifier",
+                              "start": 322,
+                              "end": 338,
+                              "name": "HDWalletProvider"
+                            },
+                            "arguments": [
+                              {
+                                "type": "CallExpression",
+                                "start": 363,
+                                "end": 398,
+                                "callee": {
+                                  "type": "MemberExpression",
+                                  "start": 363,
+                                  "end": 378,
+                                  "object": {
+                                    "type": "Identifier",
+                                    "start": 363,
+                                    "end": 365,
+                                    "name": "fs"
+                                  },
+                                  "property": {
+                                    "type": "Identifier",
+                                    "start": 366,
+                                    "end": 378,
+                                    "name": "readFileSync"
+                                  },
+                                  "computed": false
+                                },
+                                "arguments": [
+                                  {
+                                    "type": "Literal",
+                                    "start": 379,
+                                    "end": 385,
+                                    "value": "path",
+                                    "raw": "\"path\""
+                                  },
+                                  {
+                                    "type": "Literal",
+                                    "start": 387,
+                                    "end": 397,
+                                    "value": "encoding",
+                                    "raw": "\"encoding\""
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "Literal",
+                                "start": 423,
+                                "end": 428,
+                                "value": "url",
+                                "raw": "\"url\""
+                              }
+                            ]
+                          },
+                          "kind": "init"
+                        },
+                        {
+                          "type": "Property",
+                          "start": 436,
+                          "end": 452,
+                          "method": false,
+                          "shorthand": false,
+                          "computed": false,
+                          "key": {
+                            "type": "Identifier",
+                            "start": 436,
+                            "end": 446,
+                            "name": "skipDryRun"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "start": 448,
+                            "end": 452,
+                            "value": true,
+                            "raw": "true"
+                          },
+                          "kind": "init"
+                        },
+                        {
+                          "type": "Property",
+                          "start": 459,
+                          "end": 475,
+                          "method": false,
+                          "shorthand": false,
+                          "computed": false,
+                          "key": {
+                            "type": "Identifier",
+                            "start": 459,
+                            "end": 472,
+                            "name": "timeoutBlocks"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "start": 474,
+                            "end": 475,
+                            "value": 4,
+                            "raw": "4"
+                          },
+                          "kind": "init"
+                        },
+                        {
+                          "type": "Property",
+                          "start": 482,
+                          "end": 499,
+                          "method": false,
+                          "shorthand": false,
+                          "computed": false,
+                          "key": {
+                            "type": "Identifier",
+                            "start": 482,
+                            "end": 492,
+                            "name": "websockets"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "start": 494,
+                            "end": 499,
+                            "value": false,
+                            "raw": "false"
+                          },
+                          "kind": "init"
+                        }
+                      ]
+                    },
+                    "kind": "init"
+                  }
+                ]
+              },
+              "kind": "init"
+            },
+            {
+              "type": "Property",
+              "start": 511,
+              "end": 520,
+              "method": false,
+              "shorthand": false,
+              "computed": false,
+              "key": {
+                "type": "Identifier",
+                "start": 511,
+                "end": 516,
+                "name": "mocha"
+              },
+              "value": {
+                "type": "ObjectExpression",
+                "start": 518,
+                "end": 520,
+                "properties": []
+              },
+              "kind": "init"
+            },
+            {
+              "type": "Property",
+              "start": 523,
+              "end": 550,
+              "method": false,
+              "shorthand": false,
+              "computed": false,
+              "key": {
+                "type": "Identifier",
+                "start": 523,
+                "end": 532,
+                "name": "compilers"
+              },
+              "value": {
+                "type": "ObjectExpression",
+                "start": 534,
+                "end": 550,
+                "properties": [
+                  {
+                    "type": "Property",
+                    "start": 539,
+                    "end": 547,
+                    "method": false,
+                    "shorthand": false,
+                    "computed": false,
+                    "key": {
+                      "type": "Identifier",
+                      "start": 539,
+                      "end": 543,
+                      "name": "solc"
+                    },
+                    "value": {
+                      "type": "ObjectExpression",
+                      "start": 545,
+                      "end": 547,
+                      "properties": []
+                    },
+                    "kind": "init"
+                  }
+                ]
+              },
+              "kind": "init"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "sourceType": "module"
+}
