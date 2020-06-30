@@ -46,10 +46,6 @@ export namespace TruffleConfiguration {
      */
     websockets?: boolean;
     /**
-     * Gas limit used for deploys. Default is 4712388.
-     */
-    gas?: number;
-    /**
      * Gas price used for deploys. Default is 100000000000 (100 Shannon).
      */
     gasPrice?: number;
@@ -372,11 +368,6 @@ export namespace TruffleConfiguration {
       options.websockets = websockets.value.value;
     }
 
-    const gas = findProperty(node, 'gas');
-    if (gas && gas.value.type === 'Literal' && typeof gas.value.value === 'number') {
-      options.gas = gas.value.value;
-    }
-
     const gasPrice = findProperty(node, 'gasPrice');
     if (gasPrice && gasPrice.value.type === 'Literal' && typeof gasPrice.value.value === 'number') {
       options.gasPrice = gasPrice.value.value;
@@ -433,10 +424,6 @@ export namespace TruffleConfiguration {
 
     if (options.websockets !== undefined) {
       obj.properties.push(generateProperty('websockets', generateLiteral(options.websockets)));
-    }
-
-    if (options.gas !== undefined) {
-      obj.properties.push(generateProperty('gas', generateLiteral(options.gas)));
     }
 
     if (options.gasPrice !== undefined) {
@@ -506,7 +493,7 @@ export namespace TruffleConfiguration {
     };
   }
 
-  function jsonToConfiguration(truffleConfig: {[key: string]: any}): IConfiguration {
+  function jsonToConfiguration(truffleConfig: { [key: string]: any }): IConfiguration {
     const { contracts_directory, contracts_build_directory, migrations_directory }
       = Constants.truffleConfigDefaultDirectory;
 

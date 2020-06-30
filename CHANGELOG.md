@@ -2,6 +2,16 @@
 
 All notable changes to the "azure blockchain" extension will be documented in this file.
 
+## 1.5.0
+
+### Enhancements
+
+### Fixes
+
+- Fixed bug as a result of gas configuration changes to Azure Blockchain Service ([#54](https://github.com/microsoft/vscode-azure-blockchain-ethereum/issues/54) by [@rpajunen](https://github.com/rpajunen) and [@davew-msft](https://github.com/davew-msft) adn [@richross](https://github.com/richross))
+
+### Internal Improvements
+
 ## 1.4.0
 
 ### Enhancements

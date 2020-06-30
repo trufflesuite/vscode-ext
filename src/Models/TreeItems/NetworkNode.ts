@@ -11,7 +11,7 @@ const protocolRegExp = new RegExp('^(' +
   Constants.networkProtocols.http + '|' +
   Constants.networkProtocols.https + '|' +
   Constants.networkProtocols.ftp + '|' +
-  Constants.networkProtocols.file  +
+  Constants.networkProtocols.file +
   ').*', 'i');
 
 export type NetworkNodeTypes =
@@ -62,7 +62,6 @@ export abstract class NetworkNode extends ExtensionItem {
     return {
       name: this.label,
       options: {
-        gas: await this.getGasLimit(),
         gasPrice: await this.getGasPrice(),
         network_id: this.networkId,
       },
