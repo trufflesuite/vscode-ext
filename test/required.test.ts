@@ -26,11 +26,6 @@ const gitValidVersion: commands.ICommandResult = {
   cmdOutputIncludingStderr: '',
   code: 0,
 };
-const pythonValidVersion: commands.ICommandResult = {
-  cmdOutput: ' 2.9.0',
-  cmdOutputIncludingStderr: '',
-  code: 0,
-};
 const truffleValidVersion: commands.ICommandResult = {
   cmdOutput: 'truffle@5.5.0',
   cmdOutputIncludingStderr: '',
@@ -201,54 +196,6 @@ describe('Required helper', () => {
 
         // Act
         const result = await requiredRewire.required.getGitVersion();
-
-        // Assert
-        assert.strictEqual(result, '11.0.0', 'returned result should be defined');
-        assert.strictEqual(tryExecuteCommandMock.calledOnce, true, 'tryExecuteCommand should be called once');
-      });
-    });
-
-    describe('getPythonVersion', () => {
-      it('should return empty string when tryExecuteCommand throws an error', async () => {
-        // Arrange
-        tryExecuteCommandMock.throws(TestConstants.testError);
-
-        // Act
-        const result = await requiredRewire.required.getPythonVersion();
-
-        // Assert
-        assert.strictEqual(result, '', 'returned result should be empty');
-        assert.strictEqual(tryExecuteCommandMock.calledOnce, true, 'tryExecuteCommand should be called once');
-      });
-
-      it('should return empty string when tryExecuteCommand returns not zero code', async () => {
-        // Arrange
-        const executionResult: commands.ICommandResult = {
-          cmdOutput: ' 11.0.0',
-          cmdOutputIncludingStderr: '',
-          code: 1,
-        };
-        tryExecuteCommandMock.returns(executionResult);
-
-        // Act
-        const result = await requiredRewire.required.getPythonVersion();
-
-        // Assert
-        assert.strictEqual(result, '', 'returned result should be empty');
-        assert.strictEqual(tryExecuteCommandMock.calledOnce, true, 'tryExecuteCommand should be called once');
-      });
-
-      it('should return version', async () => {
-        // Arrange
-        const executionResult: commands.ICommandResult = {
-          cmdOutput: ' 11.0.0',
-          cmdOutputIncludingStderr: '',
-          code: 0,
-        };
-        tryExecuteCommandMock.returns(executionResult);
-
-        // Act
-        const result = await requiredRewire.required.getPythonVersion();
 
         // Assert
         assert.strictEqual(result, '11.0.0', 'returned result should be defined');
@@ -463,16 +410,15 @@ describe('Required helper', () => {
         tryExecuteCommandMock.onCall(0).returns(nodeValidVersion);
         tryExecuteCommandMock.onCall(1).returns(npmValidVersion);
         tryExecuteCommandMock.onCall(2).returns(gitValidVersion);
-        tryExecuteCommandMock.onCall(3).returns(pythonValidVersion);
-        tryExecuteCommandMock.onCall(4).returns(truffleValidVersion);
-        tryExecuteCommandMock.onCall(5).returns(ganacheValidVersion);
+        tryExecuteCommandMock.onCall(3).returns(truffleValidVersion);
+        tryExecuteCommandMock.onCall(4).returns(ganacheValidVersion);
 
         // Act
         const result = await requiredRewire.required.getAllVersions();
 
         // Assert
-        assert.strictEqual(result.length, 6, 'returned result should have length 6');
-        assert.strictEqual(tryExecuteCommandMock.callCount, 6, 'tryExecuteCommand should be called 6 times');
+        assert.strictEqual(result.length, 5, 'returned result should have length 5');
+        assert.strictEqual(tryExecuteCommandMock.callCount, 5, 'tryExecuteCommand should be called 5 times');
       });
     });
 
@@ -482,21 +428,19 @@ describe('Required helper', () => {
         tryExecuteCommandMock.onCall(0).returns(nodeValidVersion);
         tryExecuteCommandMock.onCall(1).returns(npmValidVersion);
         tryExecuteCommandMock.onCall(2).returns(gitValidVersion);
-        tryExecuteCommandMock.onCall(3).returns(pythonValidVersion);
-        tryExecuteCommandMock.onCall(4).returns(truffleValidVersion);
-        tryExecuteCommandMock.onCall(5).returns(ganacheValidVersion);
+        tryExecuteCommandMock.onCall(3).returns(truffleValidVersion);
+        tryExecuteCommandMock.onCall(4).returns(ganacheValidVersion);
 
         // Act
         const result = await requiredRewire.required.checkAppsSilent(
           RequiredApps.node,
           RequiredApps.npm,
           RequiredApps.git,
-          RequiredApps.python,
         );
 
         // Assert
         assert.strictEqual(result, true, 'returned result should be true');
-        assert.strictEqual(tryExecuteCommandMock.callCount, 4, 'tryExecuteCommand should be called 4 times');
+        assert.strictEqual(tryExecuteCommandMock.callCount, 3, 'tryExecuteCommand should be called 3 times');
       });
 
       it('should return false when there are invalid versions', async () => {
@@ -506,30 +450,23 @@ describe('Required helper', () => {
           cmdOutputIncludingStderr: '',
           code: 0,
         };
-        const executionResultPython: commands.ICommandResult = {
-          cmdOutput: ' 2.5.0',
-          cmdOutputIncludingStderr: '',
-          code: 0,
-        };
 
         tryExecuteCommandMock.onCall(0).returns(nodeValidVersion);
         tryExecuteCommandMock.onCall(1).returns(npmValidVersion);
         tryExecuteCommandMock.onCall(2).returns(executionResultGit);
-        tryExecuteCommandMock.onCall(3).returns(executionResultPython);
-        tryExecuteCommandMock.onCall(4).returns(truffleValidVersion);
-        tryExecuteCommandMock.onCall(5).returns(ganacheValidVersion);
+        tryExecuteCommandMock.onCall(3).returns(truffleValidVersion);
+        tryExecuteCommandMock.onCall(4).returns(ganacheValidVersion);
 
         // Act
         const result = await requiredRewire.required.checkAppsSilent(
           RequiredApps.node,
           RequiredApps.npm,
           RequiredApps.git,
-          RequiredApps.python,
         );
 
         // Assert
         assert.strictEqual(result, false, 'returned result should be false');
-        assert.strictEqual(tryExecuteCommandMock.callCount, 4, 'tryExecuteCommand should be called 4 times');
+        assert.strictEqual(tryExecuteCommandMock.callCount, 3, 'tryExecuteCommand should be called 3 times');
       });
     });
 
@@ -539,21 +476,19 @@ describe('Required helper', () => {
         tryExecuteCommandMock.onCall(0).returns(nodeValidVersion);
         tryExecuteCommandMock.onCall(1).returns(npmValidVersion);
         tryExecuteCommandMock.onCall(2).returns(gitValidVersion);
-        tryExecuteCommandMock.onCall(3).returns(pythonValidVersion);
-        tryExecuteCommandMock.onCall(4).returns(truffleValidVersion);
-        tryExecuteCommandMock.onCall(5).returns(ganacheValidVersion);
+        tryExecuteCommandMock.onCall(3).returns(truffleValidVersion);
+        tryExecuteCommandMock.onCall(4).returns(ganacheValidVersion);
 
         // Act
         const result = await requiredRewire.required.checkApps(
           RequiredApps.node,
           RequiredApps.npm,
           RequiredApps.git,
-          RequiredApps.python,
         );
 
         // Assert
         assert.strictEqual(result, true, 'returned result should be true');
-        assert.strictEqual(tryExecuteCommandMock.callCount, 4, 'tryExecuteCommand should be called 4 times');
+        assert.strictEqual(tryExecuteCommandMock.callCount, 3, 'tryExecuteCommand should be called 3 times');
         assert.strictEqual(showErrorMessageMock.called, false, 'showErrorMessage shouldn\'t be called');
         assert.strictEqual(executeVSCommandMock.called, false, 'executeVSCommand shouldn\'t be called');
       });
@@ -565,30 +500,23 @@ describe('Required helper', () => {
           cmdOutputIncludingStderr: '',
           code: 0,
         };
-        const executionResultPython: commands.ICommandResult = {
-          cmdOutput: ' 2.5.0',
-          cmdOutputIncludingStderr: '',
-          code: 0,
-        };
 
         tryExecuteCommandMock.onCall(0).returns(nodeValidVersion);
         tryExecuteCommandMock.onCall(1).returns(npmValidVersion);
         tryExecuteCommandMock.onCall(2).returns(executionResultGit);
-        tryExecuteCommandMock.onCall(3).returns(executionResultPython);
-        tryExecuteCommandMock.onCall(4).returns(truffleValidVersion);
-        tryExecuteCommandMock.onCall(5).returns(ganacheValidVersion);
+        tryExecuteCommandMock.onCall(3).returns(truffleValidVersion);
+        tryExecuteCommandMock.onCall(4).returns(ganacheValidVersion);
 
         // Act
         const result = await requiredRewire.required.checkApps(
           RequiredApps.node,
           RequiredApps.npm,
           RequiredApps.git,
-          RequiredApps.python,
         );
 
         // Assert
         assert.strictEqual(result, false, 'returned result should be false');
-        assert.strictEqual(tryExecuteCommandMock.callCount, 4, 'tryExecuteCommand should be called 4 times');
+        assert.strictEqual(tryExecuteCommandMock.callCount, 3, 'tryExecuteCommand should be called 3 times');
         assert.strictEqual(showErrorMessageMock.called, true, 'showErrorMessage should be called');
         assert.strictEqual(executeVSCommandMock.called, true, 'executeVSCommand should be called');
       });
@@ -600,9 +528,8 @@ describe('Required helper', () => {
         tryExecuteCommandMock.onCall(0).returns(nodeValidVersion);
         tryExecuteCommandMock.onCall(1).returns(npmValidVersion);
         tryExecuteCommandMock.onCall(2).returns(gitValidVersion);
-        tryExecuteCommandMock.onCall(3).returns(pythonValidVersion);
-        tryExecuteCommandMock.onCall(4).returns(truffleValidVersion);
-        tryExecuteCommandMock.onCall(5).returns(ganacheValidVersion);
+        tryExecuteCommandMock.onCall(3).returns(truffleValidVersion);
+        tryExecuteCommandMock.onCall(4).returns(ganacheValidVersion);
 
         // Act
         const result = await requiredRewire.required.checkRequiredApps();
@@ -621,18 +548,12 @@ describe('Required helper', () => {
           cmdOutputIncludingStderr: '',
           code: 0,
         };
-        const executionResultPython: commands.ICommandResult = {
-          cmdOutput: ' 2.5.0',
-          cmdOutputIncludingStderr: '',
-          code: 0,
-        };
 
         tryExecuteCommandMock.onCall(0).returns(nodeValidVersion);
         tryExecuteCommandMock.onCall(1).returns(npmValidVersion);
         tryExecuteCommandMock.onCall(2).returns(executionResultGit);
-        tryExecuteCommandMock.onCall(3).returns(executionResultPython);
-        tryExecuteCommandMock.onCall(4).returns(truffleValidVersion);
-        tryExecuteCommandMock.onCall(5).returns(ganacheValidVersion);
+        tryExecuteCommandMock.onCall(3).returns(truffleValidVersion);
+        tryExecuteCommandMock.onCall(4).returns(ganacheValidVersion);
 
         // Act
         const result = await requiredRewire.required.checkRequiredApps();
