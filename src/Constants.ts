@@ -110,10 +110,6 @@ export class Constants {
     },
     [RequiredApps.node]: '10.15.0',
     [RequiredApps.npm]: '6.4.1',
-    [RequiredApps.python]: {
-      max: '3.0.0',
-      min: '2.7.15',
-    },
     [RequiredApps.truffle]: {
       max: '6.0.0',
       min: '5.0.0',
@@ -602,7 +598,7 @@ export class Constants {
     NoContractBody: 'No contract body in AST',
     NoSubscriptionFound: 'No subscription found.',
     NoSubscriptionFoundClick: 'No subscription found, click an Azure account ' +
-    'at the bottom left corner and choose Select All',
+      'at the bottom left corner and choose Select All',
     PleaseRenameOldStyleTruffleConfig: 'Please rename file "truffle.js" to "truffle-config.js"',
     RequiredAppsAreNotInstalled: 'To run command you should install required apps',
     SolidityContractsNotFound: 'Solidity contracts were not found',

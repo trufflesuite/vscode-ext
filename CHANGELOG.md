@@ -2,6 +2,16 @@
 
 All notable changes to the "azure blockchain" extension will be documented in this file.
 
+## 1.6.0
+
+### Enhancements
+
+- Removed the dependency of Python for this extension. This was required by a nested component used by the exntension but has been removed. ([#67](https://github.com/microsoft/vscode-azure-blockchain-ethereum/issues/67) by [@pinakighatak](https://github.com/pinakighatak))
+
+### Fixes
+
+### Internal Improvements
+
 ## 1.5.0
 
 ### Enhancements

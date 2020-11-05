@@ -144,10 +144,6 @@ export namespace required {
       currentState.git = currentState.git ||
         await createRequiredVersion(RequiredApps.git, getGitVersion);
     }
-    if (apps.includes(RequiredApps.python)) {
-      currentState.python = currentState.python ||
-        await createRequiredVersion(RequiredApps.python, getPythonVersion);
-    }
     if (apps.includes(RequiredApps.truffle)) {
       currentState.truffle = currentState.truffle ||
         await createRequiredVersion(RequiredApps.truffle, getTruffleVersion);
