@@ -2,6 +2,16 @@
 
 All notable changes to the "azure blockchain" extension will be documented in this file.
 
+## 1.6.1
+
+### Enhancements
+
+### Fixes
+
+- Fixed bug with astring and the associated typings to resolve the build issues with the later version of the core library.
+
+### Internal Improvements
+
 ## 1.6.0
 
 ### Enhancements
