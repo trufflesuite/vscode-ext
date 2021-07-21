@@ -5,7 +5,7 @@
   "publisher": "AzBlockchain",
   "preview": false,
   "icon": "images/blockchain-service-logo.png",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum"
@@ -48,7 +48,6 @@
     "onCommand:azureBlockchainService.generateEventPublishingWorkflows",
     "onCommand:azureBlockchainService.generateDataPublishingWorkflows",
     "onCommand:azureBlockchainService.connectProject",
-    "onCommand:azureBlockchainService.showSmartContractPage",
     "onCommand:azureBlockchainService.copyRPCEndpointAddress",
     "onCommand:azureBlockchainService.createProject",
     "onCommand:azureBlockchainService.disconnectProject",
@@ -161,11 +160,6 @@
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.showSmartContractPage",
-        "title": "Show Smart Contract Interaction Page",
-        "category": "Blockchain"
-      },
-      {
         "command": "azureBlockchainService.copyRPCEndpointAddress",
         "title": "Copy RPC Endpoint Address",
         "category": "Blockchain"
@@ -241,10 +235,6 @@
     ],
     "menus": {
       "commandPalette": [
-        {
-          "when": "false",
-          "command": "azureBlockchainService.showSmartContractPage"
-        },
         {
           "when": "false",
           "command": "azureBlockchainService.refresh"
@@ -393,11 +383,6 @@
           "group": "8_buildContractGroup"
         },
         {
-          "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.showSmartContractPage",
-          "group": "8_buildContractGroup"
-        },
-        {
           "when": "resourceLangId == json",
           "command": "azureBlockchainService.deployContracts",
           "group": "8_buildContractGroup"
@@ -541,7 +526,7 @@
   "scripts": {
     "package": "npx vsce package",
     "publish": "npx vsce publish",
-    "vscode:prepublish": "npm i && npm run webpack:prod && cd ./drizzleUI && npm i && npm run build:ext",
+    "vscode:prepublish": "npm i && npm run webpack:prod",
     "compile": "npm run clean && tsc -p ./",
     "webpack:prod": "webpack --mode production",
     "watch": "tsc -watch -p ./",
