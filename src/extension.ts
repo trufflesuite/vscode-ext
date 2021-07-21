@@ -3,7 +3,6 @@
 
 import { commands, ExtensionContext, Uri, window, workspace } from 'vscode';
 import {
-  ContractCommands,
   DebuggerCommands,
   GanacheCommands,
   InfuraCommands,
@@ -104,7 +103,7 @@ export async function activate(context: ExtensionContext) {
   const copyRPCEndpointAddress = commands.registerCommand('azureBlockchainService.copyRPCEndpointAddress',
     async (viewItem: NetworkNodeView) => {
       await tryExecute(() => TruffleCommands.writeRPCEndpointAddressToBuffer(viewItem));
-  });
+    });
   const getPrivateKeyFromMnemonic = commands.registerCommand('azureBlockchainService.getPrivateKey', async () => {
     await tryExecute(() => TruffleCommands.getPrivateKeyFromMnemonic());
   });
@@ -140,17 +139,12 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region contract commands
-  const showSmartContractPage = commands.registerCommand(
-    'azureBlockchainService.showSmartContractPage',
-    async (contractPath: Uri) => {
-      await tryExecute(() => ContractCommands.showSmartContractPage(context, contractPath));
-    });
   const createNewBDMApplication = commands.registerCommand('azureBlockchainService.createNewBDMApplication',
     async (viewItem: ProjectView) => {
       await tryExecute(() => ServiceCommands.createNewBDMApplication(viewItem));
-  });
+    });
   const deleteBDMApplication = commands.registerCommand('azureBlockchainService.deleteBDMApplication',
-    async (viewItem: NetworkNodeView) => await tryExecute(() =>  ServiceCommands.deleteBDMApplication(viewItem)));
+    async (viewItem: NetworkNodeView) => await tryExecute(() => ServiceCommands.deleteBDMApplication(viewItem)));
   //#endregion
 
   //#region open zeppelin commands
@@ -199,7 +193,6 @@ export async function activate(context: ExtensionContext) {
   const subscriptions = [
     showWelcomePage,
     showRequirementsPage,
-    showSmartContractPage,
     refresh,
     newSolidityProject,
     buildContracts,

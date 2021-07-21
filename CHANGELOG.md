@@ -2,6 +2,16 @@
 
 All notable changes to the "azure blockchain" extension will be documented in this file.
 
+## 1.6.2
+
+### Enhancements
+
+- Removed the Smart Contract Interaction options for contracts. A new version of this interaction will be implemented in a future release.
+
+### Fixes
+
+### Internal Improvements
+
 ## 1.6.1
 
 ### Enhancements
