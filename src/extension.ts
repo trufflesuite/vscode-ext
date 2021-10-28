@@ -6,7 +6,6 @@ import {
   DebuggerCommands,
   GanacheCommands,
   InfuraCommands,
-  LogicAppCommands,
   OpenZeppelinCommands,
   ProjectCommands,
   sdkCoreCommands,
@@ -154,26 +153,26 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region logic app commands
-  const generateMicroservicesWorkflows = commands.registerCommand(
-    'azureBlockchainService.generateMicroservicesWorkflows',
-    async (filePath: Uri | undefined) => {
-      await tryExecute(async () => await LogicAppCommands.generateMicroservicesWorkflows(filePath));
-    });
-  const generateDataPublishingWorkflows = commands.registerCommand(
-    'azureBlockchainService.generateDataPublishingWorkflows',
-    async (filePath: Uri | undefined) => {
-      await tryExecute(async () => await LogicAppCommands.generateDataPublishingWorkflows(filePath));
-    });
-  const generateEventPublishingWorkflows = commands.registerCommand(
-    'azureBlockchainService.generateEventPublishingWorkflows',
-    async (filePath: Uri | undefined) => {
-      await tryExecute(async () => await LogicAppCommands.generateEventPublishingWorkflows(filePath));
-    });
-  const generateReportPublishingWorkflows = commands.registerCommand(
-    'azureBlockchainService.generateReportPublishingWorkflows',
-    async (filePath: Uri | undefined) => {
-      await tryExecute(async () => await LogicAppCommands.generateReportPublishingWorkflows(filePath));
-    });
+  // const generateMicroservicesWorkflows = commands.registerCommand(
+  //   'azureBlockchainService.generateMicroservicesWorkflows',
+  //   async (filePath: Uri | undefined) => {
+  //     await tryExecute(async () => await LogicAppCommands.generateMicroservicesWorkflows(filePath));
+  //   });
+  // const generateDataPublishingWorkflows = commands.registerCommand(
+  //   'azureBlockchainService.generateDataPublishingWorkflows',
+  //   async (filePath: Uri | undefined) => {
+  //     await tryExecute(async () => await LogicAppCommands.generateDataPublishingWorkflows(filePath));
+  //   });
+  // const generateEventPublishingWorkflows = commands.registerCommand(
+  //   'azureBlockchainService.generateEventPublishingWorkflows',
+  //   async (filePath: Uri | undefined) => {
+  //     await tryExecute(async () => await LogicAppCommands.generateEventPublishingWorkflows(filePath));
+  //   });
+  // const generateReportPublishingWorkflows = commands.registerCommand(
+  //   'azureBlockchainService.generateReportPublishingWorkflows',
+  //   async (filePath: Uri | undefined) => {
+  //     await tryExecute(async () => await LogicAppCommands.generateReportPublishingWorkflows(filePath));
+  //   });
   //#endregion
 
   //#region debugger commands
@@ -208,10 +207,10 @@ export async function activate(context: ExtensionContext) {
     copyRPCEndpointAddress,
     startGanacheServer,
     stopGanacheServer,
-    generateMicroservicesWorkflows,
-    generateDataPublishingWorkflows,
-    generateEventPublishingWorkflows,
-    generateReportPublishingWorkflows,
+    // generateMicroservicesWorkflows,
+    // generateDataPublishingWorkflows,
+    // generateEventPublishingWorkflows,
+    // generateReportPublishingWorkflows,
     getPrivateKeyFromMnemonic,
     startDebugger,
     signInToInfuraAccount,
@@ -249,7 +248,7 @@ async function tryExecute(func: () => Promise<any>, errorMessage: string | null 
     if (error instanceof CancellationEvent) {
       return;
     }
-    window.showErrorMessage(errorMessage || error.message);
+    window.showErrorMessage(errorMessage || (error as Error).message);
   }
 }
 
