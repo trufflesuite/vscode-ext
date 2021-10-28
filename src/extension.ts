@@ -3,7 +3,6 @@
 
 import { commands, ExtensionContext, Uri, window, workspace } from 'vscode';
 import {
-  DebuggerCommands,
   GanacheCommands,
   InfuraCommands,
   OpenZeppelinCommands,
@@ -176,9 +175,9 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region debugger commands
-  const startDebugger = commands.registerCommand('extension.truffle.debugTransaction', async () => {
-    await tryExecute(() => DebuggerCommands.startSolidityDebugger());
-  });
+  // const startDebugger = commands.registerCommand('extension.truffle.debugTransaction', async () => {
+  //   await tryExecute(() => DebuggerCommands.startSolidityDebugger());
+  // });
   //#endregion
 
   //#region other subscriptions
@@ -212,7 +211,6 @@ export async function activate(context: ExtensionContext) {
     // generateEventPublishingWorkflows,
     // generateReportPublishingWorkflows,
     getPrivateKeyFromMnemonic,
-    startDebugger,
     signInToInfuraAccount,
     signOutOfInfuraAccount,
     showProjectsFromInfuraAccount,

@@ -47,7 +47,6 @@
     "onCommand:azureBlockchainService.copyRPCEndpointAddress",
     "onCommand:azureBlockchainService.createProject",
     "onCommand:azureBlockchainService.disconnectProject",
-    "onCommand:extension.truffle.debugTransaction",
     "onCommand:openZeppelin.addCategory",
     "onCommand:azureBlockchainService.signInToInfuraAccount",
     "onCommand:azureBlockchainService.signOutOfInfuraAccount",
@@ -174,11 +173,6 @@
       {
         "command": "azureBlockchainService.getPrivateKey",
         "title": "Retrieve private key",
-        "category": "Blockchain"
-      },
-      {
-        "command": "extension.truffle.debugTransaction",
-        "title": "Debug Transaction",
         "category": "Blockchain"
       },
       {
