@@ -5,7 +5,7 @@
   "publisher": "AzBlockchain",
   "preview": false,
   "icon": "images/blockchain-service-logo.png",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum"
@@ -43,10 +43,6 @@
     "onCommand:truffle.newSolidityProject",
     "onCommand:azureBlockchainService.buildContracts",
     "onCommand:azureBlockchainService.deployContracts",
-    "onCommand:azureBlockchainService.generateReportPublishingWorkflows",
-    "onCommand:azureBlockchainService.generateMicroservicesWorkflows",
-    "onCommand:azureBlockchainService.generateEventPublishingWorkflows",
-    "onCommand:azureBlockchainService.generateDataPublishingWorkflows",
     "onCommand:azureBlockchainService.connectProject",
     "onCommand:azureBlockchainService.copyRPCEndpointAddress",
     "onCommand:azureBlockchainService.createProject",
@@ -90,26 +86,7 @@
       }
     },
     "commands": [
-      {
-        "command": "azureBlockchainService.generateMicroservicesWorkflows",
-        "title": "Generate Microservices for Smart Contracts",
-        "category": "Blockchain"
-      },
-      {
-        "command": "azureBlockchainService.generateDataPublishingWorkflows",
-        "title": "Generate Data Publishing Workflows for Smart Contracts",
-        "category": "Blockchain"
-      },
-      {
-        "command": "azureBlockchainService.generateReportPublishingWorkflows",
-        "title": "Generate Report Publishing Workflows for Smart Contracts",
-        "category": "Blockchain"
-      },
-      {
-        "command": "azureBlockchainService.generateEventPublishingWorkflows",
-        "title": "Generate Event Publishing Workflows for Smart Contracts",
-        "category": "Blockchain"
-      },
+
       {
         "command": "azureBlockchainService.showWelcomePage",
         "title": "Show Welcome Page",
@@ -246,22 +223,6 @@
         {
           "when": "false",
           "command": "azureBlockchainService.disconnectProject"
-        },
-        {
-          "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.generateMicroservicesWorkflows"
-        },
-        {
-          "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.generateDataPublishingWorkflows"
-        },
-        {
-          "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.generateEventPublishingWorkflows"
-        },
-        {
-          "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.generateReportPublishingWorkflows"
         },
         {
           "when": "false",
@@ -406,26 +367,6 @@
           "when": "resourceLangId == json",
           "command": "contract.copyABI",
           "group": "9_copyFromContractGroup"
-        },
-        {
-          "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.generateMicroservicesWorkflows",
-          "group": "9_generationGroup"
-        },
-        {
-          "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.generateDataPublishingWorkflows",
-          "group": "9_generationGroup"
-        },
-        {
-          "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.generateEventPublishingWorkflows",
-          "group": "9_generationGroup"
-        },
-        {
-          "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.generateReportPublishingWorkflows",
-          "group": "9_generationGroup"
         },
         {
           "when": "resourceLangId == solidity",
