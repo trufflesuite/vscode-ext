@@ -156,7 +156,7 @@ export namespace TruffleCommands {
 
       await vscodeEnvironment.writeToClipboard(deployedBytecode);
     } catch (ex) {
-      Telemetry.sendException(ex);
+      Telemetry.sendException(ex as Error);
       window.showErrorMessage(Constants.errorMessageStrings.FetchingDeployedBytecodeIsFailed);
     }
 
@@ -179,7 +179,7 @@ export namespace TruffleCommands {
           Constants.informationMessage.networkIsNotReady(networkNodeView.extensionItem.constructor.name));
       }
     } catch (error) {
-      Telemetry.sendException(error);
+      Telemetry.sendException(error as Error);
       window.showErrorMessage(Constants.errorMessageStrings.BlockchainItemIsUnavailable(
         networkNodeView.extensionItem.constructor.name));
     }
@@ -224,7 +224,7 @@ export namespace TruffleCommands {
       await vscodeEnvironment.writeToClipboard(privateKey);
       window.showInformationMessage(Constants.informationMessage.privateKeyWasCopiedToClipboard);
     } catch (error) {
-      Telemetry.sendException(error);
+      Telemetry.sendException(error as Error);
       window.showErrorMessage(Constants.errorMessageStrings.InvalidMnemonic);
     }
     Telemetry.sendEvent('TruffleCommands.getPrivateKeyFromMnemonic.commandFinished');

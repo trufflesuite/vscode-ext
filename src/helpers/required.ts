@@ -120,7 +120,7 @@ export namespace required {
         || packagesData.dependencies[RequiredApps.hdwalletProvider]
         : '';
     } catch (error) {
-      Telemetry.sendException(error);
+      Telemetry.sendException(error as Error);
       return '';
     }
   }
@@ -204,8 +204,8 @@ export namespace required {
     try {
       await installUsingNpm(RequiredApps.npm, Constants.requiredVersions[RequiredApps.npm]);
     } catch (error) {
-      Telemetry.sendException(error);
-      Output.outputLine(Constants.outputChannel.requirements, error.message);
+      Telemetry.sendException(error as Error);
+      Output.outputLine(Constants.outputChannel.requirements, (error as Error).message);
     }
 
     currentState.npm = await createRequiredVersion(RequiredApps.npm, getNpmVersion);
@@ -215,8 +215,8 @@ export namespace required {
     try {
       await installUsingNpm(RequiredApps.truffle, Constants.requiredVersions[RequiredApps.truffle], scope);
     } catch (error) {
-      Telemetry.sendException(error);
-      Output.outputLine(Constants.outputChannel.requirements, error.message);
+      Telemetry.sendException(error as Error);
+      Output.outputLine(Constants.outputChannel.requirements, (error as Error).message);
     }
 
     currentState.truffle = await createRequiredVersion(
@@ -229,8 +229,8 @@ export namespace required {
     try {
       await installUsingNpm(RequiredApps.ganache, Constants.requiredVersions[RequiredApps.ganache], scope);
     } catch (error) {
-      Telemetry.sendException(error);
-      Output.outputLine(Constants.outputChannel.requirements, error.message);
+      Telemetry.sendException(error as Error);
+      Output.outputLine(Constants.outputChannel.requirements, (error as Error).message);
     }
 
     currentState.ganache = await createRequiredVersion(
@@ -250,7 +250,7 @@ export namespace required {
       const config = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
       await config.importPackage(Constants.truffleConfigRequireNames.hdwalletProvider, RequiredApps.hdwalletProvider);
     } catch (error) {
-      Telemetry.sendException(error);
+      Telemetry.sendException(error as Error);
     }
   }
 
@@ -260,8 +260,8 @@ export namespace required {
       const config = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
       return config.isHdWalletProviderDeclared();
     } catch (error) {
-      Telemetry.sendException(error);
-      Output.outputLine(Constants.outputChannel.requirements, error.message);
+      Telemetry.sendException(error as Error);
+      Output.outputLine(Constants.outputChannel.requirements, (error as Error).message);
     }
 
     return false;
@@ -275,8 +275,8 @@ export namespace required {
 
       return packagesData.name === 'blockchain-ethereum-template';
     } catch (error) {
-      Telemetry.sendException(error);
-      Output.outputLine(Constants.outputChannel.requirements, error.message);
+      Telemetry.sendException(error as Error);
+      Output.outputLine(Constants.outputChannel.requirements, (error as Error).message);
     }
 
     return false;
@@ -336,7 +336,7 @@ export namespace required {
         return version || '';
       }
     } catch (error) {
-      Telemetry.sendException(error);
+      Telemetry.sendException(error as Error);
     }
 
     return '';
