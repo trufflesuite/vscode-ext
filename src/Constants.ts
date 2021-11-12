@@ -15,7 +15,7 @@ export enum RequiredApps {
   git = 'git',
   python = 'python',
   truffle = 'truffle',
-  ganache = 'ganache-cli',
+  ganache = 'ganache',
   hdwalletProvider = 'truffle-hdwallet-provider',
 }
 
@@ -100,7 +100,7 @@ export class Constants {
 
   public static requiredVersions: { [key: string]: string | { min: string, max: string } } = {
     [RequiredApps.ganache]: {
-      max: '7.0.0',
+      max: '7.1.0',
       min: '6.0.0',
     },
     [RequiredApps.git]: '2.10.0',
