@@ -151,10 +151,11 @@ export class LogicAppGenerator {
       case Reporting:
         Telemetry.sendEvent('LogicAppGenerator.getGenerator.Reporting');
         return this.getReportingWorkflowProjectGenerator(contract, logicAppData);
-      default:
+      default: {
         const error = new Error(Constants.errorMessageStrings.WorkflowTypeDoesNotMatch);
         Telemetry.sendException(error);
         throw error;
+      }
     }
   }
 

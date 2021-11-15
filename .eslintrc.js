@@ -30,286 +30,91 @@ Happy linting! 💖
 
 */
 module.exports = {
-    "env": {
-        "browser": true,
-        "es6": true,
-        "node": true
-    },
-    "extends": [
-        "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking",
-        "prettier"
+  env: {
+    browser: true,
+    es6: true,
+    node: true,
+    mocha: true,
+  },
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    project: "tsconfig.json",
+    sourceType: "module",
+  },
+  extends: ["plugin:@typescript-eslint/recommended", "eslint:recommended", "prettier"],
+  plugins: [
+    "prettier",
+    "@typescript-eslint",
+  ],
+  rules: {
+    // FIXME: rework this eventually. Tech-debt
+    "@typescript-eslint/ban-ts-comment": "off",
+    // FIXME: rework this eventually. Tech-debt
+    "@typescript-eslint/ban-types": [
+      "off",
+      {
+        types: {
+          Object: {
+            message: "Avoid using the `Object` type. Did you mean `object`?",
+          },
+          Function: {
+            message: "Avoid using the `Function` type. Prefer a specific function type, like `() => void`.",
+          },
+          Boolean: {
+            message: "Avoid using the `Boolean` type. Did you mean `boolean`?",
+          },
+          Number: {
+            message: "Avoid using the `Number` type. Did you mean `number`?",
+          },
+          String: {
+            message: "Avoid using the `String` type. Did you mean `string`?",
+          },
+          Symbol: {
+            message: "Avoid using the `Symbol` type. Did you mean `symbol`?",
+          },
+        },
+      },
     ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "project": "tsconfig.json",
-        "sourceType": "module"
-    },
-    "plugins": [
-        "eslint-plugin-jsdoc",
-        "eslint-plugin-prefer-arrow",
-        "eslint-plugin-import",
-        "@typescript-eslint",
-        "@typescript-eslint/tslint"
+    "@typescript-eslint/dot-notation": "warn",
+    // FIXME: rework this eventually. Tech-debt
+    "@typescript-eslint/no-empty-interface": "off",
+    // FIXME: rework this eventually. Tech-debt
+    "@typescript-eslint/no-explicit-any": "off",
+    // FIXME: rework this eventually. Tech-debt
+    "@typescript-eslint/no-inferrable-types": "off",
+    // FIXME: rework this eventually. Tech-debt
+    "@typescript-eslint/no-namespace": "off",
+    // FIXME: rework this eventually. Tech-debt
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    // FIXME: rework this eventually. Tech-debt
+    "@typescript-eslint/no-var-requires": "off",
+    // FIXME: rework this eventually. Tech-debt
+    "@typescript-eslint/prefer-namespace-keyword": "off",
+    "@typescript-eslint/triple-slash-reference": [
+      "warn",
+      {
+        path: "always",
+        types: "prefer-import",
+        lib: "always",
+      },
     ],
-    "rules": {
-        "@typescript-eslint/adjacent-overload-signatures": "warn",
-        "@typescript-eslint/array-type": [
-            "warn",
-            {
-                "default": "array-simple"
-            }
-        ],
-        "@typescript-eslint/await-thenable": "error",
-        "@typescript-eslint/ban-ts-comment": "error",
-        "@typescript-eslint/ban-types": [
-            "warn",
-            {
-                "types": {
-                    "Object": {
-                        "message": "Avoid using the `Object` type. Did you mean `object`?"
-                    },
-                    "Function": {
-                        "message": "Avoid using the `Function` type. Prefer a specific function type, like `() => void`."
-                    },
-                    "Boolean": {
-                        "message": "Avoid using the `Boolean` type. Did you mean `boolean`?"
-                    },
-                    "Number": {
-                        "message": "Avoid using the `Number` type. Did you mean `number`?"
-                    },
-                    "String": {
-                        "message": "Avoid using the `String` type. Did you mean `string`?"
-                    },
-                    "Symbol": {
-                        "message": "Avoid using the `Symbol` type. Did you mean `symbol`?"
-                    }
-                }
-            }
-        ],
-        "@typescript-eslint/consistent-type-assertions": "warn",
-        "@typescript-eslint/consistent-type-definitions": "warn",
-        "@typescript-eslint/dot-notation": "warn",
-        "@typescript-eslint/explicit-member-accessibility": [
-            "warn",
-            {
-                "accessibility": "explicit"
-            }
-        ],
-        "@typescript-eslint/indent": [
-            "warn",
-            4,
-            {
-                "FunctionDeclaration": {
-                    "parameters": "first"
-                },
-                "FunctionExpression": {
-                    "parameters": "first"
-                }
-            }
-        ],
-        "@typescript-eslint/member-delimiter-style": [
-            "warn",
-            {
-                "multiline": {
-                    "delimiter": "semi",
-                    "requireLast": true
-                },
-                "singleline": {
-                    "delimiter": "semi",
-                    "requireLast": false
-                }
-            }
-        ],
-        "@typescript-eslint/member-ordering": "warn",
-        "@typescript-eslint/naming-convention": "warn",
-        "@typescript-eslint/no-array-constructor": "error",
-        "@typescript-eslint/no-empty-function": "warn",
-        "@typescript-eslint/no-empty-interface": "warn",
-        "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-extra-non-null-assertion": "error",
-        "@typescript-eslint/no-extra-semi": "error",
-        "@typescript-eslint/no-floating-promises": "error",
-        "@typescript-eslint/no-for-in-array": "error",
-        "@typescript-eslint/no-implied-eval": "error",
-        "@typescript-eslint/no-inferrable-types": "error",
-        "@typescript-eslint/no-loss-of-precision": "error",
-        "@typescript-eslint/no-misused-new": "warn",
-        "@typescript-eslint/no-misused-promises": "error",
-        "@typescript-eslint/no-namespace": "off",
-        "@typescript-eslint/no-non-null-asserted-optional-chain": "error",
-        "@typescript-eslint/no-non-null-assertion": "warn",
-        "@typescript-eslint/no-parameter-properties": "off",
-        "@typescript-eslint/no-shadow": [
-            "warn",
-            {
-                "hoist": "all"
-            }
-        ],
-        "@typescript-eslint/no-this-alias": "error",
-        "@typescript-eslint/no-unnecessary-type-assertion": "error",
-        "@typescript-eslint/no-unnecessary-type-constraint": "error",
-        "@typescript-eslint/no-unsafe-argument": "error",
-        "@typescript-eslint/no-unsafe-assignment": "error",
-        "@typescript-eslint/no-unsafe-call": "error",
-        "@typescript-eslint/no-unsafe-member-access": "error",
-        "@typescript-eslint/no-unsafe-return": "error",
-        "@typescript-eslint/no-unused-expressions": "warn",
-        "@typescript-eslint/no-unused-vars": "warn",
-        "@typescript-eslint/no-use-before-define": "off",
-        "@typescript-eslint/no-var-requires": "warn",
-        "@typescript-eslint/prefer-as-const": "error",
-        "@typescript-eslint/prefer-for-of": "warn",
-        "@typescript-eslint/prefer-function-type": "warn",
-        "@typescript-eslint/prefer-namespace-keyword": "warn",
-        "@typescript-eslint/quotes": [
-            "warn",
-            "single",
-            {
-                "avoidEscape": true
-            }
-        ],
-        "@typescript-eslint/require-await": "error",
-        "@typescript-eslint/restrict-plus-operands": "error",
-        "@typescript-eslint/restrict-template-expressions": "error",
-        "@typescript-eslint/semi": [
-            "warn",
-            "always"
-        ],
-        "@typescript-eslint/triple-slash-reference": [
-            "warn",
-            {
-                "path": "always",
-                "types": "prefer-import",
-                "lib": "always"
-            }
-        ],
-        "@typescript-eslint/tslint/config": [
-            "error",
-            {
-                "rules": {
-                    "import-spacing": true,
-                    "object-literal-sort-keys": true,
-                    "whitespace": true
-                }
-            }
-        ],
-        "@typescript-eslint/type-annotation-spacing": "warn",
-        "@typescript-eslint/unbound-method": "error",
-        "@typescript-eslint/unified-signatures": "warn",
-        "arrow-body-style": "warn",
-        "arrow-parens": [
-            "warn",
-            "always"
-        ],
-        "brace-style": [
-            "warn",
-            "1tbs"
-        ],
-        "comma-dangle": [
-            "warn",
-            "always-multiline"
-        ],
-        "complexity": "off",
-        "constructor-super": "warn",
-        "curly": "warn",
-        "dot-notation": "warn",
-        "eol-last": "warn",
-        "eqeqeq": [
-            "warn",
-            "always"
-        ],
-        "guard-for-in": "warn",
-        "id-denylist": [
-            "warn",
-            "any",
-            "Number",
-            "number",
-            "String",
-            "string",
-            "Boolean",
-            "boolean",
-            "Undefined",
-            "undefined"
-        ],
-        "id-match": "warn",
-        "import/order": "warn",
-        "indent": "warn",
-        "jsdoc/check-alignment": "warn",
-        "jsdoc/check-indentation": "warn",
-        "jsdoc/newline-after-description": "warn",
-        "max-classes-per-file": [
-            "warn",
-            1
-        ],
-        "max-len": [
-            "warn",
-            {
-                "code": 120
-            }
-        ],
-        "new-parens": "warn",
-        "no-array-constructor": "off",
-        "no-bitwise": "warn",
-        "no-caller": "warn",
-        "no-cond-assign": "warn",
-        "no-console": "warn",
-        "no-debugger": "warn",
-        "no-empty": "warn",
-        "no-empty-function": "warn",
-        "no-eval": "warn",
-        "no-extra-semi": "off",
-        "no-fallthrough": "off",
-        "no-implied-eval": "off",
-        "no-invalid-this": "off",
-        "no-loss-of-precision": "off",
-        "no-multiple-empty-lines": "warn",
-        "no-new-wrappers": "warn",
-        "no-redeclare": "warn",
-        "no-shadow": "warn",
-        "no-throw-literal": "warn",
-        "no-trailing-spaces": "warn",
-        "no-undef-init": "warn",
-        "no-underscore-dangle": "warn",
-        "no-unsafe-finally": "warn",
-        "no-unused-expressions": "warn",
-        "no-unused-labels": "warn",
-        "no-unused-vars": "off",
-        "no-use-before-define": "off",
-        "no-var": "warn",
-        "object-shorthand": "warn",
-        "one-var": [
-            "warn",
-            "never"
-        ],
-        "prefer-arrow/prefer-arrow-functions": "warn",
-        "prefer-const": "warn",
-        "quote-props": [
-            "warn",
-            "consistent-as-needed"
-        ],
-        "quotes": "warn",
-        "radix": "warn",
-        "require-await": "off",
-        "semi": "warn",
-        "space-before-function-paren": [
-            "warn",
-            {
-                "anonymous": "never",
-                "asyncArrow": "always",
-                "named": "never"
-            }
-        ],
-        "spaced-comment": [
-            "warn",
-            "always",
-            {
-                "markers": [
-                    "/"
-                ]
-            }
-        ],
-        "use-isnan": "warn",
-        "valid-typeof": "off"
-    }
+    "dot-notation": "warn",
+
+    "no-constant-condition": ["error", { checkLoops: false }],
+    // FIXME: tech-debt.
+    "no-extra-boolean-cast": "off",
+    // FIXME: rework this eventually. Tech-debt
+    "no-inner-declarations": "off",
+    // FIXME: rework this eventually. Tech-debt
+    "no-prototype-builtins": "off",
+    // FIXME: This needs removed. Tech-Debt
+    "no-undef": "off",
+    "no-unused-vars": "off",
+    "no-useless-escape": "off",
+    "no-use-before-define": "off",
+    // FIXME: rework this eventually. Tech-debt
+    "no-var": "off",
+  },
 };

@@ -60,15 +60,14 @@ export default class RuntimeInterface extends EventEmitter {
     if (!this._session) {
       return Promise.resolve(null);
     }
-    let breakpoint: DebuggerTypes.IBreakpoint;
 
     // we'll need the debugger-internal ID of this source
     const debuggerSources: any = this._session.view(this._selectors.solidity.info.sources);
     const matchingSource: any = Object.values(debuggerSources).find((source: any) =>
-      (pathRelative(source.sourcePath, filePath) === ''));
+    (pathRelative(source.sourcePath, filePath) === ''));
     const sourceId = matchingSource.id;
 
-    breakpoint = {
+    const breakpoint: DebuggerTypes.IBreakpoint = {
       id: this._numBreakpoints,
       line,
       sourceId,
