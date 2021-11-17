@@ -41,10 +41,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '16.4.x'
-          cache: 'npm'
+          cache: 'yarn'
 
       - name: clean install dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
 
       - name: update metadata in package.json
         uses: onlyutkarsh/patch-files-action@v1.0.3
@@ -64,7 +64,7 @@ jobs:
           VERSION: "${{ steps.gitversion.outputs.semVer }}"
 
       - name: compile and create vsix
-        run: npm run package
+        run: yarn package
 
       - name: print vsix path
         run: |
