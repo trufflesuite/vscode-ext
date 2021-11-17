@@ -98,6 +98,7 @@ export class Constants {
     },
   };
 
+  // Values are quite brittle and don't map directly to the requirements.html screen.
   public static requiredVersions: { [key: string]: string | { min: string, max: string } } = {
     [RequiredApps.ganache]: {
       max: '7.1.0',

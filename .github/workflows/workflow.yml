@@ -1,4 +1,4 @@
-name: truffle-vscode-ext
+name: CI
 
 on:
   push:
