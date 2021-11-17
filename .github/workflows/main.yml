@@ -22,7 +22,7 @@ jobs:
       - name: install gitversion tool
         uses: gittools/actions/gitversion/setup@v0.9
         with:
-            versionSpec: '5.1.x'
+          versionSpec: '5.x'
 
       - name: execute gitversion
         id: gitversion # step id used as reference for output values
@@ -35,26 +35,29 @@ jobs:
           echo "Patch: ${{ steps.gitversion.outputs.patch }}"
           echo "MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}"
           echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+          echo "GIT SEMVER: $GITVERSION_SEMVER"
 
       - name: setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: '16.4.x'
+          cache: 'npm'
 
       - name: clean install dependencies
         run: npm ci
 
       - name: update metadata in package.json
-        uses: onlyutkarsh/patch-files-action@v1.0.1
+        uses: onlyutkarsh/patch-files-action@v1.0.3
         with:
           files: '${{github.workspace}}/package.json'
           patch-syntax: |
             = /version => "${{ steps.gitversion.outputs.semVer }}"
             = /displayName => "Truffle Chocolate Factory."
             = /description => "Truffle Tools for Blockchain Development."
+            = /aiKey => "SUPER_SECRET_KEY"
 
       - name: add version in CHANGELOG.md
-        uses: cschleiden/replace-tokens@v1.0
+        uses: cschleiden/replace-tokens@v1.1
         with:
           files: '${{github.workspace}}/CHANGELOG.md'
         env:
@@ -73,15 +76,15 @@ jobs:
           name: truffle-vscode-${{steps.gitversion.outputs.semVer}}.vsix
           path: ${{github.workspace}}/truffle-vscode-${{steps.gitversion.outputs.semVer}}.vsix
 
-      - name: publish to marketplace
-        if: github.ref == 'refs/heads/master'
-        run: npm run deploy ${{ env.PAT }}
-
-      - name: create a release
-        if: github.ref == 'refs/heads/master'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: v${{ steps.gitversion.outputs.semVer }}
-          release_name: v${{ steps.gitversion.outputs.semVer }}
+#      - name: publish to marketplace
+#        if: github.ref == 'refs/heads/master'
+#        run: npm run deploy ${{ env.PAT }}
+#
+#      - name: create a release
+#        if: github.ref == 'refs/heads/master'
+#        uses: actions/create-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+#        with:
+#          tag_name: v${{ steps.gitversion.outputs.semVer }}
+#          release_name: v${{ steps.gitversion.outputs.semVer }}
