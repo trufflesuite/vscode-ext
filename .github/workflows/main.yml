@@ -1,36 +1,87 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches:
+      - 'feature/**' # match an pushes on feature/* and feature/<any sub branch>/*
+      - master
+    paths-ignore: # dont run when changes made to these folders
+      - '.vscode/**'
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+  cicd:
+    name: cicd
+    runs-on: windows-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: checkout repo
+        uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: fetch all history and tags from all branches for gitversion
+        run: git fetch --prune --unshallow
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: install gitversion tool
+        uses: gittools/actions/gitversion/setup@v0.9
+        with:
+          versionSpec: '5.1.x'
+
+      - name: execute gitversion
+        id: gitversion # step id used as reference for output values
+        uses: gittools/actions/gitversion/execute@v0.9
+
+      - name: print gitversion
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          echo "Major: ${{ steps.gitversion.outputs.major }}"
+          echo "Minor: ${{ steps.gitversion.outputs.minor }}"
+          echo "Patch: ${{ steps.gitversion.outputs.patch }}"
+          echo "MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}"
+          echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+
+      - name: setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+
+      - name: clean install dependencies
+        run: npm ci
+
+      - name: update metadata in package.json
+        uses: onlyutkarsh/patch-files-action@v1.0.1
+        with:
+          files: '${{github.workspace}}/package.json'
+          patch-syntax: |
+            = /version => "${{ steps.gitversion.outputs.semVer }}"
+            = /displayName => "Truffle Chocolate Factory."
+            = /description => "Truffle Tools for Blockchain Development."
+
+      - name: add version in CHANGELOG.md
+        uses: cschleiden/replace-tokens@v1.0
+        with:
+          files: '${{github.workspace}}/CHANGELOG.md'
+        env:
+          VERSION: "${{ steps.gitversion.outputs.semVer }}"
+
+      - name: compile and create vsix
+        run: npm run package
+
+      - name: print vsix path
+        run: |
+          echo "VSIX Path: ${{ env.vsix_path }}"
+
+      - name: upload vsix as artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: truffle-vscode-${{steps.gitversion.outputs.semVer}}.vsix
+          path: ${{github.workspace}}/truffle-vscode-${{steps.gitversion.outputs.semVer}}.vsix
+
+      - name: publish to marketplace
+        if: github.ref == 'refs/heads/master'
+        run: npm run deploy ${{ env.PAT }}
+
+      - name: create a release
+        if: github.ref == 'refs/heads/master'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: v${{ steps.gitversion.outputs.semVer }}
+          release_name: v${{ steps.gitversion.outputs.semVer }}
