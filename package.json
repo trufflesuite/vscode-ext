@@ -1,11 +1,11 @@
 {
-  "name": "azure-blockchain",
+  "name": "truffle-vscode",
   "displayName": "Blockchain Development Kit for Ethereum",
   "description": "Develop, deploy, debug and manage your Ethereum based blockchain solutions",
   "publisher": "ConsenSys",
   "preview": false,
   "icon": "images/blockchain-service-logo.png",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/trufflesuite/vscode-ext"
@@ -16,7 +16,7 @@
   "homepage": "https://github.com/trufflesuite/vscode-ext/blob/master/README.md",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.44.1"
+    "vscode": "^1.60.0"
   },
   "keywords": [
     "blockchain",

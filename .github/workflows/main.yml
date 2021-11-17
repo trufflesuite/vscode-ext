@@ -28,14 +28,18 @@ jobs:
         id: gitversion # step id used as reference for output values
         uses: gittools/actions/gitversion/execute@v0.9.11
 
-      - name: print gitversion
+      - name: getPackageName
+        id: packageJson
+        uses: myrotvorets/info-from-package-json-action@1.1.0
+
+      - name: print Details
         run: |
           echo "::Major: ${{ steps.gitversion.outputs.major }}::"
           echo "::Minor: ${{ steps.gitversion.outputs.minor }}::"
           echo "::Patch: ${{ steps.gitversion.outputs.patch }}::"
           echo "::MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}::"
           echo "::SemVer: ${{ steps.gitversion.outputs.semVer }}::"
-          echo "::GIT SEMVER: $GITVERSION_SEMVER::"
+          echo "::PackageName: ${{steps.packageJson.outputs.packageName}} ::"
 
       - name: setup node
         uses: actions/setup-node@v2
@@ -46,14 +50,17 @@ jobs:
       - name: clean install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: run tests
+        run: yarn test
+
       - name: update metadata in package.json
         uses: onlyutkarsh/patch-files-action@v1.0.3
         with:
           files: '${{github.workspace}}/package.json'
           patch-syntax: |
             = /version => "${{ steps.gitversion.outputs.semVer }}"
-            = /displayName => "Truffle Chocolate Factory."
-            = /description => "Truffle Tools for Blockchain Development."
+            = /displayName => "Truffle VSCode Chocolate Factory. TEST"
+            = /description => "Truffle Tools for Blockchain Development. TEST"
             = /aiKey => "SUPER_SECRET_KEY"
 
       - name: add version in CHANGELOG.md
@@ -68,13 +75,13 @@ jobs:
 
       - name: print vsix path
         run: |
-          echo "VSIX Path: ${{ env.vsix_path }}"
+          echo "::VSIX Path: ${{ env.vsix_path }}::"
 
       - name: upload vsix as artifact
         uses: actions/upload-artifact@v1
         with:
-          name: truffle-vscode-${{steps.gitversion.outputs.semVer}}.vsix
-          path: ${{github.workspace}}/truffle-vscode-${{steps.gitversion.outputs.semVer}}.vsix
+          name: ${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.semVer}}.vsix
+          path: ${{github.workspace}}/${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.semVer}}.vsix
 
 #      - name: publish to marketplace
 #        if: github.ref == 'refs/heads/master'
