@@ -61,7 +61,7 @@ jobs:
             = /version => "${{ steps.gitversion.outputs.semVer }}"
             = /displayName => "Truffle VSCode Chocolate Factory. TEST"
             = /description => "Truffle Tools for Blockchain Development. TEST"
-            = /aiKey => "SUPER_SECRET_KEY"
+            = /aiKey => "${{ secrets.AIKEY }}"
 
       - name: add version in CHANGELOG.md
         uses: cschleiden/replace-tokens@v1.1
