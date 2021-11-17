@@ -553,7 +553,7 @@
   },
   "lint-staged": {
     "*.ts": [
-      "npm run tslint",
+      "npm run eslint",
       "git add"
     ]
   }
