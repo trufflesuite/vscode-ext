@@ -2,31 +2,29 @@
   "name": "azure-blockchain",
   "displayName": "Blockchain Development Kit for Ethereum",
   "description": "Develop, deploy, debug and manage your Ethereum based blockchain solutions",
-  "publisher": "AzBlockchain",
+  "publisher": "ConsenSys",
   "preview": false,
   "icon": "images/blockchain-service-logo.png",
-  "version": "1.6.3",
+  "version": "1.6.2",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum"
+    "url": "https://github.com/trufflesuite/vscode-ext"
   },
   "bugs": {
-    "url": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum/issues"
+    "url": "https://github.com/trufflesuite/vscode-ext/issues"
   },
-  "homepage": "https://github.com/Microsoft/vscode-azure-blockchain-ethereum/blob/master/README.md",
+  "homepage": "https://github.com/trufflesuite/vscode-ext/blob/master/README.md",
   "license": "MIT",
   "engines": {
     "vscode": "^1.44.1"
   },
   "keywords": [
     "blockchain",
-    "azure",
     "ethereum",
     "debuggers",
     "snippet"
   ],
   "categories": [
-    "Azure",
     "Extension Packs",
     "Programming Languages"
   ],
@@ -555,7 +553,7 @@
   },
   "lint-staged": {
     "*.ts": [
-      "npx tslint -t verbose",
+      "npm run tslint",
       "git add"
     ]
   }
