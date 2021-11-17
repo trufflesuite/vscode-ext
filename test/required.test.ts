@@ -12,12 +12,12 @@ import * as commands from '../src/helpers/command';
 import { TestConstants } from './TestConstants';
 
 const nodeValidVersion: commands.ICommandResult = {
-  cmdOutput: 'v11.0.0',
+  cmdOutput: 'v17.0.0',
   cmdOutputIncludingStderr: '',
   code: 0,
 };
 const npmValidVersion: commands.ICommandResult = {
-  cmdOutput: '7.0.0',
+  cmdOutput: '8.0.0',
   cmdOutputIncludingStderr: '',
   code: 0,
 };

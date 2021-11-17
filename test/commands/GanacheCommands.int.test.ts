@@ -64,7 +64,7 @@ describe('Integration tests GanacheCommands', () => {
   it('startGanacheCmd should execute npx cmd',
     async () => {
       // Arrange
-      nodeVersion = 'v10.15.0';
+      nodeVersion = 'v16.4.0';
       const spawnStub = sinon.stub(cp, 'spawn').returns(processMock as cp.ChildProcess);
       sinon.stub(shell, 'findPid').resolves(Number.NaN);
       sinon.replace(commands, 'tryExecuteCommand', tryExecuteCommandFake);
@@ -80,7 +80,7 @@ describe('Integration tests GanacheCommands', () => {
       assert.strictEqual(spawnStub.getCall(0).args[0], 'npx', 'should execute npx command');
       assert.deepStrictEqual(
         spawnStub.getCall(0).args[1],
-        ['ganache-cli', `-p ${defaultPort}`],
+        ['ganache', `-p ${defaultPort}`],
         'should execute npx command with specific parameters',
       );
     });

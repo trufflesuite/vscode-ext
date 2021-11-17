@@ -95,7 +95,7 @@ describe('Unit tests GanacheService', () => {
     assert.strictEqual(urlValidatorSpy.called, true);
     assert.strictEqual(spawnStub.called, true);
     assert.strictEqual(spawnStub.getCall(0).args[1], 'npx');
-    assert.deepStrictEqual(spawnStub.getCall(0).args[2], ['ganache-cli', `-p ${defaultPort}`]);
+    assert.deepStrictEqual(spawnStub.getCall(0).args[2], ['ganache', `-p ${defaultPort}`]);
   });
 
   it('startGanacheServer if server was not started should throw exception and dispose all', async () => {
