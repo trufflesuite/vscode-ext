@@ -12,7 +12,7 @@ import * as commands from '../src/helpers/command';
 import { TestConstants } from './TestConstants';
 
 const nodeValidVersion: commands.ICommandResult = {
-  cmdOutput: 'v17.0.0',
+  cmdOutput: 'v16.10.0',
   cmdOutputIncludingStderr: '',
   code: 0,
 };

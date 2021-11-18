@@ -6,7 +6,7 @@ import * as path from 'path';
 import { ExtensionContext, extensions } from 'vscode';
 import { IOZAsset } from './services/openZeppelin/models';
 
-const extensionId = 'AzBlockchain.azure-blockchain';
+const extensionId = 'ConsenSys.truffle-vscode';
 const packageJSON = extensions.getExtension(extensionId)!.packageJSON;
 
 export enum RequiredApps {

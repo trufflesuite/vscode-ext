@@ -31,7 +31,7 @@ class ExtensionTelemetry {
           this.defaultProperties["common.vscodemachineid"] = generateMachineId();
           this.defaultProperties["common.vscodesessionid"] = generateSessionId();
         } catch (error) {
-          Output.outputLine(Constants.outputChannel.telemetryClient, `Initialize done with error: ${error.message}`);
+          Output.outputLine(Constants.outputChannel.telemetryClient, `Initialize done with error: ${(error as Error).message}`);
         }
       }
     }
