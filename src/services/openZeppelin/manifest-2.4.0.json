@@ -51,37 +51,22 @@
     {
       "name": "Crypto utilities",
       "id": "cryptography",
-      "assets": [
-        "ecdsa",
-        "merkleproof"
-      ]
+      "assets": ["ecdsa", "merkleproof"]
     },
     {
       "name": "Introspection",
       "id": "introspection",
-      "assets": [
-        "erc165",
-        "erc165checker",
-        "erc1820implementer",
-        "ierc165",
-        "ierc1820implementer",
-        "ierc1820registry"
-      ]
+      "assets": ["erc165", "erc165checker", "erc1820implementer", "ierc165", "ierc1820implementer", "ierc1820registry"]
     },
     {
       "name": "Lifecycle",
       "id": "lifecycle",
-      "assets": [
-        "pausable"
-      ]
+      "assets": ["pausable"]
     },
     {
       "name": "Math",
       "id": "math",
-      "assets": [
-        "math",
-        "safemath"
-      ]
+      "assets": ["math", "safemath"]
     },
     {
       "name": "Mocks",
@@ -155,21 +140,12 @@
     {
       "name": "Ownership",
       "id": "ownership",
-      "assets": [
-        "ownable",
-        "secondary"
-      ]
+      "assets": ["ownable", "secondary"]
     },
     {
       "name": "Payment",
       "id": "payment",
-      "assets": [
-        "conditionalescrow",
-        "escrow",
-        "refundescrow",
-        "paymentsplitter",
-        "pullpayment"
-      ]
+      "assets": ["conditionalescrow", "escrow", "refundescrow", "paymentsplitter", "pullpayment"]
     },
     {
       "name": "Tokens/ERC20",
@@ -209,21 +185,12 @@
     {
       "name": "Tokens/ERC777",
       "id": "token/ERC777",
-      "assets": [
-        "erc777",
-        "ierc777",
-        "ierc777recipient",
-        "ierc777sender"
-      ]
+      "assets": ["erc777", "ierc777", "ierc777recipient", "ierc777sender"]
     },
     {
       "name": "Utilities",
       "id": "utils",
-      "assets": [
-        "address",
-        "arrays",
-        "reentrancyguard"
-      ]
+      "assets": ["address", "arrays", "reentrancyguard"]
     }
   ],
   "assets": [
@@ -250,11 +217,7 @@
       "name": "GSN/GSNRecipient.sol",
       "hash": "d00ca457ca49a591566f30d1f166e53af263e89d",
       "type": "abstractContract",
-      "dependencies": [
-        "irelayrecipient",
-        "irelayhub",
-        "context"
-      ]
+      "dependencies": ["irelayrecipient", "irelayhub", "context"]
     },
     {
       "id": "safemath",
@@ -267,9 +230,7 @@
       "name": "ownership/Secondary.sol",
       "hash": "5cb1dda05f6957795743c73518b9f85da7ed81c0",
       "type": "abstractContract",
-      "dependencies": [
-        "context"
-      ]
+      "dependencies": ["context"]
     },
     {
       "id": "ierc20",
@@ -288,31 +249,21 @@
       "name": "token/ERC20/SafeERC20.sol",
       "hash": "8cbc7b2f74d05e31a95d7f8b0a1ee18b9d5031c7",
       "type": "library",
-      "dependencies": [
-        "ierc20",
-        "safemath",
-        "address"
-      ]
+      "dependencies": ["ierc20", "safemath", "address"]
     },
     {
       "id": "erc20",
       "name": "token/ERC20/ERC20.sol",
       "hash": "769dc140a2d41cd741e15f6d59ff565d829a31d3",
       "type": "contract",
-      "dependencies": [
-        "context",
-        "ierc20",
-        "safemath"
-      ]
+      "dependencies": ["context", "ierc20", "safemath"]
     },
     {
       "id": "erc20detailed",
       "name": "token/ERC20/ERC20Detailed.sol",
       "hash": "61d4ab922d7d17332654fd0db39b1865505c1c40",
       "type": "abstractContract",
-      "dependencies": [
-        "ierc20"
-      ],
+      "dependencies": ["ierc20"],
       "requiredParameters": {
         "ERC20Detailed": [
           {
@@ -334,18 +285,8 @@
       "id": "gsnrecipienterc20fee",
       "name": "GSN/GSNRecipientERC20Fee.sol",
       "hash": "8e649029cd853f5242d73e6a083127a0eb040033",
-      "contracts": [
-        "GSNRecipientERC20Fee",
-        "__unstable__ERC20PrimaryAdmin"
-      ],
-      "dependencies": [
-        "gsnrecipient",
-        "safemath",
-        "secondary",
-        "safeerc20",
-        "erc20",
-        "erc20detailed"
-      ],
+      "contracts": ["GSNRecipientERC20Fee", "__unstable__ERC20PrimaryAdmin"],
+      "dependencies": ["gsnrecipient", "safemath", "secondary", "safeerc20", "erc20", "erc20detailed"],
       "requiredParameters": {
         "GSNRecipientERC20Fee": [
           {
@@ -384,10 +325,7 @@
       "name": "GSN/GSNRecipientSignature.sol",
       "hash": "c4c41a00d7e150eba74989573d726733168c9858",
       "type": "contract",
-      "dependencies": [
-        "gsnrecipient",
-        "ecdsa"
-      ],
+      "dependencies": ["gsnrecipient", "ecdsa"],
       "requiredParameters": {
         "GSNRecipientSignature": [
           {
@@ -408,61 +346,42 @@
       "name": "access/roles/CapperRole.sol",
       "hash": "2b239c1f8c3132ca416cad746c04fd4ce973b609",
       "type": "abstractContract",
-      "dependencies": [
-        "context",
-        "roles"
-      ]
+      "dependencies": ["context", "roles"]
     },
     {
       "id": "minterrole",
       "name": "access/roles/MinterRole.sol",
       "hash": "f881e3a739890aea9e22b5750002e742cf6c74de",
       "type": "abstractContract",
-      "dependencies": [
-        "context",
-        "roles"
-      ]
+      "dependencies": ["context", "roles"]
     },
     {
       "id": "pauserrole",
       "name": "access/roles/PauserRole.sol",
       "hash": "6ad238402b4fe6f14d065a94880650a75a7012be",
       "type": "abstractContract",
-      "dependencies": [
-        "context",
-        "roles"
-      ]
+      "dependencies": ["context", "roles"]
     },
     {
       "id": "signerrole",
       "name": "access/roles/SignerRole.sol",
       "hash": "50535beadf9286a2018db6ee4320a1cee24b926c",
       "type": "abstractContract",
-      "dependencies": [
-        "context",
-        "roles"
-      ]
+      "dependencies": ["context", "roles"]
     },
     {
       "id": "whitelistadminrole",
       "name": "access/roles/WhitelistAdminRole.sol",
       "hash": "b26f4ed6be2dd52439cf4b5211f7bad8c1af71af",
       "type": "abstractContract",
-      "dependencies": [
-        "context",
-        "roles"
-      ]
+      "dependencies": ["context", "roles"]
     },
     {
       "id": "whitelistedrole",
       "name": "access/roles/WhitelistedRole.sol",
       "hash": "5d749bfd35dfd002df2084636be84f631f531ed5",
       "type": "contract",
-      "dependencies": [
-        "context",
-        "roles",
-        "whitelistadminrole"
-      ]
+      "dependencies": ["context", "roles", "whitelistadminrole"]
     },
     {
       "id": "reentrancyguard",
@@ -475,13 +394,7 @@
       "name": "crowdsale/Crowdsale.sol",
       "hash": "5aec961933cad6bb77de05b94d344e832a4c3bf9",
       "type": "contract",
-      "dependencies": [
-        "context",
-        "ierc20",
-        "safemath",
-        "safeerc20",
-        "reentrancyguard"
-      ],
+      "dependencies": ["context", "ierc20", "safemath", "safeerc20", "reentrancyguard"],
       "requiredParameters": {
         "Crowdsale": [
           {
@@ -504,10 +417,7 @@
       "name": "crowdsale/validation/TimedCrowdsale.sol",
       "hash": "255a63f3485a496858d761c869433eea12d172b6",
       "type": "abstractContract",
-      "dependencies": [
-        "safemath",
-        "crowdsale"
-      ],
+      "dependencies": ["safemath", "crowdsale"],
       "requiredParameters": {
         "TimedCrowdsale": [
           {
@@ -526,54 +436,35 @@
       "name": "crowdsale/distribution/FinalizableCrowdsale.sol",
       "hash": "9c42e6146c1ab1a3c0cedd526c19093af7c88c5d",
       "type": "abstractContract",
-      "dependencies": [
-        "safemath",
-        "timedcrowdsale"
-      ]
+      "dependencies": ["safemath", "timedcrowdsale"]
     },
     {
       "id": "postdeliverycrowdsale",
       "name": "crowdsale/distribution/PostDeliveryCrowdsale.sol",
       "hash": "41b9059b7200201e1b75c7d0c384dd9798071f2e",
-      "contracts": [
-        "PostDeliveryCrowdsale",
-        "__unstable__TokenVault"
-      ],
-      "dependencies": [
-        "timedcrowdsale",
-        "safemath",
-        "secondary",
-        "ierc20"
-      ]
+      "contracts": ["PostDeliveryCrowdsale", "__unstable__TokenVault"],
+      "dependencies": ["timedcrowdsale", "safemath", "secondary", "ierc20"]
     },
     {
       "id": "escrow",
       "name": "payment/escrow/Escrow.sol",
       "hash": "01ef2cdef225bb9e5d01c408df010ec3cdba11be",
       "type": "contract",
-      "dependencies": [
-        "safemath",
-        "secondary",
-        "address"
-      ]
+      "dependencies": ["safemath", "secondary", "address"]
     },
     {
       "id": "conditionalescrow",
       "name": "payment/escrow/ConditionalEscrow.sol",
       "hash": "d1f8e1ebabd0fae3de494810fa35431e03806024",
       "type": "abstractContract",
-      "dependencies": [
-        "escrow"
-      ]
+      "dependencies": ["escrow"]
     },
     {
       "id": "refundescrow",
       "name": "payment/escrow/RefundEscrow.sol",
       "hash": "9eb164cb8cfca7aa560b039ffb6955605ba0d8d9",
       "type": "contract",
-      "dependencies": [
-        "conditionalescrow"
-      ],
+      "dependencies": ["conditionalescrow"],
       "requiredParameters": {
         "RefundEscrow": [
           {
@@ -588,12 +479,7 @@
       "name": "crowdsale/distribution/RefundableCrowdsale.sol",
       "hash": "9c42606fe7f27666fc49406f3c9f1954e08b0710",
       "type": "abstractContract",
-      "dependencies": [
-        "context",
-        "safemath",
-        "finalizablecrowdsale",
-        "refundescrow"
-      ],
+      "dependencies": ["context", "safemath", "finalizablecrowdsale", "refundescrow"],
       "requiredParameters": {
         "RefundableCrowdsale": [
           {
@@ -608,10 +494,7 @@
       "name": "crowdsale/distribution/RefundablePostDeliveryCrowdsale.sol",
       "hash": "385aa195ca0ff57ffa731e24e9cb48e8bf5cef88",
       "type": "abstractContract",
-      "dependencies": [
-        "refundablecrowdsale",
-        "postdeliverycrowdsale"
-      ]
+      "dependencies": ["refundablecrowdsale", "postdeliverycrowdsale"]
     },
     {
       "id": "math",
@@ -624,13 +507,7 @@
       "name": "crowdsale/emission/AllowanceCrowdsale.sol",
       "hash": "beee692a6c432fc35919f8949214967ece5a52a9",
       "type": "abstractContract",
-      "dependencies": [
-        "crowdsale",
-        "ierc20",
-        "safeerc20",
-        "safemath",
-        "math"
-      ],
+      "dependencies": ["crowdsale", "ierc20", "safeerc20", "safemath", "math"],
       "requiredParameters": {
         "AllowanceCrowdsale": [
           {
@@ -645,30 +522,21 @@
       "name": "token/ERC20/ERC20Mintable.sol",
       "hash": "d2fd5b73716046d60baa9bffa78b0d45f0946f22",
       "type": "contract",
-      "dependencies": [
-        "erc20",
-        "minterrole"
-      ]
+      "dependencies": ["erc20", "minterrole"]
     },
     {
       "id": "mintedcrowdsale",
       "name": "crowdsale/emission/MintedCrowdsale.sol",
       "hash": "7815b8cacec298d6da1f7b3bffe5d3b01b949c73",
       "type": "abstractContract",
-      "dependencies": [
-        "crowdsale",
-        "erc20mintable"
-      ]
+      "dependencies": ["crowdsale", "erc20mintable"]
     },
     {
       "id": "increasingpricecrowdsale",
       "name": "crowdsale/price/IncreasingPriceCrowdsale.sol",
       "hash": "964514ba204ad0dd55c989e75b9d3b9ccc5d5122",
       "type": "abstractContract",
-      "dependencies": [
-        "timedcrowdsale",
-        "safemath"
-      ],
+      "dependencies": ["timedcrowdsale", "safemath"],
       "requiredParameters": {
         "IncreasingPriceCrowdsale": [
           {
@@ -687,10 +555,7 @@
       "name": "crowdsale/validation/CappedCrowdsale.sol",
       "hash": "e8aeede14936773b42db448c6504349c10063d0a",
       "type": "abstractContract",
-      "dependencies": [
-        "safemath",
-        "crowdsale"
-      ],
+      "dependencies": ["safemath", "crowdsale"],
       "requiredParameters": {
         "CappedCrowdsale": [
           {
@@ -705,41 +570,28 @@
       "name": "crowdsale/validation/IndividuallyCappedCrowdsale.sol",
       "hash": "1f9df361df0c8ee8aec7e981f787ec0c9c877d10",
       "type": "abstractContract",
-      "dependencies": [
-        "safemath",
-        "crowdsale",
-        "capperrole"
-      ]
+      "dependencies": ["safemath", "crowdsale", "capperrole"]
     },
     {
       "id": "pausable",
       "name": "lifecycle/Pausable.sol",
       "hash": "77d11e33b6c906b9b0a09a43004859b8711f6ef3",
       "type": "abstractContract",
-      "dependencies": [
-        "context",
-        "pauserrole"
-      ]
+      "dependencies": ["context", "pauserrole"]
     },
     {
       "id": "pausablecrowdsale",
       "name": "crowdsale/validation/PausableCrowdsale.sol",
       "hash": "cc89aebab461fa75cb6f36523b655bcbd297a8fd",
       "type": "abstractContract",
-      "dependencies": [
-        "crowdsale",
-        "pausable"
-      ]
+      "dependencies": ["crowdsale", "pausable"]
     },
     {
       "id": "whitelistcrowdsale",
       "name": "crowdsale/validation/WhitelistCrowdsale.sol",
       "hash": "0f5965352e88d4e03e3c576bd814952762de8fc2",
       "type": "abstractContract",
-      "dependencies": [
-        "crowdsale",
-        "whitelistedrole"
-      ]
+      "dependencies": ["crowdsale", "whitelistedrole"]
     },
     {
       "id": "merkleproof",
@@ -758,9 +610,7 @@
       "name": "introspection/ERC165.sol",
       "hash": "86e7c9ae4202162f1eeedeff2e71826b19d1c34b",
       "type": "abstractContract",
-      "dependencies": [
-        "ierc165"
-      ]
+      "dependencies": ["ierc165"]
     },
     {
       "id": "erc165checker",
@@ -779,9 +629,7 @@
       "name": "introspection/ERC1820Implementer.sol",
       "hash": "2aba6951bebfeaca00781b3ddb87e02c7de364ca",
       "type": "contract",
-      "dependencies": [
-        "ierc1820implementer"
-      ]
+      "dependencies": ["ierc1820implementer"]
     },
     {
       "id": "ierc1820registry",
@@ -794,19 +642,14 @@
       "name": "mocks/AddressImpl.sol",
       "hash": "52563608f283fe2444b84edf2edffa36ef82dbfc",
       "type": "contract",
-      "dependencies": [
-        "address"
-      ]
+      "dependencies": ["address"]
     },
     {
       "id": "allowancecrowdsaleimpl",
       "name": "mocks/AllowanceCrowdsaleImpl.sol",
       "hash": "9c6fdb511931e86c3406d82f6a4076042b9da819",
       "type": "contract",
-      "dependencies": [
-        "ierc20",
-        "allowancecrowdsale"
-      ],
+      "dependencies": ["ierc20", "allowancecrowdsale"],
       "requiredParameters": {
         "AllowanceCrowdsaleImpl": [
           {
@@ -833,18 +676,14 @@
       "name": "utils/Arrays.sol",
       "hash": "eb0deb169c1a0e04cd9dc9f1afb613f2f1870283",
       "type": "library",
-      "dependencies": [
-        "math"
-      ]
+      "dependencies": ["math"]
     },
     {
       "id": "arraysimpl",
       "name": "mocks/ArraysImpl.sol",
       "hash": "b2067526d5b9eaac655a3d55eb630cf48a0bbb16",
       "type": "contract",
-      "dependencies": [
-        "arrays"
-      ],
+      "dependencies": ["arrays"],
       "requiredParameters": {
         "ArraysImpl": [
           {
@@ -859,10 +698,7 @@
       "name": "mocks/CappedCrowdsaleImpl.sol",
       "hash": "d0c59db4cdf2c08b7391f827dd6c467c074c3df1",
       "type": "contract",
-      "dependencies": [
-        "ierc20",
-        "cappedcrowdsale"
-      ],
+      "dependencies": ["ierc20", "cappedcrowdsale"],
       "requiredParameters": {
         "CappedCrowdsaleImpl": [
           {
@@ -889,57 +725,42 @@
       "name": "mocks/CapperRoleMock.sol",
       "hash": "0090d1ff6c45bd1275dfd04bb3c6d69c764bea19",
       "type": "contract",
-      "dependencies": [
-        "capperrole"
-      ]
+      "dependencies": ["capperrole"]
     },
     {
       "id": "conditionalescrowmock",
       "name": "mocks/ConditionalEscrowMock.sol",
       "hash": "4b39ba38698c127c432e678b9db0427710089ecc",
       "type": "contract",
-      "dependencies": [
-        "conditionalescrow"
-      ]
+      "dependencies": ["conditionalescrow"]
     },
     {
       "id": "contextmock",
       "name": "mocks/ContextMock.sol",
       "hash": "1cf1d61ccf196adbb4f1e63c045b40df4fabce6f",
-      "contracts": [
-        "ContextMock",
-        "ContextMockCaller"
-      ],
-      "dependencies": [
-        "context"
-      ]
+      "contracts": ["ContextMock", "ContextMockCaller"],
+      "dependencies": ["context"]
     },
     {
       "id": "counters",
       "name": "drafts/Counters.sol",
       "hash": "56c91319be267d5f14814a97be149db6313b9a75",
       "type": "library",
-      "dependencies": [
-        "safemath"
-      ]
+      "dependencies": ["safemath"]
     },
     {
       "id": "countersimpl",
       "name": "mocks/CountersImpl.sol",
       "hash": "cc53139f72ed00c50ddc5bbfa5b35ee27e12556b",
       "type": "contract",
-      "dependencies": [
-        "counters"
-      ]
+      "dependencies": ["counters"]
     },
     {
       "id": "crowdsalemock",
       "name": "mocks/CrowdsaleMock.sol",
       "hash": "6dafa4b7e00d728d8f39afc49320578b49b41c5d",
       "type": "contract",
-      "dependencies": [
-        "crowdsale"
-      ],
+      "dependencies": ["crowdsale"],
       "requiredParameters": {
         "CrowdsaleMock": [
           {
@@ -962,21 +783,14 @@
       "name": "mocks/ECDSAMock.sol",
       "hash": "977f324aca3be87dbf35cc9394b51d028ab74135",
       "type": "contract",
-      "dependencies": [
-        "ecdsa"
-      ]
+      "dependencies": ["ecdsa"]
     },
     {
       "id": "erc165interfacessupported",
       "name": "mocks/ERC165/ERC165InterfacesSupported.sol",
       "hash": "ab4d5a5dfcbbf0b65f310565ec6a01f90a78d170",
-      "contracts": [
-        "SupportsInterfaceWithLookupMock",
-        "ERC165InterfacesSupported"
-      ],
-      "dependencies": [
-        "ierc165"
-      ],
+      "contracts": ["SupportsInterfaceWithLookupMock", "ERC165InterfacesSupported"],
+      "dependencies": ["ierc165"],
       "requiredParameters": {
         "ERC165InterfacesSupported": [
           {
@@ -997,46 +811,35 @@
       "name": "mocks/ERC165CheckerMock.sol",
       "hash": "db1853de0fdc13822d3b455d3fc1d177908c41a4",
       "type": "contract",
-      "dependencies": [
-        "erc165checker"
-      ]
+      "dependencies": ["erc165checker"]
     },
     {
       "id": "erc165mock",
       "name": "mocks/ERC165Mock.sol",
       "hash": "e21581b52ad2c55b946708efebc009ab553576af",
       "type": "contract",
-      "dependencies": [
-        "erc165"
-      ]
+      "dependencies": ["erc165"]
     },
     {
       "id": "erc1820implementermock",
       "name": "mocks/ERC1820ImplementerMock.sol",
       "hash": "e3b2e3a057eddf176b5119358dd60e0cdae06f96",
       "type": "contract",
-      "dependencies": [
-        "erc1820implementer"
-      ]
+      "dependencies": ["erc1820implementer"]
     },
     {
       "id": "erc20burnable",
       "name": "token/ERC20/ERC20Burnable.sol",
       "hash": "e58b72b25c8559c200dfc852da6f39ff135995f3",
       "type": "contract",
-      "dependencies": [
-        "context",
-        "erc20"
-      ]
+      "dependencies": ["context", "erc20"]
     },
     {
       "id": "erc20burnablemock",
       "name": "mocks/ERC20BurnableMock.sol",
       "hash": "20db0b9a406ddbc308e0d463ba38151cb3d60bc3",
       "type": "contract",
-      "dependencies": [
-        "erc20burnable"
-      ],
+      "dependencies": ["erc20burnable"],
       "requiredParameters": {
         "ERC20BurnableMock": [
           {
@@ -1055,10 +858,7 @@
       "name": "mocks/ERC20DetailedMock.sol",
       "hash": "f2761b34882c60e98d076443f41b626b4b61d15e",
       "type": "contract",
-      "dependencies": [
-        "erc20",
-        "erc20detailed"
-      ],
+      "dependencies": ["erc20", "erc20detailed"],
       "requiredParameters": {
         "ERC20DetailedMock": [
           {
@@ -1081,9 +881,7 @@
       "name": "drafts/ERC1046/ERC20Metadata.sol",
       "hash": "2311de1c52b3912f49c7eb30525e85b4b429beac",
       "type": "contract",
-      "dependencies": [
-        "ierc20"
-      ],
+      "dependencies": ["ierc20"],
       "requiredParameters": {
         "ERC20Metadata": [
           {
@@ -1098,10 +896,7 @@
       "name": "mocks/ERC20MetadataMock.sol",
       "hash": "9807cc4ae6f7eaf6e9d81074363fed583de1709b",
       "type": "contract",
-      "dependencies": [
-        "erc20",
-        "erc20metadata"
-      ],
+      "dependencies": ["erc20", "erc20metadata"],
       "requiredParameters": {
         "ERC20MetadataMock": [
           {
@@ -1116,28 +911,21 @@
       "name": "mocks/MinterRoleMock.sol",
       "hash": "4b0401d87622b7430490bd9441af42b5eb3f4ad1",
       "type": "contract",
-      "dependencies": [
-        "minterrole"
-      ]
+      "dependencies": ["minterrole"]
     },
     {
       "id": "erc20mintablemock",
       "name": "mocks/ERC20MintableMock.sol",
       "hash": "3ea65ef627f8ab6decee1d5815f6d54efa189cc1",
       "type": "contract",
-      "dependencies": [
-        "erc20mintable",
-        "minterrolemock"
-      ]
+      "dependencies": ["erc20mintable", "minterrolemock"]
     },
     {
       "id": "erc20mock",
       "name": "mocks/ERC20Mock.sol",
       "hash": "0fdfa695378134baf90b39d93a21d7ff7d5d2d21",
       "type": "contract",
-      "dependencies": [
-        "erc20"
-      ],
+      "dependencies": ["erc20"],
       "requiredParameters": {
         "ERC20Mock": [
           {
@@ -1156,29 +944,21 @@
       "name": "token/ERC20/ERC20Pausable.sol",
       "hash": "5e8641ebc180c828192530d51c583e7f96b02e2b",
       "type": "contract",
-      "dependencies": [
-        "erc20",
-        "pausable"
-      ]
+      "dependencies": ["erc20", "pausable"]
     },
     {
       "id": "pauserrolemock",
       "name": "mocks/PauserRoleMock.sol",
       "hash": "fc2ed16d97a30d529dfc1482b5e1f171e6ada5a1",
       "type": "contract",
-      "dependencies": [
-        "pauserrole"
-      ]
+      "dependencies": ["pauserrole"]
     },
     {
       "id": "erc20pausablemock",
       "name": "mocks/ERC20PausableMock.sol",
       "hash": "6b9584e02d71610256396439cf2d2463c31ea331",
       "type": "contract",
-      "dependencies": [
-        "erc20pausable",
-        "pauserrolemock"
-      ],
+      "dependencies": ["erc20pausable", "pauserrolemock"],
       "requiredParameters": {
         "ERC20PausableMock": [
           {
@@ -1197,21 +977,14 @@
       "name": "drafts/ERC20Snapshot.sol",
       "hash": "d1f42ec3978fb502a1998ba9c1daad93fc4818f8",
       "type": "contract",
-      "dependencies": [
-        "safemath",
-        "arrays",
-        "counters",
-        "erc20"
-      ]
+      "dependencies": ["safemath", "arrays", "counters", "erc20"]
     },
     {
       "id": "erc20snapshotmock",
       "name": "mocks/ERC20SnapshotMock.sol",
       "hash": "a877a9209169c1f013bc1141c4615678c12fc644",
       "type": "contract",
-      "dependencies": [
-        "erc20snapshot"
-      ],
+      "dependencies": ["erc20snapshot"],
       "requiredParameters": {
         "ERC20SnapshotMock": [
           {
@@ -1230,9 +1003,7 @@
       "name": "token/ERC721/IERC721.sol",
       "hash": "b8efac2316fbc713377b72ffa47c8e038b24f755",
       "type": "abstractContract",
-      "dependencies": [
-        "ierc165"
-      ]
+      "dependencies": ["ierc165"]
     },
     {
       "id": "ierc721receiver",
@@ -1245,57 +1016,35 @@
       "name": "token/ERC721/ERC721.sol",
       "hash": "e5918740892f4ad2c4cb38f9f01f38069f18b966",
       "type": "contract",
-      "dependencies": [
-        "context",
-        "ierc721",
-        "ierc721receiver",
-        "safemath",
-        "address",
-        "counters",
-        "erc165"
-      ]
+      "dependencies": ["context", "ierc721", "ierc721receiver", "safemath", "address", "counters", "erc165"]
     },
     {
       "id": "ierc721enumerable",
       "name": "token/ERC721/IERC721Enumerable.sol",
       "hash": "4c1dfb564a11820ec63b890aaf45a1ab349bd72e",
       "type": "abstractContract",
-      "dependencies": [
-        "ierc721"
-      ]
+      "dependencies": ["ierc721"]
     },
     {
       "id": "erc721enumerable",
       "name": "token/ERC721/ERC721Enumerable.sol",
       "hash": "ff7a15843166646a6e91802ea8d957f184382b1d",
       "type": "contract",
-      "dependencies": [
-        "context",
-        "ierc721enumerable",
-        "erc721",
-        "erc165"
-      ]
+      "dependencies": ["context", "ierc721enumerable", "erc721", "erc165"]
     },
     {
       "id": "ierc721metadata",
       "name": "token/ERC721/IERC721Metadata.sol",
       "hash": "05835aff87f27c8b3195eac2b9d06d3ed0c5489e",
       "type": "abstractContract",
-      "dependencies": [
-        "ierc721"
-      ]
+      "dependencies": ["ierc721"]
     },
     {
       "id": "erc721metadata",
       "name": "token/ERC721/ERC721Metadata.sol",
       "hash": "26f4706bd9189096bbb8fdba7828f36a8642c6cf",
       "type": "contract",
-      "dependencies": [
-        "context",
-        "erc721",
-        "ierc721metadata",
-        "erc165"
-      ],
+      "dependencies": ["context", "erc721", "ierc721metadata", "erc165"],
       "requiredParameters": {
         "ERC721Metadata": [
           {
@@ -1314,11 +1063,7 @@
       "name": "token/ERC721/ERC721Full.sol",
       "hash": "a6fce2734bc686dd8e20da46fbc593350e36db3a",
       "type": "contract",
-      "dependencies": [
-        "erc721",
-        "erc721enumerable",
-        "erc721metadata"
-      ],
+      "dependencies": ["erc721", "erc721enumerable", "erc721metadata"],
       "requiredParameters": {
         "ERC721Full": [
           {
@@ -1337,42 +1082,28 @@
       "name": "token/ERC721/ERC721Mintable.sol",
       "hash": "faed7ad853ad1e8abdd45a2c981da5e0651e9a09",
       "type": "contract",
-      "dependencies": [
-        "erc721",
-        "minterrole"
-      ]
+      "dependencies": ["erc721", "minterrole"]
     },
     {
       "id": "erc721metadatamintable",
       "name": "token/ERC721/ERC721MetadataMintable.sol",
       "hash": "a1421d1dd64d3c2b5546e5f710350fc708439af6",
       "type": "abstractContract",
-      "dependencies": [
-        "erc721metadata",
-        "minterrole"
-      ]
+      "dependencies": ["erc721metadata", "minterrole"]
     },
     {
       "id": "erc721burnable",
       "name": "token/ERC721/ERC721Burnable.sol",
       "hash": "e35796b9ecdcceb5a5afbd42090a82355a3a7ac9",
       "type": "contract",
-      "dependencies": [
-        "context",
-        "erc721"
-      ]
+      "dependencies": ["context", "erc721"]
     },
     {
       "id": "erc721fullmock",
       "name": "mocks/ERC721FullMock.sol",
       "hash": "b0f00918bdf9f3644bbf148d3b3274570b705e0b",
       "type": "contract",
-      "dependencies": [
-        "erc721full",
-        "erc721mintable",
-        "erc721metadatamintable",
-        "erc721burnable"
-      ],
+      "dependencies": ["erc721full", "erc721mintable", "erc721metadatamintable", "erc721burnable"],
       "requiredParameters": {
         "ERC721FullMock": [
           {
@@ -1391,11 +1122,7 @@
       "name": "mocks/ERC721GSNRecipientMock.sol",
       "hash": "109cf16ae3e2ab9b34458e555123db4d4a9ddc38",
       "type": "contract",
-      "dependencies": [
-        "erc721",
-        "gsnrecipient",
-        "gsnrecipientsignature"
-      ],
+      "dependencies": ["erc721", "gsnrecipient", "gsnrecipientsignature"],
       "requiredParameters": {
         "ERC721GSNRecipientMock": [
           {
@@ -1410,50 +1137,35 @@
       "name": "mocks/ERC721MintableBurnableImpl.sol",
       "hash": "fcb692723117e99831c68d59cca4000dbd1e71f3",
       "type": "contract",
-      "dependencies": [
-        "erc721full",
-        "erc721mintable",
-        "erc721metadatamintable",
-        "erc721burnable"
-      ]
+      "dependencies": ["erc721full", "erc721mintable", "erc721metadatamintable", "erc721burnable"]
     },
     {
       "id": "erc721mock",
       "name": "mocks/ERC721Mock.sol",
       "hash": "c868a866a06c7154e63b1479a73ad9732221b2e6",
       "type": "contract",
-      "dependencies": [
-        "erc721"
-      ]
+      "dependencies": ["erc721"]
     },
     {
       "id": "erc721pausable",
       "name": "token/ERC721/ERC721Pausable.sol",
       "hash": "5080d38085d7bf436f0d012f32cba1817f87c91b",
       "type": "contract",
-      "dependencies": [
-        "erc721",
-        "pausable"
-      ]
+      "dependencies": ["erc721", "pausable"]
     },
     {
       "id": "erc721pausablemock",
       "name": "mocks/ERC721PausableMock.sol",
       "hash": "f46f9e7766c942b96169179cd0a31c06759c85a0",
       "type": "contract",
-      "dependencies": [
-        "erc721pausable",
-        "pauserrolemock"
-      ]
+      "dependencies": ["erc721pausable", "pauserrolemock"]
     },
     {
       "id": "erc721receivermock",
       "name": "mocks/ERC721ReceiverMock.sol",
       "hash": "a0932eca62888750a91d5fb96ffeeb4faaca4d80",
       "type": "contract",
-      "dependencies": [
-        "ierc721receiver"
-      ],
+      "dependencies": ["ierc721receiver"],
       "requiredParameters": {
         "ERC721ReceiverMock": [
           {
@@ -1522,10 +1234,7 @@
       "name": "mocks/ERC777Mock.sol",
       "hash": "314be2ea735c27ef991d4d629a28e39de9c5c2a9",
       "type": "contract",
-      "dependencies": [
-        "context",
-        "erc777"
-      ],
+      "dependencies": ["context", "erc777"],
       "requiredParameters": {
         "ERC777Mock": [
           {
@@ -1576,10 +1285,7 @@
       "name": "mocks/FinalizableCrowdsaleImpl.sol",
       "hash": "99f7a255d65780f9ac80aec6694845948aedff27",
       "type": "contract",
-      "dependencies": [
-        "ierc20",
-        "finalizablecrowdsale"
-      ],
+      "dependencies": ["ierc20", "finalizablecrowdsale"],
       "requiredParameters": {
         "FinalizableCrowdsaleImpl": [
           {
@@ -1610,10 +1316,7 @@
       "name": "mocks/GSNRecipientERC20FeeMock.sol",
       "hash": "83d5e21a145144f9c5d028c2553e3e65dbd22699",
       "type": "contract",
-      "dependencies": [
-        "gsnrecipient",
-        "gsnrecipienterc20fee"
-      ],
+      "dependencies": ["gsnrecipient", "gsnrecipienterc20fee"],
       "requiredParameters": {
         "GSNRecipientERC20FeeMock": [
           {
@@ -1632,20 +1335,14 @@
       "name": "mocks/GSNRecipientMock.sol",
       "hash": "7a8c493911daa35aa3637c3beda3788f4c1695ac",
       "type": "contract",
-      "dependencies": [
-        "contextmock",
-        "gsnrecipient"
-      ]
+      "dependencies": ["contextmock", "gsnrecipient"]
     },
     {
       "id": "gsnrecipientsignaturemock",
       "name": "mocks/GSNRecipientSignatureMock.sol",
       "hash": "e2004b9c91216fcbaa2b15b6a096a0a098a1d9d7",
       "type": "contract",
-      "dependencies": [
-        "gsnrecipient",
-        "gsnrecipientsignature"
-      ],
+      "dependencies": ["gsnrecipient", "gsnrecipientsignature"],
       "requiredParameters": {
         "GSNRecipientSignatureMock": [
           {
@@ -1660,10 +1357,7 @@
       "name": "mocks/IncreasingPriceCrowdsaleImpl.sol",
       "hash": "c5b0e7957b3d4d714baa9cc3735f3c86ef91c13f",
       "type": "contract",
-      "dependencies": [
-        "increasingpricecrowdsale",
-        "safemath"
-      ],
+      "dependencies": ["increasingpricecrowdsale", "safemath"],
       "requiredParameters": {
         "IncreasingPriceCrowdsaleImpl": [
           {
@@ -1698,11 +1392,7 @@
       "name": "mocks/IndividuallyCappedCrowdsaleImpl.sol",
       "hash": "43b0366ee5fbc9c5192900fcefd1e9526580bfbe",
       "type": "contract",
-      "dependencies": [
-        "ierc20",
-        "individuallycappedcrowdsale",
-        "capperrolemock"
-      ],
+      "dependencies": ["ierc20", "individuallycappedcrowdsale", "capperrolemock"],
       "requiredParameters": {
         "IndividuallyCappedCrowdsaleImpl": [
           {
@@ -1725,28 +1415,21 @@
       "name": "mocks/MathMock.sol",
       "hash": "2461fe9028872e3f89708d9060fe3c19d6da5efd",
       "type": "contract",
-      "dependencies": [
-        "math"
-      ]
+      "dependencies": ["math"]
     },
     {
       "id": "merkleproofwrapper",
       "name": "mocks/MerkleProofWrapper.sol",
       "hash": "23c72b26975752e0c81f524db36ce243ba95400e",
       "type": "contract",
-      "dependencies": [
-        "merkleproof"
-      ]
+      "dependencies": ["merkleproof"]
     },
     {
       "id": "mintedcrowdsaleimpl",
       "name": "mocks/MintedCrowdsaleImpl.sol",
       "hash": "22f4d36c064e11afed764b9497c177aa6dcf33e9",
       "type": "contract",
-      "dependencies": [
-        "erc20mintable",
-        "mintedcrowdsale"
-      ],
+      "dependencies": ["erc20mintable", "mintedcrowdsale"],
       "requiredParameters": {
         "MintedCrowdsaleImpl": [
           {
@@ -1769,37 +1452,28 @@
       "name": "ownership/Ownable.sol",
       "hash": "a1a84931b07287d4eeda17048f7301251e92f913",
       "type": "abstractContract",
-      "dependencies": [
-        "context"
-      ]
+      "dependencies": ["context"]
     },
     {
       "id": "ownableinterfaceid",
       "name": "mocks/OwnableInterfaceId.sol",
       "hash": "996ab88e973d9369de7ae767598637ef5a83eb02",
       "type": "contract",
-      "dependencies": [
-        "ownable"
-      ]
+      "dependencies": ["ownable"]
     },
     {
       "id": "ownablemock",
       "name": "mocks/OwnableMock.sol",
       "hash": "c7b1cf5c7a4617ce7728535ea64e92cf27e0be4f",
       "type": "contract",
-      "dependencies": [
-        "ownable"
-      ]
+      "dependencies": ["ownable"]
     },
     {
       "id": "pausablecrowdsaleimpl",
       "name": "mocks/PausableCrowdsaleImpl.sol",
       "hash": "11f44c7b83146cba6e9d7d70386978a126f6228c",
       "type": "contract",
-      "dependencies": [
-        "erc20",
-        "pausablecrowdsale"
-      ],
+      "dependencies": ["erc20", "pausablecrowdsale"],
       "requiredParameters": {
         "PausableCrowdsaleImpl": [
           {
@@ -1822,20 +1496,14 @@
       "name": "mocks/PausableMock.sol",
       "hash": "8e9ae03d3e6d706059ecea8e5abd81cdebfbeec9",
       "type": "contract",
-      "dependencies": [
-        "pausable",
-        "pauserrolemock"
-      ]
+      "dependencies": ["pausable", "pauserrolemock"]
     },
     {
       "id": "postdeliverycrowdsaleimpl",
       "name": "mocks/PostDeliveryCrowdsaleImpl.sol",
       "hash": "efb67c084fe1079ce70a664fc19fc0ce1751d9dc",
       "type": "contract",
-      "dependencies": [
-        "ierc20",
-        "postdeliverycrowdsale"
-      ],
+      "dependencies": ["ierc20", "postdeliverycrowdsale"],
       "requiredParameters": {
         "PostDeliveryCrowdsaleImpl": [
           {
@@ -1866,47 +1534,35 @@
       "name": "payment/PullPayment.sol",
       "hash": "3dfec7e659118c777384a53eb65e2e0978adc2e9",
       "type": "abstractContract",
-      "dependencies": [
-        "escrow"
-      ]
+      "dependencies": ["escrow"]
     },
     {
       "id": "pullpaymentmock",
       "name": "mocks/PullPaymentMock.sol",
       "hash": "1a26b62428d2859ee2c0a2d03f959957e011e001",
       "type": "contract",
-      "dependencies": [
-        "pullpayment"
-      ]
+      "dependencies": ["pullpayment"]
     },
     {
       "id": "reentrancyattack",
       "name": "mocks/ReentrancyAttack.sol",
       "hash": "2b8b6be36c4ae031e89ffc2c563fe9990e5cb070",
       "type": "contract",
-      "dependencies": [
-        "context"
-      ]
+      "dependencies": ["context"]
     },
     {
       "id": "reentrancymock",
       "name": "mocks/ReentrancyMock.sol",
       "hash": "50233287dc571b3dd25bc6134299b5e2e742a243",
       "type": "contract",
-      "dependencies": [
-        "reentrancyguard",
-        "reentrancyattack"
-      ]
+      "dependencies": ["reentrancyguard", "reentrancyattack"]
     },
     {
       "id": "refundablecrowdsaleimpl",
       "name": "mocks/RefundableCrowdsaleImpl.sol",
       "hash": "5ed5d1ed54caf630bc843bfd295d017936410072",
       "type": "contract",
-      "dependencies": [
-        "ierc20",
-        "refundablecrowdsale"
-      ],
+      "dependencies": ["ierc20", "refundablecrowdsale"],
       "requiredParameters": {
         "RefundableCrowdsaleImpl": [
           {
@@ -1941,10 +1597,7 @@
       "name": "mocks/RefundablePostDeliveryCrowdsaleImpl.sol",
       "hash": "b81f0757c890ed62e2df4d65f7ab8405e297c899",
       "type": "contract",
-      "dependencies": [
-        "ierc20",
-        "refundablepostdeliverycrowdsale"
-      ],
+      "dependencies": ["ierc20", "refundablepostdeliverycrowdsale"],
       "requiredParameters": {
         "RefundablePostDeliveryCrowdsaleImpl": [
           {
@@ -1979,25 +1632,14 @@
       "name": "mocks/RolesMock.sol",
       "hash": "4b0f0de0ac41fe51190c749fbbc739c491ecad83",
       "type": "contract",
-      "dependencies": [
-        "roles"
-      ]
+      "dependencies": ["roles"]
     },
     {
       "id": "safeerc20helper",
       "name": "mocks/SafeERC20Helper.sol",
       "hash": "8a15902626f4a4d4d01e41679acb89e5d1f331f8",
-      "contracts": [
-        "ERC20ReturnFalseMock",
-        "ERC20ReturnTrueMock",
-        "ERC20NoReturnMock",
-        "SafeERC20Wrapper"
-      ],
-      "dependencies": [
-        "context",
-        "ierc20",
-        "safeerc20"
-      ],
+      "contracts": ["ERC20ReturnFalseMock", "ERC20ReturnTrueMock", "ERC20NoReturnMock", "SafeERC20Wrapper"],
+      "dependencies": ["context", "ierc20", "safeerc20"],
       "requiredParameters": {
         "SafeERC20Wrapper": [
           {
@@ -2012,18 +1654,14 @@
       "name": "mocks/SafeMathMock.sol",
       "hash": "43dac5ec29f0756fdd1e04de20cc6a79be5b4afe",
       "type": "contract",
-      "dependencies": [
-        "safemath"
-      ]
+      "dependencies": ["safemath"]
     },
     {
       "id": "secondarymock",
       "name": "mocks/SecondaryMock.sol",
       "hash": "1ff45b11ec8b4b063be72f642d9fd7da1286ba13",
       "type": "contract",
-      "dependencies": [
-        "secondary"
-      ]
+      "dependencies": ["secondary"]
     },
     {
       "id": "signedsafemath",
@@ -2036,18 +1674,14 @@
       "name": "mocks/SignedSafeMathMock.sol",
       "hash": "90a3ee642bc76269f987d3de5df349093a2a86ce",
       "type": "contract",
-      "dependencies": [
-        "signedsafemath"
-      ]
+      "dependencies": ["signedsafemath"]
     },
     {
       "id": "signerrolemock",
       "name": "mocks/SignerRoleMock.sol",
       "hash": "71b4c792a76e023e69c79461fefacd2686045480",
       "type": "contract",
-      "dependencies": [
-        "signerrole"
-      ]
+      "dependencies": ["signerrole"]
     },
     {
       "id": "strings",
@@ -2060,19 +1694,14 @@
       "name": "mocks/StringsMock.sol",
       "hash": "3b28a70e8ce4c00c270886062ab82e5aecb53ad5",
       "type": "contract",
-      "dependencies": [
-        "strings"
-      ]
+      "dependencies": ["strings"]
     },
     {
       "id": "timedcrowdsaleimpl",
       "name": "mocks/TimedCrowdsaleImpl.sol",
       "hash": "b85817c77132139da71f73ba04e5f3967522a58d",
       "type": "contract",
-      "dependencies": [
-        "ierc20",
-        "timedcrowdsale"
-      ],
+      "dependencies": ["ierc20", "timedcrowdsale"],
       "requiredParameters": {
         "TimedCrowdsaleImpl": [
           {
@@ -2103,20 +1732,14 @@
       "name": "mocks/WhitelistAdminRoleMock.sol",
       "hash": "7a267ca2177a9ad85d54843e043f150ab2462424",
       "type": "contract",
-      "dependencies": [
-        "whitelistadminrole"
-      ]
+      "dependencies": ["whitelistadminrole"]
     },
     {
       "id": "whitelistcrowdsaleimpl",
       "name": "mocks/WhitelistCrowdsaleImpl.sol",
       "hash": "0200f7f7f251f49259d813c45fb8579fff862518",
       "type": "contract",
-      "dependencies": [
-        "ierc20",
-        "whitelistcrowdsale",
-        "crowdsale"
-      ],
+      "dependencies": ["ierc20", "whitelistcrowdsale", "crowdsale"],
       "requiredParameters": {
         "WhitelistCrowdsaleImpl": [
           {
@@ -2139,19 +1762,14 @@
       "name": "mocks/WhitelistedRoleMock.sol",
       "hash": "7f7c8941219a30ee94a0158c189755f15f741ec0",
       "type": "contract",
-      "dependencies": [
-        "whitelistedrole"
-      ]
+      "dependencies": ["whitelistedrole"]
     },
     {
       "id": "paymentsplitter",
       "name": "payment/PaymentSplitter.sol",
       "hash": "561af437c910a85b149f9713c2f9274506716700",
       "type": "contract",
-      "dependencies": [
-        "context",
-        "safemath"
-      ],
+      "dependencies": ["context", "safemath"],
       "requiredParameters": {
         "PaymentSplitter": [
           {
@@ -2170,9 +1788,7 @@
       "name": "token/ERC20/ERC20Capped.sol",
       "hash": "17efca0c482307ca46ce782ce4d50d83fe644e14",
       "type": "contract",
-      "dependencies": [
-        "erc20mintable"
-      ],
+      "dependencies": ["erc20mintable"],
       "requiredParameters": {
         "ERC20Capped": [
           {
@@ -2187,9 +1803,7 @@
       "name": "token/ERC20/TokenTimelock.sol",
       "hash": "542b22d83c7a4ae64a2ca44e39670b8a3513fd19",
       "type": "contract",
-      "dependencies": [
-        "safeerc20"
-      ],
+      "dependencies": ["safeerc20"],
       "requiredParameters": {
         "TokenTimelock": [
           {
@@ -2212,20 +1826,14 @@
       "name": "token/ERC721/ERC721Holder.sol",
       "hash": "bcc10d7e225495d51f897f31254cc128dde58669",
       "type": "contract",
-      "dependencies": [
-        "ierc721receiver"
-      ]
+      "dependencies": ["ierc721receiver"]
     },
     {
       "id": "ierc721full",
       "name": "token/ERC721/IERC721Full.sol",
       "hash": "e543aefeb38ae89d3cad665e81a89ab9d4d59dac",
       "type": "abstractContract",
-      "dependencies": [
-        "ierc721",
-        "ierc721enumerable",
-        "ierc721metadata"
-      ]
+      "dependencies": ["ierc721", "ierc721enumerable", "ierc721metadata"]
     }
   ],
   "openZeppelinVersion": "2.4.0"

@@ -1,12 +1,12 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { EventEmitter } from 'events';
-import { Telemetry } from '../../TelemetryClient';
-import { AbstractAdapter } from './AbstractAdapter';
-import { ContractInstance } from './ContractInstance';
-import { InMemoryAdapter } from './InMemoryAdapter';
-import { TruffleDBAdapter } from './TruffleDBAdapter';
+import { EventEmitter } from "events";
+import { Telemetry } from "../../TelemetryClient";
+import { AbstractAdapter } from "./AbstractAdapter";
+import { ContractInstance } from "./ContractInstance";
+import { InMemoryAdapter } from "./InMemoryAdapter";
+import { TruffleDBAdapter } from "./TruffleDBAdapter";
 
 class ExtensionContractDB {
   public readonly bus: EventEmitter;
@@ -17,7 +17,7 @@ class ExtensionContractDB {
   }
 
   public async initialize(adapterType: AdapterType): Promise<void> {
-    Telemetry.sendEvent('ContractDB.initialize', { adapterType });
+    Telemetry.sendEvent("ContractDB.initialize", { adapterType });
     if (this.adapter) {
       await this.adapter.dispose();
       this.adapter = undefined;
@@ -32,7 +32,7 @@ class ExtensionContractDB {
     }
 
     if (!this.adapter) {
-      Telemetry.sendEvent('ContractDB.initialize.unknownAdapterType', { adapterType });
+      Telemetry.sendEvent("ContractDB.initialize.unknownAdapterType", { adapterType });
       return;
     }
 
@@ -48,7 +48,7 @@ class ExtensionContractDB {
   }
 
   public async getContractInstance(contractName: string, instanceId: string): Promise<ContractInstance | undefined> {
-    return this.adapter && await this.adapter.getContractInstance(contractName, instanceId);
+    return this.adapter && (await this.adapter.getContractInstance(contractName, instanceId));
   }
 
   public async updateContracts(): Promise<void> {
@@ -56,21 +56,20 @@ class ExtensionContractDB {
       const contracts: ContractInstance[] = await this.adapter.getChangedContractInstances();
       const contractNames = contracts
         .map((contract) => contract.contractName)
-        .filter((contractName, index, arr)  => arr.indexOf(contractName) === index);
+        .filter((contractName, index, arr) => arr.indexOf(contractName) === index);
 
-      this.bus.emit('updateContracts', contractNames);
+      this.bus.emit("updateContracts", contractNames);
     }
   }
 
   public async dispose(): Promise<void> {
-    return this.adapter && await this.adapter.dispose();
+    return this.adapter && (await this.adapter.dispose());
   }
 }
 
 export enum AdapterType {
-  IN_MEMORY = 'InMemory',
-  TRUFFLE_DB = 'TruffleDB',
+  IN_MEMORY = "InMemory",
+  TRUFFLE_DB = "TruffleDB",
 }
 
-// tslint:disable-next-line:variable-name
 export const ContractDB = new ExtensionContractDB();

@@ -1,8 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { QuickPickItem } from 'vscode';
-import { IInfuraEndpointDto } from '../../services/infuraService/InfuraDto/IInfuraEndpointDto';
+import { QuickPickItem } from "vscode";
+import { IInfuraEndpointDto } from "../../services/infuraService/InfuraDto/IInfuraEndpointDto";
 
 export class InfuraProjectItem implements QuickPickItem {
   public readonly label: string;
@@ -12,7 +12,7 @@ export class InfuraProjectItem implements QuickPickItem {
 
   constructor(label: string, projectId: string, endpoints: IInfuraEndpointDto, description?: string) {
     this.label = label;
-    this.description = description || '';
+    this.description = description || "";
     this.projectId = projectId;
     this.endpoints = endpoints;
   }

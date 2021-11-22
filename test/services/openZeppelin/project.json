@@ -6,9 +6,7 @@
         "name": "introspection/ERC165.sol",
         "hash": "86e7c9ae4202162f1eeedeff2e71826b19d1c34b",
         "type": "abstractContract",
-        "dependencies": [
-          "ierc165"
-        ]
+        "dependencies": ["ierc165"]
       },
       {
         "id": "ierc165",
@@ -18,8 +16,6 @@
       }
     ],
     "version": "0.0.0",
-    "categories": [
-      "introspection"
-    ]
+    "categories": ["introspection"]
   }
 }

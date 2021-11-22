@@ -1,16 +1,16 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { IDeployDestination } from '../IDeployDestination';
-import { ItemType } from '../ItemType';
-import { ExtensionItem, ExtensionItemData } from './ExtensionItem';
-import { NetworkNode } from './NetworkNode';
+import { IDeployDestination } from "../IDeployDestination";
+import { ItemType } from "../ItemType";
+import { ExtensionItem, ExtensionItemData } from "./ExtensionItem";
+import { NetworkNode } from "./NetworkNode";
 
 export type ProjectTypes =
-  ItemType.AZURE_BLOCKCHAIN_PROJECT |
-  ItemType.LOCAL_PROJECT |
-  ItemType.INFURA_PROJECT |
-  ItemType.BLOCKCHAIN_DATA_MANAGER_PROJECT;
+  | ItemType.AZURE_BLOCKCHAIN_PROJECT
+  | ItemType.LOCAL_PROJECT
+  | ItemType.INFURA_PROJECT
+  | ItemType.BLOCKCHAIN_DATA_MANAGER_PROJECT;
 
 export abstract class Project extends ExtensionItem {
   protected constructor(itemType: ProjectTypes, label: string, data: ExtensionItemData) {
@@ -20,7 +20,7 @@ export abstract class Project extends ExtensionItem {
   public async getRPCAddress(): Promise<string> {
     const networkNodes = this.children.filter((child) => child instanceof NetworkNode) as NetworkNode[];
     if (networkNodes.length === 0) {
-      return '';
+      return "";
     }
 
     // FIXME: suggest user the list of nodes

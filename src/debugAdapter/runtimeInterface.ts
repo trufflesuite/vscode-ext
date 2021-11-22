@@ -1,18 +1,15 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as truffleDebugUtils from '@truffle/debug-utils';
-import * as truffleDebugger from '@truffle/debugger';
-import { EventEmitter } from 'events';
-import { relative as pathRelative } from 'path';
-import {
-  filterContractsWithAddress,
-  prepareContracts,
-} from './contracts/contractsPrepareHelpers';
-import { DebuggerTypes } from './models/debuggerTypes';
-import { ICallInfo } from './models/ICallInfo';
-import { IContractModel } from './models/IContractModel';
-import { IInstruction } from './models/IInstruction';
+import * as truffleDebugUtils from "@truffle/debug-utils";
+import * as truffleDebugger from "@truffle/debugger";
+import { EventEmitter } from "events";
+import { relative as pathRelative } from "path";
+import { filterContractsWithAddress, prepareContracts } from "./contracts/contractsPrepareHelpers";
+import { DebuggerTypes } from "./models/debuggerTypes";
+import { ICallInfo } from "./models/ICallInfo";
+import { IContractModel } from "./models/IContractModel";
+import { IInstruction } from "./models/IInstruction";
 
 export default class RuntimeInterface extends EventEmitter {
   private _isDebuggerAttached: boolean;
@@ -20,7 +17,7 @@ export default class RuntimeInterface extends EventEmitter {
   private _selectors: truffleDebugger.Selectors;
   private _numBreakpoints: number;
   private _deployedContracts: IContractModel[];
-  private _initialBreakPoints: Array<{ path: string, lines: number[] }>;
+  private _initialBreakPoints: Array<{ path: string; lines: number[] }>;
 
   constructor() {
     super();
@@ -33,9 +30,7 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   public clearBreakpoints(): Promise<void> {
-    return this._session
-      ? this._session.removeAllBreakpoints()
-      : Promise.resolve();
+    return this._session ? this._session.removeAllBreakpoints() : Promise.resolve();
   }
 
   public storeInitialBreakPoints(path: string, lines: number[]) {
@@ -63,8 +58,9 @@ export default class RuntimeInterface extends EventEmitter {
 
     // we'll need the debugger-internal ID of this source
     const debuggerSources: any = this._session.view(this._selectors.solidity.info.sources);
-    const matchingSource: any = Object.values(debuggerSources).find((source: any) =>
-    (pathRelative(source.sourcePath, filePath) === ''));
+    const matchingSource: any = Object.values(debuggerSources).find(
+      (source: any) => pathRelative(source.sourcePath, filePath) === ""
+    );
     const sourceId = matchingSource.id;
 
     const breakpoint: DebuggerTypes.IBreakpoint = {
@@ -84,23 +80,25 @@ export default class RuntimeInterface extends EventEmitter {
     const callStack = this._session!.view(this._selectors.evm.current.callstack);
     const currentLine = this.currentLine();
     if (callStack.length === 1) {
-      return [{ ...currentLine, method: 'Current' }];
+      return [{ ...currentLine, method: "Current" }];
     }
 
     const result: ICallInfo[] = [];
     // There is no api to get line/collumn of previous call
     // That's why set them as default
     const defaultLine = { line: 0, column: 0 };
-    for (let i = 0; i < callStack.length - 1; i++) { // processing all previous calls
-      const contract = this._deployedContracts
-        .find((c: any) => c.address === (callStack[i].address || callStack[i].storageAddress));
+    for (let i = 0; i < callStack.length - 1; i++) {
+      // processing all previous calls
+      const contract = this._deployedContracts.find(
+        (c: any) => c.address === (callStack[i].address || callStack[i].storageAddress)
+      );
       if (contract === undefined) {
         throw new Error(`Coundn\'t find contract by address ${callStack[i].address || callStack[i].storageAddress}`);
       }
-      result.push({ file: contract.sourcePath, ...defaultLine, method: 'Previous' });
+      result.push({ file: contract.sourcePath, ...defaultLine, method: "Previous" });
     }
 
-    result.push({ ...currentLine, method: 'Current' });
+    result.push({ ...currentLine, method: "Current" });
     return result;
   }
 
@@ -116,30 +114,30 @@ export default class RuntimeInterface extends EventEmitter {
   public async continue(): Promise<void> {
     this.validateSession();
     await this._session!.continueUntilBreakpoint();
-    this.processSteping('stopOnBreakpoint');
+    this.processSteping("stopOnBreakpoint");
   }
 
   public continueReverse(): void {
     this.validateSession();
-    this.sendEvent('stopOnBreakpoint');
+    this.sendEvent("stopOnBreakpoint");
   }
 
   public async stepNext(): Promise<void> {
     this.validateSession();
     await this._session!.stepNext();
-    this.processSteping('stopOnStepOver');
+    this.processSteping("stopOnStepOver");
   }
 
   public async stepIn(): Promise<void> {
     this.validateSession();
     await this._session!.stepInto();
-    this.processSteping('stopOnStepIn');
+    this.processSteping("stopOnStepIn");
   }
 
   public async stepOut(): Promise<void> {
     this.validateSession();
     await this._session!.stepOut();
-    this.processSteping('stopOnStepOut');
+    this.processSteping("stopOnStepOut");
   }
 
   public async attach(txHash: string, workingDirectory: string): Promise<void> {
@@ -161,7 +159,7 @@ export default class RuntimeInterface extends EventEmitter {
     const currentLocation = this._session!.view(this._selectors.controller.current.location);
     const sourcePath = this._session!.view(this._selectors.solidity.current.source).sourcePath;
     if (!sourcePath) {
-      throw new Error('No source file');
+      throw new Error("No source file");
     }
 
     return {
@@ -195,7 +193,7 @@ export default class RuntimeInterface extends EventEmitter {
   private processSteping(event: any) {
     const isEndOfTransactionTrace = this._session!.view(this._selectors.trace.finished);
     if (isEndOfTransactionTrace) {
-      this.sendEvent('end');
+      this.sendEvent("end");
     } else {
       this.sendEvent(event);
     }
@@ -208,7 +206,7 @@ export default class RuntimeInterface extends EventEmitter {
 
   private validateSession() {
     if (!this._session) {
-      throw new Error('Debug session is undefined');
+      throw new Error("Debug session is undefined");
     }
   }
 }

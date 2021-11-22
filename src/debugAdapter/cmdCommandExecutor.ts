@@ -1,8 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as cp from 'child_process';
-import * as os from 'os';
+import * as cp from "child_process";
+import * as os from "os";
 
 // The same implementation as in helpers/command.ts
 // The difference is that all code which uses 'vscode' module is removed.
@@ -21,7 +21,7 @@ export interface ICommandResult {
   code: number;
   cmdOutput: string;
   cmdOutputIncludingStderr: string;
-  messages?: Array<{[key: string]: any}>;
+  messages?: Array<{ [key: string]: any }>;
 }
 
 export interface ICommandExecute {
@@ -30,52 +30,58 @@ export interface ICommandExecute {
 }
 
 export async function executeCommand(
-    workingDirectory: string | undefined,
-    commands: string,
-    ...args: string[]
-  ): Promise<string> {
-    const result: ICommandResult = await tryExecuteCommand(workingDirectory, commands, ...args);
+  workingDirectory: string | undefined,
+  commands: string,
+  ...args: string[]
+): Promise<string> {
+  const result: ICommandResult = await tryExecuteCommand(workingDirectory, commands, ...args);
 
-    if (result.code !== 0) {
-      throw new Error('Error while execution command: ' + commands.concat(' ', ...args.join(' ')));
-    }
+  if (result.code !== 0) {
+    throw new Error("Error while execution command: " + commands.concat(" ", ...args.join(" ")));
+  }
 
-    return result.cmdOutput;
+  return result.cmdOutput;
 }
 
-async function tryExecuteCommand(workingDirectory: string | undefined, commands: string, ...args: string[])
-: Promise<ICommandResult> {
-    return new Promise((resolve: (res: any) => void, reject: (error: Error) => void): void => {
-    let cmdOutput: string = '';
-    let cmdOutputIncludingStderr: string = '';
+async function tryExecuteCommand(
+  workingDirectory: string | undefined,
+  commands: string,
+  ...args: string[]
+): Promise<ICommandResult> {
+  return new Promise((resolve: (res: any) => void, reject: (error: Error) => void): void => {
+    let cmdOutput: string = "";
+    let cmdOutputIncludingStderr: string = "";
 
     const options: cp.SpawnOptions = { cwd: workingDirectory || os.tmpdir(), shell: true };
     const childProcess: cp.ChildProcess = cp.spawn(commands, args, options);
 
-    childProcess.stdout.on('data', (data: string | Buffer) => {
-        data = data.toString();
-        cmdOutput = cmdOutput.concat(data);
-        cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
+    childProcess.stdout.on("data", (data: string | Buffer) => {
+      data = data.toString();
+      cmdOutput = cmdOutput.concat(data);
+      cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
     });
 
-    childProcess.stderr.on('data', (data: string | Buffer) => {
-        data = data.toString();
-        cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
+    childProcess.stderr.on("data", (data: string | Buffer) => {
+      data = data.toString();
+      cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
     });
 
-    childProcess.on('error', reject);
-    childProcess.on('close', (code: number) => {
-        resolve({
+    childProcess.on("error", reject);
+    childProcess.on("close", (code: number) => {
+      resolve({
         cmdOutput,
         cmdOutputIncludingStderr,
         code,
-        });
+      });
     });
-    });
+  });
 }
 
-export async function executeCommandInFork(workingDirectory: string | undefined, modulePath: string, ...args: string[])
-  : Promise<string> {
+export async function executeCommandInFork(
+  workingDirectory: string | undefined,
+  modulePath: string,
+  ...args: string[]
+): Promise<string> {
   const result: ICommandResult = await tryExecuteCommandInFork(workingDirectory, modulePath, ...args);
 
   if (result.code !== 0) {
@@ -105,30 +111,30 @@ export function tryExecuteCommandInForkAsync(
   modulePath: string,
   ...args: string[]
 ): ICommandExecute {
-  let cmdOutput: string = '';
-  let cmdOutputIncludingStderr: string = '';
+  let cmdOutput: string = "";
+  let cmdOutputIncludingStderr: string = "";
   const messages: Array<string | object> = [];
-  const batches: {[key: string]: string[]} = {};
+  const batches: { [key: string]: string[] } = {};
 
   const childProcess = forkProcess(workingDirectory, modulePath, args);
   const result = new Promise((resolve: (res: any) => void, reject: (error: Error) => void): void => {
-    childProcess.stdout.on('data', (data: string | Buffer) => {
+    childProcess.stdout.on("data", (data: string | Buffer) => {
       data = data.toString();
       cmdOutput = cmdOutput.concat(data);
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
     });
 
-    childProcess.stderr.on('data', (data: string | Buffer) => {
+    childProcess.stderr.on("data", (data: string | Buffer) => {
       data = data.toString();
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
     });
 
-    childProcess.on('message', (message: IForkMessage) => {
+    childProcess.on("message", (message: IForkMessage) => {
       if (message.batch) {
         batches[message.command] = batches[message.command] || [];
         batches[message.command][message.batch.index] = message.batch.message;
         if (message.batch.done) {
-          messages.push({command: message.command, message: batches[message.command].join('')});
+          messages.push({ command: message.command, message: batches[message.command].join("") });
         }
       } else {
         messages.push(message);
@@ -139,8 +145,8 @@ export function tryExecuteCommandInForkAsync(
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
     });
 
-    childProcess.on('error', reject);
-    childProcess.on('exit', (code: number) => {
+    childProcess.on("error", reject);
+    childProcess.on("exit", (code: number) => {
       resolve({ cmdOutput, cmdOutputIncludingStderr, code, messages });
     });
   });

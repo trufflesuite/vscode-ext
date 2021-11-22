@@ -1,16 +1,16 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from 'assert';
-import { ServiceClientCredentials } from 'ms-rest';
-import * as msrestazure from 'ms-rest-azure';
-import * as sinon from 'sinon';
-import * as uuid from 'uuid';
-import { EventGridManagementClient } from '../src/ARMBlockchain/EventGridManagementClient';
+import * as assert from "assert";
+import { ServiceClientCredentials } from "ms-rest";
+import * as msrestazure from "ms-rest-azure";
+import * as sinon from "sinon";
+import * as uuid from "uuid";
+import { EventGridManagementClient } from "../src/ARMBlockchain/EventGridManagementClient";
 
-describe('Unit tests for EventGridManagementClient', () => {
+describe("Unit tests for EventGridManagementClient", () => {
   let credentials: ServiceClientCredentials;
-  const eventGridManagementClient = require('../src/ARMBlockchain/EventGridManagementClient');
+  const eventGridManagementClient = require("../src/ARMBlockchain/EventGridManagementClient");
   let callbackFunction: (error: Error | null, result?: any) => void;
   let callbackFunctionSpy: any;
 
@@ -22,7 +22,7 @@ describe('Unit tests for EventGridManagementClient', () => {
   });
 
   beforeEach(() => {
-    sinon.stub(eventGridManagementClient.__proto__, 'constructor');
+    sinon.stub(eventGridManagementClient.__proto__, "constructor");
     callbackFunctionSpy = sinon.spy(callbackFunction);
   });
 
@@ -30,7 +30,7 @@ describe('Unit tests for EventGridManagementClient', () => {
     sinon.restore();
   });
 
-  describe('Public methods.', () => {
+  describe("Public methods.", () => {
     let serviceClient: EventGridManagementClient;
     let pipelineMock: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], {}>;
 
@@ -40,10 +40,10 @@ describe('Unit tests for EventGridManagementClient', () => {
         uuid.v4(),
         uuid.v4(),
         uuid.v4(),
-        {} as msrestazure.AzureServiceClientOptions,
+        {} as msrestazure.AzureServiceClientOptions
       );
       // @ts-ignore
-      pipelineMock = sinon.stub(serviceClient, 'pipeline');
+      pipelineMock = sinon.stub(serviceClient, "pipeline");
     });
 
     afterEach(() => {
@@ -52,12 +52,18 @@ describe('Unit tests for EventGridManagementClient', () => {
     });
 
     const listOfMethod = [
-      { callback: async () => await serviceClient.getEventGridList(callbackFunctionSpy),
-        methodName: 'getEventGridList' },
-      { callback: async () => await serviceClient.getEventGridItem(uuid.v4(), callbackFunctionSpy),
-        methodName: 'getEventGridItem' },
-      { callback: async () => await serviceClient.createEventGrid(uuid.v4(), uuid.v4(), callbackFunctionSpy),
-        methodName: 'createEventGrid' },
+      {
+        callback: async () => await serviceClient.getEventGridList(callbackFunctionSpy),
+        methodName: "getEventGridList",
+      },
+      {
+        callback: async () => await serviceClient.getEventGridItem(uuid.v4(), callbackFunctionSpy),
+        methodName: "getEventGridItem",
+      },
+      {
+        callback: async () => await serviceClient.createEventGrid(uuid.v4(), uuid.v4(), callbackFunctionSpy),
+        methodName: "createEventGrid",
+      },
     ];
 
     listOfMethod.forEach((method) => {
@@ -72,16 +78,17 @@ describe('Unit tests for EventGridManagementClient', () => {
         await method.callback();
 
         // Assert
-        assert.strictEqual(pipelineMock.calledOnce, true, 'pipelineMock should called once');
+        assert.strictEqual(pipelineMock.calledOnce, true, "pipelineMock should called once");
         assert.strictEqual(
           callbackFunctionSpy.calledOnceWithExactly(error),
           true,
-          'callbackFunction should called once with correct arguments');
+          "callbackFunction should called once with correct arguments"
+        );
       });
 
       it(`${method.methodName} does not return error.`, async () => {
         // Arrange
-        const expectedData = '{}';
+        const expectedData = "{}";
         pipelineMock.callsFake((...args: any[]): {} => {
           return args[1](null, true, expectedData);
         });
@@ -90,11 +97,12 @@ describe('Unit tests for EventGridManagementClient', () => {
         await method.callback();
 
         // Assert
-        assert.strictEqual(pipelineMock.calledOnce, true, 'pipelineMock should called once');
+        assert.strictEqual(pipelineMock.calledOnce, true, "pipelineMock should called once");
         assert.strictEqual(
           callbackFunctionSpy.calledOnceWithExactly(null, JSON.parse(expectedData)),
           true,
-          'callbackFunction should called once with correct arguments');
+          "callbackFunction should called once with correct arguments"
+        );
       });
     });
   });

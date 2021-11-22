@@ -1,42 +1,58 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from 'assert';
-import * as cp from 'child_process';
-import * as sinon from 'sinon';
-import * as stream from 'stream';
-import { OutputChannel, window } from 'vscode';
-import { Constants } from '../../src/Constants';
-import * as outputCommandHelper from '../../src/helpers';
-import * as shell from '../../src/helpers/shell';
-import { GanacheService } from '../../src/services';
-import * as GanacheServiceClient from '../../src/services/ganache/GanacheServiceClient';
-import { UrlValidator } from '../../src/validators/UrlValidator';
+import * as assert from "assert";
+import * as cp from "child_process";
+import * as sinon from "sinon";
+import * as stream from "stream";
+import { OutputChannel, window } from "vscode";
+import { Constants } from "../../src/Constants";
+import * as outputCommandHelper from "../../src/helpers";
+import * as shell from "../../src/helpers/shell";
+import { GanacheService } from "../../src/services";
+import * as GanacheServiceClient from "../../src/services/ganache/GanacheServiceClient";
+import { UrlValidator } from "../../src/validators/UrlValidator";
 
-const defaultPort = '8545';
-const testPortsList = ['8451', '8452', '8453'];
+const defaultPort = "8545";
+const testPortsList = ["8451", "8452", "8453"];
 
-describe('Unit tests GanacheService', () => {
+describe("Unit tests GanacheService", () => {
   let streamMock: stream.Readable;
   let processMock: cp.ChildProcess;
   let channel: OutputChannel;
 
   beforeEach(() => {
     streamMock = {
-      on(_event: 'data', _listener: (chunk: any) => void): any { /* empty */ },
-      removeAllListeners() { /* empty */ },
-    } as  stream.Readable;
+      on(_event: "data", _listener: (chunk: any) => void): any {
+        /* empty */
+      },
+      removeAllListeners() {
+        /* empty */
+      },
+    } as stream.Readable;
     processMock = {
-      on(_event: 'exit', _listener: (code: number, signal: string) => void): any { /* empty */ },
-      kill() { /* empty */ },
-      removeAllListeners() { /* empty */ },
+      on(_event: "exit", _listener: (code: number, signal: string) => void): any {
+        /* empty */
+      },
+      kill() {
+        /* empty */
+      },
+      removeAllListeners() {
+        /* empty */
+      },
       stderr: streamMock,
       stdout: streamMock,
     } as cp.ChildProcess;
     channel = {
-      appendLine(_value: string): void { /* empty */ },
-      dispose() { /* empty */ },
-      show() { /* empty */ },
+      appendLine(_value: string): void {
+        /* empty */
+      },
+      dispose() {
+        /* empty */
+      },
+      show() {
+        /* empty */
+      },
     } as OutputChannel;
   });
 
@@ -44,22 +60,22 @@ describe('Unit tests GanacheService', () => {
     sinon.restore();
   });
 
-  ['-1', 'qwe', 'asd8545', '65536', '70000', 0].forEach((port) => {
+  ["-1", "qwe", "asd8545", "65536", "70000", 0].forEach((port) => {
     it(`startGanacheServer should throw an exception if port is invalid(${port})`, async () => {
       // Arrange
-      const urlValidatorSpy = sinon.spy(UrlValidator, 'validatePort');
+      const urlValidatorSpy = sinon.spy(UrlValidator, "validatePort");
       // Act and Assert
       await assert.rejects(GanacheService.startGanacheServer(port));
-      assert.strictEqual(urlValidatorSpy.called, true, 'should call url validator');
+      assert.strictEqual(urlValidatorSpy.called, true, "should call url validator");
     });
   });
 
-  ['1', '65535', '8454', 8000, 8454].forEach((port) => {
+  ["1", "65535", "8454", 8000, 8454].forEach((port) => {
     it(`startGanacheServer should pass validation if port is ${port}`, async () => {
       // Arrange
-      const urlValidatorSpy = sinon.spy(UrlValidator, 'validatePort');
-      sinon.stub(shell, 'findPid').returns(Promise.resolve(312));
-      sinon.stub(GanacheServiceClient, 'isGanacheServer').returns(Promise.resolve(true));
+      const urlValidatorSpy = sinon.spy(UrlValidator, "validatePort");
+      sinon.stub(shell, "findPid").returns(Promise.resolve(312));
+      sinon.stub(GanacheServiceClient, "isGanacheServer").returns(Promise.resolve(true));
 
       // Act
       const result = await GanacheService.startGanacheServer(port);
@@ -70,23 +86,22 @@ describe('Unit tests GanacheService', () => {
     });
   });
 
-  it('startGanacheServer should throw an exception if port is busy', async () => {
+  it("startGanacheServer should throw an exception if port is busy", async () => {
     // Arrange
-    sinon.stub(shell, 'findPid').returns(Promise.resolve(312));
-    sinon.stub(GanacheServiceClient, 'isGanacheServer').returns(Promise.resolve(false));
+    sinon.stub(shell, "findPid").returns(Promise.resolve(312));
+    sinon.stub(GanacheServiceClient, "isGanacheServer").returns(Promise.resolve(false));
 
     // Act and Assert
     await assert.rejects(GanacheService.startGanacheServer(defaultPort));
-
   });
 
-  it('startGanacheServer should execute npx cmd if port is valid and free', async () => {
+  it("startGanacheServer should execute npx cmd if port is valid and free", async () => {
     // Arrange
-    const urlValidatorSpy = sinon.spy(UrlValidator, 'validatePort');
-    const spawnStub = sinon.stub(outputCommandHelper, 'spawnProcess').returns(processMock as cp.ChildProcess);
-    sinon.stub(shell, 'findPid').returns(Promise.resolve(Number.NaN));
-    sinon.stub(window, 'createOutputChannel').returns(channel as OutputChannel);
-    sinon.stub(GanacheServiceClient, 'waitGanacheStarted');
+    const urlValidatorSpy = sinon.spy(UrlValidator, "validatePort");
+    const spawnStub = sinon.stub(outputCommandHelper, "spawnProcess").returns(processMock as cp.ChildProcess);
+    sinon.stub(shell, "findPid").returns(Promise.resolve(Number.NaN));
+    sinon.stub(window, "createOutputChannel").returns(channel as OutputChannel);
+    sinon.stub(GanacheServiceClient, "waitGanacheStarted");
 
     // Act
     await GanacheService.startGanacheServer(defaultPort);
@@ -94,28 +109,29 @@ describe('Unit tests GanacheService', () => {
     // Assert
     assert.strictEqual(urlValidatorSpy.called, true);
     assert.strictEqual(spawnStub.called, true);
-    assert.strictEqual(spawnStub.getCall(0).args[1], 'npx');
-    assert.deepStrictEqual(spawnStub.getCall(0).args[2], ['ganache', `-p ${defaultPort}`]);
+    assert.strictEqual(spawnStub.getCall(0).args[1], "npx");
+    assert.deepStrictEqual(spawnStub.getCall(0).args[2], ["ganache", `-p ${defaultPort}`]);
   });
 
-  it('startGanacheServer if server was not started should throw exception and dispose all', async () => {
+  it("startGanacheServer if server was not started should throw exception and dispose all", async () => {
     // Arrange
-    const channelDisposeSpy = sinon.spy(channel, 'dispose');
-    const killProcessStub = sinon.stub(processMock, 'kill');
-    const processRemoveAllListenersSpy = sinon.spy(processMock, 'removeAllListeners');
+    const channelDisposeSpy = sinon.spy(channel, "dispose");
+    const killProcessStub = sinon.stub(processMock, "kill");
+    const processRemoveAllListenersSpy = sinon.spy(processMock, "removeAllListeners");
 
-    sinon.spy(UrlValidator, 'validatePort');
-    sinon.stub(shell, 'findPid').returns(Promise.resolve(Number.NaN));
-    sinon.stub(outputCommandHelper, 'spawnProcess').returns(processMock as cp.ChildProcess);
-    sinon.stub(GanacheServiceClient, 'waitGanacheStarted')
+    sinon.spy(UrlValidator, "validatePort");
+    sinon.stub(shell, "findPid").returns(Promise.resolve(Number.NaN));
+    sinon.stub(outputCommandHelper, "spawnProcess").returns(processMock as cp.ChildProcess);
+    sinon
+      .stub(GanacheServiceClient, "waitGanacheStarted")
       .throws(new Error(Constants.ganacheCommandStrings.cannotStartServer));
-    sinon.stub(window, 'createOutputChannel').returns(channel as OutputChannel);
+    sinon.stub(window, "createOutputChannel").returns(channel as OutputChannel);
 
     // Act and Assert
     await assert.rejects(
       GanacheService.startGanacheServer(defaultPort),
       Error,
-      Constants.ganacheCommandStrings.cannotStartServer,
+      Constants.ganacheCommandStrings.cannotStartServer
     );
     assert.strictEqual(killProcessStub.calledOnce, true);
     assert.strictEqual(channelDisposeSpy.calledOnce, true);
@@ -123,7 +139,6 @@ describe('Unit tests GanacheService', () => {
   });
 
   describe('Test cases with "ganacheProcesses"', () => {
-
     beforeEach(() => {
       GanacheService.ganacheProcesses[testPortsList[0]] = {
         output: channel,
@@ -149,10 +164,10 @@ describe('Unit tests GanacheService', () => {
 
     it('stopGanacheServer should kill process and remove element from "ganacheProcesses" list', async () => {
       // Arrange
-      const killPidStub = sinon.stub(shell, 'killPid');
-      const killProcessStub = sinon.stub(processMock, 'kill');
-      const processSpy = sinon.spy(processMock, 'removeAllListeners');
-      const channelDisposeSpy = sinon.spy(channel, 'dispose');
+      const killPidStub = sinon.stub(shell, "killPid");
+      const killProcessStub = sinon.stub(processMock, "kill");
+      const processSpy = sinon.spy(processMock, "removeAllListeners");
+      const channelDisposeSpy = sinon.spy(channel, "dispose");
 
       GanacheService.ganacheProcesses[defaultPort] = {
         output: channel,
@@ -171,12 +186,12 @@ describe('Unit tests GanacheService', () => {
       assert.strictEqual(channelDisposeSpy.calledOnce, true, '"dispose" should be executed for channel');
     });
 
-    it('stopGanacheServer should kill out of band process and remove element from ganacheProcesses list', async () => {
+    it("stopGanacheServer should kill out of band process and remove element from ganacheProcesses list", async () => {
       // Arrange
-      const killPidStub = sinon.stub(shell, 'killPid');
-      const killProcessStub = sinon.stub(processMock, 'kill');
-      const processSpy = sinon.spy(processMock, 'removeAllListeners');
-      const channelDisposeSpy = sinon.spy(channel, 'dispose');
+      const killPidStub = sinon.stub(shell, "killPid");
+      const killProcessStub = sinon.stub(processMock, "kill");
+      const processSpy = sinon.spy(processMock, "removeAllListeners");
+      const channelDisposeSpy = sinon.spy(channel, "dispose");
 
       GanacheService.ganacheProcesses[defaultPort] = {
         pid: 321,
@@ -196,10 +211,10 @@ describe('Unit tests GanacheService', () => {
 
     it('stopGanacheServer should not do anything if passed port not presented in "ganacheProcesses" list', async () => {
       // Arrange
-      const killPidStub = sinon.stub(shell, 'killPid');
-      const killProcessStub = sinon.stub(processMock, 'kill');
-      const processSpy = sinon.spy(processMock, 'removeAllListeners');
-      const channelDisposeSpy = sinon.spy(channel, 'dispose');
+      const killPidStub = sinon.stub(shell, "killPid");
+      const killProcessStub = sinon.stub(processMock, "kill");
+      const processSpy = sinon.spy(processMock, "removeAllListeners");
+      const channelDisposeSpy = sinon.spy(channel, "dispose");
 
       // Act
       await GanacheService.stopGanacheServer(defaultPort);
@@ -214,8 +229,8 @@ describe('Unit tests GanacheService', () => {
 
     it('dispose should kill all process and cleanup "ganacheProcesses" list', async () => {
       // Arrange
-      const killPidStub = sinon.stub(shell, 'killPid');
-      const killProcessStub = sinon.stub(processMock, 'kill');
+      const killPidStub = sinon.stub(shell, "killPid");
+      const killProcessStub = sinon.stub(processMock, "kill");
 
       // Act
       await GanacheService.dispose();
@@ -231,10 +246,10 @@ describe('Unit tests GanacheService', () => {
   });
 
   const getPortFromUrlCases = [
-    { url: 'http://example.com:8454', expectation: '8454' },
-    { url: 'ftp://example.com:123', expectation: '123' },
-    { url: 'http://example.com', expectation: Constants.defaultLocalhostPort.toString() },
-    { url: 'http:8454', expectation: '8454' },
+    { url: "http://example.com:8454", expectation: "8454" },
+    { url: "ftp://example.com:123", expectation: "123" },
+    { url: "http://example.com", expectation: Constants.defaultLocalhostPort.toString() },
+    { url: "http:8454", expectation: "8454" },
   ];
 
   getPortFromUrlCases.forEach((testcase) => {

@@ -1,26 +1,26 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from 'assert';
-import * as fs from 'fs-extra';
-import * as sinon from 'sinon';
-import { parseSolidityContract } from '../../src/Generators/CodeGenerator/ContractParser';
+import * as assert from "assert";
+import * as fs from "fs-extra";
+import * as sinon from "sinon";
+import { parseSolidityContract } from "../../src/Generators/CodeGenerator/ContractParser";
 
-describe('ContractParser', () => {
+describe("ContractParser", () => {
   afterEach(() => {
     sinon.restore();
   });
 
-  it('parser should return necessary functions and variables.', async () => {
+  it("parser should return necessary functions and variables.", async () => {
     // Arrange
-    sinon.stub(fs, 'readFileSync').returns(contractMetadata);
+    sinon.stub(fs, "readFileSync").returns(contractMetadata);
 
     // Act
-    const { variables, functionsDefinitions } = parseSolidityContract('');
+    const { variables, functionsDefinitions } = parseSolidityContract("");
 
     // Assert
-    assert.strictEqual(functionsDefinitions.length, 8, 'Array should have only public and external functions');
-    assert.strictEqual(variables.length, 4, 'Array should have only public variables');
+    assert.strictEqual(functionsDefinitions.length, 8, "Array should have only public and external functions");
+    assert.strictEqual(variables.length, 4, "Array should have only public variables");
   });
 });
 

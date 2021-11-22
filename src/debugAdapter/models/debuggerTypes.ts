@@ -1,8 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { DebugProtocol } from 'vscode-debugprotocol';
-import { EVENT_TYPES } from '../constants/debugAdapter';
+import { DebugProtocol } from "vscode-debugprotocol";
+import { EVENT_TYPES } from "../constants/debugAdapter";
 
 export namespace DebuggerTypes {
   export interface IBreakpoint {
@@ -33,6 +33,6 @@ export namespace DebuggerTypes {
   export class LaunchedEvent implements DebugProtocol.Event {
     public event: string = EVENT_TYPES.launched;
     public seq: number = 1000;
-    public type: string = 'event';
+    public type: string = "event";
   }
 }

@@ -1,16 +1,16 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 export function getClientDataTemplate() {
-  const connectionReferences: { [key: string]: any; } = {};
+  const connectionReferences: { [key: string]: any } = {};
 
   return {
     properties: {
-      apiId: '/providers/Microsoft.PowerApps/apis/shared_logicflows',
+      apiId: "/providers/Microsoft.PowerApps/apis/shared_logicflows",
       connectionReferences,
       definition: {},
-      displayName: '',
+      displayName: "",
     },
-    schemaVersion: '1.0.0.0',
+    schemaVersion: "1.0.0.0",
   };
 }

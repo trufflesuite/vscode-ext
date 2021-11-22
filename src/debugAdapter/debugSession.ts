@@ -1,30 +1,36 @@
-import { basename } from 'path';
+import { basename } from "path";
 import {
-  Breakpoint, BreakpointEvent, InitializedEvent, logger, Logger, LoggingDebugSession,
-  Source, StackFrame, StoppedEvent, TerminatedEvent, Thread,
-} from 'vscode-debugadapter';
-import { DebugProtocol } from 'vscode-debugprotocol';
+  Breakpoint,
+  BreakpointEvent,
+  InitializedEvent,
+  logger,
+  Logger,
+  LoggingDebugSession,
+  Source,
+  StackFrame,
+  StoppedEvent,
+  TerminatedEvent,
+  Thread,
+} from "vscode-debugadapter";
+import { DebugProtocol } from "vscode-debugprotocol";
 import {
   ERROR_MESSAGE_ID,
   EVALUATE_REQUEST_TYPES,
   EVENT_REASONS,
   EVENT_TYPES,
   MAIN_THREAD,
-} from './constants/debugAdapter';
-import {
-  GET_CURRENT_INSTRUCTION,
-  GET_INSTRUCTIONS,
-} from './constants/debugSessionCommands';
-import { DebuggerTypes } from './models/debuggerTypes';
-import RuntimeInterface from './runtimeInterface';
-import VariablesHandler from './variablesHandler';
+} from "./constants/debugAdapter";
+import { GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS } from "./constants/debugSessionCommands";
+import { DebuggerTypes } from "./models/debuggerTypes";
+import RuntimeInterface from "./runtimeInterface";
+import VariablesHandler from "./variablesHandler";
 
 export class SolidityDebugSession extends LoggingDebugSession {
   private _runtime: RuntimeInterface;
   private _variablesHandler: VariablesHandler;
 
   public constructor() {
-    super('debugAdapter.txt');
+    super("debugAdapter.txt");
     // this debugger uses zero-based lines and columns
     this.setDebuggerLinesStartAt1(false);
     this.setDebuggerColumnsStartAt1(false);
@@ -52,7 +58,8 @@ export class SolidityDebugSession extends LoggingDebugSession {
     });
     this._runtime.on(EVENT_TYPES.breakpointValidated, (bp: DebuggerTypes.IBreakpoint) => {
       this.sendEvent(
-        new BreakpointEvent(EVENT_REASONS.changed, { verified: true, id: bp.id } as DebugProtocol.Breakpoint));
+        new BreakpointEvent(EVENT_REASONS.changed, { verified: true, id: bp.id } as DebugProtocol.Breakpoint)
+      );
     });
     this._runtime.on(EVENT_TYPES.end, () => {
       this.sendEvent(new TerminatedEvent());
@@ -63,8 +70,10 @@ export class SolidityDebugSession extends LoggingDebugSession {
    * The 'initialize' request is the first request called by the frontend
    * to interrogate the features the debug adapter provides.
    */
-  protected initializeRequest(response: DebugProtocol.InitializeResponse,
-        /* args: DebugProtocol.InitializeRequestArguments */): void {
+  protected initializeRequest(
+    response: DebugProtocol.InitializeResponse
+    /* args: DebugProtocol.InitializeRequestArguments */
+  ): void {
     // build and return the capabilities of this debug adapter:
     response.body = response.body || {};
 
@@ -87,8 +96,10 @@ export class SolidityDebugSession extends LoggingDebugSession {
     this.sendEvent(new InitializedEvent());
   }
 
-  protected async launchRequest(response: DebugProtocol.LaunchResponse,
-                                args: DebuggerTypes.ILaunchRequestArguments): Promise<void> {
+  protected async launchRequest(
+    response: DebugProtocol.LaunchResponse,
+    args: DebuggerTypes.ILaunchRequestArguments
+  ): Promise<void> {
     await this.sendErrorIfFailed(response, async () => {
       // make sure to 'Stop' the buffered logging if 'trace' is not set
       // logger.setup enable logs in client
@@ -104,13 +115,17 @@ export class SolidityDebugSession extends LoggingDebugSession {
     });
   }
 
-  protected async disconnectRequest(response: DebugProtocol.DisconnectResponse,
-        /* args: DebugProtocol.DisconnectArguments */) {
+  protected async disconnectRequest(
+    response: DebugProtocol.DisconnectResponse
+    /* args: DebugProtocol.DisconnectArguments */
+  ) {
     this.sendResponse(response);
   }
 
-  protected async setBreakPointsRequest(response: DebugProtocol.SetBreakpointsResponse,
-                                        args: DebugProtocol.SetBreakpointsArguments): Promise<void> {
+  protected async setBreakPointsRequest(
+    response: DebugProtocol.SetBreakpointsResponse,
+    args: DebugProtocol.SetBreakpointsArguments
+  ): Promise<void> {
     await this.sendErrorIfFailed(response, async () => {
       const path = args.source.path as string;
       const clientLines = args.lines || [];
@@ -119,11 +134,15 @@ export class SolidityDebugSession extends LoggingDebugSession {
       await this._runtime.clearBreakpoints();
 
       for (const clientLine of clientLines) {
-        const debuggerBreakpoint =
-          await this._runtime.setBreakpoint(path, this.convertClientLineToDebugger(clientLine));
+        const debuggerBreakpoint = await this._runtime.setBreakpoint(
+          path,
+          this.convertClientLineToDebugger(clientLine)
+        );
         if (debuggerBreakpoint) {
-          const bp = new Breakpoint(true,
-            this.convertDebuggerLineToClient(debuggerBreakpoint.line)) as DebugProtocol.Breakpoint;
+          const bp = new Breakpoint(
+            true,
+            this.convertDebuggerLineToClient(debuggerBreakpoint.line)
+          ) as DebugProtocol.Breakpoint;
           bp.id = debuggerBreakpoint.id;
           actualBreakpoints.push(bp);
         }
@@ -153,14 +172,21 @@ export class SolidityDebugSession extends LoggingDebugSession {
     });
   }
 
-  protected async stackTraceRequest(response: DebugProtocol.StackTraceResponse,
-        /* args: DebugProtocol.StackTraceArguments */): Promise<void> {
+  protected async stackTraceRequest(
+    response: DebugProtocol.StackTraceResponse
+    /* args: DebugProtocol.StackTraceArguments */
+  ): Promise<void> {
     await this.sendErrorIfFailed(response, async () => {
       const callStack = this._runtime.callStack();
       if (callStack !== null) {
         const stackFrames = callStack.reverse().map((c) => {
-          return new StackFrame(0, c.method, this.createSource(c.file),
-            this.convertDebuggerLineToClient(c.line), c.column);
+          return new StackFrame(
+            0,
+            c.method,
+            this.createSource(c.file),
+            this.convertDebuggerLineToClient(c.line),
+            c.column
+          );
         });
         response.body = {
           stackFrames,
@@ -177,18 +203,21 @@ export class SolidityDebugSession extends LoggingDebugSession {
     });
   }
 
-  protected scopesRequest(response: DebugProtocol.ScopesResponse,
-        /* args: DebugProtocol.ScopesArguments */): void {
+  protected scopesRequest(
+    response: DebugProtocol.ScopesResponse
+    /* args: DebugProtocol.ScopesArguments */
+  ): void {
     response.body = {
       scopes: this._variablesHandler.getScopes(),
     };
     this.sendResponse(response);
   }
 
-  protected async variablesRequest(response: DebugProtocol.VariablesResponse,
-                                   args: DebugProtocol.VariablesArguments): Promise<void> {
-    const variables =
-      await this._variablesHandler.getVariableAttributesByVariableRef(args.variablesReference);
+  protected async variablesRequest(
+    response: DebugProtocol.VariablesResponse,
+    args: DebugProtocol.VariablesArguments
+  ): Promise<void> {
+    const variables = await this._variablesHandler.getVariableAttributesByVariableRef(args.variablesReference);
 
     response.body = {
       variables,
@@ -197,63 +226,76 @@ export class SolidityDebugSession extends LoggingDebugSession {
     this.sendResponse(response);
   }
 
-  protected async continueRequest(response: DebugProtocol.ContinueResponse,
-        /* args: DebugProtocol.ContinueArguments */): Promise<void> {
+  protected async continueRequest(
+    response: DebugProtocol.ContinueResponse
+    /* args: DebugProtocol.ContinueArguments */
+  ): Promise<void> {
     await this.sendErrorIfFailed(response, async () => {
       await this._runtime.continue();
       this.sendResponse(response);
     });
   }
 
-  protected reverseContinueRequest(response: DebugProtocol.ReverseContinueResponse,
-        /* args: DebugProtocol.ReverseContinueArguments */): void {
+  protected reverseContinueRequest(
+    response: DebugProtocol.ReverseContinueResponse
+    /* args: DebugProtocol.ReverseContinueArguments */
+  ): void {
     this._runtime.continueReverse();
     this.sendResponse(response);
   }
 
-  protected async nextRequest(response: DebugProtocol.NextResponse,
-        /* args: DebugProtocol.NextArguments */): Promise<void> {
+  protected async nextRequest(
+    response: DebugProtocol.NextResponse
+    /* args: DebugProtocol.NextArguments */
+  ): Promise<void> {
     await this.sendErrorIfFailed(response, async () => {
       await this._runtime.stepNext();
       this.sendResponse(response);
     });
   }
 
-  protected async stepInRequest(response: DebugProtocol.StepInResponse,
-        /* args: DebugProtocol.StepInArguments */): Promise<void> {
+  protected async stepInRequest(
+    response: DebugProtocol.StepInResponse
+    /* args: DebugProtocol.StepInArguments */
+  ): Promise<void> {
     await this.sendErrorIfFailed(response, async () => {
       await this._runtime.stepIn();
       this.sendResponse(response);
     });
   }
 
-  protected async stepOutRequest(response: DebugProtocol.StepOutResponse,
-        /* args: DebugProtocol.StepOutArguments */): Promise<void> {
+  protected async stepOutRequest(
+    response: DebugProtocol.StepOutResponse
+    /* args: DebugProtocol.StepOutArguments */
+  ): Promise<void> {
     await this.sendErrorIfFailed(response, async () => {
       await this._runtime.stepOut();
       this.sendResponse(response);
     });
   }
 
-  protected async evaluateRequest(response: DebugProtocol.EvaluateResponse,
-                                  args: DebugProtocol.EvaluateArguments): Promise<void> {
+  protected async evaluateRequest(
+    response: DebugProtocol.EvaluateResponse,
+    args: DebugProtocol.EvaluateArguments
+  ): Promise<void> {
     await this.sendErrorIfFailed(response, async () => {
-      if (args.context === EVALUATE_REQUEST_TYPES.watch
-        || args.context === EVALUATE_REQUEST_TYPES.hover
-        || args.context === undefined) {
-        const { result, variablesReference } =
-          await this._variablesHandler.evaluateExpression(args.expression);
+      if (
+        args.context === EVALUATE_REQUEST_TYPES.watch ||
+        args.context === EVALUATE_REQUEST_TYPES.hover ||
+        args.context === undefined
+      ) {
+        const { result, variablesReference } = await this._variablesHandler.evaluateExpression(args.expression);
         response.body = { result, variablesReference };
         this.sendResponse(response);
       } else {
-        response.body = { result: '', variablesReference: -1 };
+        response.body = { result: "", variablesReference: -1 };
         this.sendResponse(response);
       }
     });
   }
 
   // is invoked via debugAdaterTrackerFactory
-  protected async customRequest(command: string, response: DebugProtocol.Response/*, args: any*/): Promise<void> {
+  protected async customRequest(command: string, response: DebugProtocol.Response /*, args: any*/): Promise<void> {
     await this.sendErrorIfFailed(response, async () => {
       switch (command) {
         case GET_INSTRUCTIONS:
@@ -273,8 +315,7 @@ export class SolidityDebugSession extends LoggingDebugSession {
   }
 
   private createSource(filePath: string): Source {
-    return new Source(basename(filePath),
-      this.convertDebuggerPathToClient(filePath), undefined, undefined, null);
+    return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, null);
   }
 
   private async sendErrorIfFailed(response: DebugProtocol.Response, fn: () => {}) {
@@ -284,9 +325,10 @@ export class SolidityDebugSession extends LoggingDebugSession {
       this.sendErrorResponse(
         response,
         { id: ERROR_MESSAGE_ID, format: e && e.message ? e.message : e },
-        '',
+        "",
         null,
-        undefined);
+        undefined
+      );
     }
   }
 }

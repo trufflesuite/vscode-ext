@@ -1,8 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { OutputChannel, window } from 'vscode';
-import { Constants } from './Constants';
+import { OutputChannel, window } from "vscode";
+import { Constants } from "./Constants";
 
 export class Output {
   public static output(label: string, message: string): void {
@@ -27,7 +27,7 @@ export class Output {
 
   private static _outputChannel: OutputChannel = window.createOutputChannel(Constants.outputChannel.azureBlockchain);
 
-  private static formatMessage(label: string = '', message: string = ''): string {
-    return `${label ? `[${label}] ` : ''}${message}`;
+  private static formatMessage(label: string = "", message: string = ""): string {
+    return `${label ? `[${label}] ` : ""}${message}`;
   }
 }

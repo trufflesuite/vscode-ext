@@ -1,13 +1,13 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import { HttpService } from '..';
-import { Constants } from '../../Constants';
-import { getWorkspaceRoot, TruffleConfiguration } from '../../helpers';
-import { Telemetry } from '../../TelemetryClient';
-import { Contract } from './Contract';
+import * as fs from "fs-extra";
+import * as path from "path";
+import { HttpService } from "..";
+import { Constants } from "../../Constants";
+import { getWorkspaceRoot, TruffleConfiguration } from "../../helpers";
+import { Telemetry } from "../../TelemetryClient";
+import { Contract } from "./Contract";
 
 export namespace ContractService {
   export function getContractNameBySolidityFile(solidityFilePath: string): string {
@@ -24,33 +24,33 @@ export namespace ContractService {
   }
 
   export async function getSolidityContractsFolderPath(): Promise<string> {
-    return getPathDirectory('contracts_directory');
+    return getPathDirectory("contracts_directory");
   }
 
   export async function getMigrationFolderPath(): Promise<string> {
-    return getPathDirectory('migrations_directory');
+    return getPathDirectory("migrations_directory");
   }
 
   export async function getBuildFolderPath(): Promise<string> {
-    return getPathDirectory('contracts_build_directory');
+    return getPathDirectory("contracts_build_directory");
   }
 
   export async function getDeployedBytecodeByAddress(host: string, address: string): Promise<string> {
-    const defaultBlock = 'latest';
-    const response = await HttpService.sendRPCRequest(host, Constants.rpcMethods.getCode, [ address, defaultBlock ]);
+    const defaultBlock = "latest";
+    const response = await HttpService.sendRPCRequest(host, Constants.rpcMethods.getCode, [address, defaultBlock]);
 
-    if (!response || response && response.error) {
-      const errorMessage = response && response.error ? response.error.message : '';
+    if (!response || (response && response.error)) {
+      const errorMessage = response && response.error ? response.error.message : "";
       throw new Error(`getDeployedBytecodeByAddress failed. ${errorMessage}`);
     }
 
-    return response && response.result as string || '';
+    return (response && (response.result as string)) || "";
   }
 
   function getCompiledContractMetadataByPath(contractPath: string): Promise<Contract | null> {
     if (fs.pathExistsSync(contractPath)) {
       return new Promise((resolve, reject) => {
-        fs.readFile(contractPath, 'utf-8', (error, fileData) => {
+        fs.readFile(contractPath, "utf-8", (error, fileData) => {
           if (error) {
             reject(error);
           } else {
@@ -76,7 +76,8 @@ export namespace ContractService {
       throw new Error(Constants.errorMessageStrings.BuildContractsDirDoesNotExist(Telemetry.obfuscate(buildDir)));
     }
 
-    return fs.readdirSync(buildDir)
+    return fs
+      .readdirSync(buildDir)
       .filter((file) => path.extname(file) === Constants.contractExtension.json)
       .map((file) => path.join(buildDir, file))
       .filter((file) => fs.lstatSync(file).isFile());

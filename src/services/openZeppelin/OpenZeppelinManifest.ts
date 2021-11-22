@@ -1,14 +1,10 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as url from 'url';
-import {
-  IOZAsset,
-  IOZContractCategory,
-  IOZMetadata,
-} from './models';
+import * as url from "url";
+import { IOZAsset, IOZContractCategory, IOZMetadata } from "./models";
 
-const categoryWithoutDocumentation = 'mocks';
+const categoryWithoutDocumentation = "mocks";
 
 export class OpenZeppelinManifest {
   private metadata: IOZMetadata;
@@ -56,8 +52,6 @@ export class OpenZeppelinManifest {
   }
 
   private appendSlashIfNotExists(urlPath: string) {
-    return urlPath[urlPath.length - 1] === '/'
-      ? urlPath
-      : urlPath + '/';
+    return urlPath[urlPath.length - 1] === "/" ? urlPath : urlPath + "/";
   }
 }

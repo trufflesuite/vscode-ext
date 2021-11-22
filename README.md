@@ -129,15 +129,15 @@ Hyperledger Besu is a popular Ethereum client that is unique in that it offers a
 
 Currently, the Hyperledger Besu is fully compatible with the extension, however the provisioning of the nodes is not yet fully integrated. To connect to a running Besu node with the extension, you can do the following:
 
-1.  Deploy Hyperledger Besu locally or in the cloud (see links in above).
+1. Deploy Hyperledger Besu locally or in the cloud (see links in above).
 
-2.  Retrieve the JSON rpc endpoint that will be used to communicate with the Besu network. This varies based on the deployment model, for Azure deployments these can be retrieved from the output parameters from the deployment.
+2. Retrieve the JSON rpc endpoint that will be used to communicate with the Besu network. This varies based on the deployment model, for Azure deployments these can be retrieved from the output parameters from the deployment.
 
-3.  Update the configuration manually. This is shown in the video below. The extension has the ability to use an HD Wallet provider that simply requires a file with a mnemonic to function.
+3. Update the configuration manually. This is shown in the video below. The extension has the ability to use an HD Wallet provider that simply requires a file with a mnemonic to function.
 
 Add the following to the configuration:
 
-```
+```javascript
 besu: {
    network_id: "*",
    gas: 0,
@@ -160,7 +160,7 @@ besu: {
 
 If you are a developer that would like to target a network that leverages Azure, this option is also available. The option to create new networks or connect to existing ones are is available, the same as with Infura and Local networks!
 
-1. Click `-> Create a new network` in the AZURE BLOCKCHAIN tab, or type `Azure Blockchain: Create a new network` in the [Command Palette](https://github.com/Microsoft/vscode-azure-blockchain-ethereum/wiki/Command-Palette).
+1. Click `-> Create a new network` in the AZURE BLOCKCHAIN tab, or type `Truffle Tools: Create a new network` in the [Command Palette](https://github.com/Microsoft/vscode-azure-blockchain-ethereum/wiki/Command-Palette).
 
 2. Choose your subscription, resource group and region to deploy to.
 
@@ -169,7 +169,7 @@ If you are a developer that would like to target a network that leverages Azure,
 4. Wait until your resource has been created in Azure.
    `Note: Deploying the Azure Blockchain Service takes quite some time to complete. Please check the deployment status in the Azure portal.`
 
-![Create and Azure Blockchain Service](https://github.com/Azure-Samples/blockchain-devkit/raw/master/media/extensionMedia/azureDeploy.gif)
+![Create and Truffle Tools Service](https://github.com/Azure-Samples/blockchain-devkit/raw/master/media/extensionMedia/azureDeploy.gif)
 
 </details>
 

@@ -1,7 +1,7 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { QuickPickItem } from 'vscode';
+import { QuickPickItem } from "vscode";
 
 export class ConsortiumItem implements QuickPickItem {
   public readonly consortiumName: string;
@@ -19,7 +19,7 @@ export class ConsortiumItem implements QuickPickItem {
     resourceGroup: string,
     memberName: string,
     location: string,
-    url?: string,
+    url?: string
   ) {
     this.consortiumName = consortiumName;
     this.subscriptionId = subscriptionId;

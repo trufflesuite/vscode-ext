@@ -1,12 +1,12 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from '../../Constants';
-import { Telemetry } from '../../TelemetryClient';
-import { IDeployDestination } from '../IDeployDestination';
-import { ItemType } from '../ItemType';
-import { AzureBlockchainNetworkNode } from './AzureBlockchainNetworkNode';
-import { Project } from './Project';
+import { Constants } from "../../Constants";
+import { Telemetry } from "../../TelemetryClient";
+import { IDeployDestination } from "../IDeployDestination";
+import { ItemType } from "../ItemType";
+import { AzureBlockchainNetworkNode } from "./AzureBlockchainNetworkNode";
+import { Project } from "./Project";
 const { project, service } = Constants.treeItemData;
 
 export class AzureBlockchainProject extends Project {
@@ -14,17 +14,8 @@ export class AzureBlockchainProject extends Project {
   public readonly resourceGroup: string;
   public readonly memberNames: string[];
 
-  constructor(
-    label: string,
-    subscriptionId: string,
-    resourceGroup: string,
-    memberNames: string[],
-  ) {
-    super(
-      ItemType.AZURE_BLOCKCHAIN_PROJECT,
-      label,
-      project.azure,
-    );
+  constructor(label: string, subscriptionId: string, resourceGroup: string, memberNames: string[]) {
+    super(ItemType.AZURE_BLOCKCHAIN_PROJECT, label, project.azure);
 
     this.subscriptionId = subscriptionId;
     this.resourceGroup = resourceGroup;
@@ -43,25 +34,28 @@ export class AzureBlockchainProject extends Project {
 
   public async getDeployDestinations(): Promise<IDeployDestination[]> {
     const getDeployName = (memberName: string, labelNode: string) =>
-      [service.azure.prefix, this.label, memberName, labelNode].join('_');
+      [service.azure.prefix, this.label, memberName, labelNode].join("_");
 
     const transactionNodes: AzureBlockchainNetworkNode[] = [];
-    this.getChildren()
-      .forEach((member) => transactionNodes.push(...member.getChildren() as AzureBlockchainNetworkNode[]));
+    this.getChildren().forEach((member) =>
+      transactionNodes.push(...(member.getChildren() as AzureBlockchainNetworkNode[]))
+    );
 
-    return Promise.all(transactionNodes.map(async (node) => {
-      const deployName = getDeployName(node.memberName, node.label);
-      return this.getNetworkNode(deployName, node);
-    }));
+    return Promise.all(
+      transactionNodes.map(async (node) => {
+        const deployName = getDeployName(node.memberName, node.label);
+        return this.getNetworkNode(deployName, node);
+      })
+    );
   }
 
   private async getNetworkNode(deployName: string, node: AzureBlockchainNetworkNode): Promise<IDeployDestination> {
-    let description = '';
+    let description = "";
 
     try {
       description = await node.getRPCAddress();
     } catch (error) {
-      Telemetry.sendException(error);
+      Telemetry.sendException(error as Error);
     }
 
     return {

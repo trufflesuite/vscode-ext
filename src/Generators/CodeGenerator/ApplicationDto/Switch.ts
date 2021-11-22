@@ -1,8 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 export function getSwitchTemplate() {
-  const cases: { [key: string]: any; } = {};
+  const cases: { [key: string]: any } = {};
 
   return {
     Switch: {
@@ -10,19 +10,19 @@ export function getSwitchTemplate() {
       default: {
         actions: {
           DefaultResponse: {
-              inputs: {
-                body: 'Method or state variable not found.',
-                statusCode: 404,
-              },
-            kind: 'Http',
+            inputs: {
+              body: "Method or state variable not found.",
+              statusCode: 404,
+            },
+            kind: "Http",
             runAfter: {},
-            type: 'Response',
+            type: "Response",
           },
         },
       },
-      expression: '',
+      expression: "",
       runAfter: {},
-      type: 'Switch',
+      type: "Switch",
     },
   };
 }

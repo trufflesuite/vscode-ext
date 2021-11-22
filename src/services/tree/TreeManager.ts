@@ -1,11 +1,11 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Memento } from 'vscode';
-import { Constants } from '../../Constants';
-import { ItemFactory } from '../../Models';
+import { Memento } from "vscode";
+import { Constants } from "../../Constants";
+import { ItemFactory } from "../../Models";
 import {
-  AzureBlockchainService,
+  TruffleToolsService,
   BlockchainDataManagerService,
   Command,
   IExtensionItem,
@@ -13,9 +13,9 @@ import {
   LocalService,
   Service,
   ServiceTypes,
-} from '../../Models/TreeItems';
-import { Output } from '../../Output';
-import { Telemetry } from '../../TelemetryClient';
+} from "../../Models/TreeItems";
+import { Output } from "../../Output";
+import { Telemetry } from "../../TelemetryClient";
 
 class ExtensionTreeManager {
   private items: Service[];
@@ -49,11 +49,12 @@ class ExtensionTreeManager {
         Telemetry.sendException(error);
         Output.outputLine(
           Constants.outputChannel.treeManager,
-          `${Constants.errorMessageStrings.LoadServiceTreeFailed} ${error.message}`);
+          `${Constants.errorMessageStrings.LoadServiceTreeFailed} ${error.message}`
+        );
       }
     }
 
-    return  this.fillDefaultTypes(items);
+    return this.fillDefaultTypes(items);
   }
 
   public saveState(): void {
@@ -70,7 +71,7 @@ class ExtensionTreeManager {
   public getItems(): Service[] {
     let result = this.items.filter((item) => item.getChildren().length !== 0);
     if (result.length === 0) {
-      Telemetry.sendEvent('TreeManager.getItems.returnDefaultCommandsItems');
+      Telemetry.sendEvent("TreeManager.getItems.returnDefaultCommandsItems");
       result = defaultCommandsItems();
     }
 
@@ -87,9 +88,9 @@ class ExtensionTreeManager {
 
   // FIXME: We should use factory and ItemTypes instead of direct classes
   private fillDefaultTypes(items: Service[]): Service[] {
-    let azureBlockchainService = items.find((item) => item instanceof AzureBlockchainService);
-    if (!azureBlockchainService) {
-      azureBlockchainService = new AzureBlockchainService();
+    let truffleTools = items.find((item) => item instanceof TruffleToolsService);
+    if (!truffleTools) {
+      truffleTools = new TruffleToolsService();
     }
 
     let localService = items.find((item) => item instanceof LocalService);
@@ -107,16 +108,15 @@ class ExtensionTreeManager {
       bdmService = new BlockchainDataManagerService();
     }
 
-    return [ azureBlockchainService, infuraService, localService, bdmService];
+    return [truffleTools, infuraService, localService, bdmService];
   }
 }
 
 function defaultCommandsItems(): Command[] {
   return [
-    new Command('Connect to network', 'azureBlockchainService.connectProject'),
-    new Command('Create a new network', 'azureBlockchainService.createProject'),
+    new Command("Connect to network", "truffleTools.connectProject"),
+    new Command("Create a new network", "truffleTools.createProject"),
   ];
 }
 
-// tslint:disable-next-line:variable-name
 export const TreeManager = new ExtensionTreeManager();

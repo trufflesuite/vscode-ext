@@ -1,13 +1,13 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { SubscriptionModels } from 'azure-arm-resource';
-import { ReadStream } from 'fs';
-import { ServiceClientCredentials } from 'ms-rest';
-import { AzureEnvironment } from 'ms-rest-azure';
-import { CancellationToken, Event, Progress, Terminal } from 'vscode';
+import { SubscriptionModels } from "azure-arm-resource";
+import { ReadStream } from "fs";
+import { ServiceClientCredentials } from "ms-rest";
+import { AzureEnvironment } from "ms-rest-azure";
+import { CancellationToken, Event, Progress, Terminal } from "vscode";
 
-export type AzureLoginStatus = 'Initializing' | 'LoggingIn' | 'LoggedIn' | 'LoggedOut';
+export type AzureLoginStatus = "Initializing" | "LoggingIn" | "LoggedIn" | "LoggedOut";
 
 export interface AzureAccount {
   readonly status: AzureLoginStatus;
@@ -21,7 +21,7 @@ export interface AzureAccount {
   readonly filters: AzureResourceFilter[];
   readonly onFiltersChanged: Event<void>;
   readonly waitForFilters: () => Promise<boolean>;
-  createCloudShell(os: 'Linux' | 'Windows'): CloudShell;
+  createCloudShell(os: "Linux" | "Windows"): CloudShell;
 }
 
 export interface AzureSession {
@@ -38,7 +38,7 @@ export interface AzureSubscription {
 
 export type AzureResourceFilter = AzureSubscription;
 
-export type CloudShellStatus = 'Connecting' | 'Connected' | 'Disconnected';
+export type CloudShellStatus = "Connecting" | "Connected" | "Disconnected";
 
 export interface UploadOptions {
   contentLength?: number;

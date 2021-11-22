@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 const VARIABLE_REFERANCE = {
@@ -8,7 +8,7 @@ const VARIABLE_REFERANCE = {
 
 export const SCOPES = {
   all: {
-    name: 'All',
+    name: "All",
     ref: VARIABLE_REFERANCE.all,
   },
   dynamicVariables: {
@@ -16,4 +16,4 @@ export const SCOPES = {
   },
 };
 
-export const OBJECT_VARIABLE_DISPLAY_NAME = 'Object';
+export const OBJECT_VARIABLE_DISPLAY_NAME = "Object";

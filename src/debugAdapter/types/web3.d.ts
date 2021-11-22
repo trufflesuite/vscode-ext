@@ -1,16 +1,16 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-declare module Web3 {
+declare module Web3Module {
   interface IProvider {
-    currentProvider: any,
+    currentProvider: any;
   }
   interface IBlockResponse {
     number: number;
     transactions: string[];
   }
   interface ITransactionResponse {
-    input: string // encoded methodName and params
+    input: string; // encoded methodName and params
   }
   interface ITransactionReceiptResponse {
     from: string;
@@ -18,8 +18,8 @@ declare module Web3 {
     contractAddress?: string;
   }
   interface IBatchRequest {
-    add: (request: any) => void,
-    execute: () => Promise<any>,
+    add: (request: any) => void;
+    execute: () => Promise<any>;
   }
   interface IRequest {
     request: (...args: any[]) => any;
@@ -27,8 +27,8 @@ declare module Web3 {
 
   interface IWeb3Eth extends IProvider {
     net: {
-      getId: () => Promise<number>,
-    },
+      getId: () => Promise<number>;
+    };
     getBlock: any;
     getTransaction: any;
     getTransactionReceipt: any;
@@ -36,18 +36,17 @@ declare module Web3 {
     currentProvider: any;
   }
   const providers: {
-    HttpProvider: new (providerUrl: string) => IProvider,
-    WebsocketProvider: new (providerUrl: string) => IProvider,
+    HttpProvider: new (providerUrl: string) => IProvider;
+    WebsocketProvider: new (providerUrl: string) => IProvider;
   };
 }
 
-
 declare class Web3 {
-  constructor(provider: Web3.IProvider);
-  eth: Web3.IWeb3Eth;
-  BatchRequest: new () => Web3.IBatchRequest;
+  constructor(provider: Web3Module.IProvider);
+  eth: Web3Module.IWeb3Eth;
+  BatchRequest: new () => Web3Module.IBatchRequest;
 }
 
-declare module 'web3' {
+declare module "web3" {
   export = Web3;
 }

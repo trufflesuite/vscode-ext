@@ -1,14 +1,14 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { ItemType } from '../Models';
-import { IExtensionItem, Nullable } from '../Models/TreeItems';
-import { Telemetry } from '../TelemetryClient';
-import { ExtensionView } from './ExtensionView';
-import { ViewCreator } from './ViewCreators';
+import { ItemType } from "../Models";
+import { IExtensionItem, Nullable } from "../Models/TreeItems";
+import { Telemetry } from "../TelemetryClient";
+import { ExtensionView } from "./ExtensionView";
+import { ViewCreator } from "./ViewCreators";
 
 export namespace ViewItemFactory {
-  const registeredTypes: {[key: number]: ViewCreator} = {};
+  const registeredTypes: { [key: number]: ViewCreator } = {};
 
   export function register(type: ItemType | number, value: ViewCreator): void {
     if (registeredTypes[type]) {

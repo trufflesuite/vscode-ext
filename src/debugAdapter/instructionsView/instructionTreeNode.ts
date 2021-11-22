@@ -1,7 +1,7 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { IInstruction } from '../models/IInstruction';
+import { IInstruction } from "../models/IInstruction";
 
 export default class InstructionTreeNode {
   private key: string;
@@ -10,12 +10,10 @@ export default class InstructionTreeNode {
 
   constructor(key?: string, parent?: InstructionTreeNode, instructionData?: IInstruction) {
     if (!key && (!instructionData || (!instructionData.pc && instructionData.pc !== 0))) {
-      throw new Error('Incorrect input params');
+      throw new Error("Incorrect input params");
     }
 
-    const nodeKey = instructionData
-      ? instructionData.pc.toString()
-      : (key || '');
+    const nodeKey = instructionData ? instructionData.pc.toString() : key || "";
     this.key = nodeKey;
     this.parent = parent;
     this.path = this.generatePath(nodeKey, parent);
@@ -42,7 +40,7 @@ export default class InstructionTreeNode {
   }
 
   private generatePath(key: string, parent?: InstructionTreeNode) {
-    const parentPath = parent ? parent.path : '';
+    const parentPath = parent ? parent.path : "";
     return `${parentPath}/${key}`;
   }
 }

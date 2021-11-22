@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {
@@ -13,19 +13,19 @@ import {
   getFlowAppTemplate,
   getLogicAppTemplate,
   getSwitchTemplate,
-} from './ApplicationDto';
-import { parseSolidityContract } from './ContractParser';
+} from "./ApplicationDto";
+import { parseSolidityContract } from "./ContractParser";
 
-const propertyFunctionName = 'methodOrState';
-const propertyInputParameters = 'inputParameters';
-const propertyBlockchainethereum = 'blockchainethereum';
+const propertyFunctionName = "methodOrState";
+const propertyInputParameters = "inputParameters";
+const propertyBlockchainethereum = "blockchainethereum";
 
 export function generateLogicAppForMicroservice(
   abi: string,
   contractAddress: string,
   subscriptionId: string,
   location: string,
-  solFilePath: string,
+  solFilePath: string
 ) {
   const { variables, functionsDefinitions } = parseSolidityContract(solFilePath);
 
@@ -38,7 +38,7 @@ export function generateLogicAppForMicroservice(
     const action = getActionLogicAppTemplate();
     const bodyParameters: { [key: string]: any } = {};
 
-    if (item.type === 'FunctionDefinition') {
+    if (item.type === "FunctionDefinition") {
       for (const parameter of item.parameters) {
         bodyParameters[parameter.name] = `@triggerBody()?['${propertyInputParameters}']?['${parameter.name}']`;
       }
@@ -55,7 +55,7 @@ export function generateLogicAppForMicroservice(
 
     const actionResponse = getActionResponseTemplate();
     actionResponse.inputs.body = `@body('${item.name}')`;
-    actionResponse.runAfter[item.name!] = [ 'Succeeded' ];
+    actionResponse.runAfter[item.name!] = ["Succeeded"];
 
     actions[item.name!] = action;
     actions[`${item.name}Response`] = actionResponse;
@@ -70,16 +70,18 @@ export function generateLogicAppForMicroservice(
   switchBlock.Switch.expression = `@triggerBody()?['${propertyFunctionName}']`;
 
   definition.actions = switchBlock;
-  definition.triggers.manual.inputs.schema.properties[propertyInputParameters] = { type: 'object' };
-  definition.triggers.manual.inputs.schema.properties[propertyFunctionName] = { type: 'string' };
+  definition.triggers.manual.inputs.schema.properties[propertyInputParameters] = { type: "object" };
+  definition.triggers.manual.inputs.schema.properties[propertyFunctionName] = { type: "string" };
 
   logicApp.definition = definition;
 
   logicApp.parameters.$connections.value[propertyBlockchainethereum] = getConnectionValueTemplate();
-  logicApp.parameters.$connections.value[propertyBlockchainethereum].connectionId
-    = `/subscriptions/${subscriptionId}/resourceGroups/`;
-  logicApp.parameters.$connections.value[propertyBlockchainethereum].id
-    = `/subscriptions/${subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/blockchainethereum`;
+  logicApp.parameters.$connections.value[
+    propertyBlockchainethereum
+  ].connectionId = `/subscriptions/${subscriptionId}/resourceGroups/`;
+  logicApp.parameters.$connections.value[
+    propertyBlockchainethereum
+  ].id = `/subscriptions/${subscriptionId}/providers/Microsoft.Web/locations/${location}/managedApis/blockchainethereum`;
 
   return logicApp;
 }
@@ -88,7 +90,7 @@ export function generateFlowAppForMicroservice(
   name: string,
   abi: string,
   contractAddress: string,
-  solFilePath: string,
+  solFilePath: string
 ) {
   const { variables, functionsDefinitions } = parseSolidityContract(solFilePath);
 
@@ -103,23 +105,25 @@ export function generateFlowAppForMicroservice(
     const action = getActionFlowAppTemplate();
     const actionResponseData = getActionResponseTemplate();
 
-    if (item.type === 'FunctionDefinition') {
+    if (item.type === "FunctionDefinition") {
       for (const parameter of item.parameters) {
         bodyParameters[parameter.name] = `@triggerBody()?['${propertyInputParameters}']?['${parameter.name}']`;
         action.inputs.parameters[`parameters/${parameter.name}`] = `${propertyInputParameters}.${parameter.name}`;
       }
 
-      if (item.stateMutability === 'view' || item.stateMutability === 'pure') {
-        action.inputs.host.operationId = item.parameters.length ? 'ExecuteSmartContractFunction' : 'GetSmartContractProperties';
+      if (item.stateMutability === "view" || item.stateMutability === "pure") {
+        action.inputs.host.operationId = item.parameters.length
+          ? "ExecuteSmartContractFunction"
+          : "GetSmartContractProperties";
       } else {
-        action.inputs.host.operationId = 'ExecuteContractFunction';
+        action.inputs.host.operationId = "ExecuteContractFunction";
       }
 
       actionResponseData.inputs.body = item.returnParameters
-          ? `@outputs('${item.name}')?['body/Function Output']`
-          : `@body('${item.name}')`;
+        ? `@outputs('${item.name}')?['body/Function Output']`
+        : `@body('${item.name}')`;
     } else {
-      action.inputs.host.operationId = 'GetSmartContractProperties';
+      action.inputs.host.operationId = "GetSmartContractProperties";
       actionResponseData.inputs.body = `@outputs('${item.name}')?['body/${item.name}']`;
     }
 
@@ -130,7 +134,7 @@ export function generateFlowAppForMicroservice(
     action.inputs.parameters.functionName = item.name!;
     action.inputs.parameters.abi = abi;
 
-    actionResponseData.runAfter[item.name!] = [ 'Succeeded' ];
+    actionResponseData.runAfter[item.name!] = ["Succeeded"];
 
     actions[item.name!] = action;
     actions[`${item.name}Response`] = actionResponseData;
@@ -145,14 +149,16 @@ export function generateFlowAppForMicroservice(
   switchBlock.Switch.expression = `@triggerBody()?['${propertyFunctionName}']`;
 
   definition.actions = switchBlock;
-  definition.triggers.manual.inputs.schema.properties[propertyInputParameters] = { type: 'object' };
-  definition.triggers.manual.inputs.schema.properties[propertyFunctionName] = { type: 'string' };
+  definition.triggers.manual.inputs.schema.properties[propertyInputParameters] = { type: "object" };
+  definition.triggers.manual.inputs.schema.properties[propertyFunctionName] = { type: "string" };
 
   const clientData = getClientDataTemplate();
   clientData.properties.definition = definition;
   clientData.properties.displayName = name;
   clientData.properties.connectionReferences[connectionReferenceName] = getConnectionReferenceTemplate();
-  clientData.properties.connectionReferences[connectionReferenceName].id = `/providers/Microsoft.PowerApps/apis/${connectionReferenceName}`;
+  clientData.properties.connectionReferences[
+    connectionReferenceName
+  ].id = `/providers/Microsoft.PowerApps/apis/${connectionReferenceName}`;
 
   flowApp.clientdata = JSON.stringify(clientData);
   flowApp.name = name;

@@ -1,19 +1,19 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import { Uri, window } from 'vscode';
-import { Constants } from '../Constants';
-import { getWorkspaceRoot, showIgnorableNotification } from '../helpers';
-import { showInputBox, showQuickPick } from '../helpers/userInteraction';
-import { ResourceGroupItem, SubscriptionItem } from '../Models/QuickPickItems';
-import { Output } from '../Output';
-import { AzureResourceExplorer } from '../resourceExplorers';
-import { ContractService } from '../services';
-import { Telemetry } from '../TelemetryClient';
-import { buildContract } from './AbiDeserialiser';
-import './Nethereum.Generators.DuoCode';
+import * as fs from "fs-extra";
+import * as path from "path";
+import { Uri, window } from "vscode";
+import { Constants } from "../Constants";
+import { getWorkspaceRoot, showIgnorableNotification } from "../helpers";
+import { showInputBox, showQuickPick } from "../helpers/userInteraction";
+import { ResourceGroupItem, SubscriptionItem } from "../Models/QuickPickItems";
+import { Output } from "../Output";
+import { AzureResourceExplorer } from "../resourceExplorers";
+import { ContractService } from "../services";
+import { Telemetry } from "../TelemetryClient";
+import { buildContract } from "./AbiDeserialiser";
+import "./Nethereum.Generators.DuoCode";
 
 interface ILogicAppData {
   contractAddress: string;
@@ -35,43 +35,40 @@ interface IAzureAppsItem {
 
 export class LogicAppGenerator {
   public async generateMicroservicesWorkflows(filePath?: Uri): Promise<void> {
-    Telemetry.sendEvent('LogicAppGenerator.microservicesWorkflows');
+    Telemetry.sendEvent("LogicAppGenerator.microservicesWorkflows");
     await this.generateWorkflows(Constants.microservicesWorkflows.Service, filePath);
   }
 
   public async generateDataPublishingWorkflows(filePath?: Uri): Promise<void> {
-    Telemetry.sendEvent('LogicAppGenerator.dataPublishingWorkflows');
+    Telemetry.sendEvent("LogicAppGenerator.dataPublishingWorkflows");
     await this.generateWorkflows(Constants.microservicesWorkflows.Data, filePath);
   }
 
   public async generateEventPublishingWorkflows(filePath?: Uri): Promise<void> {
-    Telemetry.sendEvent('LogicAppGenerator.eventPublishingWorkflows');
+    Telemetry.sendEvent("LogicAppGenerator.eventPublishingWorkflows");
     await this.generateWorkflows(Constants.microservicesWorkflows.Messaging, filePath);
   }
 
   public async generateReportPublishingWorkflows(filePath?: Uri): Promise<void> {
-    Telemetry.sendEvent('LogicAppGenerator.reportPublishingWorkflows');
+    Telemetry.sendEvent("LogicAppGenerator.reportPublishingWorkflows");
     await this.generateWorkflows(Constants.microservicesWorkflows.Reporting, filePath);
   }
 
   private async generateWorkflows(workflowType: string, filePath?: Uri): Promise<void> {
     const filePaths = await this.getContractsPath(filePath);
     const logicAppData = await this.getLogicAppData(workflowType);
-    await showIgnorableNotification(
-      Constants.statusBarMessages.generatingLogicApp(logicAppData.label),
-      async () => {
-        for (const file of filePaths) {
-          const contract = await fs.readJson(file, { encoding: 'utf8' });
-          const generatedFiles: any[] = this.getGenerator(contract, logicAppData).GenerateAll();
-          for (const generatedFile of generatedFiles) {
-            await this.writeFile(generatedFile);
-          }
+    await showIgnorableNotification(Constants.statusBarMessages.generatingLogicApp(logicAppData.label), async () => {
+      for (const file of filePaths) {
+        const contract = await fs.readJson(file, { encoding: "utf8" });
+        const generatedFiles: any[] = this.getGenerator(contract, logicAppData).GenerateAll();
+        for (const generatedFile of generatedFiles) {
+          await this.writeFile(generatedFile);
         }
+      }
 
-        window.showInformationMessage(Constants.informationMessage.generatedLogicApp(logicAppData.label));
-        Telemetry.sendEvent('LogicAppGenerator.generateWorkflows.commandFinished');
-      },
-    );
+      window.showInformationMessage(Constants.informationMessage.generatedLogicApp(logicAppData.label));
+      Telemetry.sendEvent("LogicAppGenerator.generateWorkflows.commandFinished");
+    });
   }
 
   private async getContractsPath(filePath?: Uri): Promise<string[]> {
@@ -80,9 +77,9 @@ export class LogicAppGenerator {
     const files: string[] = [];
 
     if (!fs.pathExistsSync(buildDir)) {
-      Telemetry.sendException(new Error(Constants.errorMessageStrings.BuildContractsDirDoesNotExist(
-        Telemetry.obfuscate(buildDir),
-      )));
+      Telemetry.sendException(
+        new Error(Constants.errorMessageStrings.BuildContractsDirDoesNotExist(Telemetry.obfuscate(buildDir)))
+      );
       throw new Error(Constants.errorMessageStrings.BuildContractsDirDoesNotExist(buildDir));
     }
 
@@ -91,21 +88,23 @@ export class LogicAppGenerator {
       const contractName = path.basename(filePath.fsPath, Constants.contractExtension.sol);
       files.push(`${contractName}${Constants.contractExtension.json}`);
     } else {
-      files.push(...await fs.readdir(buildDir));
+      files.push(...(await fs.readdir(buildDir)));
     }
 
-    const filePaths = files
-      .map((file) => path.join(buildDir, file))
-      .filter((file) => fs.lstatSync(file).isFile());
+    const filePaths = files.map((file) => path.join(buildDir, file)).filter((file) => fs.lstatSync(file).isFile());
 
     if (files.length === 0) {
-      Telemetry.sendException(new Error(
-        Constants.errorMessageStrings.BuildContractsDirIsEmpty(Telemetry.obfuscate(buildDir)) + ' ' +
-        Constants.errorMessageStrings.BuildContractsBeforeGenerating,
-      ));
+      Telemetry.sendException(
+        new Error(
+          Constants.errorMessageStrings.BuildContractsDirIsEmpty(Telemetry.obfuscate(buildDir)) +
+            " " +
+            Constants.errorMessageStrings.BuildContractsBeforeGenerating
+        )
+      );
       throw new Error(
-        Constants.errorMessageStrings.BuildContractsDirIsEmpty(buildDir) + ' ' +
-        Constants.errorMessageStrings.BuildContractsBeforeGenerating,
+        Constants.errorMessageStrings.BuildContractsDirIsEmpty(buildDir) +
+          " " +
+          Constants.errorMessageStrings.BuildContractsBeforeGenerating
       );
     }
 
@@ -114,7 +113,7 @@ export class LogicAppGenerator {
 
   private async getLogicAppData(workflowType: string): Promise<ILogicAppData> {
     const azureAppItem: IAzureAppsItem = await this.getAzureAppItem(workflowType);
-    const contractAddress = await showInputBox({ ignoreFocusOut: true, value: 'contract address' });
+    const contractAddress = await showInputBox({ ignoreFocusOut: true, value: "contract address" });
     const [subscriptionItem, resourceGroupItem] = await this.selectSubscriptionAndResourceGroup();
     const logicAppData: ILogicAppData = {
       contractAddress,
@@ -127,8 +126,8 @@ export class LogicAppGenerator {
     };
 
     if (workflowType === Constants.microservicesWorkflows.Messaging) {
-      Telemetry.sendEvent('LogicAppGenerator.getLogicAppData.workflowTypeIsMessaging');
-      logicAppData.topicName = await showInputBox({ ignoreFocusOut: true, value: 'topic name' });
+      Telemetry.sendEvent("LogicAppGenerator.getLogicAppData.workflowTypeIsMessaging");
+      logicAppData.topicName = await showInputBox({ ignoreFocusOut: true, value: "topic name" });
       logicAppData.messagingType = await this.getMessagingType();
     }
 
@@ -140,16 +139,16 @@ export class LogicAppGenerator {
 
     switch (logicAppData.workflowType) {
       case Service:
-        Telemetry.sendEvent('LogicAppGenerator.getGenerator.Service');
+        Telemetry.sendEvent("LogicAppGenerator.getGenerator.Service");
         return this.getServiceWorkflowProjectGenerator(contract, logicAppData);
       case Data:
-        Telemetry.sendEvent('LogicAppGenerator.getGenerator.Data');
+        Telemetry.sendEvent("LogicAppGenerator.getGenerator.Data");
         return this.getDataWorkflowProjectGenerator(contract, logicAppData);
       case Messaging:
-        Telemetry.sendEvent('LogicAppGenerator.getGenerator.Messaging');
+        Telemetry.sendEvent("LogicAppGenerator.getGenerator.Messaging");
         return this.getMessagingWorkflowProjectGenerator(contract, logicAppData);
       case Reporting:
-        Telemetry.sendEvent('LogicAppGenerator.getGenerator.Reporting');
+        Telemetry.sendEvent("LogicAppGenerator.getGenerator.Reporting");
         return this.getReportingWorkflowProjectGenerator(contract, logicAppData);
       default: {
         const error = new Error(Constants.errorMessageStrings.WorkflowTypeDoesNotMatch);
@@ -170,7 +169,7 @@ export class LogicAppGenerator {
   }
 
   private async getAzureAppItem(workflowType: string): Promise<IAzureAppsItem> {
-    const items = [Constants.azureApps.LogicApp, Constants.azureApps.FlowApp ];
+    const items = [Constants.azureApps.LogicApp, Constants.azureApps.FlowApp];
 
     if (workflowType === Constants.microservicesWorkflows.Service) {
       items.push(Constants.azureApps.AzureFunction);
@@ -181,8 +180,8 @@ export class LogicAppGenerator {
 
   private async getMessagingType(): Promise<number> {
     const items = [
-      { label: 'Event Grid', messagingType: 0 },
-      { label: 'Service Bus', messagingType: 1 },
+      { label: "Event Grid", messagingType: 0 },
+      { label: "Service Bus", messagingType: 1 },
     ];
 
     const item = await showQuickPick(items, { ignoreFocusOut: true });
@@ -204,7 +203,7 @@ export class LogicAppGenerator {
       logicAppData.contractAddress,
       logicAppData.subscriptionId,
       logicAppData.resourceGroup,
-      '',
+      ""
     );
   }
 
@@ -222,7 +221,7 @@ export class LogicAppGenerator {
       logicAppData.contractAddress,
       logicAppData.subscriptionId,
       logicAppData.resourceGroup,
-      JSON.stringify(contract.abi),
+      JSON.stringify(contract.abi)
     );
   }
 
@@ -242,7 +241,7 @@ export class LogicAppGenerator {
       logicAppData.resourceGroup,
       JSON.stringify(contract.abi),
       logicAppData.topicName!,
-      logicAppData.messagingType!,
+      logicAppData.messagingType!
     );
   }
 
@@ -260,7 +259,7 @@ export class LogicAppGenerator {
       logicAppData.contractAddress,
       logicAppData.subscriptionId,
       logicAppData.resourceGroup,
-      JSON.stringify(contract.abi),
+      JSON.stringify(contract.abi)
     );
   }
 
@@ -270,6 +269,6 @@ export class LogicAppGenerator {
     await fs.mkdirp(path.dirname(filePath));
     await fs.writeFile(filePath, file.get_GeneratedCode());
 
-    Output.outputLine(Constants.outputChannel.logicAppGenerator, 'Saved file to ' + filePath);
+    Output.outputLine(Constants.outputChannel.logicAppGenerator, "Saved file to " + filePath);
   }
 }

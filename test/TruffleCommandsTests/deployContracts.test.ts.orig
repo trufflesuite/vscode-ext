@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import * as assert from 'assert';
@@ -17,7 +17,7 @@ import { CancellationEvent, ItemType } from '../../src/Models';
 import {
   AzureBlockchainNetworkNode,
   AzureBlockchainProject,
-  AzureBlockchainService,
+  TruffleToolsService,
   BlockchainDataManagerNetworkNode,
   BlockchainDataManagerProject,
   BlockchainDataManagerService,
@@ -465,7 +465,7 @@ describe('TruffleCommands', () => {
           'installTruffleHdWalletProvider should not be called');
       });
 
-      it('to AzureBlockchainService should generate mnemonic and complete successfully', async () => {
+      it('to TruffleToolsService should generate mnemonic and complete successfully', async () => {
         // Arrange
         const { consortium, member, transactionNode } = azureNames;
         checkAppsSilentMock.returns(true);
@@ -518,7 +518,7 @@ describe('TruffleCommands', () => {
           'installTruffleHdWalletProvider should not be called');
       });
 
-      it('to AzureBlockchainService should complete successfully when user paste mnemonic', async () => {
+      it('to TruffleToolsService should complete successfully when user paste mnemonic', async () => {
         // Arrange
         const { consortium, member, transactionNode } = azureNames;
         checkAppsSilentMock.returns(true);
@@ -665,7 +665,7 @@ const azureNames = {
 async function createTestServicesItems(): Promise<Service[]> {
   const services: Service[] = [];
 
-  const azureBlockchainService = new AzureBlockchainService();
+  const truffleTools = new TruffleToolsService();
   const localService = new LocalService();
   const infuraService = new InfuraService();
   const bdmService = new BlockchainDataManagerService();
@@ -704,12 +704,12 @@ async function createTestServicesItems(): Promise<Service[]> {
     uuid.v4());
   bdmProject.addChild(bdmNetworkNode);
 
-  azureBlockchainService.addChild(azureBlockchainProject);
+  truffleTools.addChild(azureBlockchainProject);
   localService.addChild(localProject);
   infuraService.addChild(infuraProject);
   bdmService.addChild(bdmProject);
 
-  services.push(azureBlockchainService, localService, infuraService, bdmService);
+  services.push(truffleTools, localService, infuraService, bdmService);
 
   return services;
 }

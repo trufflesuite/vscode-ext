@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import * as crypto from "crypto";
@@ -23,16 +23,15 @@ class ExtensionTelemetry {
         this.output = window.createOutputChannel(Constants.outputChannel.telemetryClient);
       } else {
         try {
-          this.reporter = new TelemetryReporter(
-            Constants.extensionName,
-            Constants.extensionVersion,
-            extensionKey
-          );
+          this.reporter = new TelemetryReporter(Constants.extensionName, Constants.extensionVersion, extensionKey);
           // set default values for machine/session ids
           this.defaultProperties["common.vscodemachineid"] = generateMachineId();
           this.defaultProperties["common.vscodesessionid"] = generateSessionId();
         } catch (error) {
-          Output.outputLine(Constants.outputChannel.telemetryClient, `Initialize done with error: ${(error as Error).message}`);
+          Output.outputLine(
+            Constants.outputChannel.telemetryClient,
+            `Initialize done with error: ${(error as Error).message}`
+          );
         }
       }
     }
@@ -94,5 +93,4 @@ function generateSessionId(): string {
   return crypto.randomBytes(16).toString("hex");
 }
 
-// tslint:disable-next-line:variable-name
 export const Telemetry = new ExtensionTelemetry();

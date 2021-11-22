@@ -1,11 +1,11 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { TruffleCommands } from '../../commands/TruffleCommands';
-import { IExtensionAdapter } from './IExtensionAdapter';
+import { TruffleCommands } from "../../commands/TruffleCommands";
+import { IExtensionAdapter } from "./IExtensionAdapter";
 
 export class TruffleExtensionAdapter implements IExtensionAdapter {
-  // tslint:disable-next-line:no-empty
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   public async validateExtension(): Promise<void> {}
 
   public async build(): Promise<void> {

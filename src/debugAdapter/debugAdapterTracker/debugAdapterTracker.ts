@@ -1,12 +1,12 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { DebugAdapterTracker, DebugSession, window } from 'vscode';
-import InstructionView from '../instructionsView/instructionView';
+import { DebugAdapterTracker, DebugSession, window } from "vscode";
+import InstructionView from "../instructionsView/instructionView";
 
-import { EVENT_TYPES } from '../constants/debugAdapter';
-import { GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS } from '../constants/debugSessionCommands';
-import { IInstruction } from '../models/IInstruction';
+import { EVENT_TYPES } from "../constants/debugAdapter";
+import { GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS } from "../constants/debugSessionCommands";
+import { IInstruction } from "../models/IInstruction";
 
 export default class SolidityDebugAdapterTracker implements DebugAdapterTracker {
   private session: DebugSession;
@@ -19,7 +19,7 @@ export default class SolidityDebugAdapterTracker implements DebugAdapterTracker 
 
   public onDidSendMessage(message: any): void {
     if (message.success === false) {
-      window.showErrorMessage('Error occured in debug mode: ' + message.body.error.format);
+      window.showErrorMessage("Error occured in debug mode: " + message.body.error.format);
       return;
     }
     switch (message.event) {

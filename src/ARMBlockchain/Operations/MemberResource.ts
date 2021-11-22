@@ -1,11 +1,11 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { IAzureConsortiumMemberDto } from '..';
-import { AzureBlockchainServiceClient } from '../AzureBlockchainServiceClient';
+import { IAzureConsortiumMemberDto } from "..";
+import { TruffleToolsServiceClient } from "../TruffleToolsServiceClient";
 
 export class MemberResource {
-  constructor(private readonly client: AzureBlockchainServiceClient) {}
+  constructor(private readonly client: TruffleToolsServiceClient) {}
 
   public getMemberList(memberName: string): Promise<IAzureConsortiumMemberDto[]> {
     return new Promise((resolve, reject) => {
@@ -20,10 +20,10 @@ export class MemberResource {
   }
 
   public async checkExistence(name: string): Promise<{
-    message: string | null,
-    nameAvailable: boolean,
-    reason: string,
+    message: string | null;
+    nameAvailable: boolean;
+    reason: string;
   }> {
-    return await this.client.checkExistence(name, 'Microsoft.Blockchain/blockchainMembers');
+    return await this.client.checkExistence(name, "Microsoft.Blockchain/blockchainMembers");
   }
 }

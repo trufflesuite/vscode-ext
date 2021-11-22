@@ -1,19 +1,19 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { TruffleCommands } from '../src/commands/TruffleCommands';
-import { TruffleExtensionAdapter } from '../src/services/extensionAdapter';
+import * as assert from "assert";
+import * as sinon from "sinon";
+import { TruffleCommands } from "../src/commands/TruffleCommands";
+import { TruffleExtensionAdapter } from "../src/services/extensionAdapter";
 
-describe('TruffleExtensionAdapter', () => {
+describe("TruffleExtensionAdapter", () => {
   let buildContractsMock: sinon.SinonStub<any>;
   let deployContractsMock: sinon.SinonStub<any>;
   let truffleExtensionAdapter: TruffleExtensionAdapter;
 
   beforeEach(() => {
-    buildContractsMock = sinon.stub(TruffleCommands, 'buildContracts');
-    deployContractsMock = sinon.stub(TruffleCommands, 'deployContracts');
+    buildContractsMock = sinon.stub(TruffleCommands, "buildContracts");
+    deployContractsMock = sinon.stub(TruffleCommands, "deployContracts");
 
     truffleExtensionAdapter = new TruffleExtensionAdapter();
   });
@@ -22,27 +22,19 @@ describe('TruffleExtensionAdapter', () => {
     sinon.restore();
   });
 
-  it('build method should call truffleCommands.buildContracts', async () => {
+  it("build method should call truffleCommands.buildContracts", async () => {
     // Act
     await truffleExtensionAdapter.build();
 
     // Assert
-    assert.strictEqual(
-      buildContractsMock.calledOnce,
-      true,
-      'TruffleCommands.buildContracts should be called once',
-    );
+    assert.strictEqual(buildContractsMock.calledOnce, true, "TruffleCommands.buildContracts should be called once");
   });
 
-  it('deploy method should call truffleCommands.buildContracts', async () => {
+  it("deploy method should call truffleCommands.buildContracts", async () => {
     // Act
     await truffleExtensionAdapter.deploy();
 
     // Assert
-    assert.strictEqual(
-      deployContractsMock.calledOnce,
-      true,
-      'TruffleCommands.deployContracts should be called once',
-    );
+    assert.strictEqual(deployContractsMock.calledOnce, true, "TruffleCommands.deployContracts should be called once");
   });
 });

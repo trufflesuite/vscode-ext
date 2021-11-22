@@ -1,16 +1,16 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import * as uuid from 'uuid';
-import * as vscode from 'vscode';
-import { ServiceCommands } from '../../../src/commands';
-import { Constants } from '../../../src/Constants';
-import { ItemType } from '../../../src/Models';
+import * as assert from "assert";
+import * as sinon from "sinon";
+import * as uuid from "uuid";
+import * as vscode from "vscode";
+import { ServiceCommands } from "../../../src/commands";
+import { Constants } from "../../../src/Constants";
+import { ItemType } from "../../../src/Models";
 import {
   AzureBlockchainProject,
-  AzureBlockchainService,
+  TruffleToolsService,
   BlockchainDataManagerProject,
   BlockchainDataManagerService,
   IExtensionItem,
@@ -19,14 +19,18 @@ import {
   LocalService,
   Project,
   Service,
-} from '../../../src/Models/TreeItems';
-import { BlockchainDataManagerResourceExplorer, ConsortiumResourceExplorer, InfuraResourceExplorer } from '../../../src/resourceExplorers';
-import { GanacheService, TreeManager } from '../../../src/services';
-import { AzureAccountHelper } from '../../testHelpers/AzureAccountHelper';
-import { getRandomInt } from '../../testHelpers/Random';
+} from "../../../src/Models/TreeItems";
+import {
+  BlockchainDataManagerResourceExplorer,
+  ConsortiumResourceExplorer,
+  InfuraResourceExplorer,
+} from "../../../src/resourceExplorers";
+import { GanacheService, TreeManager } from "../../../src/services";
+import { AzureAccountHelper } from "../../testHelpers/AzureAccountHelper";
+import { getRandomInt } from "../../testHelpers/Random";
 const { project, service } = Constants.treeItemData;
 
-describe('Service Commands', () => {
+describe("Service Commands", () => {
   let getItemsMock: any;
   let getItemMock: any;
   let loadStateMock: sinon.SinonStub<[], IExtensionItem[]>;
@@ -46,7 +50,7 @@ describe('Service Commands', () => {
   let bdmGroup: Service;
 
   function initializeNetworks() {
-    azureGroup = new AzureBlockchainService();
+    azureGroup = new TruffleToolsService();
     localGroup = new LocalService();
     infuraGroup = new InfuraService();
     bdmGroup = new BlockchainDataManagerService();
@@ -62,44 +66,39 @@ describe('Service Commands', () => {
   beforeEach(() => {
     initializeNetworks();
 
-    getItemsMock = sinon.stub(TreeManager, 'getItems');
-    getItemMock = sinon.stub(TreeManager, 'getItem');
-    loadStateMock = sinon.stub(TreeManager, 'loadState');
+    getItemsMock = sinon.stub(TreeManager, "getItems");
+    getItemMock = sinon.stub(TreeManager, "getItem");
+    loadStateMock = sinon.stub(TreeManager, "loadState");
     testServiceItems = createTestServiceItems();
     getItemsMock.returns(testServiceItems);
     loadStateMock.returns(testServiceItems);
 
     ganacheServiceMock = sinon.mock(GanacheService);
-    getPortStatusMock = ganacheServiceMock.expects('getPortStatus');
-    startGanacheServerMock = ganacheServiceMock.expects('startGanacheServer');
+    getPortStatusMock = ganacheServiceMock.expects("getPortStatus");
+    startGanacheServerMock = ganacheServiceMock.expects("startGanacheServer");
 
-    showQuickPickMock = sinon.stub(vscode.window, 'showQuickPick');
-    showInputBoxMock = sinon.stub(vscode.window, 'showInputBox');
-    selectConsortiumMock = sinon.stub(ConsortiumResourceExplorer.prototype, 'selectProject');
-    getExtensionMock = sinon.stub(vscode.extensions, 'getExtension').returns(AzureAccountHelper.mockExtension);
+    showQuickPickMock = sinon.stub(vscode.window, "showQuickPick");
+    showInputBoxMock = sinon.stub(vscode.window, "showInputBox");
+    selectConsortiumMock = sinon.stub(ConsortiumResourceExplorer.prototype, "selectProject");
+    getExtensionMock = sinon.stub(vscode.extensions, "getExtension").returns(AzureAccountHelper.mockExtension);
   });
 
   afterEach(() => {
     sinon.restore();
   });
 
-  describe('Unit tests', () => {
-    describe('connectProject provides types of service destination and returns new service', () => {
-      function assertAfterEachTest(
-        result: Project,
-        itemType: number,
-        contextValue: string,
-        name: string) {
-
-        assert.strictEqual(result.label, name, 'returned result should store correct label');
-        assert.strictEqual(result.itemType, itemType, 'returned result should store correct itemType');
-        assert.strictEqual(result.contextValue, contextValue, 'returned result should store correct contextValue');
+  describe("Unit tests", () => {
+    describe("connectProject provides types of service destination and returns new service", () => {
+      function assertAfterEachTest(result: Project, itemType: number, contextValue: string, name: string) {
+        assert.strictEqual(result.label, name, "returned result should store correct label");
+        assert.strictEqual(result.itemType, itemType, "returned result should store correct itemType");
+        assert.strictEqual(result.contextValue, contextValue, "returned result should store correct contextValue");
       }
 
-      it('for Local Service destination.', async () => {
+      it("for Local Service destination.", async () => {
         // Arrange
         const port = getRandomInt(65535);
-        const name = 'localProjectName';
+        const name = "localProjectName";
         const expectedLabel = `${name}`;
         getItemMock.returns(localGroup);
         showQuickPickMock.onCall(0).callsFake((items: any) => {
@@ -113,27 +112,20 @@ describe('Service Commands', () => {
         const result = await ServiceCommands.connectProject();
 
         // Assert
-        assertAfterEachTest(
-          result,
-          ItemType.LOCAL_PROJECT,
-          project.local.contextValue,
-          expectedLabel);
-        assert.strictEqual(startGanacheServerMock.called, true, 'startGanacheServer should be called');
+        assertAfterEachTest(result, ItemType.LOCAL_PROJECT, project.local.contextValue, expectedLabel);
+        assert.strictEqual(startGanacheServerMock.called, true, "startGanacheServer should be called");
       });
 
-      it('for Azure Blockchain Service destination.', async () => {
+      it("for Truffle Tools Service destination.", async () => {
         // Arrange
         const consortiumName = uuid.v4;
         getItemMock.returns(azureGroup);
         showQuickPickMock.onCall(0).callsFake((items: any) => {
           return items.find((item: any) => item.label === service.azure.label);
         });
-        const azureBlockchainProject = new AzureBlockchainProject(
-          consortiumName.toString(),
+        const azureBlockchainProject = new AzureBlockchainProject(consortiumName.toString(), uuid.v4(), uuid.v4(), [
           uuid.v4(),
-          uuid.v4(),
-          [uuid.v4()],
-        );
+        ]);
         selectConsortiumMock.returns(azureBlockchainProject);
 
         // Act
@@ -146,10 +138,11 @@ describe('Service Commands', () => {
           result,
           ItemType.AZURE_BLOCKCHAIN_PROJECT,
           project.azure.contextValue,
-          consortiumName.toString());
+          consortiumName.toString()
+        );
       });
 
-      it('for Infura Service destination.', async () => {
+      it("for Infura Service destination.", async () => {
         // Arrange
         const label = uuid.v4.toString();
         getItemMock.returns(infuraGroup);
@@ -157,7 +150,7 @@ describe('Service Commands', () => {
           return items.find((item: any) => item.label === service.infura.label);
         });
 
-        selectProjectMock = sinon.stub(InfuraResourceExplorer.prototype, 'selectProject');
+        selectProjectMock = sinon.stub(InfuraResourceExplorer.prototype, "selectProject");
         const infuraProject = new InfuraProject(label, uuid.v4());
         selectProjectMock.returns(infuraProject);
 
@@ -166,14 +159,10 @@ describe('Service Commands', () => {
 
         // Assert
         assert.strictEqual(selectProjectMock.calledOnce, true);
-        assertAfterEachTest(
-          result,
-          ItemType.INFURA_PROJECT,
-          project.infura.contextValue,
-          label.toString());
+        assertAfterEachTest(result, ItemType.INFURA_PROJECT, project.infura.contextValue, label.toString());
       });
 
-      it('for Blockchain Data Manager Service destination.', async () => {
+      it("for Blockchain Data Manager Service destination.", async () => {
         // Arrange
         const label = uuid.v4.toString();
         getItemMock.returns(bdmGroup);
@@ -181,7 +170,7 @@ describe('Service Commands', () => {
           return items.find((item: any) => item.label === service.bdm.label);
         });
 
-        selectProjectMock = sinon.stub(BlockchainDataManagerResourceExplorer.prototype, 'selectProject');
+        selectProjectMock = sinon.stub(BlockchainDataManagerResourceExplorer.prototype, "selectProject");
         const bdmProject = new BlockchainDataManagerProject(label, uuid.v4(), uuid.v4());
         selectProjectMock.returns(bdmProject);
 
@@ -195,12 +184,13 @@ describe('Service Commands', () => {
           result,
           ItemType.BLOCKCHAIN_DATA_MANAGER_PROJECT,
           project.bdm.contextValue,
-          label.toString());
+          label.toString()
+        );
       });
     });
 
-    describe('connectProject should rejects', () => {
-      it('for Local Service when port is empty', async () => {
+    describe("connectProject should rejects", () => {
+      it("for Local Service when port is empty", async () => {
         // Arrange
         getItemMock.returns(localGroup);
         showQuickPickMock.onCall(0).callsFake((items: any) => {

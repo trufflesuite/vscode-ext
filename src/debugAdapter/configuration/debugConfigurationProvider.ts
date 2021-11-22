@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {
@@ -7,7 +7,7 @@ import {
   DebugConfigurationProvider,
   ProviderResult,
   WorkspaceFolder,
-} from 'vscode';
+} from "vscode";
 
 export default class TruffleDebuggerConfigurationProvider implements DebugConfigurationProvider {
   /**
@@ -17,7 +17,8 @@ export default class TruffleDebuggerConfigurationProvider implements DebugConfig
   public resolveDebugConfiguration(
     _folder: WorkspaceFolder | undefined,
     config: DebugConfiguration,
-    _token?: CancellationToken): ProviderResult<DebugConfiguration> {
+    _token?: CancellationToken
+  ): ProviderResult<DebugConfiguration> {
     return config;
   }
 }

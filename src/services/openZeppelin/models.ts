@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 export interface IOZMetadata {
@@ -35,9 +35,9 @@ export interface IOZContractParameter {
 
 export interface IProjectMetadata {
   openZeppelin: {
-    assets: IOZAsset[],
-    version: string,
-    categories?: string[],
+    assets: IOZAsset[];
+    version: string;
+    categories?: string[];
   };
 }
 
@@ -47,10 +47,10 @@ export interface IDownloadingResult {
 }
 
 export const enum OZAssetType {
-  contract = 'contract',
-  library = 'library',
-  interface = 'interface',
-  abstractContract = 'abstractContract',
+  contract = "contract",
+  library = "library",
+  interface = "interface",
+  abstractContract = "abstractContract",
 }
 
 export const enum PromiseState {
@@ -60,9 +60,5 @@ export const enum PromiseState {
 }
 
 export class OZContractValidated {
-  constructor(
-    public contractPath: string,
-    public isExistedOnDisk: boolean,
-    public isHashValid?: boolean) {
-  }
+  constructor(public contractPath: string, public isExistedOnDisk: boolean, public isHashValid?: boolean) {}
 }

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {
@@ -8,18 +8,18 @@ import {
   DebugAdapterServer,
   DebugSession,
   ProviderResult,
-} from 'vscode';
+} from "vscode";
 
-import * as Net from 'net';
-import { SolidityDebugSession } from '../debugSession';
+import * as Net from "net";
+import { SolidityDebugSession } from "../debugSession";
 
 export default class TruffleDebugAdapterDescriptorFactory implements DebugAdapterDescriptorFactory {
   private _server?: Net.Server;
 
   public createDebugAdapterDescriptor(
     _session: DebugSession,
-    _executable: DebugAdapterExecutable | undefined): ProviderResult<DebugAdapterDescriptor> {
-
+    _executable: DebugAdapterExecutable | undefined
+  ): ProviderResult<DebugAdapterDescriptor> {
     if (!this._server) {
       // start listening on a random port
       this._server = Net.createServer((socket) => {

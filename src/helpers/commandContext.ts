@@ -1,16 +1,16 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { commands } from 'vscode';
+import { commands } from "vscode";
 
 export enum VSCommands {
-  SetContext = 'setContext',
+  SetContext = "setContext",
 }
 
 export enum CommandContext {
-  Enabled = 'azureBlockchainService:enabled',
-  IsGanacheRunning = 'azureBlockchainService:isGanacheRunning',
-  IsWorkspaceOpen = 'azureBlockchainService:isWorkspaceOpen',
+  Enabled = "truffleTools:enabled",
+  IsGanacheRunning = "truffleTools:isGanacheRunning",
+  IsWorkspaceOpen = "truffleTools:isWorkspaceOpen",
 }
 
 export function setCommandContext(key: CommandContext | string, value: boolean): Thenable<boolean | undefined> {

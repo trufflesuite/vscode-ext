@@ -1,15 +1,15 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-export * from './CancellationEvent';
-export * from './EnumStorage';
-export * from './ItemFactory';
-export * from './ItemType';
-export * from './IDeployDestination';
+export * from "./CancellationEvent";
+export * from "./EnumStorage";
+export * from "./ItemFactory";
+export * from "./ItemType";
+export * from "./IDeployDestination";
 import {
   AzureBlockchainNetworkNodeItemCreator,
   AzureBlockchainProjectItemCreator,
-  AzureBlockchainServiceItemCreator,
+  TruffleToolsServiceItemCreator,
   BlockchainDataManagerInputAndOutputItemCreator,
   BlockchainDataManagerNetworkNodeItemCreator,
   BlockchainDataManagerProjectItemCreator,
@@ -23,14 +23,14 @@ import {
   LocalServiceItemCreator,
   MemberItemCreator,
   NullableItemCreator,
-} from './ItemCreators';
-import { ItemFactory } from './ItemFactory';
-import { ItemType } from './ItemType';
+} from "./ItemCreators";
+import { ItemFactory } from "./ItemFactory";
+import { ItemType } from "./ItemType";
 
 ItemFactory.register(ItemType.COMMAND, new CommandItemCreator());
 ItemFactory.register(ItemType.NULLABLE, new NullableItemCreator());
 
-ItemFactory.register(ItemType.AZURE_BLOCKCHAIN_SERVICE, new AzureBlockchainServiceItemCreator());
+ItemFactory.register(ItemType.AZURE_BLOCKCHAIN_SERVICE, new TruffleToolsServiceItemCreator());
 ItemFactory.register(ItemType.LOCAL_SERVICE, new LocalServiceItemCreator());
 ItemFactory.register(ItemType.INFURA_SERVICE, new InfuraServiceItemCreator());
 ItemFactory.register(ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE, new BlockchainDataManagerServiceItemCreator());
@@ -50,7 +50,9 @@ ItemFactory.register(ItemType.BLOCKCHAIN_DATA_MANAGER_OUTPUT, new BlockchainData
 ItemFactory.register(ItemType.MEMBER, new MemberItemCreator());
 ItemFactory.register(
   ItemType.BLOCKCHAIN_DATA_MANAGER_INPUT_GROUP,
-  new BlockchainDataManagerInputAndOutputItemCreator());
+  new BlockchainDataManagerInputAndOutputItemCreator()
+);
 ItemFactory.register(
   ItemType.BLOCKCHAIN_DATA_MANAGER_OUTPUT_GROUP,
-  new BlockchainDataManagerInputAndOutputItemCreator());
+  new BlockchainDataManagerInputAndOutputItemCreator()
+);

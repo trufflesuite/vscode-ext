@@ -1,7 +1,7 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { relative as pathRelative, sep as pathSep } from 'path';
+import { relative as pathRelative, sep as pathSep } from "path";
 
 export function sortFilePaths(filePaths: string[]): string[] {
   return filePaths.sort(comparePaths);
@@ -25,9 +25,7 @@ function comparePaths(pathA: string, pathB: string): number {
   } else if (isPathAdiffByPathBContainsFolder && !isPathBdiffByPathBContainsFolder) {
     return 1;
   } else {
-    return pathAdiffByPathB < pathBdiffByPathA
-      ? -1
-      : (pathAdiffByPathB > pathBdiffByPathA ? 1 : 0);
+    return pathAdiffByPathB < pathBdiffByPathA ? -1 : pathAdiffByPathB > pathBdiffByPathA ? 1 : 0;
   }
 }
 

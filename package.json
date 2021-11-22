@@ -33,46 +33,46 @@
   "main": "./out/src/extension.js",
   "activationEvents": [
     "onView:AzureBlockchain",
-    "onCommand:azureBlockchainService.showWelcomePage",
-    "onCommand:azureBlockchainService.refresh",
+    "onCommand:truffleTools.showWelcomePage",
+    "onCommand:truffleTools.refresh",
     "onCommand:contract.copyByteCode",
     "onCommand:contract.copyDeployedByteCode",
     "onCommand:contract.copyABI",
     "onCommand:truffle.createLocalUI",
     "onCommand:truffle.newSolidityProject",
-    "onCommand:azureBlockchainService.buildContracts",
-    "onCommand:azureBlockchainService.deployContracts",
-    "onCommand:azureBlockchainService.connectProject",
-    "onCommand:azureBlockchainService.copyRPCEndpointAddress",
-    "onCommand:azureBlockchainService.createProject",
-    "onCommand:azureBlockchainService.disconnectProject",
+    "onCommand:truffleTools.buildContracts",
+    "onCommand:truffleTools.deployContracts",
+    "onCommand:truffleTools.connectProject",
+    "onCommand:truffleTools.copyRPCEndpointAddress",
+    "onCommand:truffleTools.createProject",
+    "onCommand:truffleTools.disconnectProject",
     "onCommand:openZeppelin.addCategory",
-    "onCommand:azureBlockchainService.signInToInfuraAccount",
-    "onCommand:azureBlockchainService.signOutOfInfuraAccount",
-    "onCommand:azureBlockchainService.openAtAzurePortal",
-    "onCommand:azureBlockchainService.createNewBDMApplication",
-    "onCommand:azureBlockchainService.deleteBDMApplication",
+    "onCommand:truffleTools.signInToInfuraAccount",
+    "onCommand:truffleTools.signOutOfInfuraAccount",
+    "onCommand:truffleTools.openAtAzurePortal",
+    "onCommand:truffleTools.createNewBDMApplication",
+    "onCommand:truffleTools.deleteBDMApplication",
     "onDebug"
   ],
   "contributes": {
     "configuration": {
       "title": "Blockchain Development Kit for Ethereum",
       "properties": {
-        "azureBlockchainService.ignoreLongRunningTaskNotification": {
+        "truffleTools.ignoreLongRunningTaskNotification": {
           "type": "boolean",
           "default": false,
           "description": "Disable notification on long running tasks."
         },
-        "azureBlockchainService.openZeppelin.version": {
+        "truffleTools.openZeppelin.version": {
           "type": "string",
           "default": "2.5.0",
           "scope": "The latest Open Zeppelin version"
         },
-        "azureBlockchainService.storageAccount.name": {
+        "truffleTools.storageAccount.name": {
           "type": "string",
           "scope": "Storage Account name"
         },
-        "azureBlockchainService.coreSDK": {
+        "truffleTools.coreSDK": {
           "type": "string",
           "scope": "Core SDK for extensions backend",
           "default": "Truffle",
@@ -85,12 +85,12 @@
     },
     "commands": [
       {
-        "command": "azureBlockchainService.showWelcomePage",
+        "command": "truffleTools.showWelcomePage",
         "title": "Show Welcome Page",
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.refresh",
+        "command": "truffleTools.refresh",
         "title": "Refresh",
         "category": "Blockchain",
         "icon": {
@@ -119,57 +119,57 @@
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.buildContracts",
+        "command": "truffleTools.buildContracts",
         "title": "Build Contracts",
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.deployContracts",
+        "command": "truffleTools.deployContracts",
         "title": "Deploy Contracts",
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.connectProject",
+        "command": "truffleTools.connectProject",
         "title": "Connect to network",
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.copyRPCEndpointAddress",
+        "command": "truffleTools.copyRPCEndpointAddress",
         "title": "Copy RPC Endpoint Address",
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.createProject",
+        "command": "truffleTools.createProject",
         "title": "Create a new network",
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.disconnectProject",
+        "command": "truffleTools.disconnectProject",
         "title": "Disconnect",
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.startGanacheServer",
+        "command": "truffleTools.startGanacheServer",
         "title": "Start Ganache Server",
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.stopGanacheServer",
+        "command": "truffleTools.stopGanacheServer",
         "title": "Stop Ganache Server",
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.signInToInfuraAccount",
+        "command": "truffleTools.signInToInfuraAccount",
         "title": "Sign in to Infura account",
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.signOutOfInfuraAccount",
+        "command": "truffleTools.signOutOfInfuraAccount",
         "title": "Sign out of Infura account",
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.getPrivateKey",
+        "command": "truffleTools.getPrivateKey",
         "title": "Retrieve private key",
         "category": "Blockchain"
       },
@@ -179,17 +179,17 @@
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.openAtAzurePortal",
+        "command": "truffleTools.openAtAzurePortal",
         "title": "Open at Azure Portal",
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.createNewBDMApplication",
+        "command": "truffleTools.createNewBDMApplication",
         "title": "Create Blockchain Application",
         "category": "Blockchain"
       },
       {
-        "command": "azureBlockchainService.deleteBDMApplication",
+        "command": "truffleTools.deleteBDMApplication",
         "title": "Delete Blockchain Application",
         "category": "Blockchain"
       }
@@ -206,15 +206,15 @@
       "commandPalette": [
         {
           "when": "false",
-          "command": "azureBlockchainService.refresh"
+          "command": "truffleTools.refresh"
         },
         {
           "when": "false",
-          "command": "azureBlockchainService.copyRPCEndpointAddress"
+          "command": "truffleTools.copyRPCEndpointAddress"
         },
         {
           "when": "false",
-          "command": "azureBlockchainService.disconnectProject"
+          "command": "truffleTools.disconnectProject"
         },
         {
           "when": "false",
@@ -229,12 +229,12 @@
           "command": "contract.copyABI"
         },
         {
-          "when": "azureBlockchainService:isWorkspaceOpen",
-          "command": "azureBlockchainService.buildContracts"
+          "when": "truffleTools:isWorkspaceOpen",
+          "command": "truffleTools.buildContracts"
         },
         {
-          "when": "azureBlockchainService:isWorkspaceOpen",
-          "command": "azureBlockchainService.deployContracts"
+          "when": "truffleTools:isWorkspaceOpen",
+          "command": "truffleTools.deployContracts"
         },
         {
           "when": "false",
@@ -242,89 +242,89 @@
         },
         {
           "when": "false",
-          "command": "azureBlockchainService.openAtAzurePortal"
+          "command": "truffleTools.openAtAzurePortal"
         },
         {
           "when": "false",
-          "command": "azureBlockchainService.deleteBDMApplication"
+          "command": "truffleTools.deleteBDMApplication"
         },
         {
           "when": "false",
-          "command": "azureBlockchainService.createNewBDMApplication"
+          "command": "truffleTools.createNewBDMApplication"
         }
       ],
       "view/title": [
         {
-          "command": "azureBlockchainService.showWelcomePage",
+          "command": "truffleTools.showWelcomePage",
           "when": "view == AzureBlockchain"
         },
         {
-          "command": "azureBlockchainService.createProject",
+          "command": "truffleTools.createProject",
           "when": "view == AzureBlockchain"
         },
         {
-          "command": "azureBlockchainService.connectProject",
+          "command": "truffleTools.connectProject",
           "when": "view == AzureBlockchain"
         },
         {
-          "command": "azureBlockchainService.refresh",
+          "command": "truffleTools.refresh",
           "when": "view == AzureBlockchain",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "azureBlockchainService.disconnectProject",
+          "command": "truffleTools.disconnectProject",
           "when": "view == AzureBlockchain && viewItem == project",
           "group": "azureBlockchain-0@0"
         },
         {
-          "command": "azureBlockchainService.startGanacheServer",
+          "command": "truffleTools.startGanacheServer",
           "when": "view == AzureBlockchain && viewItem == localproject",
           "group": "azureBlockchain-1@0"
         },
         {
-          "command": "azureBlockchainService.stopGanacheServer",
+          "command": "truffleTools.stopGanacheServer",
           "when": "view == AzureBlockchain && viewItem == localproject",
           "group": "azureBlockchain-1@1"
         },
         {
-          "command": "azureBlockchainService.disconnectProject",
+          "command": "truffleTools.disconnectProject",
           "when": "view == AzureBlockchain && viewItem == localproject",
           "group": "azureBlockchain-0@0"
         },
         {
-          "command": "azureBlockchainService.disconnectProject",
+          "command": "truffleTools.disconnectProject",
           "when": "view == AzureBlockchain && viewItem == bdmproject",
           "group": "azureBlockchain-0@0"
         },
         {
-          "command": "azureBlockchainService.copyRPCEndpointAddress",
+          "command": "truffleTools.copyRPCEndpointAddress",
           "when": "view == AzureBlockchain && viewItem == network",
           "group": "azureBlockchain-0@0"
         },
         {
-          "command": "azureBlockchainService.copyRPCEndpointAddress",
+          "command": "truffleTools.copyRPCEndpointAddress",
           "when": "view == AzureBlockchain && viewItem == localnetwork",
           "group": "azureBlockchain-0@0"
         },
         {
-          "command": "azureBlockchainService.openAtAzurePortal",
+          "command": "truffleTools.openAtAzurePortal",
           "when": "view == AzureBlockchain && viewItem == input",
           "group": "azureBlockchain-0@0"
         },
         {
-          "command": "azureBlockchainService.openAtAzurePortal",
+          "command": "truffleTools.openAtAzurePortal",
           "when": "view == AzureBlockchain && viewItem == output",
           "group": "azureBlockchain-0@0"
         },
         {
-          "command": "azureBlockchainService.createNewBDMApplication",
+          "command": "truffleTools.createNewBDMApplication",
           "when": "view == AzureBlockchain && viewItem == bdmproject",
           "group": "azureBlockchain-1@1"
         },
         {
-          "command": "azureBlockchainService.deleteBDMApplication",
+          "command": "truffleTools.deleteBDMApplication",
           "when": "view == AzureBlockchain && viewItem == bdmApplication",
           "group": "azureBlockchain-0@0"
         }
@@ -332,17 +332,17 @@
       "explorer/context": [
         {
           "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.buildContracts",
+          "command": "truffleTools.buildContracts",
           "group": "8_buildContractGroup"
         },
         {
           "when": "resourceLangId == json",
-          "command": "azureBlockchainService.deployContracts",
+          "command": "truffleTools.deployContracts",
           "group": "8_buildContractGroup"
         },
         {
           "when": "resourceLangId == solidity",
-          "command": "azureBlockchainService.deployContracts",
+          "command": "truffleTools.deployContracts",
           "group": "8_buildContractGroup"
         },
         {
@@ -463,10 +463,8 @@
     "compile": "npm run clean && tsc -p ./",
     "webpack:prod": "webpack --mode production",
     "watch": "tsc -watch -p ./",
-    "prettier": "prettier --write .",
+    "prettier:fix": "prettier --write .",
     "eslint": "eslint -c .eslintrc.js --ext .ts src/**/*.ts test/**/*.ts",
-    "tslint": "tslint -t verbose src/**/*.ts test/**/*.ts",
-    "tslint:fix": "npm run tslint -- --fix",
     "version": "tsc -v",
     "test": "npm run compile && node ./out/test/runTest",
     "clean": "npx rimraf -- ./out/*"
@@ -489,7 +487,6 @@
     "@types/uuid": "^3.4.4",
     "@types/vscode": "1.39.0",
     "@typescript-eslint/eslint-plugin": "^5.3.1",
-    "@typescript-eslint/eslint-plugin-tslint": "^5.3.1",
     "@typescript-eslint/parser": "^5.3.1",
     "copy-webpack-plugin": "5.1.1",
     "decache": "^4.5.1",
@@ -510,8 +507,6 @@
     "sinon": "^7.3.2",
     "truffle": "^5.0.14",
     "ts-loader": "7.0.2",
-    "tslint": "^5.18.0",
-    "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "3.8.3",
     "vscode-debugadapter": "^1.33.0",
     "vscode-debugprotocol": "^1.33.0",

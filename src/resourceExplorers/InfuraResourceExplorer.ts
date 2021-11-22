@@ -1,44 +1,44 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { QuickPickItem, window } from 'vscode';
-import { Constants } from '../Constants';
-import { showInputBox, showQuickPick } from '../helpers';
-import { InfuraProjectItem } from '../Models/QuickPickItems';
-import { InfuraNetworkNode, InfuraProject } from '../Models/TreeItems';
-import { IInfuraEndpointDto, IInfuraProjectDto, IInfuraProjectQuickPick } from '../services/infuraService/InfuraDto';
-import { InfuraServiceClient } from '../services/infuraService/InfuraServiceClient';
-import { Telemetry } from '../TelemetryClient';
+import { QuickPickItem, window } from "vscode";
+import { Constants } from "../Constants";
+import { showInputBox, showQuickPick } from "../helpers";
+import { InfuraProjectItem } from "../Models/QuickPickItems";
+import { InfuraNetworkNode, InfuraProject } from "../Models/TreeItems";
+import { IInfuraEndpointDto, IInfuraProjectDto, IInfuraProjectQuickPick } from "../services/infuraService/InfuraDto";
+import { InfuraServiceClient } from "../services/infuraService/InfuraServiceClient";
+import { Telemetry } from "../TelemetryClient";
 
 export class InfuraResourceExplorer {
-  public async createProject(existingProjects: string[] = [])
-  : Promise<InfuraProject> {
-    Telemetry.sendEvent('InfuraResourceExplorer.createProject');
+  public async createProject(existingProjects: string[] = []): Promise<InfuraProject> {
+    Telemetry.sendEvent("InfuraResourceExplorer.createProject");
     await this.waitForLogin();
 
     return this.createInfuraProject(existingProjects);
   }
 
-  public async selectProject(existingProjects: string[] = [], existingProjectIds: string[] = [])
-  : Promise<InfuraProject> {
-    Telemetry.sendEvent('InfuraResourceExplorer.selectProject');
+  public async selectProject(
+    existingProjects: string[] = [],
+    existingProjectIds: string[] = []
+  ): Promise<InfuraProject> {
+    Telemetry.sendEvent("InfuraResourceExplorer.selectProject");
     await this.waitForLogin();
 
-    const projectDestination = await showQuickPick(
-      this.getProjectDestinations(existingProjectIds),
-      {
-        ignoreFocusOut: true,
-        placeHolder: Constants.placeholders.selectInfuraProject,
-      });
+    const projectDestination = await showQuickPick(this.getProjectDestinations(existingProjectIds), {
+      ignoreFocusOut: true,
+      placeHolder: Constants.placeholders.selectInfuraProject,
+    });
 
     if (projectDestination instanceof InfuraProjectItem) {
-      Telemetry.sendEvent('InfuraResourceExplorer.selectProject.selectInfuraProject');
+      Telemetry.sendEvent("InfuraResourceExplorer.selectProject.selectInfuraProject");
       return this.getInfuraProject(
         projectDestination.label,
         projectDestination.projectId,
-        projectDestination.endpoints);
+        projectDestination.endpoints
+      );
     } else {
-      Telemetry.sendEvent('InfuraResourceExplorer.selectProject.creatInfuraProject');
+      Telemetry.sendEvent("InfuraResourceExplorer.selectProject.creatInfuraProject");
       return this.createInfuraProject(existingProjects);
     }
   }
@@ -67,8 +67,8 @@ export class InfuraResourceExplorer {
     const listOfProject: IInfuraProjectDto[] = await InfuraServiceClient.getAllowedProjects();
 
     return listOfProject
-    .map((project: IInfuraProjectDto) => new InfuraProjectItem(project.name, project.id, project.endpoints))
-    .filter((item) => !existingProjectIds.includes(item.projectId));
+      .map((project: IInfuraProjectDto) => new InfuraProjectItem(project.name, project.id, project.endpoints))
+      .filter((item) => !existingProjectIds.includes(item.projectId));
   }
 
   private async createInfuraProject(existingProjects: string[]): Promise<InfuraProject> {
@@ -93,7 +93,7 @@ export class InfuraResourceExplorer {
       ignoreFocusOut: true,
       prompt: Constants.paletteLabels.enterInfuraProjectName,
       validateInput: async (value: string) => {
-        if (value === '') {
+        if (value === "") {
           return Constants.validationMessages.valueCannotBeEmpty;
         }
 
@@ -116,21 +116,21 @@ export class InfuraResourceExplorer {
 
   private async getProjectAvailability(): Promise<boolean> {
     const answer = await showQuickPick(
-      [
-        { label: Constants.projectAvailability.public },
-        { label: Constants.projectAvailability.private },
-      ],
+      [{ label: Constants.projectAvailability.public }, { label: Constants.projectAvailability.private }],
       {
         ignoreFocusOut: true,
         placeHolder: `${Constants.placeholders.selectInfuraProjectAvailability}.`,
-      },
+      }
     );
 
     return answer.label === Constants.projectAvailability.private ? true : false;
   }
 
-  private async getInfuraProject(projectName: string, projectId: string, endpoints: IInfuraEndpointDto)
-  : Promise<InfuraProject> {
+  private async getInfuraProject(
+    projectName: string,
+    projectId: string,
+    endpoints: IInfuraEndpointDto
+  ): Promise<InfuraProject> {
     const infuraNetworkNodes: InfuraNetworkNode[] = [];
 
     for (const [key, value] of Object.entries(endpoints)) {
@@ -139,7 +139,7 @@ export class InfuraResourceExplorer {
 
     const infuraProject = new InfuraProject(projectName, projectId);
     infuraProject.setChildren(
-      infuraNetworkNodes.sort((first, second) => (first.networkId as number) - (second.networkId as number)),
+      infuraNetworkNodes.sort((first, second) => (first.networkId as number) - (second.networkId as number))
     );
 
     return infuraProject;
@@ -153,7 +153,8 @@ export class InfuraResourceExplorer {
 
     const shouldSignIn = await window.showInformationMessage(
       Constants.informationMessage.infuraSignInPrompt,
-      Constants.informationMessage.signInButton);
+      Constants.informationMessage.signInButton
+    );
 
     if (shouldSignIn) {
       await InfuraServiceClient.signIn();

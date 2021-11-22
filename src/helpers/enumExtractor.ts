@@ -1,10 +1,10 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from '../Constants';
-import { EnumStorage } from '../Models';
-import { Output } from '../Output';
-import { Telemetry } from '../TelemetryClient';
+import { Constants } from "../Constants";
+import { EnumStorage } from "../Models";
+import { Output } from "../Output";
+import { Telemetry } from "../TelemetryClient";
 
 interface INode {
   id: number;
@@ -33,16 +33,21 @@ export function extractEnumsInfo(contractName: string, ast: { [key: string]: any
   if (!ast) {
     throw new Error(Constants.errorMessageStrings.AstIsEmpty);
   }
-  const rootNode = ast.nodes
-    .find((node: INode) => node.nodeType === 'ContractDefinition' && node.name === contractName);
+  const rootNode = ast.nodes.find(
+    (node: INode) => node.nodeType === "ContractDefinition" && node.name === contractName
+  );
   if (!rootNode) {
     throw new Error(Constants.errorMessageStrings.NoContractBody);
   }
 
   const result = new EnumStorage();
-  const enumNodes = GetEnumDeclarations('EnumDefinition', rootNode);
+  const enumNodes = GetEnumDeclarations("EnumDefinition", rootNode);
   if (enumNodes.length > 0) {
-    const methods = GetMethodsWithEnum('FunctionDefinition', rootNode, enumNodes.map((enumNode) => enumNode.name));
+    const methods = GetMethodsWithEnum(
+      "FunctionDefinition",
+      rootNode,
+      enumNodes.map((enumNode) => enumNode.name)
+    );
     methods.forEach((method) => {
       method.parameters.parameters
         .filter((parameter: any) => enumNodes.some((enumItem) => enumItem.name === parameter.typeName.name))
@@ -62,12 +67,14 @@ export function extractEnumsInfo(contractName: string, ast: { [key: string]: any
     });
     // contract members
     const enumNames = enumNodes.map((enumItems) => enumItems.name);
-    const contractMembers = GetEnumMembers('VariableDeclaration', rootNode, enumNames);
+    const contractMembers = GetEnumMembers("VariableDeclaration", rootNode, enumNames);
     contractMembers.forEach((contractMember) => {
       const enumItemsWithoutOffset = enumNodes.find((enumNode) => enumNode.name === contractMember.typeName.name)!;
       const offset = enumItemsWithoutOffset.members[0].id;
-      result.fields[contractMember.name] = enumItemsWithoutOffset.members
-        .map((enumWithoutOffset: any) => ({name: enumWithoutOffset.name, value: enumWithoutOffset.id - offset}));
+      result.fields[contractMember.name] = enumItemsWithoutOffset.members.map((enumWithoutOffset: any) => ({
+        name: enumWithoutOffset.name,
+        value: enumWithoutOffset.id - offset,
+      }));
     });
   }
 
@@ -75,14 +82,15 @@ export function extractEnumsInfo(contractName: string, ast: { [key: string]: any
 }
 
 function ContainsEnum(node: INode, enumNames: string[]): boolean {
-  return node.parameters.parameters
-    .some((parameter: any) =>
-      (enumNames.includes(parameter.typeName.name) && parameter.nodeType === 'VariableDeclaration'));
+  return node.parameters.parameters.some(
+    (parameter: any) => enumNames.includes(parameter.typeName.name) && parameter.nodeType === "VariableDeclaration"
+  );
 }
 
 function GetEnumMembers(nodeType: string, node: INode, enumNames: string[]): INode[] {
-  return node.nodes
-    .filter((subnode: INode) => subnode.nodeType === nodeType && enumNames.includes(subnode.typeName.name));
+  return node.nodes.filter(
+    (subnode: INode) => subnode.nodeType === nodeType && enumNames.includes(subnode.typeName.name)
+  );
 }
 
 function GetMethodsWithEnum(nodeType: string, node: INode, enumNames: string[]): INode[] {

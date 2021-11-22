@@ -1,23 +1,18 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as path from 'path';
-import {
-  debug,
-  DebugConfiguration,
-  QuickPickItem,
-  workspace,
-} from 'vscode';
-import { DEBUG_TYPE } from '../debugAdapter/constants/debugAdapter';
-import { DebugNetwork } from '../debugAdapter/debugNetwork';
-import { TransactionProvider } from '../debugAdapter/transaction/transactionProvider';
-import { Web3Wrapper } from '../debugAdapter/web3Wrapper';
-import { showInputBox, showQuickPick } from '../helpers/userInteraction';
-import { Telemetry } from '../TelemetryClient';
+import * as path from "path";
+import { debug, DebugConfiguration, QuickPickItem, workspace } from "vscode";
+import { DEBUG_TYPE } from "../debugAdapter/constants/debugAdapter";
+import { DebugNetwork } from "../debugAdapter/debugNetwork";
+import { TransactionProvider } from "../debugAdapter/transaction/transactionProvider";
+import { Web3Wrapper } from "../debugAdapter/web3Wrapper";
+import { showInputBox, showQuickPick } from "../helpers/userInteraction";
+import { Telemetry } from "../TelemetryClient";
 
 export namespace DebuggerCommands {
   export async function startSolidityDebugger() {
-    Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandStarted');
+    Telemetry.sendEvent("DebuggerCommands.startSolidityDebugger.commandStarted");
     const workingDirectory = getWorkingDirectory();
     if (!workingDirectory) {
       return;
@@ -36,22 +31,22 @@ export namespace DebuggerCommands {
 
       const txHashSelection = await showQuickPick(txHashesAsQuickPickItems, {
         ignoreFocusOut: true,
-        placeHolder: 'Enter the transaction hash to debug',
+        placeHolder: "Enter the transaction hash to debug",
       });
 
       const txHash = txHashSelection.label;
       const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
       debug.startDebugging(undefined, config).then(() => {
-          Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandFinished');
-        });
+        Telemetry.sendEvent("DebuggerCommands.startSolidityDebugger.commandFinished");
+      });
     } else {
       // if remote network then require txHash
-      const placeHolder = 'Type the transaction hash you want to debug (0x...)';
+      const placeHolder = "Type the transaction hash you want to debug (0x...)";
       const txHash = await showInputBox({ placeHolder });
       if (txHash) {
         const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
         debug.startDebugging(undefined, config).then(() => {
-          Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandFinished');
+          Telemetry.sendEvent("DebuggerCommands.startSolidityDebugger.commandFinished");
         });
       }
     }
@@ -59,38 +54,37 @@ export namespace DebuggerCommands {
 }
 
 async function getQuickPickItems(txProvider: TransactionProvider) {
-    const txHashes = await txProvider.getLastTransactionHashes();
-    const txInfos = await txProvider.getTransactionsInfo(txHashes);
+  const txHashes = await txProvider.getLastTransactionHashes();
+  const txInfos = await txProvider.getTransactionsInfo(txHashes);
 
-    return txInfos.map((txInfo) => {
-        const description = generateDescription(txInfo.contractName, txInfo.methodName);
-        return { alwaysShow: true, label: txInfo.hash, description } as QuickPickItem;
-    });
+  return txInfos.map((txInfo) => {
+    const description = generateDescription(txInfo.contractName, txInfo.methodName);
+    return { alwaysShow: true, label: txInfo.hash, description } as QuickPickItem;
+  });
 }
 
 function getWorkingDirectory() {
-    if (typeof workspace.workspaceFolders === 'undefined' || workspace.workspaceFolders.length === 0) {
-        return '';
-    }
+  if (typeof workspace.workspaceFolders === "undefined" || workspace.workspaceFolders.length === 0) {
+    return "";
+  }
 
-    return workspace.workspaceFolders[0].uri.fsPath;
+  return workspace.workspaceFolders[0].uri.fsPath;
 }
 
-function generateDebugAdapterConfig(txHash: string, workingDirectory: string, providerUrl: string)
-: DebugConfiguration  {
-    return {
-        files: [],
-        name: 'Debug Transactions',
-        providerUrl,
-        request: 'launch',
-        txHash,
-        type: DEBUG_TYPE,
-        workingDirectory,
-    } as DebugConfiguration;
+function generateDebugAdapterConfig(txHash: string, workingDirectory: string, providerUrl: string): DebugConfiguration {
+  return {
+    files: [],
+    name: "Debug Transactions",
+    providerUrl,
+    request: "launch",
+    txHash,
+    type: DEBUG_TYPE,
+    workingDirectory,
+  } as DebugConfiguration;
 }
 
 // Migration.json, setComplete => Migration.setComplete()
 function generateDescription(contractName?: string, methodName?: string) {
-    const contractNameWithoutExt = path.basename(contractName || '', '.json');
-    return `${contractNameWithoutExt}.${methodName}()`;
+  const contractNameWithoutExt = path.basename(contractName || "", ".json");
+  return `${contractNameWithoutExt}.${methodName}()`;
 }

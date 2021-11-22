@@ -1,19 +1,15 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Memento, window } from 'vscode';
-import { Constants } from '../Constants';
+import { Memento, window } from "vscode";
+import { Constants } from "../Constants";
 import {
   // getWorkspaceRoot,
   // outputCommandHelper,
   // showNotificationConfirmationDialog,
   userSettings,
-} from '../helpers';
-import {
-  IExtensionAdapter,
-  OpenZeppelinExtensionAdapter,
-  TruffleExtensionAdapter,
-} from '../services/extensionAdapter';
+} from "../helpers";
+import { IExtensionAdapter, OpenZeppelinExtensionAdapter, TruffleExtensionAdapter } from "../services/extensionAdapter";
 
 class SdkCoreCommands {
   // @ts-ignore

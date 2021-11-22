@@ -3,10 +3,10 @@ name: CI
 on:
   push:
     branches:
-      - 'feat/**' # match an pushes on feature/* and feature/<any sub branch>/*
+      - "feat/**" # match an pushes on feature/* and feature/<any sub branch>/*
       - master
     paths-ignore: # dont run when changes made to these folders
-      - '.vscode/**'
+      - ".vscode/**"
 
 jobs:
   cicd:
@@ -22,7 +22,7 @@ jobs:
       - name: install gitversion tool
         uses: gittools/actions/gitversion/setup@v0.9.11
         with:
-          versionSpec: '5.x'
+          versionSpec: "5.x"
 
       - name: execute gitversion
         id: gitversion # step id used as reference for output values
@@ -44,8 +44,8 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v2
         with:
-          node-version: '16.4.x'
-          cache: 'yarn'
+          node-version: "16.4.x"
+          cache: "yarn"
 
       - name: clean install dependencies
         run: yarn install --frozen-lockfile
@@ -56,7 +56,7 @@ jobs:
       - name: update metadata in package.json
         uses: onlyutkarsh/patch-files-action@v1.0.3
         with:
-          files: '${{github.workspace}}/package.json'
+          files: "${{github.workspace}}/package.json"
           patch-syntax: |
             = /version => "${{ steps.gitversion.outputs.semVer }}"
             = /displayName => "Truffle VSCode Chocolate Factory. TEST"
@@ -66,7 +66,7 @@ jobs:
       - name: add version in CHANGELOG.md
         uses: cschleiden/replace-tokens@v1.1
         with:
-          files: '${{github.workspace}}/CHANGELOG.md'
+          files: "${{github.workspace}}/CHANGELOG.md"
         env:
           VERSION: "${{ steps.gitversion.outputs.semVer }}"
 
@@ -82,7 +82,6 @@ jobs:
         with:
           name: ${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.semVer}}.vsix
           path: ${{github.workspace}}/${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.semVer}}.vsix
-
 #      - name: publish to marketplace
 #        if: github.ref == 'refs/heads/master'
 #        run: npm run deploy ${{ env.PAT }}

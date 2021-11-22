@@ -38,14 +38,19 @@ module.exports = {
   },
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    project: "tsconfig.json",
-    sourceType: "module",
+    project: ["./tsconfig.json"],
   },
-  extends: ["plugin:@typescript-eslint/recommended", "eslint:recommended", "prettier"],
-  plugins: [
-    "prettier",
-    "@typescript-eslint",
+  overrides: [
+    {
+      files: ["*.ts"],
+      parserOptions: {
+        project: ["./tsconfig.json"],
+      },
+    },
   ],
+  extends: ["plugin:@typescript-eslint/recommended", "eslint:recommended", "prettier"],
+  plugins: ["prettier", "@typescript-eslint"],
+  ignorePatterns: ["ui-test/**/*.ts"],
   rules: {
     // FIXME: rework this eventually. Tech-debt
     "@typescript-eslint/ban-ts-comment": "off",

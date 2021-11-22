@@ -1,7 +1,7 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from 'fs-extra';
+import * as fs from "fs-extra";
 import {
   Disposable,
   ExtensionContext,
@@ -11,10 +11,10 @@ import {
   WebviewPanel,
   WebviewPanelOptions,
   window,
-} from 'vscode';
-import { Constants } from '../Constants';
-import { showNotification } from '../helpers';
-import { Telemetry } from '../TelemetryClient';
+} from "vscode";
+import { Constants } from "../Constants";
+import { showNotification } from "../helpers";
+import { Telemetry } from "../TelemetryClient";
 
 export interface IWebViewConfig {
   path: string;
@@ -43,7 +43,7 @@ export abstract class BasicWebView {
     this.context = context;
     this.startShowDate = 0;
     this.disposables = [];
-    this.rootPath = Uri.file(this.context.asAbsolutePath('.'));
+    this.rootPath = Uri.file(this.context.asAbsolutePath("."));
     this.options = {
       enableCommandUris: true,
       enableScripts: true,
@@ -63,7 +63,7 @@ export abstract class BasicWebView {
     }
 
     Telemetry.sendEvent(Constants.telemetryEvents.webPages.showWebPage, {
-      trigger: 'auto',
+      trigger: "auto",
       viewType: this.config.viewType,
     });
     return this.createAndShow();
@@ -71,7 +71,7 @@ export abstract class BasicWebView {
 
   public async show() {
     Telemetry.sendEvent(Constants.telemetryEvents.webPages.showWebPage, {
-      trigger: 'manual',
+      trigger: "manual",
       viewType: this.config.viewType,
     });
     return this.createAndShow();
@@ -104,11 +104,11 @@ export abstract class BasicWebView {
   protected async getHtmlForWebview(): Promise<string> {
     if (this.panel) {
       const rootPath = this.panel.webview.asWebviewUri(this.rootPath).toString();
-      const html = await fs.readFile(this.config.path, 'utf8');
+      const html = await fs.readFile(this.config.path, "utf8");
 
       return html.replace(/{{root}}/g, rootPath);
     }
-    return '';
+    return "";
   }
 
   protected async receiveMessage(message: { [key: string]: any }): Promise<void> {
@@ -117,20 +117,20 @@ export abstract class BasicWebView {
     }
 
     switch (message.command) {
-      case 'documentReady':
+      case "documentReady":
         await this.postMessage({
-          command: 'showOnStartup',
+          command: "showOnStartup",
           value: this.context.globalState.get(this.config.showOnStartup),
         });
         break;
-      case 'toggleShowPage':
+      case "toggleShowPage":
         this.context.globalState.update(this.config.showOnStartup, message.value);
         break;
-      case 'executeCommand':
-      case 'openLink':
+      case "executeCommand":
+      case "openLink":
         Telemetry.sendEvent(Constants.telemetryEvents.webPages.action, message);
         break;
-      case 'notification':
+      case "notification":
         showNotification(message.value);
         break;
     }

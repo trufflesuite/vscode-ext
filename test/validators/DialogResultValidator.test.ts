@@ -1,18 +1,18 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from 'assert';
-import uuid = require('uuid');
-import { Constants } from '../../src/Constants';
-import { DialogResultValidator } from '../../src/validators/DialogResultValidator';
-import { TestConstants } from '../TestConstants';
+import * as assert from "assert";
+import uuid = require("uuid");
+import { Constants } from "../../src/Constants";
+import { DialogResultValidator } from "../../src/validators/DialogResultValidator";
+import { TestConstants } from "../TestConstants";
 
-describe('DialogResultValidator', () => {
-  describe('Unit test', () => {
-    describe('validateConfirmationResult', () => {
-      it('should fail when result is empty', () => {
+describe("DialogResultValidator", () => {
+  describe("Unit test", () => {
+    describe("validateConfirmationResult", () => {
+      it("should fail when result is empty", () => {
         // Arrange
-        const testString = '';
+        const testString = "";
 
         // Act
         const result = DialogResultValidator.validateConfirmationResult(testString) as string;
@@ -21,14 +21,16 @@ describe('DialogResultValidator', () => {
         assert.strictEqual(
           result.includes(Constants.validationMessages.valueCannotBeEmpty),
           true,
-          `validation result should include message "${Constants.validationMessages.valueCannotBeEmpty}"`);
+          `validation result should include message "${Constants.validationMessages.valueCannotBeEmpty}"`
+        );
         assert.strictEqual(
           result.includes(Constants.validationMessages.invalidConfirmationResult),
           true,
-          `validation result should include message "${Constants.validationMessages.invalidConfirmationResult}"`);
+          `validation result should include message "${Constants.validationMessages.invalidConfirmationResult}"`
+        );
       });
 
-      it('should fail when result different from yes or no', () => {
+      it("should fail when result different from yes or no", () => {
         // Arrange
         const testString = uuid.v4();
 
@@ -39,7 +41,8 @@ describe('DialogResultValidator', () => {
         assert.strictEqual(
           result.includes(Constants.validationMessages.invalidConfirmationResult),
           true,
-          `validation result should include message "${Constants.validationMessages.invalidConfirmationResult}"`);
+          `validation result should include message "${Constants.validationMessages.invalidConfirmationResult}"`
+        );
       });
 
       TestConstants.testDialogAnswers.forEach((answer) => {
@@ -48,7 +51,7 @@ describe('DialogResultValidator', () => {
           const result = DialogResultValidator.validateConfirmationResult(answer);
 
           // Assert
-          assert.strictEqual(result, null, 'validation result should be null');
+          assert.strictEqual(result, null, "validation result should be null");
         });
       });
     });

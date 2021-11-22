@@ -1,21 +1,15 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { URL } from 'url';
-import { Constants } from '../../Constants';
-import { showInputBox, TruffleConfiguration } from '../../helpers';
-import { ItemType } from '../ItemType';
-import { MnemonicNetworkNode } from './MnemonicNetworkNode';
+import { URL } from "url";
+import { Constants } from "../../Constants";
+import { showInputBox, TruffleConfiguration } from "../../helpers";
+import { ItemType } from "../ItemType";
+import { MnemonicNetworkNode } from "./MnemonicNetworkNode";
 
 export class InfuraNetworkNode extends MnemonicNetworkNode {
   constructor(label: string, url: URL | string, networkId: number | string) {
-    super(
-      ItemType.INFURA_NETWORK_NODE,
-      label,
-      Constants.treeItemData.network.infura,
-      url,
-      networkId,
-    );
+    super(ItemType.INFURA_NETWORK_NODE, label, Constants.treeItemData.network.infura, url, networkId);
   }
 
   public async getTruffleNetwork(): Promise<TruffleConfiguration.INetwork> {
@@ -27,7 +21,7 @@ export class InfuraNetworkNode extends MnemonicNetworkNode {
       ignoreFocusOut: true,
       prompt: Constants.paletteLabels.valueOrDefault(
         Constants.propertyLabels.gasPrice,
-        Constants.defaultContractSettings.gasPrice,
+        Constants.defaultContractSettings.gasPrice
       ),
       validateInput: this.validation,
     });
@@ -44,7 +38,8 @@ export class InfuraNetworkNode extends MnemonicNetworkNode {
       ignoreFocusOut: true,
       prompt: Constants.paletteLabels.valueOrDefault(
         Constants.propertyLabels.gasLimit,
-        Constants.defaultContractSettings.gasLimit),
+        Constants.defaultContractSettings.gasLimit
+      ),
       validateInput: this.validation,
     });
 
