@@ -1,10 +1,10 @@
 {
   "name": "truffle-vscode",
-  "displayName": "Blockchain Development Kit for Ethereum",
-  "description": "Develop, deploy, debug and manage your Ethereum based blockchain solutions",
-  "publisher": "ConsenSys",
+  "displayName": "Truffle Tools For VSCode",
+  "description": "Develop, deploy and debug the Ethereum Ecosystem from VSCode.",
+  "publisher": "trufflesuite-csi",
   "preview": false,
-  "icon": "images/blockchain-service-logo.png",
+  "icon": "images/TruffleLogo.png",
   "version": "1.6.3",
   "repository": {
     "type": "git",
@@ -22,7 +22,8 @@
     "blockchain",
     "ethereum",
     "debuggers",
-    "snippet"
+    "snippet",
+    "truffle"
   ],
   "categories": [
     "Extension Packs",

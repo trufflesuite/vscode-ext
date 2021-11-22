@@ -6,7 +6,7 @@ import * as path from 'path';
 import { ExtensionContext, extensions } from 'vscode';
 import { IOZAsset } from './services/openZeppelin/models';
 
-const extensionId = 'ConsenSys.truffle-vscode';
+const extensionId = 'trufflesuite-csi.truffle-vscode';
 const packageJSON = extensions.getExtension(extensionId)!.packageJSON;
 
 export enum RequiredApps {
@@ -110,11 +110,11 @@ export class Constants {
       min: '1.0.17',
     },
     [RequiredApps.node]: {
-      max: '16.13.0',
-      min: '16.4.0',
+      max: '17.0.0',
+      min: '15.0.0',
     },
     [RequiredApps.npm]: {
-      max: '8.1.0',
+      max: '9.0.0',
       min: '7.18.1',
     },
     [RequiredApps.truffle]: {

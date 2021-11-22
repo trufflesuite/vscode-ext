@@ -16,7 +16,8 @@ class ExtensionTelemetry {
   constructor() {
     const isEnableTelemetry = workspace.getConfiguration("telemetry").get("enableTelemetry") || true;
     const isTestRun = process.env.CODE_TEST || false;
-
+    // make testing easier.
+    const extensionKey = process.env.AIKEY || Constants.extensionKey;
     if (isEnableTelemetry) {
       if (isTestRun) {
         this.output = window.createOutputChannel(Constants.outputChannel.telemetryClient);
@@ -25,7 +26,7 @@ class ExtensionTelemetry {
           this.reporter = new TelemetryReporter(
             Constants.extensionName,
             Constants.extensionVersion,
-            Constants.extensionKey
+            extensionKey
           );
           // set default values for machine/session ids
           this.defaultProperties["common.vscodemachineid"] = generateMachineId();
