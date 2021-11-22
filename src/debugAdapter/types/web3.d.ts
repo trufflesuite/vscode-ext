@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-declare module Web3Module {
+declare module Web3 {
   interface IProvider {
     currentProvider: any;
   }
@@ -41,10 +41,11 @@ declare module Web3Module {
   };
 }
 
+// eslint-disable-next-line no-redeclare
 declare class Web3 {
-  constructor(provider: Web3Module.IProvider);
-  eth: Web3Module.IWeb3Eth;
-  BatchRequest: new () => Web3Module.IBatchRequest;
+  constructor(provider: Web3.IProvider);
+  eth: Web3.IWeb3Eth;
+  BatchRequest: new () => Web3.IBatchRequest;
 }
 
 declare module "web3" {
