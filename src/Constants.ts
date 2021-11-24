@@ -765,9 +765,9 @@ export class Constants {
   public static allOpenZeppelinVersions = ["2.3.0", "2.4.0", "2.5.0"];
 
   public static userSettings = {
-    coreSdkSettingsKey: "truffleTools.coreSDK",
-    ozVersionUserSettingsKey: "truffleTools.openZeppelin.version",
-    storageAccountUserSettingsKey: "truffleTools.storageAccount.name",
+    coreSdkSettingsKey: "trufflesuite.coreSDK",
+    ozVersionUserSettingsKey: "trufflesuite.openZeppelin.version",
+    storageAccountUserSettingsKey: "trufflesuite.storageAccount.name",
   };
 
   public static bdmApplicationRequestParameters = {

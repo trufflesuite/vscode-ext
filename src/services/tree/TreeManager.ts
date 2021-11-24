@@ -114,8 +114,8 @@ class ExtensionTreeManager {
 
 function defaultCommandsItems(): Command[] {
   return [
-    new Command("Connect to network", "truffleTools.connectProject"),
-    new Command("Create a new network", "truffleTools.createProject"),
+    new Command("Connect to network", "trufflesuite.connectProject"),
+    new Command("Create a new network", "trufflesuite.createProject"),
   ];
 }
 

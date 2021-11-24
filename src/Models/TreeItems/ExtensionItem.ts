@@ -96,7 +96,7 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
     clearTimeout(ExtensionItem.timeoutID as Timeout);
     ExtensionItem.timeoutID = setTimeout(async () => {
       try {
-        await commands.executeCommand("truffleTools.refresh");
+        await commands.executeCommand("trufflesuite.refresh");
       } catch (error) {
         Telemetry.sendException(error);
       }

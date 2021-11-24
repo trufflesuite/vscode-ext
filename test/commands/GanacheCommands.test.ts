@@ -45,7 +45,7 @@ describe("Unit tests GanacheCommands", () => {
     sinon.restore();
   });
 
-  it("startGanacheCmd executes truffleTools.showRequirementsPage cmd when not all app are installed", async () => {
+  it("startGanacheCmd executes trufflesuite.showRequirementsPage cmd when not all app are installed", async () => {
     // Arrange
     checkAppsStub = sinon.stub(required, "checkApps").returns(Promise.resolve(false));
     const executeCommandStub = sinon.stub(commands, "executeCommand");
@@ -199,7 +199,7 @@ async function createTestServiceItems(): Promise<Service[]> {
     ["memberName"]
   );
 
-  truffleTools.addChild(azureBlockchainProject);
+  trufflesuite.addChild(azureBlockchainProject);
   localService.addChild(localProject);
 
   services.push(truffleTools, localService);

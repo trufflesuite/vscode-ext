@@ -26,11 +26,11 @@ export class WelcomePage extends BasicWebView {
 
     if (message.command === "executeCommand") {
       if (message.value === "createProject") {
-        await commands.executeCommand("truffleTools.createProject");
+        await commands.executeCommand("trufflesuite.createProject");
       }
 
       if (message.value === "connectProject") {
-        await commands.executeCommand("truffleTools.connectProject");
+        await commands.executeCommand("trufflesuite.connectProject");
       }
     }
   }

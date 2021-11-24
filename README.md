@@ -155,26 +155,6 @@ besu: {
 
 <br />
 
-<details>
-<summary style='font-size:15pt'>Deploy with Azure Blockchain Service to cloud</summary>
-
-If you are a developer that would like to target a network that leverages Azure, this option is also available. The option to create new networks or connect to existing ones are is available, the same as with Infura and Local networks!
-
-1. Click `-> Create a new network` in the AZURE BLOCKCHAIN tab, or type `Truffle Tools: Create a new network` in the [Command Palette](https://github.com/Microsoft/vscode-azure-blockchain-ethereum/wiki/Command-Palette).
-
-2. Choose your subscription, resource group and region to deploy to.
-
-3. Enter the name of your [Consortium](https://docs.microsoft.com/azure/blockchain/service/consortium)
-
-4. Wait until your resource has been created in Azure.
-   `Note: Deploying the Azure Blockchain Service takes quite some time to complete. Please check the deployment status in the Azure portal.`
-
-![Create and Truffle Tools Service](https://github.com/Azure-Samples/blockchain-devkit/raw/master/media/extensionMedia/azureDeploy.gif)
-
-</details>
-
-<br />
-
 ## System Requirements
 
 - Supported Operating Systems

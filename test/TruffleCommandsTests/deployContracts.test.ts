@@ -765,7 +765,7 @@ async function createTestServicesItems(): Promise<Service[]> {
   );
   bdmProject.addChild(bdmNetworkNode);
 
-  truffleTools.addChild(azureBlockchainProject);
+  trufflesuite.addChild(azureBlockchainProject);
   localService.addChild(localProject);
   infuraService.addChild(infuraProject);
   bdmService.addChild(bdmProject);

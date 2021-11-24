@@ -17,7 +17,7 @@ export namespace GanacheCommands {
 
     if (!(await required.checkApps(RequiredApps.node))) {
       Telemetry.sendEvent("GanacheCommands.startGanacheCmd.nodeIsNotInstalled");
-      commands.executeCommand("truffleTools.showRequirementsPage");
+      commands.executeCommand("trufflesuite.showRequirementsPage");
       return;
     }
 
