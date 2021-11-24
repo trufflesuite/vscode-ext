@@ -2,11 +2,11 @@
 // Licensed under the MIT license.
 
 import { IAzureTransactionNodeDto, ICreateTransactionNodeDto } from "..";
-import { TruffleToolsServiceClient } from "../TruffleToolsServiceClient";
+import { AzureBlockchainServiceClient } from "../AzureBlockchainServiceClient";
 import { IAzureMemberAccessKeysDto } from "../AzureDto/AccessKeysDto";
 
 export class TransactionNodeResource {
-  constructor(public readonly client: TruffleToolsServiceClient) {}
+  constructor(public readonly client: AzureBlockchainServiceClient) {}
 
   public getTransactionNodeList(memberName: string): Promise<IAzureTransactionNodeDto[]> {
     return new Promise((resolve, reject) => {

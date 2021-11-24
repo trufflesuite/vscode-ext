@@ -7,7 +7,7 @@ import { showQuickPick, telemetryHelper } from "../helpers";
 import { ItemType } from "../Models";
 import {
   AzureBlockchainProject,
-  TruffleToolsService,
+  AzureBlockchainService,
   BlockchainDataManagerNetworkNode,
   BlockchainDataManagerProject,
   BlockchainDataManagerService,
@@ -178,17 +178,17 @@ async function selectDestination(serviceDestination: IServiceDestination[]): Pro
 }
 
 // ------------ AZURE BLOCKCHAIN ------------ //
-async function createAzureBlockchainProject(_service: TruffleToolsService): Promise<AzureBlockchainProject> {
+async function createAzureBlockchainProject(_service: AzureBlockchainService): Promise<AzureBlockchainProject> {
   const azureResourceExplorer = new ConsortiumResourceExplorer();
   return azureResourceExplorer.createProject();
 }
 
-async function connectAzureBlockchainProject(service: TruffleToolsService): Promise<AzureBlockchainProject> {
+async function connectAzureBlockchainProject(service: AzureBlockchainService): Promise<AzureBlockchainProject> {
   const azureResourceExplorer = new ConsortiumResourceExplorer();
   return azureResourceExplorer.selectProject(await getExistingConsortia(service));
 }
 
-async function getExistingConsortia(service: TruffleToolsService): Promise<string[]> {
+async function getExistingConsortia(service: AzureBlockchainService): Promise<string[]> {
   const azureBlockchainProjects = service.getChildren() as AzureBlockchainProject[];
   return azureBlockchainProjects.map((item) => item.label); // Maybe member name?
 }

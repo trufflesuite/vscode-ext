@@ -17,7 +17,7 @@ import { CancellationEvent, ItemType } from "../../src/Models";
 import {
   AzureBlockchainNetworkNode,
   AzureBlockchainProject,
-  TruffleToolsService,
+  AzureBlockchainService,
   BlockchainDataManagerNetworkNode,
   BlockchainDataManagerProject,
   BlockchainDataManagerService,
@@ -516,7 +516,7 @@ describe("TruffleCommands", () => {
         );
       });
 
-      it("to TruffleToolsService should generate mnemonic and complete successfully", async () => {
+      it("to AzureBlockchain Service should generate mnemonic and complete successfully", async () => {
         // Arrange
         const { consortium, member, transactionNode } = azureNames;
         checkAppsSilentMock.returns(true);
@@ -572,7 +572,7 @@ describe("TruffleCommands", () => {
         );
       });
 
-      it("to TruffleToolsService should complete successfully when user paste mnemonic", async () => {
+      it("to AzureBlockchainService should complete successfully when user paste mnemonic", async () => {
         // Arrange
         const { consortium, member, transactionNode } = azureNames;
         checkAppsSilentMock.returns(true);
@@ -722,7 +722,7 @@ const azureNames = {
 async function createTestServicesItems(): Promise<Service[]> {
   const services: Service[] = [];
 
-  const truffleTools = new TruffleToolsService();
+  const trufflesuite = new AzureBlockchainService();
   const localService = new LocalService();
   const infuraService = new InfuraService();
   const bdmService = new BlockchainDataManagerService();
@@ -765,12 +765,12 @@ async function createTestServicesItems(): Promise<Service[]> {
   );
   bdmProject.addChild(bdmNetworkNode);
 
-  truffleTools.addChild(azureBlockchainProject);
+  trufflesuite.addChild(azureBlockchainProject);
   localService.addChild(localProject);
   infuraService.addChild(infuraProject);
   bdmService.addChild(bdmProject);
 
-  services.push(truffleTools, localService, infuraService, bdmService);
+  services.push(trufflesuite, localService, infuraService, bdmService);
 
   return services;
 }

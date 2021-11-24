@@ -10,7 +10,7 @@ import { Constants } from "../../../src/Constants";
 import { ItemType } from "../../../src/Models";
 import {
   AzureBlockchainProject,
-  TruffleToolsService,
+  AzureBlockchainService,
   BlockchainDataManagerProject,
   InfuraProject,
   Project,
@@ -72,9 +72,9 @@ describe("Service Commands", () => {
         sinon.stub(GanacheService, "getPortStatus").resolves(GanacheService.PortStatus.FREE);
 
         sinon.stub(TreeManager, "getItem").callsFake(() => {
-          const truffleTools = new TruffleToolsService();
-          addChildStub = sinon.stub(truffleTools, "addChild");
-          return truffleTools;
+          const trufflesuite = new AzureBlockchainService();
+          addChildStub = sinon.stub(trufflesuite, "addChild");
+          return trufflesuite;
         });
 
         selectConsortiumMock = sinon
@@ -142,7 +142,7 @@ describe("Service Commands", () => {
         assert.notStrictEqual(validationMessage, undefined, "validationMessage should not be undefined");
       });
 
-      it("for Truffle Tools Service destination.", async () => {
+      it("for AzureBlockchain Service destination.", async () => {
         // Arrange
         showQuickPickMock.callsFake(async (...args: any[]) => {
           const destination = args[0].find((x: any) => x.itemType === ItemType.AZURE_BLOCKCHAIN_SERVICE);

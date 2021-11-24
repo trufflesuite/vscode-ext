@@ -8,9 +8,9 @@ export enum VSCommands {
 }
 
 export enum CommandContext {
-  Enabled = "truffleTools:enabled",
-  IsGanacheRunning = "truffleTools:isGanacheRunning",
-  IsWorkspaceOpen = "truffleTools:isWorkspaceOpen",
+  Enabled = "trufflesuite:enabled",
+  IsGanacheRunning = "trufflesuite:isGanacheRunning",
+  IsWorkspaceOpen = "trufflesuite:isWorkspaceOpen",
 }
 
 export function setCommandContext(key: CommandContext | string, value: boolean): Thenable<boolean | undefined> {

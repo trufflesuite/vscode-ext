@@ -235,11 +235,11 @@
           "command": "contract.copyABI"
         },
         {
-          "when": "truffleTools:isWorkspaceOpen",
+          "when": "trufflesuite:isWorkspaceOpen",
           "command": "trufflesuite.buildContracts"
         },
         {
-          "when": "truffleTools:isWorkspaceOpen",
+          "when": "trufflesuite:isWorkspaceOpen",
           "command": "trufflesuite.deployContracts"
         },
         {

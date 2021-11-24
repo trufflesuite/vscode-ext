@@ -33,8 +33,8 @@ export class Constants {
   public static extensionKey = packageJSON.aiKey;
 
   public static outputChannel = {
-    azureBlockchain: "Truffle Tools",
-    truffleToolsClient: "Truffle Tools Service Client",
+    azureBlockchain: "Azure Blockchain - DEPRECATED",
+    trufflesuiteClient: "Trufflesuite for VSCode",
     executeCommand: "Execute command",
     ganacheCommands: "Ganache Server",
     logicAppGenerator: "Logic App Generator",
@@ -152,7 +152,7 @@ export class Constants {
       changelogPath: "",
       path: "",
       showOnStartup: "showOnStartupChangelog",
-      title: "Truffle Tools Development Kit for Ethereum Changelog",
+      title: "Trufflesuite Development Kit for Ethereum Changelog",
       viewType: "changelog",
     },
     contractUI: {
@@ -164,13 +164,13 @@ export class Constants {
     requirements: {
       path: "",
       showOnStartup: "showOnStartupRequirementsPage",
-      title: "Truffle Tools Development Kit - Preview",
+      title: "Trufflesuite Development Kit - Preview",
       viewType: "requirementsPage",
     },
     welcome: {
       path: "",
       showOnStartup: "showOnStartupWelcomePage",
-      title: "Welcome to Truffle Tools",
+      title: "Welcome to Trufflesuite",
       viewType: "welcomePage",
     },
   };
@@ -323,7 +323,7 @@ export class Constants {
       azure: {
         contextValue: "service",
         iconPath: { dark: "", light: "" },
-        label: "Truffle Tools Service",
+        label: "Trufflesuite Service",
         prefix: "abs",
       },
       bdm: {
@@ -1011,7 +1011,7 @@ export class Constants {
   private static getNetworkIsNotReadyMessage(itemType: string) {
     switch (itemType) {
       case "AzureBlockchainNetworkNode":
-        return "Truffle Tools Service item is not ready yet. Please wait.";
+        return "Trufflesuite Service item is not ready yet. Please wait.";
       default:
         return "Blockchain item is not ready yet. Please wait.";
     }
@@ -1020,7 +1020,7 @@ export class Constants {
   private static getNetworkIsNotAvailableMessage(itemType: string) {
     switch (itemType) {
       case "AzureBlockchainNetworkNode":
-        return "Truffle Tools Service item is unavailable.";
+        return "Trufflesuite Service item is unavailable.";
       default:
         return "Blockchain item is unavailable.";
     }

@@ -9,7 +9,7 @@ import { Validator } from "./validator";
 
 const debounce = new Debounce();
 
-export namespace TruffleToolsServiceValidator {
+export namespace AzureBlockchainServiceValidator {
   const { specialChars, forbiddenChars } = Constants.validationRegexps;
   const { unresolvedSymbols } = Constants.validationMessages;
   const { azureBlockchainResourceName, resourceGroup } = Constants.lengthParam;

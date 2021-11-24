@@ -18,7 +18,7 @@ import {
   ICreateEventGridDto,
   ICreateTransactionNodeDto,
 } from "../ARMBlockchain";
-import { TruffleToolsServiceClient } from "../ARMBlockchain/TruffleToolsServiceClient";
+import { AzureBlockchainServiceClient } from "../ARMBlockchain/AzureBlockchainServiceClient";
 import { EventGridManagementClient } from "../ARMBlockchain/EventGridManagementClient";
 import { TruffleCommands } from "../commands/TruffleCommands";
 import { Constants, NotificationOptions } from "../Constants";
@@ -41,7 +41,7 @@ import {
 } from "../Models/TreeItems";
 import { ContractDB, ContractInstanceWithMetadata, ContractService, TreeManager } from "../services";
 import { Telemetry } from "../TelemetryClient";
-import { TruffleToolsServiceValidator } from "../validators/TruffleToolsServiceValidator";
+import { AzureBlockchainServiceValidator } from "../validators/AzureBlockchainServiceValidator";
 import { AzureResourceExplorer } from "./AzureResourceExplorer";
 import { ConsortiumResourceExplorer } from "./ConsortiumResourceExplorer";
 import { EventGridResourceExplorer } from "./EventGridResourceExplorer";
@@ -85,7 +85,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
   public async createProject(
     consortiumResourceExplorer: ConsortiumResourceExplorer,
     createConsortiumCallback: (consortium: AzureBlockchainProject) => Promise<void>,
-    azureClient?: TruffleToolsServiceClient,
+    azureClient?: AzureBlockchainServiceClient,
     subscriptionItem?: SubscriptionItem,
     resourceGroupItem?: ResourceGroupItem
   ): Promise<BlockchainDataManagerProject> {
@@ -316,14 +316,14 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
       ignoreFocusOut: true,
       prompt: Constants.paletteLabels.enterApplicationName,
       validateInput: async (name) => {
-        return TruffleToolsServiceValidator.validateBDMApplicationName(name, existingNames);
+        return AzureBlockchainServiceValidator.validateBDMApplicationName(name, existingNames);
       },
       value: contractName.toLowerCase(),
     });
   }
 
   private async getBlockchainDataManagerInstanceItems(
-    azureClient: TruffleToolsServiceClient,
+    azureClient: AzureBlockchainServiceClient,
     excludedItems: string[] = []
   ): Promise<QuickPickItem[]> {
     const items: QuickPickItem[] = [];
@@ -336,7 +336,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
   }
 
   private async loadBlockchainDataManagerInstanceItems(
-    azureClient: TruffleToolsServiceClient,
+    azureClient: AzureBlockchainServiceClient,
     excludedItems: string[] = []
   ): Promise<BlockchainDataManagerInstanceItem[]> {
     const bdmItems = await azureClient.bdmResource.getBlockchainDataManagerList();
@@ -357,7 +357,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
 
   private async getBlockchainDataManagerInstance(
     bdmInstanceItem: BlockchainDataManagerInstanceItem,
-    azureClient: TruffleToolsServiceClient
+    azureClient: AzureBlockchainServiceClient
   ): Promise<BlockchainDataManagerProject> {
     const { bdmName, subscriptionId, resourceGroup } = bdmInstanceItem;
 
@@ -377,7 +377,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
 
   private async getBlockchainDataManagerApplications(
     bdmInstanceItem: BlockchainDataManagerInstanceItem,
-    azureClient: TruffleToolsServiceClient
+    azureClient: AzureBlockchainServiceClient
   ): Promise<BlockchainDataManagerNetworkNode[]> {
     const { bdmName, subscriptionId, resourceGroup } = bdmInstanceItem;
 
@@ -463,7 +463,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
   }
 
   private async createBlockchainDataManagerInstance(
-    azureClient: TruffleToolsServiceClient,
+    azureClient: AzureBlockchainServiceClient,
     bdmItems: IAzureBlockchainDataManagerDto[],
     location: string,
     memberName: string,
@@ -611,7 +611,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
 
   private async getSelectedConsortium(
     consortiumResourceExplorer: ConsortiumResourceExplorer,
-    azureClient: TruffleToolsServiceClient
+    azureClient: AzureBlockchainServiceClient
   ): Promise<QuickPickItem> {
     Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.getSelectedConsortium.selectConsortium");
 
@@ -632,7 +632,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
 
   private async getSelectedMember(
     consortiumResourceExplorer: ConsortiumResourceExplorer,
-    azureClient: TruffleToolsServiceClient,
+    azureClient: AzureBlockchainServiceClient,
     memberName: string
   ): Promise<QuickPickItem> {
     Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.getSelectedMember.selectMember");
@@ -644,7 +644,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
   }
 
   private async getSelectedTransactionNode(
-    azureClient: TruffleToolsServiceClient,
+    azureClient: AzureBlockchainServiceClient,
     bdmItems: IAzureBlockchainDataManagerDto[],
     selectedMemberName: string,
     location: string
@@ -758,7 +758,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
   private async createdTransactionNode(
     memberName: string,
     location: string,
-    azureClient: TruffleToolsServiceClient,
+    azureClient: AzureBlockchainServiceClient,
     transactionNodeItems: TransactionNodeItem[]
   ): Promise<void> {
     Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.createdTransactionNode.createTransactionNode");
@@ -768,7 +768,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
       ignoreFocusOut: true,
       password: true,
       prompt: Constants.paletteLabels.enterTransactionNodePassword,
-      validateInput: TruffleToolsServiceValidator.validateAccessPassword,
+      validateInput: AzureBlockchainServiceValidator.validateAccessPassword,
     });
 
     const bodyParamsTransactionNode: ICreateTransactionNodeDto = {
@@ -826,8 +826,8 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
   private async getAzureClient(
     subscriptionItem: SubscriptionItem,
     resourceGroupItem: ResourceGroupItem
-  ): Promise<TruffleToolsServiceClient> {
-    return new TruffleToolsServiceClient(
+  ): Promise<AzureBlockchainServiceClient> {
+    return new AzureBlockchainServiceClient(
       subscriptionItem.session.credentials,
       subscriptionItem.subscriptionId,
       resourceGroupItem.label,

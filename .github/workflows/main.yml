@@ -60,7 +60,7 @@ jobs:
           patch-syntax: |
             = /version => "${{ steps.gitversion.outputs.semVer }}"
             = /displayName => "Truffle VSCode Chocolate Factory. TEST"
-            = /description => "Truffle Tools for Blockchain Development. TEST"
+            = /description => "Trufflesuite for Blockchain Development. TEST"
             = /aiKey => "${{ secrets.AIKEY }}"
 
       - name: add version in CHANGELOG.md

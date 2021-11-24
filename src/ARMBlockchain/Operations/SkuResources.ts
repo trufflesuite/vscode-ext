@@ -2,10 +2,10 @@
 // Licensed under the MIT license.
 
 import { ISkuDto } from "..";
-import { TruffleToolsServiceClient } from "../TruffleToolsServiceClient";
+import { AzureBlockchainServiceClient } from "../AzureBlockchainServiceClient";
 
 export class SkuResource {
-  constructor(public readonly client: TruffleToolsServiceClient) {}
+  constructor(public readonly client: AzureBlockchainServiceClient) {}
 
   public getListSkus(): Promise<ISkuDto[]> {
     return new Promise((resolve, reject) => {

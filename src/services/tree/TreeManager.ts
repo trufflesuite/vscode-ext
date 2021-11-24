@@ -5,7 +5,7 @@ import { Memento } from "vscode";
 import { Constants } from "../../Constants";
 import { ItemFactory } from "../../Models";
 import {
-  TruffleToolsService,
+  AzureBlockchainService,
   BlockchainDataManagerService,
   Command,
   IExtensionItem,
@@ -88,9 +88,9 @@ class ExtensionTreeManager {
 
   // FIXME: We should use factory and ItemTypes instead of direct classes
   private fillDefaultTypes(items: Service[]): Service[] {
-    let truffleTools = items.find((item) => item instanceof TruffleToolsService);
-    if (!truffleTools) {
-      truffleTools = new TruffleToolsService();
+    let trufflesuite = items.find((item) => item instanceof AzureBlockchainService);
+    if (!trufflesuite) {
+      trufflesuite = new AzureBlockchainService();
     }
 
     let localService = items.find((item) => item instanceof LocalService);
@@ -108,7 +108,7 @@ class ExtensionTreeManager {
       bdmService = new BlockchainDataManagerService();
     }
 
-    return [truffleTools, infuraService, localService, bdmService];
+    return [trufflesuite, infuraService, localService, bdmService];
   }
 }
 

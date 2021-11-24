@@ -14,7 +14,7 @@ import { TransactionNodeResource } from "./Operations/TransactionNodeResource";
 
 const { preview20180601, preview20190601 } = Constants.azureApiVersions;
 
-export class TruffleToolsServiceClient extends BaseClient {
+export class AzureBlockchainServiceClient extends BaseClient {
   public memberResource: MemberResource;
   public transactionNodeResource: TransactionNodeResource;
   public consortiumResource: ConsortiumResource;
@@ -49,10 +49,10 @@ export class TruffleToolsServiceClient extends BaseClient {
 
     return this.sendRequestToAzure(httpRequest, (error) => {
       if (error) {
-        Telemetry.sendEvent("TruffleToolsServiceClient.createConsortium.createdFailed");
+        Telemetry.sendEvent("AzureBlockchainServiceClient.createConsortium.createdFailed");
         callback(error);
       } else {
-        Telemetry.sendEvent("TruffleToolsServiceClient.createConsortium.createdSuccessfully");
+        Telemetry.sendEvent("AzureBlockchainServiceClient.createConsortium.createdSuccessfully");
         callback(null);
       }
     });
@@ -68,10 +68,10 @@ export class TruffleToolsServiceClient extends BaseClient {
 
     return this.sendRequestToAzure(httpRequest, (error) => {
       if (error) {
-        Telemetry.sendEvent("TruffleToolsServiceClient.startBlockchainDataManager.createdFailed");
+        Telemetry.sendEvent("AzureBlockchainServiceClient.startBlockchainDataManager.createdFailed");
         callback(error);
       } else {
-        Telemetry.sendEvent("TruffleToolsServiceClient.startBlockchainDataManager.runSuccessfully");
+        Telemetry.sendEvent("AzureBlockchainServiceClient.startBlockchainDataManager.runSuccessfully");
         callback(null);
       }
     });

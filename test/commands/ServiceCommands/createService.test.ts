@@ -11,7 +11,7 @@ import * as helpers from "../../../src/helpers";
 import { ItemType } from "../../../src/Models";
 import {
   AzureBlockchainProject,
-  TruffleToolsService,
+  AzureBlockchainService,
   BlockchainDataManagerProject,
   BlockchainDataManagerService,
 } from "../../../src/Models/TreeItems";
@@ -32,7 +32,7 @@ describe("Create Service", () => {
       label: Constants.treeItemData.service.azure.label,
     });
 
-    sinon.stub(TreeManager, "getItem").returns(new TruffleToolsService());
+    sinon.stub(TreeManager, "getItem").returns(new AzureBlockchainService());
     sinon.replace(helpers, "showQuickPick", showQuickPickStub);
 
     // Act

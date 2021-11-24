@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-export * from "./TruffleToolsServiceClient";
+export * from "./AzureBlockchainServiceClient";
 export * from "./AzureDto/BlockchainDataManager/BlockchainDataManagerApplicationDto";
 export * from "./AzureDto/BlockchainDataManager/BlockchainDataManagerDto";
 export * from "./AzureDto/BlockchainDataManager/BlockchainDataManagerInputDto";

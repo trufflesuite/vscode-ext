@@ -2,11 +2,11 @@
 // Licensed under the MIT license.
 
 import { IAzureConsortiumDto, IAzureMemberDto } from "..";
-import { TruffleToolsServiceClient } from "../TruffleToolsServiceClient";
+import { AzureBlockchainServiceClient } from "../AzureBlockchainServiceClient";
 import { ConsortiumMapper, ICreateQuorumMember } from "../Mapper/ConsortiumMapper";
 
 export class ConsortiumResource {
-  constructor(private readonly client: TruffleToolsServiceClient) {}
+  constructor(private readonly client: AzureBlockchainServiceClient) {}
 
   public createConsortium(memberName: string, bodyParams: ICreateQuorumMember): Promise<void> {
     const body = ConsortiumMapper.getBodyForCreateQuorumMember(bodyParams);

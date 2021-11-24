@@ -7,12 +7,12 @@ import * as msrestazure from "ms-rest-azure";
 import * as sinon from "sinon";
 import * as uuid from "uuid";
 import * as vscode from "vscode";
-import { TruffleToolsServiceClient } from "../src/ARMBlockchain/TruffleToolsServiceClient";
+import { AzureBlockchainServiceClient } from "../src/ARMBlockchain/AzureBlockchainServiceClient";
 
-describe("Unit tests for TruffleToolsServiceClient", () => {
+describe("Unit tests for AzureBlockchainServiceClient", () => {
   let credentials: ServiceClientCredentials;
   let memberName: string;
-  const truffleToolsClient = require("../src/ARMBlockchain/TruffleToolsServiceClient");
+  const trufflesuiteClient = require("../src/ARMBlockchain/AzureBlockchainServiceClient");
   let callbackFunction: (error: Error | null, result?: any) => void;
   let callbackFunctionSpy: any;
   let options: msrestazure.AzureServiceClientOptions;
@@ -31,7 +31,7 @@ describe("Unit tests for TruffleToolsServiceClient", () => {
 
   beforeEach(() => {
     memberName = uuid.v4();
-    sinon.stub(truffleToolsClient.__proto__, "constructor");
+    sinon.stub(trufflesuiteClient.__proto__, "constructor");
 
     callbackFunctionSpy = sinon.spy(callbackFunction);
   });
@@ -41,12 +41,12 @@ describe("Unit tests for TruffleToolsServiceClient", () => {
   });
 
   describe("Public methods.", () => {
-    let serviceClient: TruffleToolsServiceClient;
+    let serviceClient: AzureBlockchainServiceClient;
     let pipelineMock: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], {}>;
     let sendRequestToAzureMock: sinon.SinonStub<any[], any>;
 
     beforeEach(() => {
-      serviceClient = new truffleToolsClient.TruffleToolsServiceClient(
+      serviceClient = new trufflesuiteClient.AzureBlockchainServiceClient(
         credentials,
         uuid.v4(),
         uuid.v4(),

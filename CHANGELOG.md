@@ -1,6 +1,6 @@
 # Change Log
 
-All notable changes to the "Truffle Tools" extension will be documented in this file.
+All notable changes to the "Trufflesuite" extension will be documented in this file.
 
 ## 2.0.0
 

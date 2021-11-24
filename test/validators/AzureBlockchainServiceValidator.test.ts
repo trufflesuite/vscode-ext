@@ -5,11 +5,11 @@ import * as assert from "assert";
 import rewire = require("rewire");
 import sinon = require("sinon");
 import { Constants } from "../../src/Constants";
-import { TruffleToolsServiceValidator } from "../../src/validators/TruffleToolsServiceValidator";
+import { AzureBlockchainServiceValidator } from "../../src/validators/AzureBlockchainServiceValidator";
 
 const { azureBlockchainResourceName, password, resourceGroup } = Constants.lengthParam;
-
-describe("Truffle Tools Service Validator", () => {
+``;
+describe("AzureBlockchain Service Validator", () => {
   const emptyValues = ["", " "];
   const {
     valueCannotBeEmpty,
@@ -29,7 +29,7 @@ describe("Truffle Tools Service Validator", () => {
       emptyValues.forEach((testPassword) => {
         it(`returns error message when password is empty: '${testPassword}'`, async () => {
           // Arrange, Act
-          const result = (await TruffleToolsServiceValidator.validateAccessPassword(testPassword)) as string;
+          const result = (await AzureBlockchainServiceValidator.validateAccessPassword(testPassword)) as string;
 
           // Assert
           assert.strictEqual(result.includes(valueCannotBeEmpty), true, "empty password should be invalid");
@@ -41,7 +41,7 @@ describe("Truffle Tools Service Validator", () => {
         const invalidPassword = "AAAAAA111!!!";
 
         // Act
-        const result = await TruffleToolsServiceValidator.validateAccessPassword(invalidPassword);
+        const result = await AzureBlockchainServiceValidator.validateAccessPassword(invalidPassword);
 
         // Assert
         assert.strictEqual(result, noLowerCaseLetter, "password without lower case should be invalid");
@@ -52,7 +52,7 @@ describe("Truffle Tools Service Validator", () => {
         const invalidPassword = "aaaaaa111!!!";
 
         // Act
-        const result = await TruffleToolsServiceValidator.validateAccessPassword(invalidPassword);
+        const result = await AzureBlockchainServiceValidator.validateAccessPassword(invalidPassword);
 
         // Assert
         assert.strictEqual(result, noUpperCaseLetter, "password without upper case should be invalid");
@@ -63,7 +63,7 @@ describe("Truffle Tools Service Validator", () => {
         const invalidPassword = "AAAaaaAAA!!!";
 
         // Act
-        const result = await TruffleToolsServiceValidator.validateAccessPassword(invalidPassword);
+        const result = await AzureBlockchainServiceValidator.validateAccessPassword(invalidPassword);
 
         // Assert
         assert.strictEqual(result, noDigits, "password without digit should be invalid");
@@ -74,7 +74,7 @@ describe("Truffle Tools Service Validator", () => {
         const invalidPassword = "AAAaaa111222";
 
         // Act
-        const result = await TruffleToolsServiceValidator.validateAccessPassword(invalidPassword);
+        const result = await AzureBlockchainServiceValidator.validateAccessPassword(invalidPassword);
 
         // Assert
         assert.strictEqual(result, noSpecialChars, "password without special char should be invalid");
@@ -85,7 +85,7 @@ describe("Truffle Tools Service Validator", () => {
         const invalidPassword = "AAAaaa111!!!*";
 
         // Act
-        const result = await TruffleToolsServiceValidator.validateAccessPassword(invalidPassword);
+        const result = await AzureBlockchainServiceValidator.validateAccessPassword(invalidPassword);
 
         // Assert
         assert.strictEqual(
@@ -105,7 +105,7 @@ describe("Truffle Tools Service Validator", () => {
           const invalidPassword = mainSymbols.substr(0, length);
 
           // Act
-          const result = await TruffleToolsServiceValidator.validateAccessPassword(invalidPassword);
+          const result = await AzureBlockchainServiceValidator.validateAccessPassword(invalidPassword);
 
           // Assert
           assert.strictEqual(
@@ -121,7 +121,7 @@ describe("Truffle Tools Service Validator", () => {
         const invalidPassword = "A;";
 
         // Act
-        const result = (await TruffleToolsServiceValidator.validateAccessPassword(invalidPassword)) as string;
+        const result = (await AzureBlockchainServiceValidator.validateAccessPassword(invalidPassword)) as string;
 
         // Assert
         assert.strictEqual(result.includes(noLowerCaseLetter), true, "error should have lower case message");
@@ -141,16 +141,16 @@ describe("Truffle Tools Service Validator", () => {
     });
 
     describe("validateResourceGroupName", () => {
-      let truffleToolsValidator: any;
+      let azureBlockchainValidator: any;
 
       before(() => {
-        truffleToolsValidator = rewire("../../src/validators/TruffleToolsServiceValidator");
+        azureBlockchainValidator = rewire("../../src/validators/AzureBlockchainServiceValidator");
       });
 
       emptyValues.forEach((testResourceGroup) => {
         it(`returns error message when resource group name (${testResourceGroup}) is empty`, async () => {
           // Arrange, Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateResourceGroupName(
+          const result = await azureBlockchainValidator.AzureBlockchainServiceValidator.validateResourceGroupName(
             testResourceGroup,
             {
               checkExistence: sinon.stub().returns(Promise.resolve(true)),
@@ -167,9 +167,12 @@ describe("Truffle Tools Service Validator", () => {
       resourceGroupHasDotAtTheEndList.forEach((name) => {
         it(`returns error message when resource group name ('${name}') ends with dot`, async () => {
           // Arrange, Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateResourceGroupName(name, {
-            checkExistence: sinon.stub().returns(Promise.resolve(true)),
-          });
+          const result = await azureBlockchainValidator.AzureBlockchainServiceValidator.validateResourceGroupName(
+            name,
+            {
+              checkExistence: sinon.stub().returns(Promise.resolve(true)),
+            }
+          );
 
           // Assert
           assert.strictEqual(
@@ -185,9 +188,12 @@ describe("Truffle Tools Service Validator", () => {
       resourceGroupHasUnavailableSymbolList.forEach((name) => {
         it(`returns error message when resource group name ('${name}') has unavailable symbols`, async () => {
           // Arrange, Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateResourceGroupName(name, {
-            checkExistence: sinon.stub().returns(Promise.resolve(true)),
-          });
+          const result = await azureBlockchainValidator.AzureBlockchainServiceValidator.validateResourceGroupName(
+            name,
+            {
+              checkExistence: sinon.stub().returns(Promise.resolve(true)),
+            }
+          );
 
           // Assert
           assert.strictEqual(
@@ -207,7 +213,7 @@ describe("Truffle Tools Service Validator", () => {
           const invalidResourceGroup = mainSymbols.repeat(resourceGroup.max + 1);
 
           // Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateResourceGroupName(
+          const result = await azureBlockchainValidator.AzureBlockchainServiceValidator.validateResourceGroupName(
             invalidResourceGroup,
             {
               checkExistence: sinon.stub().returns(Promise.resolve(true)),
@@ -228,7 +234,7 @@ describe("Truffle Tools Service Validator", () => {
         const existingResourceGroupName = "resourceGroupName";
 
         // Act
-        const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateResourceGroupName(
+        const result = await azureBlockchainValidator.AzureBlockchainServiceValidator.validateResourceGroupName(
           existingResourceGroupName,
           {
             checkExistence: sinon.stub().returns(
@@ -254,9 +260,12 @@ describe("Truffle Tools Service Validator", () => {
       validResourceGroupNameList.forEach((name) => {
         it(`resource group name (${name}) should be valid`, async () => {
           // Arrange, Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateResourceGroupName(name, {
-            checkExistence: sinon.stub().returns(Promise.resolve(false)),
-          });
+          const result = await azureBlockchainValidator.AzureBlockchainServiceValidator.validateResourceGroupName(
+            name,
+            {
+              checkExistence: sinon.stub().returns(Promise.resolve(false)),
+            }
+          );
 
           // Assert
           assert.strictEqual(result, null, "resource group name should be valid");
@@ -272,7 +281,7 @@ describe("Truffle Tools Service Validator", () => {
           const validResourceGroup = mainSymbols.repeat(length);
 
           // Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateResourceGroupName(
+          const result = await azureBlockchainValidator.AzureBlockchainServiceValidator.validateResourceGroupName(
             validResourceGroup,
             {
               checkExistence: sinon.stub().returns(Promise.resolve(false)),
@@ -286,21 +295,22 @@ describe("Truffle Tools Service Validator", () => {
     });
 
     describe("validateAzureBlockchainResourceName", () => {
-      let truffleToolsValidator: any;
+      let azureBlockchainValidator: any;
 
       before(() => {
-        truffleToolsValidator = rewire("../../src/validators/TruffleToolsServiceValidator");
+        azureBlockchainValidator = rewire("../../src/validators/AzureBlockchainServiceValidator");
       });
 
       emptyValues.forEach((consortiumName) => {
         it(`returns error message when consortium name (${consortiumName}) is empty`, async () => {
           // Arrange, Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateAzureBlockchainResourceName(
-            consortiumName,
-            {
-              checkExistence: sinon.stub().returns(Promise.resolve(true)),
-            }
-          );
+          const result =
+            await azureBlockchainValidator.AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(
+              consortiumName,
+              {
+                checkExistence: sinon.stub().returns(Promise.resolve(true)),
+              }
+            );
 
           // Assert
           assert.strictEqual(result, invalidAzureName, "empty consortium name should be invalid");
@@ -316,12 +326,13 @@ describe("Truffle Tools Service Validator", () => {
           const invalidConsortiumName = mainSymbols.repeat(length);
 
           // Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateAzureBlockchainResourceName(
-            invalidConsortiumName,
-            {
-              checkExistence: sinon.stub().returns(Promise.resolve(false)),
-            }
-          );
+          const result =
+            await azureBlockchainValidator.AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(
+              invalidConsortiumName,
+              {
+                checkExistence: sinon.stub().returns(Promise.resolve(false)),
+              }
+            );
 
           // Assert
           assert.strictEqual(result, invalidAzureName, `consortium name length: ${length} should be invalid`);
@@ -333,12 +344,10 @@ describe("Truffle Tools Service Validator", () => {
       consortiumNameWithUpperCaseLetterList.forEach((name) => {
         it(`returns error message when consortium name ('${name}') has upper case letter`, async () => {
           // Arrange, Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateAzureBlockchainResourceName(
-            name,
-            {
+          const result =
+            await azureBlockchainValidator.AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(name, {
               checkExistence: sinon.stub().returns(Promise.resolve(false)),
-            }
-          );
+            });
 
           // Assert
           assert.strictEqual(result, invalidAzureName, "consortium name with upper case should be invalid");
@@ -350,12 +359,10 @@ describe("Truffle Tools Service Validator", () => {
       consortiumNameDigitAtFirstPlaceList.forEach((name) => {
         it(`returns error message when consortium name ('${name}') has digit at first place`, async () => {
           // Arrange, Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateAzureBlockchainResourceName(
-            name,
-            {
+          const result =
+            await azureBlockchainValidator.AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(name, {
               checkExistence: sinon.stub().returns(Promise.resolve(false)),
-            }
-          );
+            });
 
           // Assert
           assert.strictEqual(result, invalidAzureName, "consortium name with digit at first place should be invalid");
@@ -367,12 +374,13 @@ describe("Truffle Tools Service Validator", () => {
         const invalidConsortiumName = "aa!";
 
         // Act
-        const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateAzureBlockchainResourceName(
-          invalidConsortiumName,
-          {
-            checkExistence: sinon.stub().returns(Promise.resolve(false)),
-          }
-        );
+        const result =
+          await azureBlockchainValidator.AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(
+            invalidConsortiumName,
+            {
+              checkExistence: sinon.stub().returns(Promise.resolve(false)),
+            }
+          );
 
         // Assert
         assert.strictEqual(result, invalidAzureName, "consortium name with unavailable symbols should be invalid");
@@ -389,9 +397,8 @@ describe("Truffle Tools Service Validator", () => {
       validConsortiumNames.forEach((name) => {
         it(`consortium name (${name}) should be valid`, async () => {
           // Arrange, Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateAzureBlockchainResourceName(
-            name,
-            {
+          const result =
+            await azureBlockchainValidator.AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(name, {
               checkExistence: sinon.stub().returns(
                 Promise.resolve({
                   message: null,
@@ -399,8 +406,7 @@ describe("Truffle Tools Service Validator", () => {
                   reason: "",
                 })
               ),
-            }
-          );
+            });
 
           // Assert
           assert.strictEqual(result, null, "consortium name should be valid");
@@ -409,21 +415,22 @@ describe("Truffle Tools Service Validator", () => {
     });
 
     describe("validateAzureBlockchainResourceName", () => {
-      let truffleToolsValidator: any;
+      let azureBlockchainValidator: any;
 
       before(() => {
-        truffleToolsValidator = rewire("../../src/validators/TruffleToolsServiceValidator");
+        azureBlockchainValidator = rewire("../../src/validators/AzureBlockchainServiceValidator");
       });
 
       emptyValues.forEach((memberName) => {
         it(`returns error message when member name (${memberName}) is empty`, async () => {
           // Arrange,  Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateAzureBlockchainResourceName(
-            memberName,
-            {
-              checkExistence: sinon.stub().returns(Promise.resolve(true)),
-            }
-          );
+          const result =
+            await azureBlockchainValidator.AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(
+              memberName,
+              {
+                checkExistence: sinon.stub().returns(Promise.resolve(true)),
+              }
+            );
 
           // Assert
           assert.strictEqual(result, invalidAzureName, "empty member name should be invalid");
@@ -439,12 +446,13 @@ describe("Truffle Tools Service Validator", () => {
           const invalidMemberName = mainSymbols.repeat(length);
 
           // Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateAzureBlockchainResourceName(
-            invalidMemberName,
-            {
-              checkExistence: sinon.stub().returns(Promise.resolve(false)),
-            }
-          );
+          const result =
+            await azureBlockchainValidator.AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(
+              invalidMemberName,
+              {
+                checkExistence: sinon.stub().returns(Promise.resolve(false)),
+              }
+            );
 
           // Assert
           assert.strictEqual(result, invalidAzureName, `member name length: ${length} should be invalid`);
@@ -456,12 +464,10 @@ describe("Truffle Tools Service Validator", () => {
       memberNameWithUpperCaseLetterList.forEach((name) => {
         it(`returns error message when member name ('${name}') has upper case letter`, async () => {
           // Arrange, Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateAzureBlockchainResourceName(
-            name,
-            {
+          const result =
+            await azureBlockchainValidator.AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(name, {
               checkExistence: sinon.stub().returns(Promise.resolve(false)),
-            }
-          );
+            });
 
           // Assert
           assert.strictEqual(result, invalidAzureName, "member name with upper case should be invalid");
@@ -473,12 +479,10 @@ describe("Truffle Tools Service Validator", () => {
       memberNameDigitAtFirstPlaceList.forEach((name) => {
         it(`returns error message when member name ('${name}') has digit at first place`, async () => {
           // Arrange, Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateAzureBlockchainResourceName(
-            name,
-            {
+          const result =
+            await azureBlockchainValidator.AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(name, {
               checkExistence: sinon.stub().returns(Promise.resolve(false)),
-            }
-          );
+            });
 
           // Assert
           assert.strictEqual(result, invalidAzureName, "member name with digit at first place should be invalid");
@@ -490,12 +494,13 @@ describe("Truffle Tools Service Validator", () => {
         const invalidMemberName = "aa!";
 
         // Act
-        const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateAzureBlockchainResourceName(
-          invalidMemberName,
-          {
-            checkExistence: sinon.stub().returns(Promise.resolve(false)),
-          }
-        );
+        const result =
+          await azureBlockchainValidator.AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(
+            invalidMemberName,
+            {
+              checkExistence: sinon.stub().returns(Promise.resolve(false)),
+            }
+          );
 
         // Assert
         assert.strictEqual(result, invalidAzureName, "member name with unavailable symbols should be invalid");
@@ -512,9 +517,8 @@ describe("Truffle Tools Service Validator", () => {
       validMemberNames.forEach((name) => {
         it(`member name (${name}) should be valid`, async () => {
           // Arrange, Act
-          const result = await truffleToolsValidator.TruffleToolsServiceValidator.validateAzureBlockchainResourceName(
-            name,
-            {
+          const result =
+            await azureBlockchainValidator.AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(name, {
               checkExistence: sinon.stub().returns(
                 Promise.resolve({
                   message: null,
@@ -522,8 +526,7 @@ describe("Truffle Tools Service Validator", () => {
                   reason: "",
                 })
               ),
-            }
-          );
+            });
 
           // Assert
           assert.strictEqual(result, null, "member name should be valid");

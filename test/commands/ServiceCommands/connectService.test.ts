@@ -10,7 +10,7 @@ import { Constants } from "../../../src/Constants";
 import { ItemType } from "../../../src/Models";
 import {
   AzureBlockchainProject,
-  TruffleToolsService,
+  AzureBlockchainService,
   BlockchainDataManagerProject,
   BlockchainDataManagerService,
   IExtensionItem,
@@ -50,7 +50,7 @@ describe("Service Commands", () => {
   let bdmGroup: Service;
 
   function initializeNetworks() {
-    azureGroup = new TruffleToolsService();
+    azureGroup = new AzureBlockchainService();
     localGroup = new LocalService();
     infuraGroup = new InfuraService();
     bdmGroup = new BlockchainDataManagerService();
@@ -116,7 +116,7 @@ describe("Service Commands", () => {
         assert.strictEqual(startGanacheServerMock.called, true, "startGanacheServer should be called");
       });
 
-      it("for Truffle Tools Service destination.", async () => {
+      it("for AzureBlockchain Service destination.", async () => {
         // Arrange
         const consortiumName = uuid.v4;
         getItemMock.returns(azureGroup);

@@ -11,10 +11,10 @@ import {
   ICreateBlockchainDataManagerInputDto,
   ICreateBlockchainDataManagerOutputDto,
 } from "..";
-import { TruffleToolsServiceClient } from "../TruffleToolsServiceClient";
+import { AzureBlockchainServiceClient } from "../AzureBlockchainServiceClient";
 
 export class BlockchainDataManagerResource {
-  constructor(public readonly client: TruffleToolsServiceClient) {}
+  constructor(public readonly client: AzureBlockchainServiceClient) {}
 
   public async getBlockchainDataManagerList(): Promise<IAzureBlockchainDataManagerDto[]> {
     return new Promise((resolve, reject) => {

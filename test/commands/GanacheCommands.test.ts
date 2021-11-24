@@ -12,7 +12,7 @@ import { required } from "../../src/helpers";
 import * as shell from "../../src/helpers/shell";
 import {
   AzureBlockchainProject,
-  TruffleToolsService,
+  AzureBlockchainService,
   IExtensionItem,
   LocalProject,
   LocalService,
@@ -189,7 +189,7 @@ const localProject = new LocalProject(TestConstants.consortiumTestNames.local, t
 async function createTestServiceItems(): Promise<Service[]> {
   const services: Service[] = [];
 
-  const truffleTools = new TruffleToolsService();
+  const trufflesuite = new AzureBlockchainService();
   const localService = new LocalService();
 
   const azureBlockchainProject = new AzureBlockchainProject(
@@ -199,10 +199,10 @@ async function createTestServiceItems(): Promise<Service[]> {
     ["memberName"]
   );
 
-  truffleTools.addChild(azureBlockchainProject);
+  trufflesuite.addChild(azureBlockchainProject);
   localService.addChild(localProject);
 
-  services.push(truffleTools, localService);
+  services.push(trufflesuite, localService);
 
   return services;
 }

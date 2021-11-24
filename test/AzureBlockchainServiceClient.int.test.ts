@@ -6,11 +6,11 @@ import { ServiceClientCredentials } from "ms-rest";
 import * as sinon from "sinon";
 import * as uuid from "uuid";
 import * as vscode from "vscode";
-import { TruffleToolsServiceClient } from "../src/ARMBlockchain";
+import { AzureBlockchainServiceClient } from "../src/ARMBlockchain";
 
-describe("Integration tests for TruffleToolsServiceClient", () => {
+describe("Integration tests for AzureBlockchainServiceClient", () => {
   let credentials: ServiceClientCredentials;
-  const truffleToolsClient = require("../src/ARMBlockchain/TruffleToolsServiceClient");
+  const trufflesuiteClient = require("../src/ARMBlockchain/AzureBlockchainServiceClient");
   const defaultResponseBody = '{ "message": "default response body" }';
   let callbackFunction: (error: Error | null, result?: any) => void;
 
@@ -18,7 +18,7 @@ describe("Integration tests for TruffleToolsServiceClient", () => {
   let windowMock: sinon.SinonMock;
   let showErrorMessageMock: sinon.SinonExpectation;
   let pipelineMock: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], {}>;
-  let serviceClient: TruffleToolsServiceClient;
+  let serviceClient: AzureBlockchainServiceClient;
   let callbackFunctionSpy: any;
 
   before(() => {
@@ -29,7 +29,7 @@ describe("Integration tests for TruffleToolsServiceClient", () => {
   });
 
   beforeEach(() => {
-    sinon.stub(truffleToolsClient.__proto__, "constructor");
+    sinon.stub(trufflesuiteClient.__proto__, "constructor");
 
     windowMock = sinon.mock(vscode.window);
     showErrorMessageMock = windowMock.expects("showErrorMessage");
@@ -37,7 +37,7 @@ describe("Integration tests for TruffleToolsServiceClient", () => {
       acceptLanguage: uuid.v4(),
       generateClientRequestId: true,
     };
-    serviceClient = new truffleToolsClient.TruffleToolsServiceClient(
+    serviceClient = new trufflesuiteClient.AzureBlockchainServiceClient(
       credentials,
       uuid.v4(),
       uuid.v4(),

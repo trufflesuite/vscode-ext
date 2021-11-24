@@ -52,7 +52,7 @@ describe("Truffle tests", function () {
     it("Create new network", async () => {
       const testNetworkName = "testnetwork";
 
-      await workbench.executeCommand("Truffle Tools: Create a new network");
+      await workbench.executeCommand("AzureBlockchain: Create a new network");
       const serviceTypeInput = await driver.wait(() => new InputBox(), 5000);
       await serviceTypeInput.setText("Local Service");
       await serviceTypeInput.confirm();
@@ -66,7 +66,7 @@ describe("Truffle tests", function () {
       await networkPortInput.confirm();
 
       const azureBlockchainSection = <CustomTreeSection>(
-        await new SideBarView().getContent().getSection("Truffle Tools")
+        await new SideBarView().getContent().getSection("AzureBlockchain")
       );
       await azureBlockchainSection.expand();
 
@@ -82,10 +82,10 @@ describe("Truffle tests", function () {
 
     it("Build contracts", async () => {
       const output = await driver.wait(() => new BottomBarPanel().openOutputView(), 5000);
-      await output.selectChannel("Truffle Tools");
+      await output.selectChannel("AzureBlockchain");
       await output.clearText();
 
-      await workbench.executeCommand("Truffle Tools: Build Contracts");
+      await workbench.executeCommand("AzureBlockchain: Build Contracts");
 
       await scanOutput(driver, output, "Compiled successfully using", 60000, 2000, 5000);
 
@@ -96,10 +96,10 @@ describe("Truffle tests", function () {
 
     it("Deploy contracts", async () => {
       const output = await driver.wait(() => new BottomBarPanel().openOutputView(), 5000);
-      await output.selectChannel("Truffle Tools");
+      await output.selectChannel("AzureBlockchain");
       await output.clearText();
 
-      await workbench.executeCommand("Truffle Tools: Deploy Contracts");
+      await workbench.executeCommand("AzureBlockchain: Deploy Contracts");
 
       const destinationInput = await driver.wait(() => new InputBox(), 60000);
       await destinationInput.setText("loc_testnetwork_testnetwork");
@@ -231,7 +231,7 @@ async function createNewSolidityProject(driver: WebDriver, workbench: Workbench,
   const explorer = await activityBar.getViewControl("Explorer");
   await explorer.openView();
 
-  await workbench.executeCommand("Truffle Tools: New Solidity Project");
+  await workbench.executeCommand("AzureBlockchain: New Solidity Project");
   const input = await driver.wait(() => new InputBox(), 60000);
   await input.setText("Create basic project");
   await input.confirm();
@@ -241,7 +241,7 @@ async function createNewSolidityProject(driver: WebDriver, workbench: Workbench,
   await dialog.confirm();
 
   const output = await driver.wait(() => new BottomBarPanel().openOutputView(), 5000);
-  await output.selectChannel("Truffle Tools");
+  await output.selectChannel("AzureBlockchain");
 
   await driver.wait(async () => {
     return new Promise((resolve, reject) => {

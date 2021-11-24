@@ -2,10 +2,10 @@
 // Licensed under the MIT license.
 
 import { IAzureConsortiumMemberDto } from "..";
-import { TruffleToolsServiceClient } from "../TruffleToolsServiceClient";
+import { AzureBlockchainServiceClient } from "../AzureBlockchainServiceClient";
 
 export class MemberResource {
-  constructor(private readonly client: TruffleToolsServiceClient) {}
+  constructor(private readonly client: AzureBlockchainServiceClient) {}
 
   public getMemberList(memberName: string): Promise<IAzureConsortiumMemberDto[]> {
     return new Promise((resolve, reject) => {

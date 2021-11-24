@@ -4,13 +4,13 @@
 import * as open from "open";
 import { ProgressLocation, QuickPickItem, window } from "vscode";
 import { IAzureConsortiumDto, IAzureConsortiumMemberDto, ICreateQuorumMember, ISkuDto } from "../ARMBlockchain";
-import { TruffleToolsServiceClient } from "../ARMBlockchain/TruffleToolsServiceClient";
+import { AzureBlockchainServiceClient } from "../ARMBlockchain/AzureBlockchainServiceClient";
 import { Constants } from "../Constants";
 import { showInputBox, showQuickPick } from "../helpers";
 import { ConsortiumItem, LocationItem, ResourceGroupItem, SkuItem, SubscriptionItem } from "../Models/QuickPickItems";
 import { AzureBlockchainNetworkNode, AzureBlockchainProject, Member } from "../Models/TreeItems";
 import { Telemetry } from "../TelemetryClient";
-import { TruffleToolsServiceValidator } from "../validators/TruffleToolsServiceValidator";
+import { AzureBlockchainServiceValidator } from "../validators/AzureBlockchainServiceValidator";
 import { AzureResourceExplorer } from "./AzureResourceExplorer";
 
 export class ConsortiumResourceExplorer extends AzureResourceExplorer {
@@ -80,7 +80,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
   }
 
   public async loadConsortiumItems(
-    azureClient: TruffleToolsServiceClient,
+    azureClient: AzureBlockchainServiceClient,
     excludedItems: string[] = []
   ): Promise<ConsortiumItem[]> {
     const consortia: IAzureConsortiumDto[] = await azureClient.consortiumResource.getConsortiaList();
@@ -102,7 +102,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
   }
 
   public async loadMemberItems(
-    azureClient: TruffleToolsServiceClient,
+    azureClient: AzureBlockchainServiceClient,
     memberName: string
   ): Promise<IAzureConsortiumMemberDto[]> {
     const members: IAzureConsortiumMemberDto[] = await azureClient.memberResource.getMemberList(memberName);
@@ -111,7 +111,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
   }
 
   public async loadTransactionNodeItems(
-    azureClient: TruffleToolsServiceClient,
+    azureClient: AzureBlockchainServiceClient,
     memberName: string
   ): Promise<AzureBlockchainNetworkNode[]> {
     const { subscriptionId, resourceGroup } = azureClient;
@@ -130,7 +130,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
   }
 
   public async createAzureConsortium(
-    azureClient: TruffleToolsServiceClient,
+    azureClient: AzureBlockchainServiceClient,
     subscriptionItem: SubscriptionItem,
     certainLocation?: string[]
   ): Promise<AzureBlockchainProject> {
@@ -185,7 +185,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
   }
 
   private async getAzureConsortium(
-    azureClient: TruffleToolsServiceClient,
+    azureClient: AzureBlockchainServiceClient,
     consortiumItems: ConsortiumItem
   ): Promise<AzureBlockchainProject> {
     const { consortiumName, subscriptionId, resourceGroup, memberName } = consortiumItems;
@@ -214,19 +214,20 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
     return azureConsortium;
   }
 
-  private getConsortiumName(azureClient: TruffleToolsServiceClient): Promise<string> {
-    return this.getTruffleToolsServiceName(
+  private getConsortiumName(azureClient: AzureBlockchainServiceClient): Promise<string> {
+    return this.getTrufflesuiteServiceName(
       Constants.paletteLabels.enterConsortiumName,
       Constants.informationMessage.consortiumNameValidating,
-      (name) => TruffleToolsServiceValidator.validateAzureBlockchainResourceName(name, azureClient.consortiumResource)
+      (name) =>
+        AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(name, azureClient.consortiumResource)
     );
   }
 
-  private getConsortiumMemberName(azureClient: TruffleToolsServiceClient): Promise<string> {
-    return this.getTruffleToolsServiceName(
+  private getConsortiumMemberName(azureClient: AzureBlockchainServiceClient): Promise<string> {
+    return this.getTrufflesuiteServiceName(
       Constants.paletteLabels.enterMemberName,
       Constants.informationMessage.memberNameValidating,
-      (name) => TruffleToolsServiceValidator.validateAzureBlockchainResourceName(name, azureClient.memberResource)
+      (name) => AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(name, azureClient.memberResource)
     );
   }
 
@@ -244,7 +245,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
       ignoreFocusOut: true,
       password: true,
       prompt: Constants.paletteLabels.enterMemberPassword,
-      validateInput: TruffleToolsServiceValidator.validateAccessPassword,
+      validateInput: AzureBlockchainServiceValidator.validateAccessPassword,
     });
   }
 
@@ -253,18 +254,18 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
       ignoreFocusOut: true,
       password: true,
       prompt: Constants.paletteLabels.enterConsortiumManagementPassword,
-      validateInput: TruffleToolsServiceValidator.validateAccessPassword,
+      validateInput: AzureBlockchainServiceValidator.validateAccessPassword,
     });
   }
 
-  private async getOrSelectSku(client: TruffleToolsServiceClient, location: LocationItem): Promise<SkuItem> {
+  private async getOrSelectSku(client: AzureBlockchainServiceClient, location: LocationItem): Promise<SkuItem> {
     return showQuickPick(this.loadSkuItems(client, location), {
       placeHolder: Constants.paletteLabels.selectConsortiumSku,
       ignoreFocusOut: true,
     });
   }
 
-  private async loadSkuItems(client: TruffleToolsServiceClient, location: LocationItem): Promise<SkuItem[]> {
+  private async loadSkuItems(client: AzureBlockchainServiceClient, location: LocationItem): Promise<SkuItem[]> {
     const skus: ISkuDto[] = await client.skuResource.getListSkus();
     const skuItems: SkuItem[] = [];
 
@@ -293,8 +294,8 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
   private async getAzureClient(
     subscriptionItem: SubscriptionItem,
     resourceGroupItem: ResourceGroupItem
-  ): Promise<TruffleToolsServiceClient> {
-    return new TruffleToolsServiceClient(
+  ): Promise<AzureBlockchainServiceClient> {
+    return new AzureBlockchainServiceClient(
       subscriptionItem.session.credentials,
       subscriptionItem.subscriptionId,
       resourceGroupItem.label,
@@ -315,7 +316,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
   }
 
   private async getConsortiumItems(
-    azureClient: TruffleToolsServiceClient,
+    azureClient: AzureBlockchainServiceClient,
     excludedItems?: string[]
   ): Promise<QuickPickItem[]> {
     const items: QuickPickItem[] = [];
@@ -328,7 +329,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
   }
 
   private async createConsortium(
-    azureClient: TruffleToolsServiceClient,
+    azureClient: AzureBlockchainServiceClient,
     memberName: string,
     bodyParams: ICreateQuorumMember
   ): Promise<void> {
@@ -339,7 +340,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
     );
   }
 
-  private getTruffleToolsServiceName(
+  private getTrufflesuiteServiceName(
     prompt: string,
     notificationTitle: string,
     validateInput: (value: string) => Promise<string | undefined | null>

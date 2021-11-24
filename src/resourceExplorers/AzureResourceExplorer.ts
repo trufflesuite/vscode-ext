@@ -8,7 +8,7 @@ import { Constants } from "../Constants";
 import { showInputBox, showQuickPick } from "../helpers";
 import { LocationItem, ResourceGroupItem, SubscriptionItem } from "../Models/QuickPickItems";
 import { Telemetry } from "../TelemetryClient";
-import { TruffleToolsServiceValidator } from "../validators/TruffleToolsServiceValidator";
+import { AzureBlockchainServiceValidator } from "../validators/AzureBlockchainServiceValidator";
 
 interface ICachedLocationItems {
   locationItems: LocationItem[];
@@ -158,7 +158,7 @@ export class AzureResourceExplorer {
       ignoreFocusOut: true,
       placeHolder: Constants.placeholders.resourceGroupName,
       prompt: Constants.paletteLabels.provideResourceGroupName,
-      validateInput: (name) => TruffleToolsServiceValidator.validateResourceGroupName(name, resourceGroups),
+      validateInput: (name) => AzureBlockchainServiceValidator.validateResourceGroupName(name, resourceGroups),
     });
 
     const locationItem = await showQuickPick(this.getLocationItems(subscriptionItem), {
