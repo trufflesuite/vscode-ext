@@ -1,11 +1,11 @@
-# Blockchain Development Kit for Ethereum
+# Trufflesuite for VSCode
 
 [![Version](https://vsmarketplacebadge.apphb.com/version/AzBlockchain.azure-blockchain.svg)](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-logicapps) [![Installs](https://vsmarketplacebadge.apphb.com/installs/AzBlockchain.azure-blockchain.svg)](https://marketplace.visualstudio.com/items?itemName=AzBlockchain.azure-blockchain) [![Rating](https://vsmarketplacebadge.apphb.com/rating-star/AzBlockchain.azure-blockchain.svg)](https://marketplace.visualstudio.com/items?itemName=AzBlockchain.azure-blockchain#review-details) [![Build status](https://msazure.visualstudio.com/Blockchain/_apis/build/status/Blockchain-VS-Extensions/Blockchain-VS-Extension-Prod)](https://msazure.visualstudio.com/Blockchain/_build/latest?definitionId=71311)
 
-The extension simplifies how you create, build and deploy smart contracts on Ethereum ledgers.
+The extension simplifies how you create, build and deploy smart contracts on Ethereum ledgers using the Trufflesuite of tools.
 
-- If you are doing open source blockchain development, the extension has built in integration for open source tools such as [Truffle](https://truffleframework.com/), [Infura](https://infura.io/), and [OpenZeppelin](https://openzeppelin.com/). An Azure subscription is optional.
-- If you are doing Azure development, an Azure subscription is required, log into your Azure subscription or create a [free account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F) before you begin. Enjoy the same integration of open source tools with Azure Blockchain Service and other Azure hosted blockchain networks such as [Hyperledger Besu](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/consensys.hyperledger-besu-quickstart) or the enterprise supported PegaSys Plus network.
+- If you are doing open source blockchain development, the extension has built in integration for open source tools such as [Truffle/Ganache](https://trufflesuite.com/), [Infura](https://infura.io/), and [OpenZeppelin](https://openzeppelin.com/). An Azure subscription is optional.
+- If you are doing Azure development, an Azure subscription is required, log into your Azure subscription or create a [free account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F) before you begin. Enjoy the same integration of open source tools with Azure hosted blockchain networks such as [Hyperledger Besu](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/consensys.quorum-dev-quickstart) or the enterprise supported [Quorum Blockchain Service](https://azuremarketplace.microsoft.com/en-gb/marketplace/apps/consensys.qbs-contact-me)
 
 # Open Source Ethereum development
 
@@ -14,9 +14,9 @@ The extension simplifies how you create, build and deploy smart contracts on Eth
 
 ## Create a new smart contract project
 
-The Blockchain Developer Kit was built to work effectively for both new users to Ethereum, but not get in the way for those familiar with the process. One of the primary goals is to help users create a project structure for these smart contracts, help in the compilation and building of these assets, deployment of these assets to blockchain endpoints as well as debugging of these contracts.
+The Trufflesuite for VSCode was built to work effectively for both new users to Ethereum, but not get in the way for those familiar with the process. One of the primary goals is to help users create a project structure for developing smart contracts, help in the compilation and building of these assets, deployment of these assets to blockchain endpoints as well as debugging of these contracts.
 
-One of the frameworks that the extension leverages is [Truffle Suite](https://truffleframework.com/), a well known set of tools to assist in smart contract and Dapp development. Developers that are familiar with Truffle Suite may use the Truffle command line `e.g., Truffle Init` directly from the VS Code terminal, if they like.
+Developers that are familiar with Truffle Suite may use the Truffle command line `e.g., truffle init` directly from the VS Code terminal, if they like.
 
 For developers who are not familiar with Truffle, or prefer to use the Command Palette, the extension can easily scaffold out a project directory using the following steps.
 
@@ -180,23 +180,32 @@ If you are a developer that would like to target a network that leverages Azure,
 - Supported Operating Systems
 - Windows 10
 - Mac OSX
-- VS Code 1.36.1 (or greater)
-- Python 2.7.15
-- Node 10.15.x
-- Git 2.10.x
+- VS Code 1.60.0 (or Greater)
+- Node 15.00.x (or Greater)
+- NPM 7.18.1 (or Greater)
+- Git 2.10.x (or Greater)
 
-**Our [Wiki page](https://github.com/Microsoft/vscode-azure-blockchain-ethereum/wiki) includes a comprehensive getting started guide with detailed usage instructions for this plugin**
+**Our [Wiki page](https://github.com/trufflesuite/vscode-ext/wiki) includes a comprehensive getting started guide with detailed usage instructions for this plugin**
 
-## Code of Conduct
+## Development
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+We welcome pull requests. To get started, just fork this repo, clone it locally, and run:
+
+```shell
+# Install
+npm install -g yarn
+yarn install
+
+# Test
+yarn test
+```
+
+There are more docs online at the VSCode website on how to develop plugins at the [VSCode Docs - Extension API](https://code.visualstudio.com/api).
+
+## License
+
+MIT
 
 ## Telemetry
 
-VS Code collects usage data and sends it to Microsoft to help improve our products and services. Read our [privacy statement](https://go.microsoft.com/fwlink/?LinkID=528096&clcid=0x409) to learn more. If you don’t wish to send usage data to Microsoft, you can set the `telemetry.enableTelemetry` setting to `false`. Learn more in our [FAQ](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting).
-
-```
-
-```
+VS Code collects usage data and sends it to Microsoft to help improve their products and services. Read their [privacy statement](https://go.microsoft.com/fwlink/?LinkID=528096&clcid=0x409) to learn more. If you don’t wish to send usage data to Microsoft, you can set the `telemetry.enableTelemetry` setting to `false`. Learn more at their [FAQ](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting).

@@ -2,11 +2,11 @@
 
 All notable changes to the "Truffle Tools" extension will be documented in this file.
 
-## 1.6.3
+## 2.0.0
 
 ### Enhancements
 
-- This is the first iteration of the plugin as Truffle Tools.
+- This is the first iteration of the plugin as Trufflesuite for VSCode.
 
 ## 1.6.2
 

@@ -6,7 +6,7 @@ import * as path from "path";
 import { ExtensionContext, extensions } from "vscode";
 import { IOZAsset } from "./services/openZeppelin/models";
 
-const extensionId = "trufflesuite-csi.truffle-vscode";
+const extensionId = "trufflesuite-csi.trufflesuite-vscode";
 const packageJSON = extensions.getExtension(extensionId)!.packageJSON;
 
 export enum RequiredApps {
