@@ -199,7 +199,7 @@ async function createTestServiceItems(): Promise<Service[]> {
     ["memberName"]
   );
 
-  trufflesuite.addChild(azureBlockchainProject);
+  truffleTools.addChild(azureBlockchainProject);
   localService.addChild(localProject);
 
   services.push(truffleTools, localService);
