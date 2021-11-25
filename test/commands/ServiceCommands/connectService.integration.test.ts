@@ -8,26 +8,17 @@ import * as uuid from "uuid";
 import * as vscode from "vscode";
 import { Constants } from "../../../src/Constants";
 import { ItemType } from "../../../src/Models";
-import { AzureBlockchainProject, AzureBlockchainService, InfuraProject, Project } from "../../../src/Models/TreeItems";
-import { ConsortiumResourceExplorer, InfuraResourceExplorer } from "../../../src/resourceExplorers";
+import { AzureBlockchainService, InfuraProject, Project } from "../../../src/Models/TreeItems";
+import { InfuraResourceExplorer } from "../../../src/resourceExplorers";
 import { GanacheService, TreeManager } from "../../../src/services";
 import { AzureAccountHelper } from "../../testHelpers/AzureAccountHelper";
 const { project } = Constants.treeItemData;
 
 describe("Service Commands", () => {
-  let defaultConsortiumName: string;
-  let defaultSubscriptionId: string;
-  let defaultResourceGroup: string;
-  let defaultMemberName: string;
   let vscodeWindowMock: sinon.SinonMock;
 
   before(() => {
     sinon.restore();
-
-    defaultConsortiumName = uuid.v4();
-    defaultSubscriptionId = uuid.v4();
-    defaultResourceGroup = uuid.v4();
-    defaultMemberName = uuid.v4();
   });
 
   after(() => {
@@ -46,7 +37,7 @@ describe("Service Commands", () => {
       let addChildStub: sinon.SinonStub<any, any>;
       let showQuickPickMock: sinon.SinonStub<any[], any>;
       let showInputBoxMock: sinon.SinonExpectation;
-      let selectConsortiumMock: any;
+      // let selectConsortiumMock: any;
       let startGanacheServerStub: any;
       let selectProjectMock: any;
 
@@ -67,15 +58,15 @@ describe("Service Commands", () => {
           return trufflesuite;
         });
 
-        selectConsortiumMock = sinon
-          .stub(ConsortiumResourceExplorer.prototype, "selectProject")
-          .returns(
-            Promise.resolve(
-              new AzureBlockchainProject(defaultConsortiumName, defaultSubscriptionId, defaultResourceGroup, [
-                defaultMemberName,
-              ])
-            )
-          );
+        // selectConsortiumMock = sinon
+        //   .stub(ConsortiumResourceExplorer.prototype, "selectProject")
+        //   .returns(
+        //     Promise.resolve(
+        //       new AzureBlockchainProject(defaultConsortiumName, defaultSubscriptionId, defaultResourceGroup, [
+        //         defaultMemberName,
+        //       ])
+        //     )
+        //   );
         sinon.stub(vscode.extensions, "getExtension").returns(AzureAccountHelper.mockExtension);
       });
 
@@ -130,30 +121,6 @@ describe("Service Commands", () => {
         assert.strictEqual(startGanacheServerStub.calledOnce, true, "startGanacheServer command should called once");
         assert.strictEqual(result.children[0].url.origin, defaultUrl, "returned result should store correct url");
         assert.notStrictEqual(validationMessage, undefined, "validationMessage should not be undefined");
-      });
-
-      it("for AzureBlockchain Service destination.", async () => {
-        // Arrange
-        showQuickPickMock.callsFake(async (...args: any[]) => {
-          const destination = args[0].find((x: any) => x.itemType === ItemType.AZURE_BLOCKCHAIN_SERVICE);
-          selectedDestination = destination;
-          selectedDestination.cmd = sinon.spy(destination.cmd);
-
-          return selectedDestination;
-        });
-
-        // Act
-        const result = await serviceCommandsRewire.ServiceCommands.connectProject();
-
-        // Assert
-        assertAfterEachTest(
-          result,
-          ItemType.AZURE_BLOCKCHAIN_PROJECT,
-          project.azure.contextValue,
-          defaultConsortiumName
-        );
-        assert.strictEqual(startGanacheServerStub.notCalled, true, "startGanacheServer command should not be called");
-        assert.strictEqual(selectConsortiumMock.calledOnce, true, "selectProject should be called once");
       });
 
       it("for Infura Service destination.", async () => {

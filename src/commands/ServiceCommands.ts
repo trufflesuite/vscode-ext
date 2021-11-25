@@ -6,10 +6,10 @@ import { Constants } from "../Constants";
 import { showQuickPick, telemetryHelper } from "../helpers";
 import { ItemType } from "../Models";
 import {
-  AzureBlockchainProject,
-  AzureBlockchainService,
-  BlockchainDataManagerNetworkNode,
-  BlockchainDataManagerProject,
+  // AzureBlockchainProject,
+  // AzureBlockchainService,
+  // BlockchainDataManagerNetworkNode,
+  // BlockchainDataManagerProject,
   // BlockchainDataManagerService,
   InfuraProject,
   InfuraService,
@@ -20,11 +20,11 @@ import {
   ServiceTypes,
 } from "../Models/TreeItems";
 import {
-  BlockchainDataManagerResourceExplorer,
-  ConsortiumResourceExplorer,
+  // BlockchainDataManagerResourceExplorer,
+  // ConsortiumResourceExplorer,
   InfuraResourceExplorer,
   LocalResourceExplorer,
-  StorageAccountResourceExplorer,
+  // StorageAccountResourceExplorer,
 } from "../resourceExplorers";
 import { GanacheService, TreeManager } from "../services";
 import { Telemetry } from "../TelemetryClient";
@@ -46,11 +46,11 @@ export namespace ServiceCommands {
         itemType: ItemType.LOCAL_SERVICE,
         label: Constants.treeItemData.service.local.label,
       },
-      {
-        cmd: createAzureBlockchainProject,
-        itemType: ItemType.AZURE_BLOCKCHAIN_SERVICE,
-        label: Constants.treeItemData.service.azure.label,
-      },
+      // {
+      //   cmd: createAzureBlockchainProject,
+      //   itemType: ItemType.AZURE_BLOCKCHAIN_SERVICE,
+      //   label: Constants.treeItemData.service.azure.label,
+      // },
       {
         cmd: createInfuraProject,
         itemType: ItemType.INFURA_SERVICE,
@@ -80,11 +80,11 @@ export namespace ServiceCommands {
         itemType: ItemType.LOCAL_SERVICE,
         label: Constants.treeItemData.service.local.label,
       },
-      {
-        cmd: connectAzureBlockchainProject,
-        itemType: ItemType.AZURE_BLOCKCHAIN_SERVICE,
-        label: Constants.treeItemData.service.azure.label,
-      },
+      // {
+      //   cmd: connectAzureBlockchainProject,
+      //   itemType: ItemType.AZURE_BLOCKCHAIN_SERVICE,
+      //   label: Constants.treeItemData.service.azure.label,
+      // },
       {
         cmd: connectInfuraProject,
         itemType: ItemType.INFURA_SERVICE,
@@ -126,38 +126,38 @@ export namespace ServiceCommands {
     open(viewItem.extensionItem.url.href);
   }
 
-  export async function deleteBDMApplication(viewItem: NetworkNodeView): Promise<void> {
-    Telemetry.sendEvent("ServiceCommands.deleteBDMApplication.commandStarted");
+  // export async function deleteBDMApplication(viewItem: NetworkNodeView): Promise<void> {
+  //   Telemetry.sendEvent("ServiceCommands.deleteBDMApplication.commandStarted");
 
-    const application = viewItem.extensionItem;
-    const selectedBDM = application.getParent() as BlockchainDataManagerProject;
+  //   const application = viewItem.extensionItem;
+  //   const selectedBDM = application.getParent() as BlockchainDataManagerProject;
 
-    const bdmResourceExplorer = new BlockchainDataManagerResourceExplorer();
-    const storageAccountResourceExplorer = new StorageAccountResourceExplorer();
+  //   const bdmResourceExplorer = new BlockchainDataManagerResourceExplorer();
+  //   const storageAccountResourceExplorer = new StorageAccountResourceExplorer();
 
-    await bdmResourceExplorer.deleteBDMApplication(
-      selectedBDM.label,
-      application as BlockchainDataManagerNetworkNode,
-      storageAccountResourceExplorer
-    );
+  //   await bdmResourceExplorer.deleteBDMApplication(
+  //     selectedBDM.label,
+  //     application as BlockchainDataManagerNetworkNode,
+  //     storageAccountResourceExplorer
+  //   );
 
-    Telemetry.sendEvent("ServiceCommands.deleteBDMApplication.commandFinished");
-  }
+  //   Telemetry.sendEvent("ServiceCommands.deleteBDMApplication.commandFinished");
+  // }
 
-  export async function createNewBDMApplication(viewItem: ProjectView): Promise<void> {
-    Telemetry.sendEvent("ServiceCommands.createNewBDMApplication.commandStarted");
+  // export async function createNewBDMApplication(viewItem: ProjectView): Promise<void> {
+  //   Telemetry.sendEvent("ServiceCommands.createNewBDMApplication.commandStarted");
 
-    const selectedBDM = viewItem.extensionItem as BlockchainDataManagerProject;
+  //   const selectedBDM = viewItem.extensionItem as BlockchainDataManagerProject;
 
-    const bdmResourceExplorer = new BlockchainDataManagerResourceExplorer();
-    const storageAccountResourceExplorer = new StorageAccountResourceExplorer();
+  //   const bdmResourceExplorer = new BlockchainDataManagerResourceExplorer();
+  //   const storageAccountResourceExplorer = new StorageAccountResourceExplorer();
 
-    await bdmResourceExplorer.createNewBDMApplication(
-      selectedBDM as BlockchainDataManagerProject,
-      storageAccountResourceExplorer
-    );
-    Telemetry.sendEvent("ServiceCommands.createNewBDMApplication.commandFinished");
-  }
+  //   await bdmResourceExplorer.createNewBDMApplication(
+  //     selectedBDM as BlockchainDataManagerProject,
+  //     storageAccountResourceExplorer
+  //   );
+  //   Telemetry.sendEvent("ServiceCommands.createNewBDMApplication.commandFinished");
+  // }
 }
 
 async function execute(serviceDestinations: IServiceDestination[]): Promise<Project> {
@@ -178,20 +178,20 @@ async function selectDestination(serviceDestination: IServiceDestination[]): Pro
 }
 
 // ------------ AZURE BLOCKCHAIN ------------ //
-async function createAzureBlockchainProject(_service: AzureBlockchainService): Promise<AzureBlockchainProject> {
-  const azureResourceExplorer = new ConsortiumResourceExplorer();
-  return azureResourceExplorer.createProject();
-}
+// async function createAzureBlockchainProject(_service: AzureBlockchainService): Promise<AzureBlockchainProject> {
+//   const azureResourceExplorer = new ConsortiumResourceExplorer();
+//   return azureResourceExplorer.createProject();
+// }
 
-async function connectAzureBlockchainProject(service: AzureBlockchainService): Promise<AzureBlockchainProject> {
-  const azureResourceExplorer = new ConsortiumResourceExplorer();
-  return azureResourceExplorer.selectProject(await getExistingConsortia(service));
-}
+// async function connectAzureBlockchainProject(service: AzureBlockchainService): Promise<AzureBlockchainProject> {
+//   const azureResourceExplorer = new ConsortiumResourceExplorer();
+//   return azureResourceExplorer.selectProject(await getExistingConsortia(service));
+// }
 
-async function getExistingConsortia(service: AzureBlockchainService): Promise<string[]> {
-  const azureBlockchainProjects = service.getChildren() as AzureBlockchainProject[];
-  return azureBlockchainProjects.map((item) => item.label); // Maybe member name?
-}
+// async function getExistingConsortia(service: AzureBlockchainService): Promise<string[]> {
+//   const azureBlockchainProjects = service.getChildren() as AzureBlockchainProject[];
+//   return azureBlockchainProjects.map((item) => item.label); // Maybe member name?
+// }
 
 // ------------ INFURA ------------ //
 async function createInfuraProject(service: InfuraService): Promise<InfuraProject> {

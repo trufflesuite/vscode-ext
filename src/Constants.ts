@@ -322,7 +322,7 @@ export class Constants {
       azure: {
         contextValue: "service",
         iconPath: { dark: "", light: "" },
-        label: "Trufflesuite Service",
+        label: "Azure Service",
         prefix: "abs",
       },
       bdm: {
@@ -917,11 +917,13 @@ export class Constants {
       light: context.asAbsolutePath(path.join("resources/light", "LocalNetwork.svg")),
     };
 
+    // @deprecated
     this.treeItemData.project.azure.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "ABS-consortium.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "ABS-consortium.svg")),
     };
 
+    // @deprecated
     this.treeItemData.project.bdm.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "BlockchainDataManager-service_and_project.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "BlockchainDataManager-service_and_project.svg")),
@@ -937,11 +939,13 @@ export class Constants {
       light: context.asAbsolutePath(path.join("resources/light", "LocalProject.svg")),
     };
 
+    // @deprecated
     this.treeItemData.service.azure.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "ABS-service.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "ABS-service.svg")),
     };
 
+    // @deprecated
     this.treeItemData.service.bdm.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "BlockchainDataManager-service_and_project.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "BlockchainDataManager-service_and_project.svg")),

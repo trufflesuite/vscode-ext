@@ -9,7 +9,6 @@ import { ServiceCommands } from "../../../src/commands";
 import { Constants } from "../../../src/Constants";
 import { ItemType } from "../../../src/Models";
 import {
-  AzureBlockchainProject,
   AzureBlockchainService,
   IExtensionItem,
   InfuraProject,
@@ -18,9 +17,8 @@ import {
   Project,
   Service,
 } from "../../../src/Models/TreeItems";
-import { ConsortiumResourceExplorer, InfuraResourceExplorer } from "../../../src/resourceExplorers";
+import { InfuraResourceExplorer } from "../../../src/resourceExplorers";
 import { GanacheService, TreeManager } from "../../../src/services";
-import { AzureAccountHelper } from "../../testHelpers/AzureAccountHelper";
 import { getRandomInt } from "../../testHelpers/Random";
 const { project, service } = Constants.treeItemData;
 
@@ -34,8 +32,6 @@ describe("Service Commands", () => {
   let ganacheServiceMock: sinon.SinonMock;
   let getPortStatusMock: sinon.SinonExpectation;
   let startGanacheServerMock: sinon.SinonExpectation;
-  let selectConsortiumMock: any;
-  let getExtensionMock: any;
   let selectProjectMock: any;
 
   let azureGroup: Service;
@@ -71,8 +67,6 @@ describe("Service Commands", () => {
 
     showQuickPickMock = sinon.stub(vscode.window, "showQuickPick");
     showInputBoxMock = sinon.stub(vscode.window, "showInputBox");
-    selectConsortiumMock = sinon.stub(ConsortiumResourceExplorer.prototype, "selectProject");
-    getExtensionMock = sinon.stub(vscode.extensions, "getExtension").returns(AzureAccountHelper.mockExtension);
   });
 
   afterEach(() => {
@@ -106,32 +100,6 @@ describe("Service Commands", () => {
         // Assert
         assertAfterEachTest(result, ItemType.LOCAL_PROJECT, project.local.contextValue, expectedLabel);
         assert.strictEqual(startGanacheServerMock.called, true, "startGanacheServer should be called");
-      });
-
-      it("for AzureBlockchain Service destination.", async () => {
-        // Arrange
-        const consortiumName = uuid.v4;
-        getItemMock.returns(azureGroup);
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === service.azure.label);
-        });
-        const azureBlockchainProject = new AzureBlockchainProject(consortiumName.toString(), uuid.v4(), uuid.v4(), [
-          uuid.v4(),
-        ]);
-        selectConsortiumMock.returns(azureBlockchainProject);
-
-        // Act
-        const result = await ServiceCommands.connectProject();
-
-        // Assert
-        assert.strictEqual(getExtensionMock.calledOnce, true);
-        assert.strictEqual(selectConsortiumMock.calledOnce, true);
-        assertAfterEachTest(
-          result,
-          ItemType.AZURE_BLOCKCHAIN_PROJECT,
-          project.azure.contextValue,
-          consortiumName.toString()
-        );
       });
 
       it("for Infura Service destination.", async () => {

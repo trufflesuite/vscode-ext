@@ -15,7 +15,7 @@ import { NetworkNodeView } from "../../../src/ViewItems/NetworkNodeView";
 import { ProjectView } from "../../../src/ViewItems/ProjectView";
 import { AzureAccountHelper } from "../../testHelpers/AzureAccountHelper";
 
-describe("BDM methods", () => {
+describe.skip("BDM methods", () => {
   beforeEach(() => {
     sinon.stub(extensions, "getExtension").returns(AzureAccountHelper.mockExtension);
   });
@@ -24,7 +24,7 @@ describe("BDM methods", () => {
     sinon.restore();
   });
 
-  it("deleteBDMApplication should delete BDM application and all dependent resources", async () => {
+  it.skip("deleteBDMApplication should delete BDM application and all dependent resources", async () => {
     // Arrange
     const serviceCommandsRewire = rewire("../../../src/commands/ServiceCommands");
     const deleteBDMApplicationStub = sinon.stub(
@@ -53,7 +53,7 @@ describe("BDM methods", () => {
     assert.strictEqual(deleteBDMApplicationStub.calledOnce, true, "deleteBDMApplication should be called.");
   });
 
-  it("createNewBDMApplication should call all methods when we click on tree item", async () => {
+  it.skip("createNewBDMApplication should call all methods when we click on tree item", async () => {
     // Arrange
     const serviceCommandsRewire = rewire("../../../src/commands/ServiceCommands");
     const createNewBDMApplicationStub = sinon.stub(

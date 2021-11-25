@@ -150,16 +150,16 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region contract commands
-  const createNewBDMApplication = commands.registerCommand(
-    "trufflesuite.createNewBDMApplication",
-    async (viewItem: ProjectView) => {
-      await tryExecute(() => ServiceCommands.createNewBDMApplication(viewItem));
-    }
-  );
-  const deleteBDMApplication = commands.registerCommand(
-    "trufflesuite.deleteBDMApplication",
-    async (viewItem: NetworkNodeView) => await tryExecute(() => ServiceCommands.deleteBDMApplication(viewItem))
-  );
+  // const createNewBDMApplication = commands.registerCommand(
+  //   "trufflesuite.createNewBDMApplication",
+  //   async (viewItem: ProjectView) => {
+  //     await tryExecute(() => ServiceCommands.createNewBDMApplication(viewItem));
+  //   }
+  // );
+  // const deleteBDMApplication = commands.registerCommand(
+  //   "trufflesuite.deleteBDMApplication",
+  //   async (viewItem: NetworkNodeView) => await tryExecute(() => ServiceCommands.deleteBDMApplication(viewItem))
+  // );
   //#endregion
 
   //#region open zeppelin commands
@@ -212,10 +212,10 @@ export async function activate(context: ExtensionContext) {
     newSolidityProject,
     buildContracts,
     deployContracts,
-    createNewBDMApplication,
+    // createNewBDMApplication,
     createProject,
     connectProject,
-    deleteBDMApplication,
+    // deleteBDMApplication,
     disconnectProject,
     copyByteCode,
     copyDeployedByteCode,
