@@ -109,7 +109,7 @@ async function createProject(projectPath: string, truffleBoxName: string): Promi
     } catch (error) {
       fs.emptyDirSync(projectPath);
       Telemetry.sendException(new Error(Constants.errorMessageStrings.NewProjectCreationFailed));
-      throw new Error(`${Constants.errorMessageStrings.NewProjectCreationFailed} ${error.message}`);
+      throw new Error(`${Constants.errorMessageStrings.NewProjectCreationFailed} ${(error as Error).message}`);
     }
   });
 }

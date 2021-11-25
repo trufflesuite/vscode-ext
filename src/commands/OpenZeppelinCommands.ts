@@ -24,12 +24,12 @@ export namespace OpenZeppelinCommands {
     const baseUrl = manifest.getBaseUrlToContractsSource();
     const fullAssetWithDependencies = manifest.collectAssetsWithDependencies(category.assets);
     Output.outputLine(
-      Constants.outputChannel.azureBlockchain,
+      Constants.outputChannel.truffleSuiteForVSCode,
       Constants.openZeppelin.categoryWillDownloaded(category.name)
     );
     const assetsStatuses = await OpenZeppelinService.getAssetsStatus(fullAssetWithDependencies);
     Output.outputLine(
-      Constants.outputChannel.azureBlockchain,
+      Constants.outputChannel.truffleSuiteForVSCode,
       Constants.openZeppelin.fileNow(assetsStatuses.existing.length)
     );
 
@@ -73,7 +73,10 @@ async function downloadOZFiles(
 
     Telemetry.sendEvent("OpenZeppelinCommands.downloadOZFiles.overwriteExistedDialog", { name: answer || "" });
     if (answer === Constants.openZeppelin.replaceButtonTitle) {
-      Output.outputLine(Constants.outputChannel.azureBlockchain, Constants.openZeppelin.overwriteExistedContracts);
+      Output.outputLine(
+        Constants.outputChannel.truffleSuiteForVSCode,
+        Constants.openZeppelin.overwriteExistedContracts
+      );
       downloadedAssets = await downloadFileSetWithProgress(baseUrl, fullAssetWithDependencies, true);
     } else {
       downloadedAssets = await downloadFileSetWithProgress(baseUrl, missing, false);
@@ -121,7 +124,7 @@ async function downloadFileSetWithProgress(
         Constants.openZeppelin.cancelButtonTitle
       );
       if (answer === Constants.openZeppelin.retryButtonTitle) {
-        Output.outputLine(Constants.outputChannel.azureBlockchain, Constants.openZeppelin.retryDownloading);
+        Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, Constants.openZeppelin.retryDownloading);
         Telemetry.sendEvent("OpenZeppelinCommands.downloadFileSet.retry", { assetsCount: rejected.length.toString() });
         downloaded = downloaded.concat(await downloadFileSet(rejected));
       }

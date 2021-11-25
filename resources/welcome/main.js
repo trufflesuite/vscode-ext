@@ -49,7 +49,7 @@ function main() {
 
   window.addEventListener("message", function (event) {
     const message = event.data; // The JSON data our extension sent
-
+    console.log("addEvent message: ", {message})
     if (message.command === "versions") {
       const versions = message.value;
       if (Array.isArray(versions)) {

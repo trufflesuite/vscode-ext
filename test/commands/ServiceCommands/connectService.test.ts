@@ -11,8 +11,6 @@ import { ItemType } from "../../../src/Models";
 import {
   AzureBlockchainProject,
   AzureBlockchainService,
-  BlockchainDataManagerProject,
-  BlockchainDataManagerService,
   IExtensionItem,
   InfuraProject,
   InfuraService,
@@ -20,11 +18,7 @@ import {
   Project,
   Service,
 } from "../../../src/Models/TreeItems";
-import {
-  BlockchainDataManagerResourceExplorer,
-  ConsortiumResourceExplorer,
-  InfuraResourceExplorer,
-} from "../../../src/resourceExplorers";
+import { ConsortiumResourceExplorer, InfuraResourceExplorer } from "../../../src/resourceExplorers";
 import { GanacheService, TreeManager } from "../../../src/services";
 import { AzureAccountHelper } from "../../testHelpers/AzureAccountHelper";
 import { getRandomInt } from "../../testHelpers/Random";
@@ -47,13 +41,11 @@ describe("Service Commands", () => {
   let azureGroup: Service;
   let localGroup: Service;
   let infuraGroup: Service;
-  let bdmGroup: Service;
 
   function initializeNetworks() {
     azureGroup = new AzureBlockchainService();
     localGroup = new LocalService();
     infuraGroup = new InfuraService();
-    bdmGroup = new BlockchainDataManagerService();
   }
 
   function createTestServiceItems() {
@@ -160,32 +152,6 @@ describe("Service Commands", () => {
         // Assert
         assert.strictEqual(selectProjectMock.calledOnce, true);
         assertAfterEachTest(result, ItemType.INFURA_PROJECT, project.infura.contextValue, label.toString());
-      });
-
-      it("for Blockchain Data Manager Service destination.", async () => {
-        // Arrange
-        const label = uuid.v4.toString();
-        getItemMock.returns(bdmGroup);
-        showQuickPickMock.onCall(0).callsFake((items: any) => {
-          return items.find((item: any) => item.label === service.bdm.label);
-        });
-
-        selectProjectMock = sinon.stub(BlockchainDataManagerResourceExplorer.prototype, "selectProject");
-        const bdmProject = new BlockchainDataManagerProject(label, uuid.v4(), uuid.v4());
-        selectProjectMock.returns(bdmProject);
-
-        // Act
-        const result = await ServiceCommands.connectProject();
-
-        // Assert
-        assert.strictEqual(getExtensionMock.calledOnce, true);
-        assert.strictEqual(selectProjectMock.calledOnce, true);
-        assertAfterEachTest(
-          result,
-          ItemType.BLOCKCHAIN_DATA_MANAGER_PROJECT,
-          project.bdm.contextValue,
-          label.toString()
-        );
       });
     });
 

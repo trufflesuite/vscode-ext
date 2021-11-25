@@ -84,8 +84,8 @@ export class InMemoryAdapter extends AbstractAdapter {
         networkMaps = await NetworkService.getNetworkMaps();
       }
     } catch (error) {
-      Telemetry.sendException(error);
-      Output.outputLine(Constants.outputChannel.azureBlockchain, error.message);
+      Telemetry.sendException(error as Error);
+      Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, (error as Error).message);
     }
 
     return [contracts, networkMaps];

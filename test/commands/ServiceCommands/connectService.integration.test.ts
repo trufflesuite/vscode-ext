@@ -8,18 +8,8 @@ import * as uuid from "uuid";
 import * as vscode from "vscode";
 import { Constants } from "../../../src/Constants";
 import { ItemType } from "../../../src/Models";
-import {
-  AzureBlockchainProject,
-  AzureBlockchainService,
-  BlockchainDataManagerProject,
-  InfuraProject,
-  Project,
-} from "../../../src/Models/TreeItems";
-import {
-  BlockchainDataManagerResourceExplorer,
-  ConsortiumResourceExplorer,
-  InfuraResourceExplorer,
-} from "../../../src/resourceExplorers";
+import { AzureBlockchainProject, AzureBlockchainService, InfuraProject, Project } from "../../../src/Models/TreeItems";
+import { ConsortiumResourceExplorer, InfuraResourceExplorer } from "../../../src/resourceExplorers";
 import { GanacheService, TreeManager } from "../../../src/services";
 import { AzureAccountHelper } from "../../testHelpers/AzureAccountHelper";
 const { project } = Constants.treeItemData;
@@ -186,30 +176,6 @@ describe("Service Commands", () => {
 
         // Assert
         assertAfterEachTest(result, ItemType.INFURA_PROJECT, project.infura.contextValue, label);
-        assert.strictEqual(startGanacheServerStub.notCalled, true, "startGanacheServer command should not be called");
-        assert.strictEqual(selectProjectMock.calledOnce, true, "selectProject should be called once");
-      });
-
-      it("for Blockchain Data Manager Service destination.", async () => {
-        // Arrange
-        const label = uuid.v4.toString();
-        selectProjectMock = sinon.stub(BlockchainDataManagerResourceExplorer.prototype, "selectProject");
-        const bdmProject = new BlockchainDataManagerProject(label, uuid.v4(), uuid.v4());
-        selectProjectMock.returns(bdmProject);
-
-        showQuickPickMock.callsFake(async (...args: any[]) => {
-          const destination = args[0].find((x: any) => x.itemType === ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE);
-          selectedDestination = destination;
-          selectedDestination.cmd = sinon.spy(destination.cmd);
-
-          return selectedDestination;
-        });
-
-        // Act
-        const result = await serviceCommandsRewire.ServiceCommands.connectProject();
-
-        // Assert
-        assertAfterEachTest(result, ItemType.BLOCKCHAIN_DATA_MANAGER_PROJECT, project.bdm.contextValue, label);
         assert.strictEqual(startGanacheServerStub.notCalled, true, "startGanacheServer command should not be called");
         assert.strictEqual(selectProjectMock.calledOnce, true, "selectProject should be called once");
       });

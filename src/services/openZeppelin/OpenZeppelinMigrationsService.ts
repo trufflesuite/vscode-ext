@@ -107,7 +107,7 @@ async function saveMigrationContent(content: string): Promise<void> {
   const filePath = path.join(migrationFolderPath, migrationFilename);
 
   Output.outputLine(
-    Constants.outputChannel.azureBlockchain,
+    Constants.outputChannel.truffleSuiteForVSCode,
     `New migration for OpenZeppelin contracts was stored to file ${migrationFilename}`
   );
 

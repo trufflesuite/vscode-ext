@@ -85,6 +85,7 @@ export namespace required {
       .filter((version) => apps.includes(version.app as RequiredApps))
       .some((version) => !version.isValid);
 
+    Output.outputLine("checkApps", `Current state for versions: ${JSON.stringify(versions)} Invalid: ${invalid}`);
     return !invalid;
   }
 
@@ -304,7 +305,7 @@ export namespace required {
     await window.withProgress(
       {
         location: ProgressLocation.Window,
-        title: `Installing ${packageName}`,
+        title: `Installing ${packageName}@${versionString}`,
       },
       async () => {
         await executeCommand(workspaceRoot, "npm", "i", scope ? "" : "-g", ` ${packageName}@"${versionString}"`);

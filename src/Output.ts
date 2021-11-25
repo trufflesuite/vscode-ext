@@ -25,7 +25,9 @@ export class Output {
     this._outputChannel.dispose();
   }
 
-  private static _outputChannel: OutputChannel = window.createOutputChannel(Constants.outputChannel.azureBlockchain);
+  private static _outputChannel: OutputChannel = window.createOutputChannel(
+    Constants.outputChannel.truffleSuiteForVSCode
+  );
 
   private static formatMessage(label: string = "", message: string = ""): string {
     return `${label ? `[${label}] ` : ""}${message}`;

@@ -10,7 +10,7 @@ import {
   AzureBlockchainService,
   BlockchainDataManagerNetworkNode,
   BlockchainDataManagerProject,
-  BlockchainDataManagerService,
+  // BlockchainDataManagerService,
   InfuraProject,
   InfuraService,
   LocalProject,
@@ -56,11 +56,11 @@ export namespace ServiceCommands {
         itemType: ItemType.INFURA_SERVICE,
         label: Constants.treeItemData.service.infura.label,
       },
-      {
-        cmd: createBlockchainDataManagerProject,
-        itemType: ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE,
-        label: Constants.treeItemData.service.bdm.label,
-      },
+      // {
+      //   cmd: createBlockchainDataManagerProject,
+      //   itemType: ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE,
+      //   label: Constants.treeItemData.service.bdm.label,
+      // },
     ];
 
     const project = await execute(serviceDestinations);
@@ -90,11 +90,11 @@ export namespace ServiceCommands {
         itemType: ItemType.INFURA_SERVICE,
         label: Constants.treeItemData.service.infura.label,
       },
-      {
-        cmd: connectBlockchainDataManagerProject,
-        itemType: ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE,
-        label: Constants.treeItemData.service.bdm.label,
-      },
+      // {
+      //   cmd: connectBlockchainDataManagerProject,
+      //   itemType: ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE,
+      //   label: Constants.treeItemData.service.bdm.label,
+      // },
     ];
 
     const project = await execute(serviceDestinations);
@@ -237,31 +237,31 @@ async function getExistingPorts(service: LocalService): Promise<number[]> {
 
 // ------------ BLOCKCHAIN DATA MANAGER ------------ //
 
-async function connectBlockchainDataManagerProject(
-  service: BlockchainDataManagerService
-): Promise<BlockchainDataManagerProject> {
-  const bdmResourceExplorer = new BlockchainDataManagerResourceExplorer();
+// async function connectBlockchainDataManagerProject(
+//   service: BlockchainDataManagerService
+// ): Promise<BlockchainDataManagerProject> {
+//   const bdmResourceExplorer = new BlockchainDataManagerResourceExplorer();
 
-  return bdmResourceExplorer.selectProject(await getExistingBlockchainDataManager(service), addConsortiumToTree);
-}
+//   return bdmResourceExplorer.selectProject(await getExistingBlockchainDataManager(service), addConsortiumToTree);
+// }
 
-async function createBlockchainDataManagerProject(): Promise<BlockchainDataManagerProject> {
-  const consortiumResourceExplorer = new ConsortiumResourceExplorer();
-  const bdmResourceExplorer = new BlockchainDataManagerResourceExplorer();
+// async function createBlockchainDataManagerProject(): Promise<BlockchainDataManagerProject> {
+//   const consortiumResourceExplorer = new ConsortiumResourceExplorer();
+//   const bdmResourceExplorer = new BlockchainDataManagerResourceExplorer();
 
-  return bdmResourceExplorer.createProject(consortiumResourceExplorer, addConsortiumToTree);
-}
+//   return bdmResourceExplorer.createProject(consortiumResourceExplorer, addConsortiumToTree);
+// }
 
-async function getExistingBlockchainDataManager(service: BlockchainDataManagerService): Promise<string[]> {
-  const bdmProjects = service.getChildren() as BlockchainDataManagerProject[];
-  return bdmProjects.map((item) => item.label);
-}
+// async function getExistingBlockchainDataManager(service: BlockchainDataManagerService): Promise<string[]> {
+//   const bdmProjects = service.getChildren() as BlockchainDataManagerProject[];
+//   return bdmProjects.map((item) => item.label);
+// }
 
-async function addConsortiumToTree(consortium: AzureBlockchainProject): Promise<void> {
-  const service = await TreeManager.getItem(ItemType.AZURE_BLOCKCHAIN_SERVICE);
+// async function addConsortiumToTree(consortium: AzureBlockchainProject): Promise<void> {
+//   const service = await TreeManager.getItem(ItemType.AZURE_BLOCKCHAIN_SERVICE);
 
-  await addChild(service, consortium);
-}
+//   await addChild(service, consortium);
+// }
 
 async function addChild(service: Service, child: Project): Promise<void> {
   await service.addChild(child);

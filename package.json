@@ -56,8 +56,6 @@
     "onCommand:trufflesuite.signInToInfuraAccount",
     "onCommand:trufflesuite.signOutOfInfuraAccount",
     "onCommand:trufflesuite.openAtAzurePortal",
-    "onCommand:trufflesuite.createNewBDMApplication",
-    "onCommand:trufflesuite.deleteBDMApplication",
     "onDebug"
   ],
   "contributes": {
@@ -188,16 +186,6 @@
         "command": "trufflesuite.openAtAzurePortal",
         "title": "Open at Azure Portal",
         "category": "Blockchain"
-      },
-      {
-        "command": "trufflesuite.createNewBDMApplication",
-        "title": "Create Blockchain Application",
-        "category": "Blockchain"
-      },
-      {
-        "command": "trufflesuite.deleteBDMApplication",
-        "title": "Delete Blockchain Application",
-        "category": "Blockchain"
       }
     ],
     "breakpoints": [
@@ -249,14 +237,6 @@
         {
           "when": "false",
           "command": "trufflesuite.openAtAzurePortal"
-        },
-        {
-          "when": "false",
-          "command": "trufflesuite.deleteBDMApplication"
-        },
-        {
-          "when": "false",
-          "command": "trufflesuite.createNewBDMApplication"
         }
       ],
       "view/title": [
@@ -322,16 +302,6 @@
         {
           "command": "trufflesuite.openAtAzurePortal",
           "when": "view == AzureBlockchain && viewItem == output",
-          "group": "azureBlockchain-0@0"
-        },
-        {
-          "command": "trufflesuite.createNewBDMApplication",
-          "when": "view == AzureBlockchain && viewItem == bdmproject",
-          "group": "azureBlockchain-1@1"
-        },
-        {
-          "command": "trufflesuite.deleteBDMApplication",
-          "when": "view == AzureBlockchain && viewItem == bdmApplication",
           "group": "azureBlockchain-0@0"
         }
       ],

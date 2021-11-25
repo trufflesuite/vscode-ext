@@ -33,8 +33,7 @@ export class Constants {
   public static extensionKey = packageJSON.aiKey;
 
   public static outputChannel = {
-    azureBlockchain: "Azure Blockchain - DEPRECATED",
-    trufflesuiteClient: "Trufflesuite for VSCode",
+    truffleSuiteForVSCode: "Trufflesuite for VSCode",
     executeCommand: "Execute command",
     ganacheCommands: "Ganache Server",
     logicAppGenerator: "Logic App Generator",
@@ -111,11 +110,11 @@ export class Constants {
     },
     [RequiredApps.node]: {
       max: "17.0.0",
-      min: "15.0.0",
+      min: "14.0.0",
     },
     [RequiredApps.npm]: {
       max: "9.0.0",
-      min: "7.18.1",
+      min: "v6.14.15",
     },
     [RequiredApps.truffle]: {
       max: "6.0.0",

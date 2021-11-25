@@ -100,19 +100,19 @@ export namespace OpenZeppelinService {
           if (overwrite) {
             await fs.chmod(destinationFilePath, 0o222); // reset r/o flag, this allows to overwrite
           } else {
-            Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - Skipped`);
+            Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, `${fileUrl} - Skipped`);
             return { state: PromiseState.fileExisted, asset };
           }
         }
 
         return download(fileUrl, destinationDirPath, { filename: path.basename(destinationFilePath) })
           .then(async () => {
-            Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - OK`);
+            Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, `${fileUrl} - OK`);
             await fs.chmod(destinationFilePath, 0o444);
             return { state: PromiseState.fulfilled, asset };
           })
           .catch(() => {
-            Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - Failed`);
+            Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, `${fileUrl} - Failed`);
             return { state: PromiseState.rejected, asset };
           });
       })
@@ -320,7 +320,7 @@ function isFileExists(filePath: string): boolean {
   try {
     return fs.lstatSync(filePath).isFile();
   } catch (error) {
-    if (error.code === "ENOENT") {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return false;
     }
     throw error;

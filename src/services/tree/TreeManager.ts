@@ -46,10 +46,10 @@ class ExtensionTreeManager {
             .filter((child) => child instanceof Service) as Service[];
         }
       } catch (error) {
-        Telemetry.sendException(error);
+        Telemetry.sendException(error as Error);
         Output.outputLine(
           Constants.outputChannel.treeManager,
-          `${Constants.errorMessageStrings.LoadServiceTreeFailed} ${error.message}`
+          `${Constants.errorMessageStrings.LoadServiceTreeFailed} ${(error as Error).message}`
         );
       }
     }
