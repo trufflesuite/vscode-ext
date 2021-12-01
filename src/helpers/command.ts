@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { ChildProcess, fork, ForkOptions, spawn, SpawnOptions } from "child_process";
-import { tmpdir } from "os";
-import { Constants } from "../Constants";
-import { Output } from "../Output";
-import { Telemetry } from "../TelemetryClient";
+import {ChildProcess, fork, ForkOptions, spawn, SpawnOptions} from "child_process";
+import {tmpdir} from "os";
+import {Constants} from "../Constants";
+import {Output} from "../Output";
+import {Telemetry} from "../TelemetryClient";
 
 interface IForkMessage {
   command: string;
@@ -21,7 +21,7 @@ export interface ICommandResult {
   code: number;
   cmdOutput: string;
   cmdOutputIncludingStderr: string;
-  messages?: Array<{ [key: string]: any }>;
+  messages?: Array<{[key: string]: any}>;
 }
 
 export interface ICommandExecute {
@@ -56,7 +56,7 @@ export async function executeCommand(
 }
 
 export function spawnProcess(workingDirectory: string | undefined, commands: string, args: string[]): ChildProcess {
-  const options: SpawnOptions = { cwd: workingDirectory || tmpdir(), shell: true };
+  const options: SpawnOptions = {cwd: workingDirectory || tmpdir(), shell: true};
   return spawn(commands, args, options);
 }
 
@@ -65,7 +65,7 @@ export async function tryExecuteCommand(
   commands: string,
   ...args: string[]
 ): Promise<ICommandResult> {
-  const { result } = tryExecuteCommandAsync(workingDirectory, true, commands, ...args);
+  const {result} = tryExecuteCommandAsync(workingDirectory, true, commands, ...args);
 
   return result;
 }
@@ -81,7 +81,7 @@ export function tryExecuteCommandAsync(
 
   const childProcess = spawnProcess(workingDirectory, commands, args);
   const result = new Promise((resolve: (res: any) => void, reject: (error: Error) => void): void => {
-    childProcess.stdout.on("data", (data: string | Buffer) => {
+    childProcess.stdout!.on("data", (data: string | Buffer) => {
       data = data.toString();
       cmdOutput = cmdOutput.concat(data);
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
@@ -91,10 +91,9 @@ export function tryExecuteCommandAsync(
       }
     });
 
-    childProcess.stderr.on("data", (data: string | Buffer) => {
+    childProcess.stderr!.on("data", (data: string | Buffer) => {
       data = data.toString();
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
-
       if (writeToOutputChannel) {
         Output.output(Constants.outputChannel.executeCommand, data);
       }
@@ -102,7 +101,7 @@ export function tryExecuteCommandAsync(
 
     childProcess.on("error", reject);
     childProcess.on("exit", (code: number) => {
-      resolve({ cmdOutput, cmdOutputIncludingStderr, code });
+      resolve({cmdOutput, cmdOutputIncludingStderr, code});
     });
   });
 
@@ -137,7 +136,7 @@ export async function executeCommandInFork(
 }
 
 export function forkProcess(workingDirectory: string | undefined, modulePath: string, args: string[]): ChildProcess {
-  const options: ForkOptions = { cwd: workingDirectory || tmpdir(), silent: true, env: {}, execArgv: [] };
+  const options: ForkOptions = {cwd: workingDirectory || tmpdir(), silent: true, env: {}, execArgv: []};
   return fork(modulePath, args, options);
 }
 
@@ -146,7 +145,7 @@ export async function tryExecuteCommandInFork(
   modulePath: string,
   ...args: string[]
 ): Promise<ICommandResult> {
-  const { result } = tryExecuteCommandInForkAsync(workingDirectory, false, modulePath, ...args);
+  const {result} = tryExecuteCommandInForkAsync(workingDirectory, false, modulePath, ...args);
 
   return result;
 }
@@ -160,11 +159,11 @@ export function tryExecuteCommandInForkAsync(
   let cmdOutput: string = "";
   let cmdOutputIncludingStderr: string = "";
   const messages: Array<string | object> = [];
-  const batches: { [key: string]: string[] } = {};
+  const batches: {[key: string]: string[]} = {};
 
   const childProcess = forkProcess(workingDirectory, modulePath, args);
   const result = new Promise((resolve: (res: any) => void, reject: (error: Error) => void): void => {
-    childProcess.stdout.on("data", (data: string | Buffer) => {
+    childProcess.stdout!.on("data", (data: string | Buffer) => {
       data = data.toString();
       cmdOutput = cmdOutput.concat(data);
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
@@ -174,7 +173,7 @@ export function tryExecuteCommandInForkAsync(
       }
     });
 
-    childProcess.stderr.on("data", (data: string | Buffer) => {
+    childProcess.stderr!.on("data", (data: string | Buffer) => {
       data = data.toString();
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
 
@@ -188,7 +187,7 @@ export function tryExecuteCommandInForkAsync(
         batches[message.command] = batches[message.command] || [];
         batches[message.command][message.batch.index] = message.batch.message;
         if (message.batch.done) {
-          messages.push({ command: message.command, message: batches[message.command].join("") });
+          messages.push({command: message.command, message: batches[message.command].join("")});
         }
       } else {
         messages.push(message);
@@ -205,11 +204,11 @@ export function tryExecuteCommandInForkAsync(
 
     childProcess.on("error", reject);
     childProcess.on("close", (code: number) => {
-      resolve({ cmdOutput, cmdOutputIncludingStderr, code, messages });
+      resolve({cmdOutput, cmdOutputIncludingStderr, code, messages});
     });
   });
 
-  return { childProcess, result };
+  return {childProcess, result};
 }
 
 export async function awaiter<T>(

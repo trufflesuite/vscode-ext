@@ -19,8 +19,8 @@ describe("Commands helper", () => {
   });
 
   const cases = [
-    { workingDirectory: "defined", tmpdirExecuted: false },
-    { workingDirectory: undefined, tmpdirExecuted: true },
+    {workingDirectory: "defined", tmpdirExecuted: false},
+    {workingDirectory: undefined, tmpdirExecuted: true},
   ];
 
   cases.forEach((testCase) => {
@@ -65,7 +65,7 @@ describe("Commands helper", () => {
       // eslint-disable-next-line no-async-promise-executor
       await new Promise<void>(async (resolve) => {
         setTimeout(async () => {
-          await processMock.stdout.emit("data", "test stdout");
+          await processMock.stdout!.emit("data", "test stdout");
           await processMock.emit("exit", 0);
           resolve();
         }, 500);
@@ -91,7 +91,7 @@ describe("Commands helper", () => {
       // eslint-disable-next-line no-async-promise-executor
       await new Promise<void>(async (resolve) => {
         setTimeout(async () => {
-          await processMock.stderr.emit("data", "test stdout");
+          await processMock.stderr!.emit("data", "test stdout");
           await processMock.emit("exit", 0);
           resolve();
         }, 500);
@@ -121,7 +121,7 @@ describe("Commands helper", () => {
       // eslint-disable-next-line no-async-promise-executor
       await new Promise<void>(async (resolve) => {
         setTimeout(async () => {
-          await processMock.stderr.emit("data", "test stdout");
+          await processMock.stderr!.emit("data", "test stdout");
           await processMock.emit("close", 0);
           resolve();
         }, 500);
@@ -177,7 +177,7 @@ describe("Commands helper", () => {
 
   describe("tryExecuteCommandInFork", () => {
     const modulePath = "some_path";
-    const messageData = { command: "truffleConfig", message: "{ result: 'some message data' }" };
+    const messageData = {command: "truffleConfig", message: "{ result: 'some message data' }"};
 
     let childProcessMock: sinon.SinonMock;
     let processMock: cp.ChildProcess;

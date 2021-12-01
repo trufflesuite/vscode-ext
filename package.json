@@ -52,6 +52,7 @@
     "onCommand:trufflesuite.copyRPCEndpointAddress",
     "onCommand:trufflesuite.createProject",
     "onCommand:trufflesuite.disconnectProject",
+    "onCommand:extension.truffle.debugTransaction",
     "onCommand:openZeppelin.addCategory",
     "onCommand:trufflesuite.signInToInfuraAccount",
     "onCommand:trufflesuite.signOutOfInfuraAccount",
@@ -170,6 +171,11 @@
       {
         "command": "trufflesuite.signOutOfInfuraAccount",
         "title": "Sign out of Infura account",
+        "category": "Blockchain"
+      },
+      {
+        "command": "extension.truffle.debugTransaction",
+        "title": "Debug Transaction",
         "category": "Blockchain"
       },
       {
@@ -437,8 +443,13 @@
     "publish": "npx vsce publish",
     "vscode:prepublish": "npm i && npm run webpack:prod",
     "compile": "npm run clean && tsc -p ./",
-    "webpack:prod": "webpack --mode production",
-    "watch": "tsc -watch -p ./",
+    "compile:webpack": "npm run clean && tsc -p ./ && webpack:dev",
+    "webpack:dev": "webpack --config webpack.dev.js",
+    "webpack:prod": "webpack --config webpack.prod.js",
+    "watchc:webpack": "webpack --watch --config webpack.dev.js",
+    "copyFiles": "copyfiles -V -f ./src/debugAdapter/web3ProviderResolver.js ./src/helpers/checkTruffleConfigTemplate.js ./out/src/ ",
+    "watch:tsc": "tsc-watch --onCompilationComplete \"npm run copyFiles\" ",
+    "watch": "npm run watch:tsc",
     "prettier:fix": "prettier --write .",
     "eslint": "eslint -c .eslintrc.js --ext .ts src/**/*.ts test/**/*.ts",
     "version": "tsc -v",
@@ -446,6 +457,7 @@
     "clean": "npx rimraf -- ./out/*"
   },
   "devDependencies": {
+    "@types/copy-webpack-plugin": "^8.0.1",
     "@types/download": "^6.2.4",
     "@types/estree": "^0.0.39",
     "@types/fs-extra": "^7.0.0",
@@ -453,7 +465,6 @@
     "@types/hdkey": "^0.7.0",
     "@types/istanbul": "^0.4.30",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^10.12.21",
     "@types/request": "^2.48.1",
     "@types/request-promise": "^4.1.44",
     "@types/rewire": "^2.5.28",
@@ -464,7 +475,7 @@
     "@types/vscode": "1.39.0",
     "@typescript-eslint/eslint-plugin": "^5.3.1",
     "@typescript-eslint/parser": "^5.3.1",
-    "copy-webpack-plugin": "5.1.1",
+    "copy-webpack-plugin": "^10.0.0",
     "decache": "^4.5.1",
     "eslint": "^8.2.0",
     "eslint-config-prettier": "8.3.0",
@@ -481,20 +492,19 @@
     "remap-istanbul": "^0.13.0",
     "rewire": "^4.0.1",
     "sinon": "^7.3.2",
-    "truffle": "^5.0.14",
+    "truffle": "^5.4.22",
     "ts-loader": "7.0.2",
+    "tsc-watch": "^4.5.0",
     "typescript": "3.8.3",
     "vscode-debugadapter": "^1.33.0",
     "vscode-debugprotocol": "^1.33.0",
     "vscode-test": "^1.2.0",
-    "webpack": "4.43.0",
-    "webpack-cli": "3.3.11"
+    "webpack": "5.64.4",
+    "webpack-cli": "4.9.1",
+    "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@truffle/debug-utils": "1.0.19",
-    "@truffle/debugger": "5.0.35",
-    "@truffle/provider": "0.2.1",
-    "abi-decoder": "^2.0.1",
+    "abi-decoder": "^2.4.0",
     "acorn": "^6.1.1",
     "acorn-walk": "^6.1.1",
     "astring": "^1.7.5",
@@ -510,6 +520,8 @@
     "request-promise": "^4.2.4",
     "semver": "^6.0.0",
     "solidity-parser-antlr": "^0.4.11",
+    "truffle": "^5.4.22",
+    "ts-node": "^10.4.0",
     "uuid": "^3.3.2",
     "vscode-azureextensionui": "^0.29.12",
     "vscode-extension-telemetry": "^0.1.1"
@@ -525,7 +537,7 @@
   },
   "lint-staged": {
     "*.ts": [
-      "eslint",
+      "eslint -c .eslintrc.js --ext .ts src/**/*.ts test/**/*.ts",
       "prettier --write",
       "git add"
     ]
