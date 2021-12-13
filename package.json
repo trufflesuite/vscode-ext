@@ -69,7 +69,7 @@
         },
         "trufflesuite.openZeppelin.version": {
           "type": "string",
-          "default": "4.4.0",
+          "default": "2.5.0",
           "scope": "The latest Open Zeppelin version"
         },
         "trufflesuite.storageAccount.name": {
@@ -448,88 +448,8 @@
           "id": "AzureBlockchain",
           "name": "Blockchain Networks"
         }
-      ],
-      "debug": [
-        {
-          "id": "InstructionView",
-          "name": "Instructions"
-        }
       ]
-    },
-    "debuggers": [
-      {
-        "type": "truffle",
-        "label": "Truffle Debugger",
-        "program": "./out/src/debugger.js",
-        "runtime": "node",
-        "configurationAttributes": {
-          "launch": {
-            "required": [],
-            "properties": {
-              "stopOnEntry": {
-                "type": "boolean",
-                "description": "Automatically stop after launch.",
-                "default": true
-              },
-              "trace": {
-                "type": "boolean",
-                "description": "Enable logging of the Debug Adapter Protocol.",
-                "default": true
-              },
-              "txHash": {
-                "type": "string",
-                "description": "Transaction hash to debug",
-                "default": "0x"
-              },
-              "files": {
-                "type": "string[]",
-                "description": "Array of file paths of solidity files to debug",
-                "default": []
-              },
-              "workingDirectory": {
-                "type": "string",
-                "description": "Directory of truffle box",
-                "default": "${workspaceFolder}"
-              },
-              "providerUrl": {
-                "type": "string",
-                "description": "URL of provider",
-                "default": "http://127.0.0.1:8545"
-              }
-            }
-          }
-        },
-        "initialConfigurations": [
-          {
-            "type": "truffle",
-            "request": "launch",
-            "name": "Debug Transaction with Truffle",
-            "stopOnEntry": false,
-            "txHash": "0x",
-            "files": [],
-            "workingDirectory": "${workspaceFolder}",
-            "providerUrl": "http://127.0.0.1:8545"
-          }
-        ],
-        "configurationSnippets": [
-          {
-            "label": "Truffle Debugger: Launch",
-            "description": "Runs the Truffle debugger (truffle) and attaches to a TestRPC instance",
-            "body": {
-              "type": "truffle",
-              "request": "launch",
-              "name": "Debug Transaction with Truffle",
-              "stopOnEntry": false,
-              "txHash": "0x",
-              "files": [],
-              "workingDirectory": "^\"\\${workspaceFolder}/",
-              "providerUrl": "http://127.0.0.1:8545"
-            }
-          }
-        ],
-        "variables": {}
-      }
-    ]
+    }
   },
   "scripts": {
     "package": "npx vsce package",
