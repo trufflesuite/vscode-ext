@@ -3,7 +3,7 @@
   "displayName": "Trufflesuite for VSCode",
   "description": "Develop, deploy and debug on the Ethereum Ecosystem from inside VSCode.",
   "publisher": "trufflesuite-csi",
-  "preview": false,
+  "preview": true,
   "icon": "images/TruffleLogo.png",
   "version": "2.0.0",
   "repository": {
@@ -186,6 +186,105 @@
         "command": "trufflesuite.openAtAzurePortal",
         "title": "Open at Azure Portal",
         "category": "Blockchain"
+      },
+      {
+        "command": "trufflesuite.showWelcomePage",
+        "title": "Show Welcome Page",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.refresh",
+        "title": "Refresh",
+        "category": "Truffle",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "contract.copyByteCode",
+        "title": "Copy Constructor Bytecode",
+        "category": "Truffle"
+      },
+      {
+        "command": "contract.copyDeployedByteCode",
+        "title": "Copy Transaction Bytecode",
+        "category": "Truffle"
+      },
+      {
+        "command": "contract.copyABI",
+        "title": "Copy Contract ABI",
+        "category": "Truffle"
+      },
+      {
+        "command": "truffle.newSolidityProject",
+        "title": "New Solidity Project",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.buildContracts",
+        "title": "Build Contracts",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.deployContracts",
+        "title": "Deploy Contracts",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.connectProject",
+        "title": "Connect to network",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.copyRPCEndpointAddress",
+        "title": "Copy RPC Endpoint Address",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.createProject",
+        "title": "Create a new network",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.disconnectProject",
+        "title": "Disconnect",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.startGanacheServer",
+        "title": "Start Ganache Server",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.stopGanacheServer",
+        "title": "Stop Ganache Server",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.signInToInfuraAccount",
+        "title": "Sign in to Infura account",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.signOutOfInfuraAccount",
+        "title": "Sign out of Infura account",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.getPrivateKey",
+        "title": "Retrieve private key",
+        "category": "Truffle"
+      },
+      {
+        "command": "openZeppelin.addCategory",
+        "title": "Add contracts from OpenZeppelin",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.openAtAzurePortal",
+        "title": "Open at Azure Portal",
+        "category": "Truffle"
       }
     ],
     "breakpoints": [

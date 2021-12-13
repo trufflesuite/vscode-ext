@@ -28,7 +28,7 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
 
     await this.createStorageAccountIfDoesNotExist(client, client.location, storageAccountName);
 
-    const containerName = Constants.containerAzureBlockchainExtension;
+    const containerName = Constants.containerTruffleSuiteExtension;
     const sas = await this.getStorageAccountSas(client, storageAccountName);
 
     await this.createContainerIfDoesNotExist(storageAccountName, containerName, sas);

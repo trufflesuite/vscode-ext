@@ -57,7 +57,7 @@ export class Constants {
   public static defaultTruffleBox = "Azure-Samples/Blockchain-Ethereum-Template";
   public static defaultDebounceTimeout = 300;
   public static defaultInputNameInBdm = "transaction-node";
-  public static containerAzureBlockchainExtension = "container-azureblockchainextension";
+  public static containerTruffleSuiteExtension = "container-trufflesuite-extension";
 
   public static infuraHost = "infura.io";
   public static localhost = "127.0.0.1";
@@ -69,7 +69,7 @@ export class Constants {
   public static ganacheRetryTimeout = 2000; // milliseconds
   public static ganacheRetryAttempts = 5;
 
-  public static azureBlockchainResourceName = {
+  public static trufflesuiteResourceName = {
     eventGrid: "Event Grid",
     transactionNode: "Transaction Node",
   };
@@ -760,8 +760,9 @@ export class Constants {
     uint: "uint",
   };
 
+  // FIXME: revise the openzeppelin versions to work properly.
   public static firstOZVersion = "2.3.0";
-  public static allOpenZeppelinVersions = ["2.3.0", "2.4.0", "2.5.0"];
+  public static allOpenZeppelinVersions = ["2.3.0", "2.4.0", "2.5.0", "3.4.0", "4.4.0"];
 
   public static userSettings = {
     coreSdkSettingsKey: "trufflesuite.coreSDK",
@@ -1014,7 +1015,7 @@ export class Constants {
   private static getNetworkIsNotReadyMessage(itemType: string) {
     switch (itemType) {
       case "AzureBlockchainNetworkNode":
-        return "Trufflesuite Service item is not ready yet. Please wait.";
+        return "AzureBlockchain Service item is not ready yet. Please wait.";
       default:
         return "Blockchain item is not ready yet. Please wait.";
     }
@@ -1023,7 +1024,7 @@ export class Constants {
   private static getNetworkIsNotAvailableMessage(itemType: string) {
     switch (itemType) {
       case "AzureBlockchainNetworkNode":
-        return "Trufflesuite Service item is unavailable.";
+        return "AzureBlockchain Service item is unavailable.";
       default:
         return "Blockchain item is unavailable.";
     }

@@ -41,6 +41,7 @@ export async function activate(context: ExtensionContext) {
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
   TreeManager.initialize(context.globalState);
+  // FIXME: i think this is breaking things..
   TreeService.initialize("AzureBlockchain");
   await sdkCoreCommands.initialize(context.globalState);
 
@@ -54,7 +55,7 @@ export async function activate(context: ExtensionContext) {
   await welcomePage.checkAndShow();
   await changelogPage.checkAndShow();
 
-  //#region azureBlockchain extension commands
+  //#region trufflesuite extension commands
   const refresh = commands.registerCommand("trufflesuite.refresh", (element) => {
     TreeService.refresh(element);
   });
