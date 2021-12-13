@@ -38,7 +38,7 @@
   "aiKey": "INSERTAIKEY",
   "main": "./out/src/extension.js",
   "activationEvents": [
-    "onView:AzureBlockchain",
+    "onView:Trufflesuite",
     "onCommand:trufflesuite.showWelcomePage",
     "onCommand:trufflesuite.refresh",
     "onCommand:contract.copyByteCode",
@@ -61,7 +61,7 @@
   ],
   "contributes": {
     "configuration": {
-      "title": "Blockchain Development Kit for Ethereum",
+      "title": "Trufflesuite for VSCode",
       "properties": {
         "trufflesuite.ignoreLongRunningTaskNotification": {
           "type": "boolean",
@@ -347,67 +347,67 @@
       "view/title": [
         {
           "command": "trufflesuite.showWelcomePage",
-          "when": "view == AzureBlockchain"
+          "when": "view == Trufflesuite"
         },
         {
           "command": "trufflesuite.createProject",
-          "when": "view == AzureBlockchain"
+          "when": "view == Trufflesuite"
         },
         {
           "command": "trufflesuite.connectProject",
-          "when": "view == AzureBlockchain"
+          "when": "view == Trufflesuite"
         },
         {
           "command": "trufflesuite.refresh",
-          "when": "view == AzureBlockchain",
+          "when": "view == Trufflesuite",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
           "command": "trufflesuite.disconnectProject",
-          "when": "view == AzureBlockchain && viewItem == project",
-          "group": "azureBlockchain-0@0"
+          "when": "view == Trufflesuite && viewItem == project",
+          "group": "truffleSuite-0@0"
         },
         {
           "command": "trufflesuite.startGanacheServer",
-          "when": "view == AzureBlockchain && viewItem == localproject",
-          "group": "azureBlockchain-1@0"
+          "when": "view == Trufflesuite && viewItem == localproject",
+          "group": "truffleSuite-1@0"
         },
         {
           "command": "trufflesuite.stopGanacheServer",
-          "when": "view == AzureBlockchain && viewItem == localproject",
-          "group": "azureBlockchain-1@1"
+          "when": "view == Trufflesuite && viewItem == localproject",
+          "group": "truffleSuite-1@1"
         },
         {
           "command": "trufflesuite.disconnectProject",
-          "when": "view == AzureBlockchain && viewItem == localproject",
-          "group": "azureBlockchain-0@0"
+          "when": "view == Trufflesuite && viewItem == localproject",
+          "group": "truffleSuite-0@0"
         },
         {
           "command": "trufflesuite.disconnectProject",
-          "when": "view == AzureBlockchain && viewItem == bdmproject",
-          "group": "azureBlockchain-0@0"
+          "when": "view == Trufflesuite && viewItem == bdmproject",
+          "group": "truffleSuite-0@0"
         },
         {
           "command": "trufflesuite.copyRPCEndpointAddress",
-          "when": "view == AzureBlockchain && viewItem == network",
-          "group": "azureBlockchain-0@0"
+          "when": "view == Trufflesuite && viewItem == network",
+          "group": "truffleSuite-0@0"
         },
         {
           "command": "trufflesuite.copyRPCEndpointAddress",
-          "when": "view == AzureBlockchain && viewItem == localnetwork",
-          "group": "azureBlockchain-0@0"
+          "when": "view == Trufflesuite && viewItem == localnetwork",
+          "group": "truffleSuite-0@0"
         },
         {
           "command": "trufflesuite.openAtAzurePortal",
-          "when": "view == AzureBlockchain && viewItem == input",
-          "group": "azureBlockchain-0@0"
+          "when": "view == Trufflesuite && viewItem == input",
+          "group": "truffleSuite-0@0"
         },
         {
           "command": "trufflesuite.openAtAzurePortal",
-          "when": "view == AzureBlockchain && viewItem == output",
-          "group": "azureBlockchain-0@0"
+          "when": "view == Trufflesuite && viewItem == output",
+          "group": "truffleSuite-0@0"
         }
       ],
       "explorer/context": [
@@ -451,7 +451,7 @@
     "views": {
       "explorer": [
         {
-          "id": "AzureBlockchain",
+          "id": "Trufflesuite",
           "name": "Blockchain Networks"
         }
       ],
@@ -542,10 +542,10 @@
     "publish": "npx vsce publish",
     "vscode:prepublish": "npm i && npm run webpack:prod",
     "compile": "npm run clean && tsc -p ./",
-    "compile:webpack": "npm run clean && tsc -p ./ && webpack:dev",
+    "compile:webpack": "npm run clean && tsc -p ./ && npm run webpack:dev",
     "webpack:dev": "webpack --config webpack.dev.js",
     "webpack:prod": "webpack --config webpack.prod.js",
-    "watchc:webpack": "webpack --watch --config webpack.dev.js",
+    "watch:webpack": "webpack --watch --config webpack.dev.js",
     "copyFiles": "copyfiles -V -f ./src/debugAdapter/web3ProviderResolver.js ./src/helpers/checkTruffleConfigTemplate.js ./out/src/ ",
     "watch:tsc": "tsc-watch --onCompilationComplete \"npm run copyFiles\" ",
     "watch": "npm run watch:tsc",
@@ -574,6 +574,7 @@
     "@types/vscode": "1.39.0",
     "@typescript-eslint/eslint-plugin": "^5.3.1",
     "@typescript-eslint/parser": "^5.3.1",
+    "copyfiles": "^2.4.1",
     "copy-webpack-plugin": "^10.0.0",
     "decache": "^4.5.1",
     "eslint": "^8.2.0",
