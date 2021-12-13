@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {commands, ExtensionContext, Uri, window, workspace} from "vscode";
+import { commands, ExtensionContext, Uri, window, workspace } from "vscode";
 import {
   DebuggerCommands,
   GanacheCommands,
@@ -12,11 +12,11 @@ import {
   ServiceCommands,
   TruffleCommands,
 } from "./commands";
-import {Constants} from "./Constants";
-import {CommandContext, isWorkspaceOpen, openZeppelinHelper, required, setCommandContext} from "./helpers";
-import {CancellationEvent} from "./Models";
-import {Output} from "./Output";
-import {ChangelogPage, RequirementsPage, WelcomePage} from "./pages";
+import { Constants } from "./Constants";
+import { CommandContext, isWorkspaceOpen, openZeppelinHelper, required, setCommandContext } from "./helpers";
+import { CancellationEvent } from "./Models";
+import { Output } from "./Output";
+import { ChangelogPage, RequirementsPage, WelcomePage } from "./pages";
 import {
   AdapterType,
   ContractDB,
@@ -26,10 +26,10 @@ import {
   TreeManager,
   TreeService,
 } from "./services";
-import {Telemetry} from "./TelemetryClient";
-import {NetworkNodeView, ProjectView} from "./ViewItems";
+import { Telemetry } from "./TelemetryClient";
+import { NetworkNodeView, ProjectView } from "./ViewItems";
 
-import {DebuggerConfiguration} from "./debugAdapter/configuration/debuggerConfiguration";
+import { DebuggerConfiguration } from "./debugAdapter/configuration/debuggerConfiguration";
 
 export async function activate(context: ExtensionContext) {
   if (process.env.CODE_TEST) {
@@ -42,6 +42,7 @@ export async function activate(context: ExtensionContext) {
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
   TreeManager.initialize(context.globalState);
+  // FIXME: i think this is breaking things..
   TreeService.initialize("AzureBlockchain");
   await sdkCoreCommands.initialize(context.globalState);
 
@@ -55,7 +56,7 @@ export async function activate(context: ExtensionContext) {
   await welcomePage.checkAndShow();
   await changelogPage.checkAndShow();
 
-  //#region azureBlockchain extension commands
+  //#region trufflesuite extension commands
   const refresh = commands.registerCommand("trufflesuite.refresh", (element) => {
     TreeService.refresh(element);
   });
