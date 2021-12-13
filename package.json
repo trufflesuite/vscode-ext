@@ -69,7 +69,7 @@
         },
         "trufflesuite.openZeppelin.version": {
           "type": "string",
-          "default": "2.5.0",
+          "default": "4.4.0",
           "scope": "The latest Open Zeppelin version"
         },
         "trufflesuite.storageAccount.name": {

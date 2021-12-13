@@ -4,7 +4,7 @@
     {
       "envFile": "${workspaceFolder}/.env",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
-      "name": "Launch Extension - using .env",
+      "name": "Run Extension - using .env",
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "Build extension with watcher",
       "request": "launch",
