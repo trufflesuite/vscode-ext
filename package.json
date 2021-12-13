@@ -19,17 +19,7 @@
     "vscode": "^1.60.0"
   },
   "keywords": [
-    "blockchain",
-    "ethereum",
-    "debugger",
-    "debuggers",
-    "snippet",
-    "truffle",
-    "solidity",
-    "trufflesuite",
-    "ganache",
-    "ganache-cli",
-    "evm"
+   ""
   ],
   "categories": [
     "Extension Packs",
@@ -55,12 +45,11 @@
     "onCommand:openZeppelin.addCategory",
     "onCommand:trufflesuite.signInToInfuraAccount",
     "onCommand:trufflesuite.signOutOfInfuraAccount",
-    "onCommand:trufflesuite.openAtAzurePortal",
-    "onDebug"
+    "onCommand:trufflesuite.openAtAzurePortal"
   ],
   "contributes": {
     "configuration": {
-      "title": "Blockchain Development Kit for Ethereum",
+      "title": "Trufflesuite for VSCode",
       "properties": {
         "trufflesuite.ignoreLongRunningTaskNotification": {
           "type": "boolean",
