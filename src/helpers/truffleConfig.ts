@@ -234,7 +234,7 @@ export namespace TruffleConfiguration {
         const moduleExports = walk.findNodeAt(this.ast, null, null, isHdWalletProviderDeclaration);
         return !!moduleExports;
       } catch (error) {
-        Telemetry.sendException(error);
+        Telemetry.sendException(error as Error);
       }
       return false;
     }
@@ -465,6 +465,7 @@ export namespace TruffleConfiguration {
     };
 
     const mnemonicNode = node.arguments[0] as ESTree.NewExpression & ESTree.Literal;
+
     const mnemonicFilePathNode =
       mnemonicNode && mnemonicNode.arguments && (mnemonicNode.arguments[0] as ESTree.Literal);
 

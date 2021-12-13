@@ -4,7 +4,7 @@
     {
       "type": "pwa-extensionHost",
       "request": "launch",
-      "name": "Launch Extension - using .env",
+      "name": "Run Extension - using .env",
       "runtimeExecutable": "${execPath}",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
       "envFile": "${workspaceFolder}/.env",
