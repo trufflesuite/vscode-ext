@@ -12,7 +12,6 @@ export type ContractData = {
   contracts: Array<any>;
   files: Array<string>;
   provider: any;
-  web3: Web3Wrapper;
 };
 
 export async function prepareContracts(workingDirectory: any): Promise<ContractData> {
@@ -40,7 +39,6 @@ export async function prepareContracts(workingDirectory: any): Promise<ContractD
     contracts,
     files: sortedSourcePaths,
     provider,
-    web3,
   };
 }
 
