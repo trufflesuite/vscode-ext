@@ -1,14 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as open from "open";
-import { ProgressLocation, window } from "vscode";
-import { Constants } from "../Constants";
-import { openZeppelinHelper, showQuickPick } from "../helpers";
-import { Output } from "../Output";
-import { OpenZeppelinMigrationsService, OpenZeppelinService } from "../services";
-import { IOZAsset, IOZContractCategory, PromiseState } from "../services/openZeppelin/models";
-import { Telemetry } from "../TelemetryClient";
+import open from "open";
+import {ProgressLocation, window} from "vscode";
+import {Constants} from "../Constants";
+import {openZeppelinHelper, showQuickPick} from "../helpers";
+import {Output} from "../Output";
+import {OpenZeppelinMigrationsService, OpenZeppelinService} from "../services";
+import {IOZAsset, IOZContractCategory, PromiseState} from "../services/openZeppelin/models";
+import {Telemetry} from "../TelemetryClient";
 
 export namespace OpenZeppelinCommands {
   export async function addCategory(): Promise<void> {
@@ -19,7 +19,7 @@ export namespace OpenZeppelinCommands {
     const categories = await manifest.getCategories();
     const category = await selectCategory(categories);
 
-    Telemetry.sendEvent("OpenZeppelinCommands.addCategory.selected", { name: category.name });
+    Telemetry.sendEvent("OpenZeppelinCommands.addCategory.selected", {name: category.name});
 
     const baseUrl = manifest.getBaseUrlToContractsSource();
     const fullAssetWithDependencies = manifest.collectAssetsWithDependencies(category.assets);
@@ -71,7 +71,7 @@ async function downloadOZFiles(
       Constants.openZeppelin.skipButtonTitle
     );
 
-    Telemetry.sendEvent("OpenZeppelinCommands.downloadOZFiles.overwriteExistedDialog", { name: answer || "" });
+    Telemetry.sendEvent("OpenZeppelinCommands.downloadOZFiles.overwriteExistedDialog", {name: answer || ""});
     if (answer === Constants.openZeppelin.replaceButtonTitle) {
       Output.outputLine(
         Constants.outputChannel.truffleSuiteForVSCode,
@@ -125,7 +125,7 @@ async function downloadFileSetWithProgress(
       );
       if (answer === Constants.openZeppelin.retryButtonTitle) {
         Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, Constants.openZeppelin.retryDownloading);
-        Telemetry.sendEvent("OpenZeppelinCommands.downloadFileSet.retry", { assetsCount: rejected.length.toString() });
+        Telemetry.sendEvent("OpenZeppelinCommands.downloadFileSet.retry", {assetsCount: rejected.length.toString()});
         downloaded = downloaded.concat(await downloadFileSet(rejected));
       }
     }

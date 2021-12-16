@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as open from "open";
-import { Constants } from "../Constants";
-import { showQuickPick, telemetryHelper } from "../helpers";
-import { ItemType } from "../Models";
+import open from "open";
+import {Constants} from "../Constants";
+import {showQuickPick, telemetryHelper} from "../helpers";
+import {ItemType} from "../Models";
 import {
   // AzureBlockchainProject,
   // AzureBlockchainService,
@@ -26,9 +26,9 @@ import {
   LocalResourceExplorer,
   // StorageAccountResourceExplorer,
 } from "../resourceExplorers";
-import { GanacheService, TreeManager } from "../services";
-import { Telemetry } from "../TelemetryClient";
-import { NetworkNodeView, ProjectView } from "../ViewItems";
+import {GanacheService, TreeManager} from "../services";
+import {Telemetry} from "../TelemetryClient";
+import {NetworkNodeView, ProjectView} from "../ViewItems";
 
 interface IServiceDestination {
   cmd: (service: Service) => Promise<Project>;

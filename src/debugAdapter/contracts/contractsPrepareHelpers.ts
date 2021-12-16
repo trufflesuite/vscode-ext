@@ -1,14 +1,21 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { DebugNetwork } from "../debugNetwork";
-import { sortFilePaths } from "../helpers";
-import { IContractJsonModel } from "../models/IContractJsonModel";
-import { IContractModel } from "../models/IContractModel";
-import { Web3Wrapper } from "../web3Wrapper";
-import { ContractJsonsProvider } from "./contractJsonsProvider";
+import {DebugNetwork} from "../debugNetwork";
+import {sortFilePaths} from "../helpers";
+import {IContractJsonModel} from "../models/IContractJsonModel";
+import {IContractModel} from "../models/IContractModel";
+import {Web3Wrapper} from "../web3Wrapper";
+import {ContractJsonsProvider} from "./contractJsonsProvider";
 
-export async function prepareContracts(workingDirectory: any) {
+export type ContractData = {
+  contracts: Array<any>;
+  files: Array<string>;
+  provider: any;
+  web3: Web3Wrapper;
+};
+
+export async function prepareContracts(workingDirectory: any): Promise<ContractData> {
   // TODO, the same code in the debuggerCommands.ts, do refactoring
   const debugNetwork = new DebugNetwork(workingDirectory);
   await debugNetwork.load();
@@ -33,6 +40,7 @@ export async function prepareContracts(workingDirectory: any) {
     contracts,
     files: sortedSourcePaths,
     provider,
+    web3,
   };
 }
 

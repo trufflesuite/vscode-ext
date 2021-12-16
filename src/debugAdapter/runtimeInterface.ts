@@ -1,15 +1,15 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as truffleDebugUtils from "@truffle/debug-utils";
-import * as truffleDebugger from "@truffle/debugger";
-import { EventEmitter } from "events";
-import { relative as pathRelative } from "path";
-import { filterContractsWithAddress, prepareContracts } from "./contracts/contractsPrepareHelpers";
-import { DebuggerTypes } from "./models/debuggerTypes";
-import { ICallInfo } from "./models/ICallInfo";
-import { IContractModel } from "./models/IContractModel";
-import { IInstruction } from "./models/IInstruction";
+// import * as truffleDebugUtils from "@truffle/debug-utils";
+import truffleDebugger from "@truffle/debugger";
+import {EventEmitter} from "events";
+import {relative as pathRelative} from "path";
+import {filterContractsWithAddress, prepareContracts} from "./contracts/contractsPrepareHelpers";
+import {DebuggerTypes} from "./models/debuggerTypes";
+import {ICallInfo} from "./models/ICallInfo";
+import {IContractModel} from "./models/IContractModel";
+import {IInstruction} from "./models/IInstruction";
 
 export default class RuntimeInterface extends EventEmitter {
   private _isDebuggerAttached: boolean;
@@ -17,7 +17,7 @@ export default class RuntimeInterface extends EventEmitter {
   private _selectors: truffleDebugger.Selectors;
   private _numBreakpoints: number;
   private _deployedContracts: IContractModel[];
-  private _initialBreakPoints: Array<{ path: string; lines: number[] }>;
+  private _initialBreakPoints: Array<{path: string; lines: number[]}>;
 
   constructor() {
     super();
@@ -34,7 +34,7 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   public storeInitialBreakPoints(path: string, lines: number[]) {
-    this._initialBreakPoints.push({ path, lines });
+    this._initialBreakPoints.push({path, lines});
   }
 
   public async processInitialBreakPoints() {
@@ -43,7 +43,7 @@ export default class RuntimeInterface extends EventEmitter {
     }
 
     for (const initialBreakPoint of this._initialBreakPoints) {
-      const { path, lines } = initialBreakPoint;
+      const {path, lines} = initialBreakPoint;
       for (const line of lines) {
         await this.setBreakpoint(path, line);
       }
@@ -80,13 +80,13 @@ export default class RuntimeInterface extends EventEmitter {
     const callStack = this._session!.view(this._selectors.evm.current.callstack);
     const currentLine = this.currentLine();
     if (callStack.length === 1) {
-      return [{ ...currentLine, method: "Current" }];
+      return [{...currentLine, method: "Current"}];
     }
 
     const result: ICallInfo[] = [];
     // There is no api to get line/collumn of previous call
     // That's why set them as default
-    const defaultLine = { line: 0, column: 0 };
+    const defaultLine = {line: 0, column: 0};
     for (let i = 0; i < callStack.length - 1; i++) {
       // processing all previous calls
       const contract = this._deployedContracts.find(
@@ -95,17 +95,20 @@ export default class RuntimeInterface extends EventEmitter {
       if (contract === undefined) {
         throw new Error(`Coundn\'t find contract by address ${callStack[i].address || callStack[i].storageAddress}`);
       }
-      result.push({ file: contract.sourcePath, ...defaultLine, method: "Previous" });
+      result.push({file: contract.sourcePath, ...defaultLine, method: "Previous"});
     }
 
-    result.push({ ...currentLine, method: "Current" });
+    result.push({...currentLine, method: "Current"});
     return result;
   }
 
   public async variables(/* args?: DebugProtocol.VariablesArguments */): Promise<any> {
     if (this._session) {
       const variables = await this._session.variables();
-      return truffleDebugUtils.nativize(variables);
+      // FIXME: This is no longer a function. Can we just use the actual variables as they now come back?
+      // return truffleDebugUtils.nativize(variables);
+      console.log("variables call: ", {variables: JSON.stringify(variables)});
+      return variables;
     } else {
       return Promise.resolve({});
     }
@@ -141,16 +144,16 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   public async attach(txHash: string, workingDirectory: string): Promise<void> {
-    const result: any = await prepareContracts(workingDirectory);
+    const result = await prepareContracts(workingDirectory);
 
     this._deployedContracts = filterContractsWithAddress(result.contracts);
 
-    const debuggerOptions = {
+    const options: truffleDebugger.DebuggerOptions = {
       contracts: result.contracts,
       files: result.files,
       provider: result.provider,
     };
-    this._session = await this.generateSession(txHash, debuggerOptions);
+    this._session = await this.generateSession(txHash, options);
     this._isDebuggerAttached = true;
   }
 
@@ -199,8 +202,8 @@ export default class RuntimeInterface extends EventEmitter {
     }
   }
 
-  private async generateSession(txHash: string, debuggerOptions: any) {
-    const bugger = await truffleDebugger.forTx(txHash, debuggerOptions);
+  private async generateSession(txHash: string, options: truffleDebugger.DebuggerOptions) {
+    const bugger = await truffleDebugger.forTx(txHash, options);
     return bugger.connect();
   }
 

@@ -1,12 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as truffleDebugUtils from "@truffle/debug-utils";
 import * as truffleDebugger from "@truffle/debugger";
 import * as assert from "assert";
 import * as sinon from "sinon";
 import * as contractsPrepareHelpers from "../../src/debugAdapter/contracts/contractsPrepareHelpers";
-import { IContractModel } from "../../src/debugAdapter/models/IContractModel";
+import {IContractModel} from "../../src/debugAdapter/models/IContractModel";
 import RuntimeInterface from "../../src/debugAdapter/runtimeInterface";
 
 describe("RuntimeInterface unit tests", () => {
@@ -15,7 +14,7 @@ describe("RuntimeInterface unit tests", () => {
   beforeEach(async () => {
     sinon
       .stub(contractsPrepareHelpers, "prepareContracts")
-      .resolves({ contracts: contractsMock, provider: {}, files: [] });
+      .resolves({contracts: contractsMock, provider: {}, files: []});
   });
 
   afterEach(() => {
@@ -26,14 +25,14 @@ describe("RuntimeInterface unit tests", () => {
     // Arrange
     const sessionSelectorView = (selector: any) => {
       if (selector === truffleDebugger.selectors.evm.current.callstack) {
-        return [{ address: contractAddressMock }];
+        return [{address: contractAddressMock}];
       }
       return {};
     };
     const sessionMock = buildSessionMock(sessionSelectorView);
     sinon.stub(RuntimeInterface.prototype, "generateSession" as any).resolves(sessionMock);
-    const currentDebugLine = { column: 1, file: contractSourcePathMock, line: 1 };
-    sinon.stub(RuntimeInterface.prototype, "currentLine").returns({ column: 1, file: contractSourcePathMock, line: 1 });
+    const currentDebugLine = {column: 1, file: contractSourcePathMock, line: 1};
+    sinon.stub(RuntimeInterface.prototype, "currentLine").returns({column: 1, file: contractSourcePathMock, line: 1});
 
     // Act
     runtimeInterface = await initMockRuntime();
@@ -47,19 +46,6 @@ describe("RuntimeInterface unit tests", () => {
     );
     assert.strictEqual(callStack[0].file, currentDebugLine.file, assertCallstackMessage("file", currentDebugLine.file));
     assert.strictEqual(callStack[0].line, currentDebugLine.line, assertCallstackMessage("line", currentDebugLine.line));
-  });
-
-  it("variables should call truffleDebugUtils.nativize", async () => {
-    // Arrange
-    sinon.stub(RuntimeInterface.prototype, "generateSession" as any).resolves(baseSessionMock);
-    const nativizeStub = sinon.stub(truffleDebugUtils, "nativize").callsFake((vars) => {
-      return vars;
-    });
-    // Act
-    runtimeInterface = await initMockRuntime();
-    await runtimeInterface.variables();
-    // Assert
-    assert.strictEqual(nativizeStub.called, true, "truffleDebugUtils.nativize should be called");
   });
 
   it("currentLine should throw error when no sourcePath", async () => {
@@ -122,7 +108,7 @@ function assertCallstackMessage(callStackProp: string, callStackValue: any) {
 }
 
 function buildSessionMock(view?: (selectors: any) => any) {
-  const sessionMock = { ...baseSessionMock };
+  const sessionMock = {...baseSessionMock};
   if (view) {
     sessionMock.view = view;
   }

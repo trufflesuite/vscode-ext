@@ -624,7 +624,8 @@
     "ts-node": "^10.4.0",
     "uuid": "^3.3.2",
     "vscode-azureextensionui": "^0.29.12",
-    "vscode-extension-telemetry": "^0.1.1"
+    "vscode-extension-telemetry": "^0.1.1",
+    "web3": "1.5.3"
   },
   "extensionDependencies": [
     "JuanBlanco.solidity",
