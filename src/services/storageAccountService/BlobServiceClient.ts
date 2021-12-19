@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {HttpMethods, WebResource} from "ms-rest";
-import requestPromise from "request-promise";
+import * as requestPromise from "request-promise";
 import {Constants} from "../../Constants";
 import {Telemetry} from "../../TelemetryClient";
 

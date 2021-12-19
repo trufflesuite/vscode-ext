@@ -5,12 +5,12 @@ import * as assert from "assert";
 import * as fs from "fs-extra";
 import * as os from "os";
 import * as sinon from "sinon";
-import uuid = require("uuid");
-import { Memento } from "vscode";
-import { Constants } from "../src/Constants";
-import { MnemonicRepository } from "../src/services";
-import { FakeExtensionState } from "./FakeExtensionState";
-import { TestConstants } from "./TestConstants";
+import * as uuid from "uuid";
+import {Memento} from "vscode";
+import {Constants} from "../src/Constants";
+import {MnemonicRepository} from "../src/services";
+import {FakeExtensionState} from "./FakeExtensionState";
+import {TestConstants} from "./TestConstants";
 
 describe("MnemonicRepository", () => {
   describe("Unit test", () => {

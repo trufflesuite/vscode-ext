@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import open from "open";
+import * as open from "open";
 import {ProgressLocation, window} from "vscode";
 import {Constants} from "../Constants";
 import {openZeppelinHelper, showQuickPick} from "../helpers";

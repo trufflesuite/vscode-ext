@@ -5,9 +5,9 @@
 
 declare var global: any;
 
-import fs from "fs";
-import glob from "glob";
-import paths from "path";
+import * as fs from "fs";
+import * as glob from "glob";
+import * as paths from "path";
 
 const istanbul = require("istanbul");
 const Mocha = require("mocha");

@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import crypto from "crypto";
-import fs from "fs-extra";
-import http from "http";
-import open from "open";
-import querystring from "querystring";
-import requestPromise from "request-promise";
-import url from "url";
+import * as crypto from "crypto";
+import * as fs from "fs-extra";
+import * as http from "http";
+import * as open from "open";
+import * as querystring from "querystring";
+import * as requestPromise from "request-promise";
+import * as url from "url";
 import {Constants} from "../../Constants";
 import {Telemetry} from "../../TelemetryClient";
 

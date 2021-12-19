@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 // import * as truffleDebugUtils from "@truffle/debug-utils";
-import truffleDebugger from "@truffle/debugger";
+import * as truffleDebugger from "@truffle/debugger";
 import {EventEmitter} from "events";
 import {relative as pathRelative} from "path";
 import {filterContractsWithAddress, prepareContracts} from "./contracts/contractsPrepareHelpers";

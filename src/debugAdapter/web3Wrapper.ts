@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 
 import * as truffleProvider from "@truffle/provider";
-import Web3 from "web3";
+import * as Web3 from "web3";
 import {ConfigurationReader} from "./configurationReader";
-import {BatchRequest, provider} from "web3-core";
+// import * as web3core from "web3-core";
 
 export class Web3Wrapper extends Web3 {
   private _networkId: number | undefined;
@@ -64,7 +64,7 @@ export class Web3Wrapper extends Web3 {
   }
 }
 
-function PromiseBatch(batch: BatchRequest) {
+function PromiseBatch(batch: Web3.IBatchRequest) {
   const _batch = batch;
   const _requests: Array<Promise<any>> = [];
   return {
@@ -101,9 +101,9 @@ function getProviderUrl(options: ConfigurationReader.INetworkOption): string {
   throw new Error("Undefined network options.");
 }
 
-function getWeb3InnerProvider(options: ConfigurationReader.INetworkOption): provider {
+function getWeb3InnerProvider(options: ConfigurationReader.INetworkOption): Web3.IProvider {
   const providerUrl = getProviderUrl(options);
-  let provider: provider;
+  let provider;
   if (providerUrl.startsWith("ws")) {
     provider = new Web3.providers.WebsocketProvider(providerUrl);
   } else {

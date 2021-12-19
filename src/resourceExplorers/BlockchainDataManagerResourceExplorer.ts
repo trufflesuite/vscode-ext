@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import fs from "fs-extra";
-import open from "open";
-import path from "path";
+import * as fs from "fs-extra";
+import * as open from "open";
+import * as path from "path";
 import {ProgressLocation, QuickPickItem, window} from "vscode";
 import {
   BlockchainDataManagerResource,
@@ -205,7 +205,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     const files: string[] = [];
     const directoryFiles = fs.readdirSync(dir);
 
-    directoryFiles.map((file) => {
+    directoryFiles.map((file: any) => {
       const name = path.join(dir, file);
 
       if (fs.statSync(name).isDirectory()) {

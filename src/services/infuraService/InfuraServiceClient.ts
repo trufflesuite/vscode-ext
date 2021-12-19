@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import requestPromise from "request-promise";
+import * as requestPromise from "request-promise";
 import {Disposable, Event, EventEmitter, Memento, StatusBarItem, window} from "vscode";
 import {Constants} from "../../Constants";
 import {IToken, refreshToken, signIn, signOut} from "./codeFlowLogin";
