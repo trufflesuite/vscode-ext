@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import assert = require("assert");
-import * as cp from "child_process";
-import events = require("events");
-import * as os from "os";
-import rewire = require("rewire");
-import * as sinon from "sinon";
-import stream = require("stream");
+import assert from "assert";
+import cp from "child_process";
+import events from "events";
+import os from "os";
+import rewire from "rewire";
+import sinon from "sinon";
+import stream from "stream";
 import * as outputCommandHelper from "../src/helpers/command";
 
 describe("Commands helper", () => {

@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from "fs-extra";
-import { Uri, window, workspace } from "vscode";
-import { Constants, RequiredApps } from "../Constants";
+import fs from "fs-extra";
+import {Uri, window, workspace} from "vscode";
+import {Constants, RequiredApps} from "../Constants";
 import {
   gitHelper,
   outputCommandHelper,
@@ -14,8 +14,8 @@ import {
   showQuickPick,
   TruffleConfiguration,
 } from "../helpers";
-import { CancellationEvent } from "../Models";
-import { Telemetry } from "../TelemetryClient";
+import {CancellationEvent} from "../Models";
+import {Telemetry} from "../TelemetryClient";
 
 interface IProjectDestination {
   cmd: (projectPath: string) => Promise<void>;
@@ -89,17 +89,17 @@ async function createNewEmptyProject(projectPath: string): Promise<void> {
 async function createProjectFromTruffleBox(projectPath: string): Promise<void> {
   const truffleBoxName = await getTruffleBoxName();
 
-  Telemetry.sendEvent("ProjectCommands.createProjectFromTruffleBox.started", { truffleBoxName });
+  Telemetry.sendEvent("ProjectCommands.createProjectFromTruffleBox.started", {truffleBoxName});
 
   await createProject(projectPath, truffleBoxName);
 
-  Telemetry.sendEvent("ProjectCommands.createProjectFromTruffleBox.finished", { truffleBoxName });
+  Telemetry.sendEvent("ProjectCommands.createProjectFromTruffleBox.finished", {truffleBoxName});
 }
 
 async function createProject(projectPath: string, truffleBoxName: string): Promise<void> {
   await showIgnorableNotification(Constants.statusBarMessages.creatingProject, async () => {
     try {
-      Telemetry.sendEvent("ProjectCommands.createProject.unbox", { truffleBoxName });
+      Telemetry.sendEvent("ProjectCommands.createProject.unbox", {truffleBoxName});
       await outputCommandHelper.executeCommand(projectPath, "npx", RequiredApps.truffle, "unbox", truffleBoxName);
 
       TruffleConfiguration.checkTruffleConfigNaming(projectPath);

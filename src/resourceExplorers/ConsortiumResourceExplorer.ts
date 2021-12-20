@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as open from "open";
+import open from "open";
 import {ProgressLocation, QuickPickItem, window} from "vscode";
 import {IAzureConsortiumDto, IAzureConsortiumMemberDto, ICreateQuorumMember, ISkuDto} from "../ARMBlockchain";
 import {AzureBlockchainServiceClient} from "../ARMBlockchain/AzureBlockchainServiceClient";

@@ -1,12 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { HttpMethods, IncomingMessage, ServiceClientCredentials, WebResource } from "ms-rest";
-import { AzureServiceClient, AzureServiceClientOptions, UserTokenCredentials } from "ms-rest-azure";
-import * as uuid from "uuid";
-import { window } from "vscode";
-import { Constants } from "../Constants";
-import { Telemetry } from "../TelemetryClient";
+import {HttpMethods, IncomingMessage, ServiceClientCredentials, WebResource} from "ms-rest";
+import {AzureServiceClient, AzureServiceClientOptions, UserTokenCredentials} from "ms-rest-azure";
+import uuid from "uuid";
+import {window} from "vscode";
+import {Constants} from "../Constants";
+import {Telemetry} from "../TelemetryClient";
 
 export class BaseClient extends AzureServiceClient {
   constructor(
@@ -55,7 +55,7 @@ export class BaseClient extends AzureServiceClient {
           return callback(null, parsedResult);
         } catch (error) {
           Telemetry.sendException(new Error("Unexpected token in JSON at position 1"));
-          return callback(new Error(`Error ${error.message} occurred in deserialize the responseBody`));
+          return callback(new Error(`Error ${(error as Error).message} occurred in deserialize the responseBody`));
         }
       }
     });

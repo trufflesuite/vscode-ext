@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as truffleProvider from "@truffle/provider";
-import * as Web3 from "web3";
+import truffleProvider from "@truffle/provider";
+import Web3 from "web3";
 import {ConfigurationReader} from "./configurationReader";
 // import * as web3core from "web3-core";
 

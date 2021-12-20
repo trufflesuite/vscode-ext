@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as truffleDebugger from "@truffle/debugger";
-import * as assert from "assert";
-import * as sinon from "sinon";
+import truffleDebugger from "@truffle/debugger";
+import assert from "assert";
+import sinon from "sinon";
 import * as contractsPrepareHelpers from "../../src/debugAdapter/contracts/contractsPrepareHelpers";
 import {IContractModel} from "../../src/debugAdapter/models/IContractModel";
 import RuntimeInterface from "../../src/debugAdapter/runtimeInterface";

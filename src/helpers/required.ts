@@ -1,23 +1,23 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from "fs-extra";
-import * as path from "path";
-import * as semver from "semver";
-import { commands, ProgressLocation, window } from "vscode";
-import { Constants, RequiredApps } from "../Constants";
-import { getWorkspaceRoot } from "../helpers";
-import { Output } from "../Output";
-import { Telemetry } from "../TelemetryClient";
-import { executeCommand, tryExecuteCommand } from "./command";
-import { TruffleConfiguration } from "./truffleConfig";
+import fs from "fs-extra";
+import path from "path";
+import semver from "semver";
+import {commands, ProgressLocation, window} from "vscode";
+import {Constants, RequiredApps} from "../Constants";
+import {getWorkspaceRoot} from "../helpers";
+import {Output} from "../Output";
+import {Telemetry} from "../TelemetryClient";
+import {executeCommand, tryExecuteCommand} from "./command";
+import {TruffleConfiguration} from "./truffleConfig";
 
 export namespace required {
   export interface IRequiredVersion {
     app: string;
     isValid: boolean;
     version: string;
-    requiredVersion: string | { min: string; max: string };
+    requiredVersion: string | {min: string; max: string};
   }
 
   export enum Scope {
@@ -25,7 +25,7 @@ export namespace required {
     global = 0,
   }
 
-  const currentState: { [key: string]: IRequiredVersion } = {};
+  const currentState: {[key: string]: IRequiredVersion} = {};
 
   const requiredApps = [RequiredApps.node, RequiredApps.npm, RequiredApps.git];
   const auxiliaryApps = [RequiredApps.python, RequiredApps.truffle, RequiredApps.ganache];
@@ -101,8 +101,8 @@ export namespace required {
       } else {
         return isValid(
           installedVersion,
-          (requiredVersion as { max: string; min: string }).min,
-          (requiredVersion as { max: string; min: string }).max
+          (requiredVersion as {max: string; min: string}).min,
+          (requiredVersion as {max: string; min: string}).max
         );
       }
     }
@@ -288,7 +288,7 @@ export namespace required {
 
   async function installUsingNpm(
     packageName: string,
-    packageVersion: string | { min: string; max: string },
+    packageVersion: string | {min: string; max: string},
     scope?: Scope
   ): Promise<void> {
     const versionString =

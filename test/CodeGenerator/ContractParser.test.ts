@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as fs from "fs-extra";
-import * as sinon from "sinon";
-import { parseSolidityContract } from "../../src/Generators/CodeGenerator/ContractParser";
+import assert from "assert";
+import fs from "fs-extra";
+import sinon from "sinon";
+import {parseSolidityContract} from "../../src/Generators/CodeGenerator/ContractParser";
 
 describe("ContractParser", () => {
   afterEach(() => {
@@ -16,7 +16,7 @@ describe("ContractParser", () => {
     sinon.stub(fs, "readFileSync").returns(contractMetadata);
 
     // Act
-    const { variables, functionsDefinitions } = parseSolidityContract("");
+    const {variables, functionsDefinitions} = parseSolidityContract("");
 
     // Assert
     assert.strictEqual(functionsDefinitions.length, 8, "Array should have only public and external functions");

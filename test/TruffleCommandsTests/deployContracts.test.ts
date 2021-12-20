@@ -1,19 +1,19 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as fs from "fs";
-import * as path from "path";
-import rewire = require("rewire");
-import * as sinon from "sinon";
-import uuid = require("uuid");
-import * as vscode from "vscode";
-import { TruffleCommands } from "../../src/commands/TruffleCommands";
-import { Constants } from "../../src/Constants";
+import assert from "assert";
+import fs from "fs";
+import path from "path";
+import rewire from "rewire";
+import sinon from "sinon";
+import uuid from "uuid";
+import vscode from "vscode";
+import {TruffleCommands} from "../../src/commands/TruffleCommands";
+import {Constants} from "../../src/Constants";
 import * as helpers from "../../src/helpers";
-import { openZeppelinHelper, TruffleConfiguration } from "../../src/helpers";
+import {openZeppelinHelper, TruffleConfiguration} from "../../src/helpers";
 import * as commands from "../../src/helpers/command";
-import { CancellationEvent, ItemType } from "../../src/Models";
+import {CancellationEvent, ItemType} from "../../src/Models";
 import {
   AzureBlockchainNetworkNode,
   AzureBlockchainProject,
@@ -31,13 +31,13 @@ import {
   Member,
   Service,
 } from "../../src/Models/TreeItems";
-import { ConsortiumResourceExplorer } from "../../src/resourceExplorers";
-import { GanacheService, MnemonicRepository, OpenZeppelinMigrationsService, TreeManager } from "../../src/services";
-import { OpenZeppelinService } from "../../src/services";
-import { OZContractValidated } from "../../src/services/openZeppelin/models";
-import { TestConstants } from "../TestConstants";
-import { AzureAccountHelper } from "../testHelpers/AzureAccountHelper";
-const { service } = Constants.treeItemData;
+import {ConsortiumResourceExplorer} from "../../src/resourceExplorers";
+import {GanacheService, MnemonicRepository, OpenZeppelinMigrationsService, TreeManager} from "../../src/services";
+import {OpenZeppelinService} from "../../src/services";
+import {OZContractValidated} from "../../src/services/openZeppelin/models";
+import {TestConstants} from "../TestConstants";
+import {AzureAccountHelper} from "../testHelpers/AzureAccountHelper";
+const {service} = Constants.treeItemData;
 
 describe("TruffleCommands", () => {
   describe("Integration test", async () => {
@@ -436,7 +436,7 @@ describe("TruffleCommands", () => {
 
       it("to local network should complete successfully", async () => {
         // Arrange
-        const { local } = TestConstants.consortiumTestNames;
+        const {local} = TestConstants.consortiumTestNames;
         checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
@@ -478,7 +478,7 @@ describe("TruffleCommands", () => {
 
       it("to local network should throw exception when there is an error on command execution", async () => {
         // Arrange
-        const { local } = TestConstants.consortiumTestNames;
+        const {local} = TestConstants.consortiumTestNames;
         checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.throws(TestConstants.testError);
@@ -518,7 +518,7 @@ describe("TruffleCommands", () => {
 
       it("to AzureBlockchain Service should generate mnemonic and complete successfully", async () => {
         // Arrange
-        const { consortium, member, transactionNode } = azureNames;
+        const {consortium, member, transactionNode} = azureNames;
         checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
@@ -574,7 +574,7 @@ describe("TruffleCommands", () => {
 
       it("to AzureBlockchainService should complete successfully when user paste mnemonic", async () => {
         // Arrange
-        const { consortium, member, transactionNode } = azureNames;
+        const {consortium, member, transactionNode} = azureNames;
         checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
@@ -632,7 +632,7 @@ describe("TruffleCommands", () => {
       it("Blockchain Data Manager should be ignored in deploy destination list", async () => {
         // Arrange
         let isBDMExist = false;
-        const { local } = TestConstants.consortiumTestNames;
+        const {local} = TestConstants.consortiumTestNames;
         checkAppsSilentMock.returns(true);
         getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());

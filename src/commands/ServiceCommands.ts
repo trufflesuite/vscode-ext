@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as open from "open";
+import open from "open";
 import {Constants} from "../Constants";
 import {showQuickPick, telemetryHelper} from "../helpers";
 import {ItemType} from "../Models";

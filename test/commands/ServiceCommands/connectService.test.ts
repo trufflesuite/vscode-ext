@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as sinon from "sinon";
-import * as uuid from "uuid";
+import assert from "assert";
+import sinon from "sinon";
+import uuid from "uuid";
 import * as vscode from "vscode";
-import { ServiceCommands } from "../../../src/commands";
-import { Constants } from "../../../src/Constants";
-import { ItemType } from "../../../src/Models";
+import {ServiceCommands} from "../../../src/commands";
+import {Constants} from "../../../src/Constants";
+import {ItemType} from "../../../src/Models";
 import {
   AzureBlockchainService,
   IExtensionItem,
@@ -17,10 +17,10 @@ import {
   Project,
   Service,
 } from "../../../src/Models/TreeItems";
-import { InfuraResourceExplorer } from "../../../src/resourceExplorers";
-import { GanacheService, TreeManager } from "../../../src/services";
-import { getRandomInt } from "../../testHelpers/Random";
-const { project, service } = Constants.treeItemData;
+import {InfuraResourceExplorer} from "../../../src/resourceExplorers";
+import {GanacheService, TreeManager} from "../../../src/services";
+import {getRandomInt} from "../../testHelpers/Random";
+const {project, service} = Constants.treeItemData;
 
 describe("Service Commands", () => {
   let getItemsMock: any;

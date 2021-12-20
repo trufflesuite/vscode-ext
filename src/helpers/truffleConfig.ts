@@ -1,20 +1,20 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as acorn from "acorn";
+import {parse} from "acorn";
 // @ts-ignore
 import * as walk from "acorn-walk";
-import { generate } from "astring";
-import * as bip39 from "bip39";
-import * as crypto from "crypto";
-import * as ESTree from "estree";
-import * as fs from "fs-extra";
-import * as path from "path";
-import { Constants } from "../Constants";
-import { getWorkspaceRoot } from "../helpers";
-import { MnemonicRepository } from "../services";
-import { Telemetry } from "../TelemetryClient";
-import { tryExecuteCommandInFork } from "./command";
+import {generate} from "astring";
+import {entropyToMnemonic} from "bip39";
+import crypto from "crypto";
+import ESTree from "estree";
+import fs from "fs-extra";
+import path from "path";
+import {Constants} from "../Constants";
+import {getWorkspaceRoot} from "../helpers";
+import {MnemonicRepository} from "../services";
+import {Telemetry} from "../TelemetryClient";
+import {tryExecuteCommandInFork} from "./command";
 
 export namespace TruffleConfiguration {
   const notAllowedSymbols = new RegExp(
@@ -129,7 +129,7 @@ export namespace TruffleConfiguration {
   }
 
   export function generateMnemonic(): string {
-    return bip39.entropyToMnemonic(crypto.randomBytes(16).toString("hex"));
+    return entropyToMnemonic(crypto.randomBytes(16).toString("hex"));
   }
 
   /**
@@ -148,7 +148,7 @@ export namespace TruffleConfiguration {
 
     constructor(private readonly filePath: string) {
       const file = fs.readFileSync(this.filePath, "utf8");
-      this.ast = acorn.parse(file, {
+      this.ast = parse(file, {
         allowHashBang: true,
         allowReserved: true,
         sourceType: "module",
@@ -160,7 +160,7 @@ export namespace TruffleConfiguration {
     }
 
     public writeAST(): void {
-      return fs.writeFileSync(this.filePath, generate(this.ast, { comments: true }));
+      return fs.writeFileSync(this.filePath, generate(this.ast, {comments: true}));
     }
 
     public getNetworks(): INetwork[] {
@@ -464,7 +464,7 @@ export namespace TruffleConfiguration {
       raw: generate(node),
     };
 
-    const mnemonicNode = node.arguments[0] as ESTree.NewExpression & ESTree.Literal;
+    const mnemonicNode: any = node.arguments[0] as ESTree.NewExpression & ESTree.Literal;
 
     const mnemonicFilePathNode =
       mnemonicNode && mnemonicNode.arguments && (mnemonicNode.arguments[0] as ESTree.Literal);
@@ -501,8 +501,8 @@ export namespace TruffleConfiguration {
     };
   }
 
-  function jsonToConfiguration(truffleConfig: { [key: string]: any }): IConfiguration {
-    const { contracts_directory, contracts_build_directory, migrations_directory } =
+  function jsonToConfiguration(truffleConfig: {[key: string]: any}): IConfiguration {
+    const {contracts_directory, contracts_build_directory, migrations_directory} =
       Constants.truffleConfigDefaultDirectory;
 
     if (!truffleConfig.hasOwnProperty("contracts_directory")) {

@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as path from "path";
-import { executeCommand } from "./cmdCommandExecutor";
-import { ConfigurationReader } from "./configurationReader";
-import { TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE, TRUFFLE_CONFIG_NAME } from "./constants/truffleConfig";
+import path from "path";
+import {executeCommand} from "./cmdCommandExecutor";
+import {ConfigurationReader} from "./configurationReader";
+import {TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE, TRUFFLE_CONFIG_NAME} from "./constants/truffleConfig";
 
 export class DebugNetwork {
   public workingDirectory: string;

@@ -1,14 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as path from "path";
-import { debug, DebugConfiguration, QuickPickItem, workspace } from "vscode";
-import { DEBUG_TYPE } from "../debugAdapter/constants/debugAdapter";
-import { DebugNetwork } from "../debugAdapter/debugNetwork";
-import { TransactionProvider } from "../debugAdapter/transaction/transactionProvider";
-import { Web3Wrapper } from "../debugAdapter/web3Wrapper";
-import { showInputBox, showQuickPick } from "../helpers/userInteraction";
-import { Telemetry } from "../TelemetryClient";
+import path from "path";
+import {debug, DebugConfiguration, QuickPickItem, workspace} from "vscode";
+import {DEBUG_TYPE} from "../debugAdapter/constants/debugAdapter";
+import {DebugNetwork} from "../debugAdapter/debugNetwork";
+import {TransactionProvider} from "../debugAdapter/transaction/transactionProvider";
+import {Web3Wrapper} from "../debugAdapter/web3Wrapper";
+import {showInputBox, showQuickPick} from "../helpers/userInteraction";
+import {Telemetry} from "../TelemetryClient";
 
 export namespace DebuggerCommands {
   export async function startSolidityDebugger() {
@@ -42,7 +42,7 @@ export namespace DebuggerCommands {
     } else {
       // if remote network then require txHash
       const placeHolder = "Type the transaction hash you want to debug (0x...)";
-      const txHash = await showInputBox({ placeHolder });
+      const txHash = await showInputBox({placeHolder});
       if (txHash) {
         const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
         debug.startDebugging(undefined, config).then(() => {
@@ -59,7 +59,7 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
 
   return txInfos.map((txInfo) => {
     const description = generateDescription(txInfo.contractName, txInfo.methodName);
-    return { alwaysShow: true, label: txInfo.hash, description } as QuickPickItem;
+    return {alwaysShow: true, label: txInfo.hash, description} as QuickPickItem;
   });
 }
 

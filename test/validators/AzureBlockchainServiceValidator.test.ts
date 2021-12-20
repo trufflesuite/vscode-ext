@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import rewire = require("rewire");
-import sinon = require("sinon");
-import { Constants } from "../../src/Constants";
-import { AzureBlockchainServiceValidator } from "../../src/validators/AzureBlockchainServiceValidator";
+import assert from "assert";
+import rewire from "rewire";
+import sinon from "sinon";
+import {Constants} from "../../src/Constants";
+import {AzureBlockchainServiceValidator} from "../../src/validators/AzureBlockchainServiceValidator";
 
-const { azureBlockchainResourceName, password, resourceGroup } = Constants.lengthParam;
+const {azureBlockchainResourceName, password, resourceGroup} = Constants.lengthParam;
 ``;
 describe("AzureBlockchain Service Validator", () => {
   const emptyValues = ["", " "];

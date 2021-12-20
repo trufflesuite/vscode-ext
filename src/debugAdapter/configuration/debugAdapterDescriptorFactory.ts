@@ -10,8 +10,8 @@ import {
   ProviderResult,
 } from "vscode";
 
-import * as Net from "net";
-import { SolidityDebugSession } from "../debugSession";
+import Net from "net";
+import {SolidityDebugSession} from "../debugSession";
 
 export default class TruffleDebugAdapterDescriptorFactory implements DebugAdapterDescriptorFactory {
   private _server?: Net.Server;

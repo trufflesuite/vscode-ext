@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as bip39 from "bip39";
-import * as fs from "fs-extra";
+import {mnemonicToSeed} from "bip39";
+import fs from "fs-extra";
 // @ts-ignore
-import * as hdkey from "hdkey";
-import * as path from "path";
-import { QuickPickItem, Uri, window } from "vscode";
-import { Constants, RequiredApps } from "../Constants";
+import hdkey from "hdkey";
+import path from "path";
+import {QuickPickItem, Uri, window} from "vscode";
+import {Constants, RequiredApps} from "../Constants";
 import {
   getWorkspaceRoot,
   openZeppelinHelper,
@@ -21,11 +21,11 @@ import {
   TruffleConfiguration,
   vscodeEnvironment,
 } from "../helpers";
-import { IDeployDestination, ItemType } from "../Models";
-import { NetworkForContractItem } from "../Models/QuickPickItems/NetworkForContractItem";
-import { AzureBlockchainProject, InfuraProject, LocalProject, LocalService } from "../Models/TreeItems";
-import { Project } from "../Models/TreeItems";
-import { Output } from "../Output";
+import {IDeployDestination, ItemType} from "../Models";
+import {NetworkForContractItem} from "../Models/QuickPickItems/NetworkForContractItem";
+import {AzureBlockchainProject, InfuraProject, LocalProject, LocalService} from "../Models/TreeItems";
+import {Project} from "../Models/TreeItems";
+import {Output} from "../Output";
 import {
   ContractDB,
   ContractInstanceWithMetadata,
@@ -35,10 +35,10 @@ import {
   OpenZeppelinService,
   TreeManager,
 } from "../services";
-import { OZContractValidated } from "../services/openZeppelin/models";
-import { Telemetry } from "../TelemetryClient";
-import { NetworkNodeView } from "../ViewItems";
-import { ServiceCommands } from "./ServiceCommands";
+import {OZContractValidated} from "../services/openZeppelin/models";
+import {Telemetry} from "../TelemetryClient";
+import {NetworkNodeView} from "../ViewItems";
+import {ServiceCommands} from "./ServiceCommands";
 
 interface IDeployDestinationItem {
   cmd: () => Promise<void>;
@@ -215,7 +215,7 @@ export namespace TruffleCommands {
     }
 
     try {
-      const buffer = await bip39.mnemonicToSeed(mnemonic);
+      const buffer = await mnemonicToSeed(mnemonic);
       const key = hdkey.fromMasterSeed(buffer);
       const childKey = key.derive("m/44'/60'/0'/0/0");
       const privateKey = childKey.privateKey.toString("hex");
@@ -255,7 +255,7 @@ async function installRequiredDependencies(): Promise<void> {
 
   if ((await required.isHdWalletProviderRequired()) && !(await required.checkHdWalletProviderVersion())) {
     if (!(await required.isDefaultProject())) {
-      const { cancelButton, installButton, requiresDependency } = Constants.informationMessage;
+      const {cancelButton, installButton, requiresDependency} = Constants.informationMessage;
       const answer = await window.showInformationMessage(requiresDependency, installButton, cancelButton);
 
       if (answer !== installButton) {
@@ -361,7 +361,7 @@ async function getProjectDeployDestinationItems(
   }
 
   return destinations.map((destination) => {
-    const { description, detail, getTruffleNetwork, label, networkId, networkType, port } = destination;
+    const {description, detail, getTruffleNetwork, label, networkId, networkType, port} = destination;
 
     return {
       cmd: getServiceCreateFunction(networkType, getTruffleNetwork, truffleConfigPath, port),

@@ -1,8 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-// import * as truffleDebugUtils from "@truffle/debug-utils";
-import * as truffleDebugger from "@truffle/debugger";
+import truffleDebugger from "@truffle/debugger";
 import {EventEmitter} from "events";
 import {relative as pathRelative} from "path";
 import {filterContractsWithAddress, prepareContracts} from "./contracts/contractsPrepareHelpers";

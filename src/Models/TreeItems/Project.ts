@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { IDeployDestination } from "../IDeployDestination";
-import { ItemType } from "../ItemType";
-import { ExtensionItem, ExtensionItemData } from "./ExtensionItem";
-import { NetworkNode } from "./NetworkNode";
+import {IDeployDestination} from "../IDeployDestination";
+import {ItemType} from "../ItemType";
+import {ExtensionItem, ExtensionItemData} from "./ExtensionItem";
+import {NetworkNode} from "./NetworkNode";
 
 export type ProjectTypes =
   | ItemType.AZURE_BLOCKCHAIN_PROJECT
@@ -27,5 +27,5 @@ export abstract class Project extends ExtensionItem {
     return networkNodes[0].getRPCAddress();
   }
 
-  public abstract async getDeployDestinations(): Promise<IDeployDestination[]>;
+  public abstract getDeployDestinations(): Promise<IDeployDestination[]>;
 }

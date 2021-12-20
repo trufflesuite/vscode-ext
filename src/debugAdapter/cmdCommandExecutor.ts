@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as cp from "child_process";
-import * as os from "os";
+import cp from "child_process";
+import os from "os";
 
 // The same implementation as in helpers/command.ts
 // The difference is that all code which uses 'vscode' module is removed.

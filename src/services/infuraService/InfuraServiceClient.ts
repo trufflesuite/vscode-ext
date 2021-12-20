@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as requestPromise from "request-promise";
+import requestPromise from "request-promise";
 import {Disposable, Event, EventEmitter, Memento, StatusBarItem, window} from "vscode";
 import {Constants} from "../../Constants";
 import {IToken, refreshToken, signIn, signOut} from "./codeFlowLogin";
@@ -223,7 +223,7 @@ class InfuraClient {
   private async sendRequest(params: any = {}): Promise<any> {
     try {
       return await requestPromise(this.addTokenToParams(params));
-    } catch (error) {
+    } catch (error: any) {
       if (error.response && error.response.statusCode === 401) {
         await this.signInSilently();
         return await requestPromise(this.addTokenToParams(params));

@@ -1,12 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as semver from "semver";
-import * as sinon from "sinon";
-import * as uuid from "uuid";
-import { commands, extensions } from "vscode";
-import { OpenZeppelinExtensionAdapter } from "../src/services/extensionAdapter";
+import assert from "assert";
+import semver from "semver";
+import sinon from "sinon";
+import uuid from "uuid";
+import {commands, extensions} from "vscode";
+import {OpenZeppelinExtensionAdapter} from "../src/services/extensionAdapter";
 
 describe("sdkService", () => {
   let executeCommandMock: sinon.SinonStub<any>;

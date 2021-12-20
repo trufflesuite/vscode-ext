@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 
 import * as assert from "assert";
-import * as fs from "fs-extra";
-const rewire = require("rewire");
-import * as sinon from "sinon";
+import fs from "fs-extra";
+import rewire from "rewire";
+import sinon from "sinon";
 import {CancellationToken, Progress, ProgressOptions, window, workspace} from "vscode";
 import {Constants, RequiredApps} from "../../src/Constants";
 import * as helpers from "../../src/helpers";

@@ -1,18 +1,18 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as fs from "fs";
-import * as path from "path";
-import * as sinon from "sinon";
-import * as vscode from "vscode";
-import { window } from "vscode";
-import { TruffleCommands } from "../../src/commands/TruffleCommands";
-import { Constants } from "../../src/Constants";
-import { vscodeEnvironment } from "../../src/helpers";
-import { EnumStorage } from "../../src/Models";
-import { ContractDB, ContractInstanceWithMetadata, ContractService } from "../../src/services";
-import { Contract } from "../../src/services/contract/Contract";
+import assert from "assert";
+import fs from "fs";
+import path from "path";
+import sinon from "sinon";
+import vscode from "vscode";
+import {window} from "vscode";
+import {TruffleCommands} from "../../src/commands/TruffleCommands";
+import {Constants} from "../../src/Constants";
+import {vscodeEnvironment} from "../../src/helpers";
+import {EnumStorage} from "../../src/Models";
+import {ContractDB, ContractInstanceWithMetadata, ContractService} from "../../src/services";
+import {Contract} from "../../src/services/contract/Contract";
 
 describe("TruffleCommands", () => {
   const fileUri = {
@@ -85,8 +85,8 @@ describe("TruffleCommands", () => {
         contractName: "",
         updateDate: "",
         enumsInfo: new EnumStorage(),
-        provider: { host: "test" },
-        network: { id: "", name: "networkName" },
+        provider: {host: "test"},
+        network: {id: "", name: "networkName"},
         address: "contractAddress",
       } as ContractInstanceWithMetadata;
       const mockContracts = [mockContractInstance];

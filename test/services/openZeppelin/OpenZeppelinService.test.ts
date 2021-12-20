@@ -1,26 +1,26 @@
-import * as assert from "assert";
-import * as fs from "fs-extra";
-import * as path from "path";
-import rewire = require("rewire");
-import sinon = require("sinon");
+import assert from "assert";
+import fs from "fs-extra";
+import path from "path";
+import rewire from "rewire";
+import sinon from "sinon";
 import * as constants from "../../../src/Constants";
 import * as helpers from "../../../src/helpers";
-import { openZeppelinHelper } from "../../../src/helpers";
-import { ContractService, OpenZeppelinService } from "../../../src/services";
-import { IOZAsset, IOZContractCategory, IProjectMetadata } from "../../../src/services/openZeppelin/models";
-import { OpenZeppelinManifest } from "../../../src/services/openZeppelin/OpenZeppelinManifest";
-import { OpenZeppelinProjectJsonService } from "../../../src/services/openZeppelin/OpenZeppelinProjectJsonService";
+import {openZeppelinHelper} from "../../../src/helpers";
+import {ContractService, OpenZeppelinService} from "../../../src/services";
+import {IOZAsset, IOZContractCategory, IProjectMetadata} from "../../../src/services/openZeppelin/models";
+import {OpenZeppelinManifest} from "../../../src/services/openZeppelin/OpenZeppelinManifest";
+import {OpenZeppelinProjectJsonService} from "../../../src/services/openZeppelin/OpenZeppelinProjectJsonService";
 
 describe("OpenZeppelinService", () => {
   let getWorkspaceRootMock: any;
-  let getConfigurationAsyncStub: sinon.SinonStub<[string], Promise<{ defaultValue: string; userValue: string }>>;
+  let getConfigurationAsyncStub: sinon.SinonStub<[string], Promise<{defaultValue: string; userValue: string}>>;
 
   beforeEach(() => {
     sinon.stub(helpers.openZeppelinHelper, "tryGetCurrentOpenZeppelinVersionAsync");
     getWorkspaceRootMock = sinon.stub(helpers, "getWorkspaceRoot");
     getConfigurationAsyncStub = sinon
       .stub(helpers.userSettings, "getConfigurationAsync")
-      .resolves({ defaultValue: "", userValue: "" });
+      .resolves({defaultValue: "", userValue: ""});
   });
 
   afterEach(() => {
@@ -57,7 +57,7 @@ describe("OpenZeppelinService", () => {
     const fsChmodStub = sinon.stub(fs, "chmod").resolves();
     const openZeppelinServiceRewire = rewire("../../../src/services/openZeppelin/OpenZeppelinService");
     openZeppelinServiceRewire.__set__("download", sinon.stub().resolves());
-    const testAssets = [{ id: "1", name: "assetA" } as IOZAsset, { id: "2", name: "assetB" } as IOZAsset];
+    const testAssets = [{id: "1", name: "assetA"} as IOZAsset, {id: "2", name: "assetB"} as IOZAsset];
 
     // Act
     await openZeppelinServiceRewire.OpenZeppelinService.downloadAssetsAsync(
@@ -77,9 +77,9 @@ describe("OpenZeppelinService", () => {
 
   it("updateOpenZeppelinContractsAsync should update contracts in user project", async () => {
     // Arrange
-    const currentAssets = [{ id: "1", name: "A" } as IOZAsset];
-    const newAssets = [{ id: "1", name: "A", dependencies: ["2"] } as IOZAsset, { id: "2", name: "B" } as IOZAsset];
-    const currentProjectJson = { openZeppelin: { assets: currentAssets } } as IProjectMetadata;
+    const currentAssets = [{id: "1", name: "A"} as IOZAsset];
+    const newAssets = [{id: "1", name: "A", dependencies: ["2"]} as IOZAsset, {id: "2", name: "B"} as IOZAsset];
+    const currentProjectJson = {openZeppelin: {assets: currentAssets}} as IProjectMetadata;
     const mockOpenZeppelinManifest = {
       collectAssetsWithDependencies: (_assetIds: string[]) => newAssets,
       getAssets: () => [] as IOZAsset[],
@@ -127,7 +127,7 @@ describe("OpenZeppelinService", () => {
 
   describe("getCurrentOpenZeppelinVersionAsync", () => {
     const testProjectJsonVersion = "1.0.0";
-    const testUserSettingsVersion = { defaultValue: "default", userValue: "value" };
+    const testUserSettingsVersion = {defaultValue: "default", userValue: "value"};
 
     let openZeppelinServiceRewire: any;
 
@@ -137,7 +137,7 @@ describe("OpenZeppelinService", () => {
       getConfigurationAsyncStub.resolves(testUserSettingsVersion);
       sinon
         .stub(OpenZeppelinProjectJsonService, "getProjectJson")
-        .resolves({ openZeppelin: { version: testProjectJsonVersion } } as IProjectMetadata);
+        .resolves({openZeppelin: {version: testProjectJsonVersion}} as IProjectMetadata);
 
       constants.Constants.allOpenZeppelinVersions = [
         "1.0.0",
@@ -192,7 +192,7 @@ describe("OpenZeppelinService", () => {
 
   it("getLatestOpenZeppelinVersionAsync should return defaultValue from userSettings", async () => {
     // Arrange
-    const testUserSettingsVersion = { defaultValue: "default", userValue: "value" };
+    const testUserSettingsVersion = {defaultValue: "default", userValue: "value"};
     getConfigurationAsyncStub.resolves(testUserSettingsVersion);
 
     // Act

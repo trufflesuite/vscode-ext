@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from "fs-extra";
-import * as open from "open";
-import * as path from "path";
+import fs from "fs-extra";
+import open from "open";
+import path from "path";
 import {ProgressLocation, QuickPickItem, window} from "vscode";
 import {
   BlockchainDataManagerResource,

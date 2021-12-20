@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from "fs-extra";
+import fs from "fs-extra";
 import {
   FunctionDefinition,
   parse,
@@ -34,7 +34,7 @@ export function parseSolidityContract(solFilePath: string): {
     },
   });
 
-  return { variables: stateVariableArray, functionsDefinitions: functionArray };
+  return {variables: stateVariableArray, functionsDefinitions: functionArray};
 }
 
 function parseFileToAstNode(solFilePath: string) {

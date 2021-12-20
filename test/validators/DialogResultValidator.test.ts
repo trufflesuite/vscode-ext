@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import uuid = require("uuid");
-import { Constants } from "../../src/Constants";
-import { DialogResultValidator } from "../../src/validators/DialogResultValidator";
-import { TestConstants } from "../TestConstants";
+import assert from "assert";
+import uuid from "uuid";
+import {Constants} from "../../src/Constants";
+import {DialogResultValidator} from "../../src/validators/DialogResultValidator";
+import {TestConstants} from "../TestConstants";
 
 describe("DialogResultValidator", () => {
   describe("Unit test", () => {

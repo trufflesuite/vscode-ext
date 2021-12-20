@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import { ServiceClientCredentials } from "ms-rest";
-import * as msrestazure from "ms-rest-azure";
-import * as sinon from "sinon";
-import * as uuid from "uuid";
-import * as vscode from "vscode";
-import { AzureBlockchainServiceClient } from "../src/ARMBlockchain/AzureBlockchainServiceClient";
+import assert from "assert";
+import {ServiceClientCredentials} from "ms-rest";
+import msrestazure from "ms-rest-azure";
+import sinon from "sinon";
+import uuid from "uuid";
+import vscode from "vscode";
+import {AzureBlockchainServiceClient} from "../src/ARMBlockchain/AzureBlockchainServiceClient";
 
 describe("Unit tests for AzureBlockchainServiceClient", () => {
   let credentials: ServiceClientCredentials;
@@ -69,7 +69,7 @@ describe("Unit tests for AzureBlockchainServiceClient", () => {
         callback: async () => await serviceClient.getMembers("consortiumName", callbackFunctionSpy),
         methodName: "getMembers",
       },
-      { callback: async () => await serviceClient.getConsortia(callbackFunctionSpy), methodName: "getConsortia" },
+      {callback: async () => await serviceClient.getConsortia(callbackFunctionSpy), methodName: "getConsortia"},
       {
         callback: async () => await serviceClient.getTransactionNodes(uuid.v4(), callbackFunctionSpy),
         methodName: "getTransactionNodes",
@@ -79,7 +79,7 @@ describe("Unit tests for AzureBlockchainServiceClient", () => {
           await serviceClient.getTransactionNodeAccessKeys(uuid.v4(), uuid.v4(), callbackFunctionSpy),
         methodName: "getTransactionNodeAccessKeys",
       },
-      { callback: async () => await serviceClient.getSkus(callbackFunctionSpy), methodName: "getSkus" },
+      {callback: async () => await serviceClient.getSkus(callbackFunctionSpy), methodName: "getSkus"},
       {
         callback: async () => await serviceClient.getBlockchainDataManagers(callbackFunctionSpy),
         methodName: "getBlockchainDataManagers",
@@ -202,7 +202,7 @@ describe("Unit tests for AzureBlockchainServiceClient", () => {
 
         it("shows error when response has error", async () => {
           // Arrange
-          const error = { message: uuid.v4() };
+          const error = {message: uuid.v4()};
           sendRequestToAzureMock.restore();
           pipelineMock.callsFake((...args: any[]): {} => {
             return args[1](error);
@@ -227,7 +227,7 @@ describe("Unit tests for AzureBlockchainServiceClient", () => {
               // Arrange
               sendRequestToAzureMock.restore();
               pipelineMock.callsFake((...args: any[]): {} => {
-                return args[1](null, { statusCode });
+                return args[1](null, {statusCode});
               });
 
               // Act
@@ -247,7 +247,7 @@ describe("Unit tests for AzureBlockchainServiceClient", () => {
               // Arrange
               sendRequestToAzureMock.restore();
               pipelineMock.callsFake((...args: any[]): {} => {
-                return args[1](null, { statusCode }, "");
+                return args[1](null, {statusCode}, "");
               });
 
               // Act

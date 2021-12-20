@@ -1,22 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as fs from "fs";
-import * as sinon from "sinon";
-import uuid = require("uuid");
-import {
-  InputBoxOptions,
-  QuickPickItem,
-  QuickPickOptions,
-  Uri,
-  window,
-  workspace,
-  WorkspaceConfiguration,
-} from "vscode";
-import { Constants } from "../src/Constants";
+import assert from "assert";
+import fs from "fs";
+import sinon from "sinon";
+import uuid from "uuid";
+import {InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace, WorkspaceConfiguration} from "vscode";
+import {Constants} from "../src/Constants";
 import * as userInteraction from "../src/helpers/userInteraction";
-import { CancellationEvent } from "../src/Models";
+import {CancellationEvent} from "../src/Models";
 
 interface ITestItems extends QuickPickItem {
   id: number;
@@ -164,7 +156,7 @@ describe("User interaction test", () => {
   it("showOpenFolderDialog should return a folder path", async () => {
     // Arrange
     const folderPath = "test/test";
-    const uris: Uri[] = [{ fsPath: folderPath } as Uri];
+    const uris: Uri[] = [{fsPath: folderPath} as Uri];
 
     windowMock.expects("showOpenDialog").returns(uris);
 
@@ -179,7 +171,7 @@ describe("User interaction test", () => {
     // Arrange
     const folderPath1 = "test/test";
     const folderPath2 = "test2/test2";
-    const uris: Uri[] = [{ fsPath: folderPath1 }, { fsPath: folderPath2 }] as Uri[];
+    const uris: Uri[] = [{fsPath: folderPath1}, {fsPath: folderPath2}] as Uri[];
 
     windowMock.expects("showOpenDialog").returns(uris);
 
@@ -204,7 +196,7 @@ describe("User interaction test", () => {
     const filePath = "filePath";
     const text = "test text";
 
-    windowMock.expects("showSaveDialog").returns({ fsPath: filePath } as Uri);
+    windowMock.expects("showSaveDialog").returns({fsPath: filePath} as Uri);
     fsMock.expects("writeFileSync");
 
     // Act

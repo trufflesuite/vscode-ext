@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from "fs-extra";
-import * as path from "path";
-import { Constants } from "../../Constants";
-import { getWorkspaceRoot } from "../../helpers";
-import { IOZAsset, IOZContractCategory, IProjectMetadata, OZAssetType } from "./models";
+import fs from "fs-extra";
+import path from "path";
+import {Constants} from "../../Constants";
+import {getWorkspaceRoot} from "../../helpers";
+import {IOZAsset, IOZContractCategory, IProjectMetadata, OZAssetType} from "./models";
 
 const projectFileName: string = "project.json";
 
@@ -14,8 +14,8 @@ export namespace OpenZeppelinProjectJsonService {
     const projectJsonPath = getProjectJsonPath();
 
     return (
-      fs.readJSONSync(projectJsonPath, { throws: false, encoding: "utf8" }) ||
-      ({ openZeppelin: { assets: [], version: "" } } as IProjectMetadata)
+      fs.readJSONSync(projectJsonPath, {throws: false, encoding: "utf8"}) ||
+      ({openZeppelin: {assets: [], version: ""}} as IProjectMetadata)
     );
   }
 

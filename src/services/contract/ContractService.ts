@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from "fs-extra";
-import * as path from "path";
-import { HttpService } from "..";
-import { Constants } from "../../Constants";
-import { getWorkspaceRoot, TruffleConfiguration } from "../../helpers";
-import { Telemetry } from "../../TelemetryClient";
-import { Contract } from "./Contract";
+import fs from "fs-extra";
+import path from "path";
+import {HttpService} from "..";
+import {Constants} from "../../Constants";
+import {getWorkspaceRoot, TruffleConfiguration} from "../../helpers";
+import {Telemetry} from "../../TelemetryClient";
+import {Contract} from "./Contract";
 
 export namespace ContractService {
   export function getContractNameBySolidityFile(solidityFilePath: string): string {

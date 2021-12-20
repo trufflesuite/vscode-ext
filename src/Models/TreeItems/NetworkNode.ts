@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { URL } from "url";
-import { Constants } from "../../Constants";
-import { TruffleConfiguration } from "../../helpers";
-import { ItemType } from "../ItemType";
-import { ExtensionItem, ExtensionItemData } from "./ExtensionItem";
+import {URL} from "url";
+import {Constants} from "../../Constants";
+import {TruffleConfiguration} from "../../helpers";
+import {ItemType} from "../ItemType";
+import {ExtensionItem, ExtensionItemData} from "./ExtensionItem";
 
 const protocolRegExp = new RegExp(
   "^(" +
@@ -47,7 +47,7 @@ export abstract class NetworkNode extends ExtensionItem {
     this.networkId = networkId;
   }
 
-  public toJSON(): { [key: string]: any } {
+  public toJSON(): {[key: string]: any} {
     const obj = super.toJSON();
 
     obj.url = this.url.toString();
@@ -74,9 +74,9 @@ export abstract class NetworkNode extends ExtensionItem {
     };
   }
 
-  protected abstract async getGasPrice(): Promise<number | undefined>;
+  protected abstract getGasPrice(): Promise<number | undefined>;
 
-  protected abstract async getGasLimit(): Promise<number | undefined>;
+  protected abstract getGasLimit(): Promise<number | undefined>;
 
   protected abstract defaultProtocol(): string;
 

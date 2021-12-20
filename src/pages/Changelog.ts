@@ -1,12 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from "fs-extra";
-import * as semver from "semver";
-import { commands, ExtensionContext } from "vscode";
-import { Constants } from "../Constants";
-import { Telemetry } from "../TelemetryClient";
-import { BasicWebView, IWebViewConfig } from "./BasicWebView";
+import fs from "fs-extra";
+import semver from "semver";
+import {commands, ExtensionContext} from "vscode";
+import {Constants} from "../Constants";
+import {Telemetry} from "../TelemetryClient";
+import {BasicWebView, IWebViewConfig} from "./BasicWebView";
 
 export class ChangelogPage extends BasicWebView {
   protected readonly config: IWebViewConfig;

@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {HttpMethods, WebResource} from "ms-rest";
-import * as requestPromise from "request-promise";
+import requestPromise from "request-promise";
 import {Constants} from "../../Constants";
 import {Telemetry} from "../../TelemetryClient";
 
@@ -72,7 +72,7 @@ class BlobClient {
     try {
       responseBody = await requestPromise({...params});
     } catch (error) {
-      if (!error.message.includes("ContainerNotFound")) {
+      if (!(error as Error).message.includes("ContainerNotFound")) {
         Telemetry.sendException(new Error("BlobServiceClient.sendRequest.error"));
       }
 
@@ -84,7 +84,7 @@ class BlobClient {
       return responseBody ? JSON.parse(responseBody) : null;
     } catch (error) {
       Telemetry.sendException(new Error("Invalid JSON"));
-      throw new Error(`Error '${error.message}' occurred in deserialize the responseBody`);
+      throw new Error(`Error '${(error as Error).message}' occurred in deserialize the responseBody`);
     }
   }
 }

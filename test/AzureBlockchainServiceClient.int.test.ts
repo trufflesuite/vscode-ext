@@ -1,12 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import { ServiceClientCredentials } from "ms-rest";
-import * as sinon from "sinon";
-import * as uuid from "uuid";
-import * as vscode from "vscode";
-import { AzureBlockchainServiceClient } from "../src/ARMBlockchain";
+import assert from "assert";
+import {ServiceClientCredentials} from "ms-rest";
+import sinon from "sinon";
+import uuid from "uuid";
+import vscode from "vscode";
+import {AzureBlockchainServiceClient} from "../src/ARMBlockchain";
 
 describe("Integration tests for AzureBlockchainServiceClient", () => {
   let credentials: ServiceClientCredentials;
@@ -112,8 +112,8 @@ describe("Integration tests for AzureBlockchainServiceClient", () => {
       callback: async () => await serviceClient.getTransactionNodeAccessKeys(uuid.v4(), uuid.v4(), callbackFunctionSpy),
       methodName: "getTransactionNodeAccessKeys",
     },
-    { callback: async () => await serviceClient.getSkus(callbackFunctionSpy), methodName: "getSkus" },
-    { callback: async () => await serviceClient.getConsortia(callbackFunctionSpy), methodName: "getConsortia" },
+    {callback: async () => await serviceClient.getSkus(callbackFunctionSpy), methodName: "getSkus"},
+    {callback: async () => await serviceClient.getConsortia(callbackFunctionSpy), methodName: "getConsortia"},
     {
       callback: async () => await serviceClient.getBlockchainDataManagers(callbackFunctionSpy),
       methodName: "getBlockchainDataManagers",
@@ -155,7 +155,7 @@ describe("Integration tests for AzureBlockchainServiceClient", () => {
       it("shows error when request failed.", async () => {
         // Arrange
         const response = sinon.stub();
-        const error = { message: uuid.v4() };
+        const error = {message: uuid.v4()};
 
         pipelineMock.callsFake((...args: any[]): {} => {
           return args[1](error, response, defaultResponseBody);
@@ -180,7 +180,7 @@ describe("Integration tests for AzureBlockchainServiceClient", () => {
             response[1]
           )}.`, async () => {
             // Arrange
-            const res = { statusCode: response[0] };
+            const res = {statusCode: response[0]};
             let pipelineCallbackSpy: any;
 
             pipelineMock.callsFake((...args: any[]): {} => {
@@ -199,7 +199,7 @@ describe("Integration tests for AzureBlockchainServiceClient", () => {
 
       it("does not throw error when response is success.", async () => {
         // Arrange
-        const res = { statusCode: 200 };
+        const res = {statusCode: 200};
         const parsedResult = JSON.parse(defaultResponseBody);
         let pipelineCallbackSpy: any;
 

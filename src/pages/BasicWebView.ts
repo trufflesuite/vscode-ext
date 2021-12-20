@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from "fs-extra";
+import fs from "fs-extra";
 import {
   Disposable,
   ExtensionContext,
@@ -12,9 +12,9 @@ import {
   WebviewPanelOptions,
   window,
 } from "vscode";
-import { Constants } from "../Constants";
-import { showNotification } from "../helpers";
-import { Telemetry } from "../TelemetryClient";
+import {Constants} from "../Constants";
+import {showNotification} from "../helpers";
+import {Telemetry} from "../TelemetryClient";
 
 export interface IWebViewConfig {
   path: string;
@@ -99,7 +99,7 @@ export abstract class BasicWebView {
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
   }
 
-  protected abstract async setShowOnStartupFlagAtFirstTime(): Promise<boolean>;
+  protected abstract setShowOnStartupFlagAtFirstTime(): Promise<boolean>;
 
   protected async getHtmlForWebview(): Promise<string> {
     if (this.panel) {
@@ -111,7 +111,7 @@ export abstract class BasicWebView {
     return "";
   }
 
-  protected async receiveMessage(message: { [key: string]: any }): Promise<void> {
+  protected async receiveMessage(message: {[key: string]: any}): Promise<void> {
     if (!this.panel) {
       return;
     }
@@ -144,8 +144,8 @@ export abstract class BasicWebView {
       this.startShowDate = 0;
       Telemetry.sendEvent(
         Constants.telemetryEvents.webPages.disposeWebPage,
-        { viewType: this.config.viewType },
-        { duration }
+        {viewType: this.config.viewType},
+        {duration}
       );
     }
 
