@@ -25,8 +25,8 @@ export abstract class MnemonicNetworkNode extends NetworkNode {
       if (!targetURL) {
         window.showInformationMessage(Constants.informationMessage.networkIsNotReady(this.constructor.name));
       }
-    } catch (error: any) {
-      Telemetry.sendException(error);
+    } catch (error) {
+      Telemetry.sendException(error as Error);
     }
 
     network.options.provider = {

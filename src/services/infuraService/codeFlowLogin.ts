@@ -48,8 +48,8 @@ export async function signIn() {
     const code = await codePromise;
 
     return await getToken(code);
-  } catch (error: any) {
-    Telemetry.sendException(error);
+  } catch (error) {
+    Telemetry.sendException(error as Error);
     throw error;
   } finally {
     setTimeout(() => server.close(), closeTimeout);

@@ -12,8 +12,8 @@ export async function isGanacheServer(port: number | string): Promise<boolean> {
       Constants.rpcMethods.netListening
     );
     return (response && !!response.result) || false;
-  } catch (error: any) {
-    Telemetry.sendException(error);
+  } catch (error) {
+    Telemetry.sendException(error as Error);
     return false;
   }
 }

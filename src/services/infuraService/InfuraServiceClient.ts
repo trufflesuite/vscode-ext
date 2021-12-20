@@ -223,8 +223,8 @@ class InfuraClient {
   private async sendRequest(params: any = {}): Promise<any> {
     try {
       return await requestPromise(this.addTokenToParams(params));
-    } catch (error: any) {
-      if (error.response && error.response.statusCode === 401) {
+    } catch (error) {
+      if ((error as any).response && (error as any).response.statusCode === 401) {
         await this.signInSilently();
         return await requestPromise(this.addTokenToParams(params));
       } else {

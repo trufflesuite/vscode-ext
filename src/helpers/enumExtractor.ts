@@ -22,9 +22,11 @@ interface IEnumNode extends INode {
 export function extractEnumsInfoSafe(contractName: string, ast: {[key: string]: any}): EnumStorage {
   try {
     return extractEnumsInfo(contractName, ast);
-  } catch (error: any) {
-    Output.outputLine(Constants.outputChannel.telemetryClient, error.message);
-    Telemetry.sendException(error);
+  } catch (error) {
+    if (error instanceof Error) {
+      Output.outputLine(Constants.outputChannel.telemetryClient, error.message);
+      Telemetry.sendException(error);
+    }
   }
   return new EnumStorage();
 }
