@@ -13,7 +13,7 @@ jobs:
     name: cicd
     runs-on: windows-latest
     env:
-      VSCE_FLAGS: '' # empty by default
+      VSCE_FLAGS: '--pre-release' # have to set as pre-release here. env is not working as expected.
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
@@ -72,14 +72,16 @@ jobs:
           VERSION: "${{ steps.gitversion.outputs.majorMinorPatch }}"
 
       - name: configure package flags
+        id: package_flags
         if: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
         run: |
-           echo "VSCE_FLAGS='--pre-release'" >> $GITHUB_ENV
+           echo "VSCE_FLAGS=--pre-release" >> $GITHUB_ENV
+           echo "flags_set=true" >> $GITHUB_ENV
 
       - name: compile and create vsix
         run: |
-          echo "Packaging VSIX ::VSCE_FLAGS=${{ env.VSCE_FLAGS }}::"
-          yarn package ${{ env.VSCE_FLAGS }}
+          echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} ::"
+          yarn package --pre-release
 
       - name: print vsix path
         run: |
