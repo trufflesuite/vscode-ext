@@ -1,7 +1,7 @@
 {
   "name": "trufflesuite-vscode",
   "displayName": "Trufflesuite for VSCode",
-  "description": "Develop and deploy on the Ethereum Ecosystem from inside VSCode.",
+  "description": "Develop and deploy on the Ethereum Ecosystem with VSCode.",
   "publisher": "trufflesuite-csi",
   "preview": true,
   "icon": "images/TruffleLogo.png",
