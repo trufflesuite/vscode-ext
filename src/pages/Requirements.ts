@@ -1,10 +1,10 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { ExtensionContext } from 'vscode';
-import { Constants } from '../Constants';
-import { required } from '../helpers';
-import { BasicWebView, IWebViewConfig } from './BasicWebView';
+import { ExtensionContext } from "vscode";
+import { Constants } from "../Constants";
+import { required } from "../helpers";
+import { BasicWebView, IWebViewConfig } from "./BasicWebView";
 
 export class RequirementsPage extends BasicWebView {
   protected readonly config: IWebViewConfig;
@@ -18,30 +18,30 @@ export class RequirementsPage extends BasicWebView {
     return true;
   }
 
-  protected async receiveMessage(message: {[key: string]: any}): Promise<void> {
+  protected async receiveMessage(message: { [key: string]: any }): Promise<void> {
     await super.receiveMessage(message);
 
     if (!this.panel) {
       return;
     }
 
-    if (message.command === 'documentReady') {
+    if (message.command === "documentReady") {
       await this.postMessage({
-        command: 'versions',
+        command: "versions",
         value: await required.getAllVersions(),
       });
     }
 
-    if (message.command === 'executeCommand') {
-      if (message.value === 'installNpm') {
+    if (message.command === "executeCommand") {
+      if (message.value === "installNpm") {
         await required.installNpm();
       }
 
-      if (message.value === 'installTruffle') {
+      if (message.value === "installTruffle") {
         await required.installTruffle();
       }
 
-      if (message.value === 'installGanache') {
+      if (message.value === "installGanache") {
         await required.installGanache();
       }
     }

@@ -1,6 +1,6 @@
-import * as fs from 'fs-extra';
-import { Memento } from 'vscode';
-import { Constants } from '../Constants';
+import * as fs from "fs-extra";
+import { Memento } from "vscode";
+import { Constants } from "../Constants";
 
 class ExtensionMnemonicRepository {
   private globalState?: Memento;
@@ -27,17 +27,14 @@ class ExtensionMnemonicRepository {
 
   public saveMnemonicPath(filePath: string): void {
     if (this.globalState) {
-      const storage = this.globalState.get(Constants.globalStateKeys.mnemonicStorageKey) as string[] || [];
+      const storage = (this.globalState.get(Constants.globalStateKeys.mnemonicStorageKey) as string[]) || [];
       this.globalState.update(Constants.globalStateKeys.mnemonicStorageKey, [...storage, filePath]);
     }
   }
 
   public MaskMnemonic(mnemonic: string) {
-    return mnemonic
-      ? `${mnemonic.slice(0, 3)} ... ${mnemonic.slice(-3)}`
-      : Constants.placeholders.emptyLineText;
+    return mnemonic ? `${mnemonic.slice(0, 3)} ... ${mnemonic.slice(-3)}` : Constants.placeholders.emptyLineText;
   }
 }
 
-// tslint:disable-next-line:variable-name
 export const MnemonicRepository = new ExtensionMnemonicRepository();

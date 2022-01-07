@@ -1,7 +1,7 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { QuickPickItem } from 'vscode';
+import { QuickPickItem } from "vscode";
 
 export class BlockchainDataManagerInstanceItem implements QuickPickItem {
   public readonly bdmName: string;

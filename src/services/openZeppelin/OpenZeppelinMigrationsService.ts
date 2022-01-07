@@ -1,33 +1,33 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import { OpenZeppelinService } from '..';
-import { Constants } from '../../Constants';
-import { Output } from '../../Output';
-import { ContractService } from '../../services';
-import { IOZAsset, OZAssetType } from './models';
-import { OpenZeppelinProjectJsonService } from './OpenZeppelinProjectJsonService';
+import * as fs from "fs-extra";
+import * as path from "path";
+import { OpenZeppelinService } from "..";
+import { Constants } from "../../Constants";
+import { Output } from "../../Output";
+import { ContractService } from "../../services";
+import { IOZAsset, OZAssetType } from "./models";
+import { OpenZeppelinProjectJsonService } from "./OpenZeppelinProjectJsonService";
 
-const migrationFilename = '99_deploy_openzeppelin.js';
+const migrationFilename = "99_deploy_openzeppelin.js";
 
 export namespace OpenZeppelinMigrationsService {
   export async function generateMigrations(items: IOZAsset[]): Promise<void> {
-    const declarationSection = generateDeclarationSection(items).concat('\n');
+    const declarationSection = generateDeclarationSection(items).concat("\n");
     const contractDeployerSection = generateContractDeployerSection(items);
     const librariesDeployerSection = generateLibrariesDeployerSection(items);
-    const librariesLinkingSection = (await generateLinkingSection(items)).join('\n');
+    const librariesLinkingSection = (await generateLinkingSection(items)).join("\n");
 
     if (contractDeployerSection || librariesDeployerSection) {
       const migrationContent = [
         declarationSection,
-        'module.exports = deployer => {',
+        "module.exports = deployer => {",
         librariesDeployerSection,
         librariesLinkingSection,
         contractDeployerSection,
-        '};',
-      ].join('\n');
+        "};",
+      ].join("\n");
 
       return saveMigrationContent(migrationContent);
     }
@@ -36,15 +36,15 @@ export namespace OpenZeppelinMigrationsService {
 
 function generateDeclarationSection(items: IOZAsset[]): string {
   return items
-    .filter((asset: IOZAsset) =>
-    OpenZeppelinService.assetHasContracts(asset) || asset.type === OZAssetType.library)
+    .filter((asset: IOZAsset) => OpenZeppelinService.assetHasContracts(asset) || asset.type === OZAssetType.library)
     .reduce((declarations: string[], asset: IOZAsset) => {
       const contractNames = OpenZeppelinService.getContractsNamesFromAsset(asset);
 
       return declarations.concat(
-        contractNames.map((contract) => `var ${contract} = artifacts.require("${contract}");`));
+        contractNames.map((contract) => `var ${contract} = artifacts.require("${contract}");`)
+      );
     }, [])
-    .join('\n');
+    .join("\n");
 }
 
 function generateContractDeployerSection(items: IOZAsset[]): string {
@@ -53,13 +53,14 @@ function generateContractDeployerSection(items: IOZAsset[]): string {
     .reduce((deployerSections: string[], asset: IOZAsset) => {
       const contractNames = OpenZeppelinService.getContractsNamesFromAsset(asset);
 
-      return deployerSections
-        .concat(contractNames.map((contract) => {
+      return deployerSections.concat(
+        contractNames.map((contract) => {
           const contractParameters = OpenZeppelinService.getContractParametersFromAsset(asset, contract);
-          return `    deployer.deploy(${[contract, ...contractParameters].join(', ')});`;
-        }));
+          return `    deployer.deploy(${[contract, ...contractParameters].join(", ")});`;
+        })
+      );
     }, [])
-    .join('\n');
+    .join("\n");
 }
 
 function generateLibrariesDeployerSection(items: IOZAsset[]): string {
@@ -71,7 +72,7 @@ function generateLibrariesDeployerSection(items: IOZAsset[]): string {
       deployerSections.push(libraryDeploySection);
       return deployerSections;
     }, [])
-    .join('\n');
+    .join("\n");
 }
 
 async function generateLinkingSection(items: IOZAsset[]): Promise<string[]> {
@@ -82,8 +83,8 @@ async function generateLinkingSection(items: IOZAsset[]): Promise<string[]> {
     librariesLinkingSection.push(
       ...contractToLibraryLinkingSection(
         contract,
-        await OpenZeppelinProjectJsonService.getReferencesToLibrariesAsync(contract),
-      ),
+        await OpenZeppelinProjectJsonService.getReferencesToLibrariesAsync(contract)
+      )
     );
   }
 
@@ -96,19 +97,19 @@ function contractToLibraryLinkingSection(baseAsset: IOZAsset, libraries: IOZAsse
 
   return contractsNames.reduce((deployerLinks: string[], contractName: string) => {
     return deployerLinks.concat(
-      librariesNames.map((libraryName) => (`    deployer.link(${libraryName}, ${contractName});`)));
+      librariesNames.map((libraryName) => `    deployer.link(${libraryName}, ${contractName});`)
+    );
   }, []);
 }
 
 async function saveMigrationContent(content: string): Promise<void> {
   const migrationFolderPath = await ContractService.getMigrationFolderPath();
-  const filePath = path.join(migrationFolderPath, migrationFilename,
-  );
+  const filePath = path.join(migrationFolderPath, migrationFilename);
 
   Output.outputLine(
-    Constants.outputChannel.azureBlockchain,
-    `New migration for OpenZeppelin contracts was stored to file ${migrationFilename}`,
+    Constants.outputChannel.truffleSuiteForVSCode,
+    `New migration for OpenZeppelin contracts was stored to file ${migrationFilename}`
   );
 
-  return fs.writeFile(filePath, content, { encoding: 'utf8' });
+  return fs.writeFile(filePath, content, { encoding: "utf8" });
 }

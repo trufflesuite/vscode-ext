@@ -1,107 +1,116 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from 'assert';
-import * as fs from 'fs-extra';
-import * as sinon from 'sinon';
-import uuid = require('uuid');
-import { generateFlowAppForMicroservice, generateLogicAppForMicroservice } from '../../src/Generators/CodeGenerator/CodeGenerator';
+import * as assert from "assert";
+import * as fs from "fs-extra";
+import * as sinon from "sinon";
+import uuid = require("uuid");
+import {
+  generateFlowAppForMicroservice,
+  generateLogicAppForMicroservice,
+} from "../../src/Generators/CodeGenerator/CodeGenerator";
 
-describe('CodeGenerator', () => {
+describe("CodeGenerator", () => {
   afterEach(() => {
     sinon.restore();
   });
 
-  it('generateLogicAppForMicroservice should return logic app data for microservice.', async () => {
+  it("generateLogicAppForMicroservice should return logic app data for microservice.", async () => {
     // Arrange
-    sinon.stub(fs, 'readFileSync').returns(contractWithDifferentTypeOfVariableAndFunction);
+    sinon.stub(fs, "readFileSync").returns(contractWithDifferentTypeOfVariableAndFunction);
 
     // Act
-    const logicAppData = generateLogicAppForMicroservice('abi', 'contract address', 'subscriptionId', 'location', '');
+    const logicAppData = generateLogicAppForMicroservice("abi", "contract address", "subscriptionId", "location", "");
 
     // Assert
     assert.strictEqual(
       Object.keys((logicAppData.definition as any).actions.Switch.cases).length,
       12,
-      'logicAppData should have special count of cases.');
+      "logicAppData should have special count of cases."
+    );
   });
 
-  it('generateFlowAppForMicroservice should return flow app data for microservice.', async () => {
+  it("generateFlowAppForMicroservice should return flow app data for microservice.", async () => {
     // Arrange
-    sinon.stub(fs, 'readFileSync').returns(contractWithDifferentTypeOfVariableAndFunction);
+    sinon.stub(fs, "readFileSync").returns(contractWithDifferentTypeOfVariableAndFunction);
     const testContractName = uuid.v4().toString();
 
     // Act
-    const flowAppData = generateFlowAppForMicroservice(testContractName, '[]', 'contract address', '');
+    const flowAppData = generateFlowAppForMicroservice(testContractName, "[]", "contract address", "");
     const clientData = JSON.parse(flowAppData.clientdata);
 
     // Assert
     assert.strictEqual(
       Object.keys(clientData.properties.definition.actions.Switch.cases).length,
       12,
-      'flowAppData should have special count of cases');
-    assert.strictEqual(flowAppData.name, testContractName, 'Name should equals parameter which we send to function.');
+      "flowAppData should have special count of cases"
+    );
+    assert.strictEqual(flowAppData.name, testContractName, "Name should equals parameter which we send to function.");
   });
 
-  it('generateFlowAppForMicroservice should return flow app data with special operationId for functions.',
-  async () => {
+  it("generateFlowAppForMicroservice should return flow app data with special operationId for functions.", async () => {
     // Arrange
-    sinon.stub(fs, 'readFileSync').returns(contractWithDifferentAccessOfFunctions);
+    sinon.stub(fs, "readFileSync").returns(contractWithDifferentAccessOfFunctions);
     const testContractName = uuid.v4().toString();
 
     // Act
-    const flowAppData = generateFlowAppForMicroservice(testContractName, '[]', 'contract address', '');
+    const flowAppData = generateFlowAppForMicroservice(testContractName, "[]", "contract address", "");
 
     // Assert
     const cases = JSON.parse(flowAppData.clientdata).properties.definition.actions.Switch.cases;
     const casesPropertyNames = Object.getOwnPropertyNames(cases);
 
-    const simpleFunctionNames = casesPropertyNames.filter((name) => !name.includes('View') && !name.includes('Pure'));
-    const viewPureFunctionNames = casesPropertyNames.filter((name) => name.includes('View') || name.includes('Pure'));
-    const viewPureFunctionNamesWithParameters = viewPureFunctionNames.filter((name) => !name.includes('NOTParam'));
-    const viewPureFunctionNamesWithoutParameters = viewPureFunctionNames.filter((name) => name.includes('NOTParam'));
+    const simpleFunctionNames = casesPropertyNames.filter((name) => !name.includes("View") && !name.includes("Pure"));
+    const viewPureFunctionNames = casesPropertyNames.filter((name) => name.includes("View") || name.includes("Pure"));
+    const viewPureFunctionNamesWithParameters = viewPureFunctionNames.filter((name) => !name.includes("NOTParam"));
+    const viewPureFunctionNamesWithoutParameters = viewPureFunctionNames.filter((name) => name.includes("NOTParam"));
 
-    const functionNamesWithReturnValue = casesPropertyNames.filter((name) => !name.includes('NOTReturn'));
-    const functionNamesWithoutReturnValue = casesPropertyNames.filter((name) => name.includes('NOTReturn'));
+    const functionNamesWithReturnValue = casesPropertyNames.filter((name) => !name.includes("NOTReturn"));
+    const functionNamesWithoutReturnValue = casesPropertyNames.filter((name) => name.includes("NOTReturn"));
 
     viewPureFunctionNamesWithParameters.forEach((name) => {
-      const functionName = name.replace(/Case_/, '');
+      const functionName = name.replace(/Case_/, "");
       assert.strictEqual(
         cases[name].actions[functionName].inputs.host.operationId,
-        'ExecuteSmartContractFunction',
-        'Case should have operationId equals `ExecuteSmartContractFunction`, when function has parameters and modifier access equal `view` or `pure`');
+        "ExecuteSmartContractFunction",
+        "Case should have operationId equals `ExecuteSmartContractFunction`, when function has parameters and modifier access equal `view` or `pure`"
+      );
     });
 
     viewPureFunctionNamesWithoutParameters.forEach((name) => {
-      const functionName = name.replace(/Case_/, '');
+      const functionName = name.replace(/Case_/, "");
       assert.strictEqual(
         cases[name].actions[functionName].inputs.host.operationId,
-        'GetSmartContractProperties',
-        'Case should have operationId equals `GetSmartContractProperties`, when function without parameters has modifier access equal `view` or `pure`');
+        "GetSmartContractProperties",
+        "Case should have operationId equals `GetSmartContractProperties`, when function without parameters has modifier access equal `view` or `pure`"
+      );
     });
 
     simpleFunctionNames.forEach((name) => {
-      const functionName = name.replace(/Case_/, '');
+      const functionName = name.replace(/Case_/, "");
       assert.strictEqual(
         cases[name].actions[functionName].inputs.host.operationId,
-        'ExecuteContractFunction',
-        'Case should have operationId equals `ExecuteContractFunction`, when function does not have modifier access equal `view` or `pure`');
+        "ExecuteContractFunction",
+        "Case should have operationId equals `ExecuteContractFunction`, when function does not have modifier access equal `view` or `pure`"
+      );
     });
 
     functionNamesWithReturnValue.forEach((name) => {
-      const functionName = name.replace(/Case_/, '');
+      const functionName = name.replace(/Case_/, "");
       assert.strictEqual(
         cases[name].actions[`${functionName}Response`].inputs.body,
         `@outputs('${functionName}')?['body/Function Output']`,
-        'Case should have response with body, which return Function Output, when function has return value');
+        "Case should have response with body, which return Function Output, when function has return value"
+      );
     });
 
     functionNamesWithoutReturnValue.forEach((name) => {
-      const functionName = name.replace(/Case_/, '');
+      const functionName = name.replace(/Case_/, "");
       assert.strictEqual(
         cases[name].actions[`${functionName}Response`].inputs.body,
         `@body('${functionName}')`,
-        'Case should have response with body, which return function body, when function does not have return value');
+        "Case should have response with body, which return function body, when function does not have return value"
+      );
     });
   });
 });

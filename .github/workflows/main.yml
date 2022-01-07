@@ -3,10 +3,10 @@ name: CI
 on:
   push:
     branches:
-      - 'feature/**' # match an pushes on feature/* and feature/<any sub branch>/*
+      - "feat/**" # match an pushes on feature/* and feature/<any sub branch>/*
       - master
     paths-ignore: # dont run when changes made to these folders
-      - '.vscode/**'
+      - ".vscode/**"
 
 jobs:
   cicd:
@@ -20,68 +20,77 @@ jobs:
         run: git fetch --prune --unshallow
 
       - name: install gitversion tool
-        uses: gittools/actions/gitversion/setup@v0.9
+        uses: gittools/actions/gitversion/setup@v0.9.11
         with:
-          versionSpec: '5.1.x'
+          versionSpec: "5.x"
 
       - name: execute gitversion
         id: gitversion # step id used as reference for output values
-        uses: gittools/actions/gitversion/execute@v0.9
+        uses: gittools/actions/gitversion/execute@v0.9.11
 
-      - name: print gitversion
+      - name: getPackageName
+        id: packageJson
+        uses: myrotvorets/info-from-package-json-action@1.1.0
+
+      - name: print Details
         run: |
-          echo "Major: ${{ steps.gitversion.outputs.major }}"
-          echo "Minor: ${{ steps.gitversion.outputs.minor }}"
-          echo "Patch: ${{ steps.gitversion.outputs.patch }}"
-          echo "MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}"
-          echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+          echo "::Major: ${{ steps.gitversion.outputs.major }}::"
+          echo "::Minor: ${{ steps.gitversion.outputs.minor }}::"
+          echo "::Patch: ${{ steps.gitversion.outputs.patch }}::"
+          echo "::MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}::"
+          echo "::SemVer: ${{ steps.gitversion.outputs.semVer }}::"
+          echo "::PackageName: ${{steps.packageJson.outputs.packageName}} ::"
 
       - name: setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: "16.4.x"
+          cache: "yarn"
 
       - name: clean install dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
+
+      - name: run tests
+        run: yarn test
 
       - name: update metadata in package.json
-        uses: onlyutkarsh/patch-files-action@v1.0.1
+        uses: onlyutkarsh/patch-files-action@v1.0.3
         with:
-          files: '${{github.workspace}}/package.json'
+          files: "${{github.workspace}}/package.json"
           patch-syntax: |
             = /version => "${{ steps.gitversion.outputs.semVer }}"
-            = /displayName => "Truffle Chocolate Factory."
-            = /description => "Truffle Tools for Blockchain Development."
+            = /displayName => "Truffle VSCode Chocolate Factory. TEST"
+            = /description => "Trufflesuite for Blockchain Development. TEST"
+            = /aiKey => "${{ secrets.AIKEY }}"
 
       - name: add version in CHANGELOG.md
-        uses: cschleiden/replace-tokens@v1.0
+        uses: cschleiden/replace-tokens@v1.1
         with:
-          files: '${{github.workspace}}/CHANGELOG.md'
+          files: "${{github.workspace}}/CHANGELOG.md"
         env:
           VERSION: "${{ steps.gitversion.outputs.semVer }}"
 
       - name: compile and create vsix
-        run: npm run package
+        run: yarn package
 
       - name: print vsix path
         run: |
-          echo "VSIX Path: ${{ env.vsix_path }}"
+          echo "::VSIX Path: ${{ env.vsix_path }}::"
 
       - name: upload vsix as artifact
         uses: actions/upload-artifact@v1
         with:
-          name: truffle-vscode-${{steps.gitversion.outputs.semVer}}.vsix
-          path: ${{github.workspace}}/truffle-vscode-${{steps.gitversion.outputs.semVer}}.vsix
-
-      - name: publish to marketplace
-        if: github.ref == 'refs/heads/master'
-        run: npm run deploy ${{ env.PAT }}
-
-      - name: create a release
-        if: github.ref == 'refs/heads/master'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: v${{ steps.gitversion.outputs.semVer }}
-          release_name: v${{ steps.gitversion.outputs.semVer }}
+          name: ${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.semVer}}.vsix
+          path: ${{github.workspace}}/${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.semVer}}.vsix
+#      - name: publish to marketplace
+#        if: github.ref == 'refs/heads/master'
+#        run: npm run deploy ${{ env.PAT }}
+#
+#      - name: create a release
+#        if: github.ref == 'refs/heads/master'
+#        uses: actions/create-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+#        with:
+#          tag_name: v${{ steps.gitversion.outputs.semVer }}
+#          release_name: v${{ steps.gitversion.outputs.semVer }}

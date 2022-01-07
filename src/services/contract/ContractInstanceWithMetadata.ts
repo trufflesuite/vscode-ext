@@ -1,12 +1,12 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { extractEnumsInfoSafe } from '../../helpers';
-import { EnumStorage } from '../../Models';
-import { Contract } from './Contract';
-import { ContractInstance } from './ContractInstance';
-import { Network } from './Network';
-import { Provider } from './Provider';
+import { extractEnumsInfoSafe } from "../../helpers";
+import { EnumStorage } from "../../Models";
+import { Contract } from "./Contract";
+import { ContractInstance } from "./ContractInstance";
+import { Network } from "./Network";
+import { Provider } from "./Provider";
 
 export class ContractInstanceWithMetadata extends ContractInstance {
   public readonly provider: Provider | null;

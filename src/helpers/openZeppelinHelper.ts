@@ -1,16 +1,19 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { ProgressLocation, window } from 'vscode';
-import { showConfirmationDialog, showInputBox, userSettings } from '.';
-import { Constants } from '../Constants';
-import { CancellationEvent } from '../Models';
-import { OpenZeppelinMigrationsService, OpenZeppelinProjectJsonService, OpenZeppelinService } from '../services';
-import { CurrentOpenZeppelinVersionLocation, InvalidOpenZeppelinVersionException } from '../services/openZeppelin/InvalidOpenZeppelinVersionException';
-import { IOZAsset, IOZMetadata } from '../services/openZeppelin/models';
-import { OpenZeppelinManifest } from '../services/openZeppelin/OpenZeppelinManifest';
-import { Telemetry } from '../TelemetryClient';
-import { validateSolidityType } from '../validators/solidityTypeValidation';
+import { ProgressLocation, window } from "vscode";
+import { showConfirmationDialog, showInputBox, userSettings } from ".";
+import { Constants } from "../Constants";
+import { CancellationEvent } from "../Models";
+import { OpenZeppelinMigrationsService, OpenZeppelinProjectJsonService, OpenZeppelinService } from "../services";
+import {
+  CurrentOpenZeppelinVersionLocation,
+  InvalidOpenZeppelinVersionException,
+} from "../services/openZeppelin/InvalidOpenZeppelinVersionException";
+import { IOZAsset, IOZMetadata } from "../services/openZeppelin/models";
+import { OpenZeppelinManifest } from "../services/openZeppelin/OpenZeppelinManifest";
+import { Telemetry } from "../TelemetryClient";
+import { validateSolidityType } from "../validators/solidityTypeValidation";
 
 export async function createManifestAsync(version: string): Promise<OpenZeppelinManifest> {
   const metadata = await getManifestMetadata(version);
@@ -26,13 +29,14 @@ export async function tryGetCurrentOpenZeppelinVersionAsync(): Promise<string> {
       const latestVersion = await OpenZeppelinService.getLatestOpenZeppelinVersionAsync();
       const message = Constants.openZeppelin.invalidVersionDialog(
         error.invalidVersion,
-        error.location === CurrentOpenZeppelinVersionLocation.projectJson ? 'project.json' : 'UserSettings',
-        latestVersion,
+        error.location === CurrentOpenZeppelinVersionLocation.projectJson ? "project.json" : "UserSettings",
+        latestVersion
       );
       const answer = await window.showInformationMessage(
         message,
         Constants.confirmationDialogResult.yes,
-        Constants.confirmationDialogResult.no);
+        Constants.confirmationDialogResult.no
+      );
 
       if (answer !== Constants.confirmationDialogResult.yes) {
         throw ex;
@@ -51,28 +55,30 @@ export async function shouldUpgradeOpenZeppelinAsync(): Promise<boolean> {
   const currentVersion = await tryGetCurrentOpenZeppelinVersionAsync();
   const latestVersion = await OpenZeppelinService.getLatestOpenZeppelinVersionAsync();
 
-  return currentVersion !== latestVersion && await showConfirmationDialog(Constants.openZeppelin.newVersionAvailable);
+  return currentVersion !== latestVersion && (await showConfirmationDialog(Constants.openZeppelin.newVersionAvailable));
 }
 
 export async function upgradeOpenZeppelinUserSettingsAsync() {
   const latestVersion = await OpenZeppelinService.getLatestOpenZeppelinVersionAsync();
 
-  Telemetry.sendEvent('OpenZeppelinService.updateOpenZeppelin.userSettings');
+  Telemetry.sendEvent("OpenZeppelinService.updateOpenZeppelin.userSettings");
   return userSettings.updateConfigurationAsync(Constants.userSettings.ozVersionUserSettingsKey, latestVersion);
 }
 
-export async function upgradeOpenZeppelinContractsAsync()
-: Promise<void> {
-  await window.withProgress({
-    location: ProgressLocation.Notification,
-    title: Constants.openZeppelin.upgradeOpenZeppelin,
-  }, async () => {
-    const latestVersion = await OpenZeppelinService.getLatestOpenZeppelinVersionAsync();
-    const manifest = await createManifestAsync(latestVersion);
+export async function upgradeOpenZeppelinContractsAsync(): Promise<void> {
+  await window.withProgress(
+    {
+      location: ProgressLocation.Notification,
+      title: Constants.openZeppelin.upgradeOpenZeppelin,
+    },
+    async () => {
+      const latestVersion = await OpenZeppelinService.getLatestOpenZeppelinVersionAsync();
+      const manifest = await createManifestAsync(latestVersion);
 
-    await OpenZeppelinService.updateOpenZeppelinContractsAsync(manifest);
-    await OpenZeppelinMigrationsService.generateMigrations(await OpenZeppelinService.getAllDownloadedAssetsAsync());
-  });
+      await OpenZeppelinService.updateOpenZeppelinContractsAsync(manifest);
+      await OpenZeppelinMigrationsService.generateMigrations(await OpenZeppelinService.getAllDownloadedAssetsAsync());
+    }
+  );
 }
 
 export async function defineContractRequiredParameters(): Promise<void> {
@@ -102,26 +108,18 @@ async function setContractParameters(assets: IOZAsset[]): Promise<void> {
           if (!parameter.value) {
             parameter.value = await showInputBox({
               ignoreFocusOut: true,
-              prompt: Constants.openZeppelin.contactParameterInformation(
-                contractName,
-                parameter.name,
-                parameter.type,
-              ),
+              prompt: Constants.openZeppelin.contactParameterInformation(contractName, parameter.name, parameter.type),
               validateInput: (v) => validateSolidityType(v, parameter.type),
             });
           }
         }
       }
     }
-    await OpenZeppelinProjectJsonService.addAssetsToProjectJsonAsync(
-      assets,
-      projectMetadata);
+    await OpenZeppelinProjectJsonService.addAssetsToProjectJsonAsync(assets, projectMetadata);
     await OpenZeppelinProjectJsonService.storeProjectJsonAsync(projectMetadata);
   } catch (error) {
     if (await showConfirmationDialog(Constants.openZeppelin.saveSpecifiedParameters)) {
-      await OpenZeppelinProjectJsonService.addAssetsToProjectJsonAsync(
-        assets,
-        projectMetadata);
+      await OpenZeppelinProjectJsonService.addAssetsToProjectJsonAsync(assets, projectMetadata);
       await OpenZeppelinProjectJsonService.storeProjectJsonAsync(projectMetadata);
     }
     if (error instanceof CancellationEvent) {
@@ -147,9 +145,11 @@ async function getAssetsWithNotSpecifiedRequiredParameters() {
           if (manifestContractParameters) {
             for (const parameter of contractParameters) {
               if (parameter.value === undefined) {
-                const param = manifestContractParameters.find((manifestContractParameter) =>
-                  manifestContractParameter.name === parameter.name &&
-                  manifestContractParameter.type === parameter.type);
+                const param = manifestContractParameters.find(
+                  (manifestContractParameter) =>
+                    manifestContractParameter.name === parameter.name &&
+                    manifestContractParameter.type === parameter.type
+                );
                 if (param) {
                   assets.push(asset);
                   return assets;

@@ -1,13 +1,13 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Telemetry } from '../TelemetryClient';
-import { ItemCreator } from './ItemCreators/ItemCreator';
-import { ItemType } from './ItemType';
-import { IExtensionItem } from './TreeItems';
+import { Telemetry } from "../TelemetryClient";
+import { ItemCreator } from "./ItemCreators/ItemCreator";
+import { ItemType } from "./ItemType";
+import { IExtensionItem } from "./TreeItems";
 
 export namespace ItemFactory {
-  const registeredTypes: {[key: number]: ItemCreator} = {};
+  const registeredTypes: { [key: number]: ItemCreator } = {};
 
   export function register(type: ItemType | number, value: ItemCreator): void {
     if (registeredTypes[type]) {

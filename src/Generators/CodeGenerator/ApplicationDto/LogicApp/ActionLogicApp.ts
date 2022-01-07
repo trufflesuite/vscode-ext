@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 export function getActionLogicAppTemplate() {
@@ -7,17 +7,17 @@ export function getActionLogicAppTemplate() {
       body: {},
       host: {
         connection: {
-          name: '',
+          name: "",
         },
       },
-      method: 'post',
-      path: '',
+      method: "post",
+      path: "",
       queries: {
-        abi: '',
-        contractAddress: '',
+        abi: "",
+        contractAddress: "",
       },
     },
     runAfter: {},
-    type: 'ApiConnection',
+    type: "ApiConnection",
   };
 }

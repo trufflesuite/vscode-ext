@@ -33,9 +33,7 @@
         "reveal": "never"
       },
       "group": "build",
-      "dependsOn": [
-        "Clean tests folder"
-      ]
+      "dependsOn": ["Clean tests folder"]
     },
     {
       "label": "Install dependencies for Drizzle UI",
@@ -63,11 +61,7 @@
     },
     {
       "label": "Run extension with Drizzle UI",
-      "dependsOn": [
-        "Install dependencies for Drizzle UI",
-        "Build Drizzle UI",
-        "Build extension"
-      ]
+      "dependsOn": ["Install dependencies for Drizzle UI", "Build Drizzle UI", "Build extension"]
     },
     {
       "label": "Prepare resources for ui-tests",

@@ -1,7 +1,7 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { IStorageAccountEncryptionServicesDto } from './StorageAccountEncryptionServicesDto';
+import { IStorageAccountEncryptionServicesDto } from "./StorageAccountEncryptionServicesDto";
 
 export interface IStorageAccountDto {
   sku: {

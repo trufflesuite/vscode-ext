@@ -1,11 +1,11 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { URL } from 'url';
-import { Constants } from '../../Constants';
-import { ConsortiumResourceExplorer } from '../../resourceExplorers';
-import { ItemType } from '../ItemType';
-import { MnemonicNetworkNode } from './MnemonicNetworkNode';
+import { URL } from "url";
+import { Constants } from "../../Constants";
+import { ConsortiumResourceExplorer } from "../../resourceExplorers";
+import { ItemType } from "../ItemType";
+import { MnemonicNetworkNode } from "./MnemonicNetworkNode";
 
 export class AzureBlockchainNetworkNode extends MnemonicNetworkNode {
   public readonly subscriptionId: string;
@@ -18,15 +18,9 @@ export class AzureBlockchainNetworkNode extends MnemonicNetworkNode {
     networkId: number | string,
     subscriptionId: string,
     resourceGroup: string,
-    memberName: string,
+    memberName: string
   ) {
-    super(
-      ItemType.AZURE_BLOCKCHAIN_NETWORK_NODE,
-      label,
-      Constants.treeItemData.network.azure,
-      url,
-      networkId,
-    );
+    super(ItemType.AZURE_BLOCKCHAIN_NETWORK_NODE, label, Constants.treeItemData.network.azure, url, networkId);
 
     this.subscriptionId = subscriptionId;
     this.resourceGroup = resourceGroup;
@@ -44,7 +38,7 @@ export class AzureBlockchainNetworkNode extends MnemonicNetworkNode {
       return `${url.origin}/${keys[0]}`;
     }
 
-    return '';
+    return "";
   }
 
   public toJSON(): { [key: string]: any } {

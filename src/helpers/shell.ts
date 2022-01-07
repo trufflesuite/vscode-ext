@@ -1,9 +1,9 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { tryExecuteCommand } from './command';
+import { tryExecuteCommand } from "./command";
 
-const isWin = process.platform === 'win32';
+const isWin = process.platform === "win32";
 
 export async function killPort(port: string | number): Promise<void> {
   const pid = await findPid(port);
@@ -30,9 +30,9 @@ function killPidCommand(pid: number): string {
 }
 
 function findPidCommand(port: string | number): string {
-  return isWin ?
-    `netstat -ano -p tcp | find "LISTENING" | findstr /r /c:":${port} *[^ ]*:[^ ]*"` :
-    `lsof -i tcp:${port} | grep LISTEN | awk '{print $2}'`;
+  return isWin
+    ? `netstat -ano -p tcp | find "LISTENING" | findstr /r /c:":${port} *[^ ]*:[^ ]*"`
+    : `lsof -i tcp:${port} | grep LISTEN | awk '{print $2}'`;
 }
 
 function parsePid(stdout: string): number {

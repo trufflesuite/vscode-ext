@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {
@@ -10,8 +10,8 @@ import {
   ICreateBlockchainDataManagerDto,
   ICreateBlockchainDataManagerInputDto,
   ICreateBlockchainDataManagerOutputDto,
-} from '..';
-import { AzureBlockchainServiceClient } from '../AzureBlockchainServiceClient';
+} from "..";
+import { AzureBlockchainServiceClient } from "../AzureBlockchainServiceClient";
 
 export class BlockchainDataManagerResource {
   constructor(public readonly client: AzureBlockchainServiceClient) {}
@@ -52,27 +52,35 @@ export class BlockchainDataManagerResource {
     });
   }
 
-  public createBlockchainDataManager(bdmName: string, body: ICreateBlockchainDataManagerDto)
-  : Promise<IAzureBlockchainDataManagerDto> {
+  public createBlockchainDataManager(
+    bdmName: string,
+    body: ICreateBlockchainDataManagerDto
+  ): Promise<IAzureBlockchainDataManagerDto> {
     return new Promise((resolve, reject) => {
-      return this.client.createBlockchainDataManager(bdmName, JSON.stringify(body),
+      return this.client.createBlockchainDataManager(
+        bdmName,
+        JSON.stringify(body),
         (error: Error | null, result?: any) => {
           if (error) {
             reject(error);
           } else {
             resolve(Object.assign([], result));
           }
-        });
+        }
+      );
     });
   }
 
   public createBlockchainDataManagerInput(
     bdmName: string,
     transactionNodeName: string,
-    body: ICreateBlockchainDataManagerInputDto)
-  : Promise<IAzureBlockchainDataManagerInputDto> {
+    body: ICreateBlockchainDataManagerInputDto
+  ): Promise<IAzureBlockchainDataManagerInputDto> {
     return new Promise((resolve, reject) => {
-      return this.client.createBlockchainDataManagerInput(bdmName, transactionNodeName, JSON.stringify(body),
+      return this.client.createBlockchainDataManagerInput(
+        bdmName,
+        transactionNodeName,
+        JSON.stringify(body),
         (error: Error | null, result?: any) => {
           if (error) {
             this.removeBlockchainDataManager(bdmName);
@@ -80,46 +88,56 @@ export class BlockchainDataManagerResource {
           } else {
             resolve(Object.assign([], result));
           }
-        });
+        }
+      );
     });
   }
 
   public createBlockchainDataManagerOutput(
     bdmName: string,
     connectionName: string,
-    body: ICreateBlockchainDataManagerOutputDto)
-  : Promise<IAzureBlockchainDataManagerOutputDto> {
+    body: ICreateBlockchainDataManagerOutputDto
+  ): Promise<IAzureBlockchainDataManagerOutputDto> {
     return new Promise((resolve, reject) => {
-      return this.client.createBlockchainDataManagerOutput(bdmName, connectionName, JSON.stringify(body),
+      return this.client.createBlockchainDataManagerOutput(
+        bdmName,
+        connectionName,
+        JSON.stringify(body),
         (error: Error | null, result?: any) => {
           if (error) {
             reject(error);
           } else {
             resolve(Object.assign([], result));
           }
-        });
+        }
+      );
     });
   }
 
   public createBlockchainDataManagerApplication(
     bdmName: string,
     applicationName: string,
-    body: ICreateBlockchainDataManagerApplicationDto,
+    body: ICreateBlockchainDataManagerApplicationDto
   ): Promise<IAzureBlockchainDataManagerApplicationDto> {
     return new Promise((resolve, reject) => {
-      return this.client.createBlockchainDataManagerApplication(bdmName, applicationName, JSON.stringify(body),
+      return this.client.createBlockchainDataManagerApplication(
+        bdmName,
+        applicationName,
+        JSON.stringify(body),
         (error: Error | null, result?: any) => {
           if (error) {
             reject(error);
           } else {
             resolve(Object.assign([], result));
           }
-        });
+        }
+      );
     });
   }
 
-  public async getBlockchainDataManagerApplicationList(bdmName: string)
-  : Promise<IAzureBlockchainDataManagerApplicationDto[]> {
+  public async getBlockchainDataManagerApplicationList(
+    bdmName: string
+  ): Promise<IAzureBlockchainDataManagerApplicationDto[]> {
     return new Promise((resolve, reject) => {
       return this.client.getBlockchainDataManagerApplications(bdmName, (error: Error | null, result?: any) => {
         if (error) {
@@ -131,8 +149,10 @@ export class BlockchainDataManagerResource {
     });
   }
 
-  public async getBlockchainDataManagerApplication(bdmName: string, applicationName: string)
-  : Promise<IAzureBlockchainDataManagerApplicationDto> {
+  public async getBlockchainDataManagerApplication(
+    bdmName: string,
+    applicationName: string
+  ): Promise<IAzureBlockchainDataManagerApplicationDto> {
     return new Promise((resolve, reject) => {
       return this.client.getBlockchainDataManagerApplication(
         bdmName,
@@ -143,7 +163,8 @@ export class BlockchainDataManagerResource {
           } else {
             resolve(Object.assign([], result));
           }
-      });
+        }
+      );
     });
   }
 
@@ -158,7 +179,8 @@ export class BlockchainDataManagerResource {
           } else {
             resolve(Object.assign([], result));
           }
-      });
+        }
+      );
     });
   }
 

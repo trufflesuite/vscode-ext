@@ -3,10 +3,7 @@
     "module": "commonjs",
     "target": "es6",
     "outDir": "out",
-    "lib": [
-      "es6",
-      "dom"
-    ],
+    "lib": ["es6", "dom"],
     "sourceMap": true,
     "resolveJsonModule": true,
     "rootDir": ".",
@@ -22,24 +19,8 @@
     "strictNullChecks": true,
     "noUnusedParameters": true,
     "allowJs": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules/@machinomy",
-      "./src/debugger/types"
-    ]
+    "typeRoots": ["./node_modules/@types", "./node_modules/@machinomy", "./src/debugger/types"]
   },
-  "include": [
-    "src/**/*.js",
-    "src/**/*.ts",
-    "src/**/*.json",
-    "test/**/*.js",
-    "test/**/*.ts",
-    "test/**/*.json"
-  ],
-  "exclude": [
-    "node_modules",
-    ".vscode-test",
-    "drizzleUI",
-    "ui-test"
-  ]
+  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.json", "test/**/*.js", "test/**/*.ts", "test/**/*.json"],
+  "exclude": ["node_modules", ".vscode-test", "drizzleUI", "ui-test"]
 }

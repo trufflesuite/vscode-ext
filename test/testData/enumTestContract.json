@@ -157,33 +157,21 @@
   "ast": {
     "absolutePath": "/contracts/enumTestContract.sol",
     "exportedSymbols": {
-      "Base": [
-        624
-      ],
-      "HelloBlockchain": [
-        716
-      ]
+      "Base": [624],
+      "HelloBlockchain": [716]
     },
     "id": 717,
     "nodeType": "SourceUnit",
     "nodes": [
       {
         "id": 618,
-        "literals": [
-          "solidity",
-          "^",
-          "0.5",
-          ".0"
-        ],
+        "literals": ["solidity", "^", "0.5", ".0"],
         "nodeType": "PragmaDirective",
         "src": "0:23:9"
       },
       {
         "id": 619,
-        "literals": [
-          "experimental",
-          "ABIEncoderV2"
-        ],
+        "literals": ["experimental", "ABIEncoderV2"],
         "nodeType": "PragmaDirective",
         "src": "25:33:9"
       },
@@ -194,9 +182,7 @@
         "documentation": null,
         "fullyImplemented": true,
         "id": 624,
-        "linearizedBaseContracts": [
-          624
-        ],
+        "linearizedBaseContracts": [624],
         "name": "Base",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -279,17 +265,12 @@
             "src": "174:4:9"
           }
         ],
-        "contractDependencies": [
-          624
-        ],
+        "contractDependencies": [624],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
         "id": 716,
-        "linearizedBaseContracts": [
-          716,
-          624
-        ],
+        "linearizedBaseContracts": [716, 624],
         "name": "HelloBlockchain",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -1320,33 +1301,21 @@
   "legacyAST": {
     "absolutePath": "/contracts/enumTestContract.sol",
     "exportedSymbols": {
-      "Base": [
-        624
-      ],
-      "HelloBlockchain": [
-        716
-      ]
+      "Base": [624],
+      "HelloBlockchain": [716]
     },
     "id": 717,
     "nodeType": "SourceUnit",
     "nodes": [
       {
         "id": 618,
-        "literals": [
-          "solidity",
-          "^",
-          "0.5",
-          ".0"
-        ],
+        "literals": ["solidity", "^", "0.5", ".0"],
         "nodeType": "PragmaDirective",
         "src": "0:23:9"
       },
       {
         "id": 619,
-        "literals": [
-          "experimental",
-          "ABIEncoderV2"
-        ],
+        "literals": ["experimental", "ABIEncoderV2"],
         "nodeType": "PragmaDirective",
         "src": "25:33:9"
       },
@@ -1357,9 +1326,7 @@
         "documentation": null,
         "fullyImplemented": true,
         "id": 624,
-        "linearizedBaseContracts": [
-          624
-        ],
+        "linearizedBaseContracts": [624],
         "name": "Base",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -1442,17 +1409,12 @@
             "src": "174:4:9"
           }
         ],
-        "contractDependencies": [
-          624
-        ],
+        "contractDependencies": [624],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
         "id": 716,
-        "linearizedBaseContracts": [
-          716,
-          624
-        ],
+        "linearizedBaseContracts": [716, 624],
         "name": "HelloBlockchain",
         "nodeType": "ContractDefinition",
         "nodes": [

@@ -1,5 +1,5 @@
-import { Constants } from '../../Constants';
-import { bigIntMath } from '../../helpers/bigIntMath';
+import { Constants } from "../../Constants";
+import { bigIntMath } from "../../helpers/bigIntMath";
 
 export function validateSolidityType(value: string, type: string): string | undefined {
   if (type.match(Constants.validationRegexps.types.simpleMapping)) {
@@ -7,7 +7,7 @@ export function validateSolidityType(value: string, type: string): string | unde
     return;
   }
   if (type.match(Constants.validationRegexps.types.simpleArray)) {
-    return validateSimpleArray(value, type.split('[]')[0]);
+    return validateSimpleArray(value, type.split("[]")[0]);
   }
 
   return validateElementaryType(value, type);
@@ -22,11 +22,11 @@ function validateElementaryType(value: string, type: string): string | undefined
     case Constants.solidityTypes.string:
       return;
     case Constants.solidityTypes.bool:
-      return value === 'true' || value === 'false' ? undefined : Constants.validationMessages.valueShouldBeBool;
+      return value === "true" || value === "false" ? undefined : Constants.validationMessages.valueShouldBeBool;
     case Constants.solidityTypes.address:
-      return value.match(Constants.validationRegexps.types.solidityAddress) ?
-      undefined :
-      Constants.validationMessages.valueShouldBeSolidityAddress;
+      return value.match(Constants.validationRegexps.types.solidityAddress)
+        ? undefined
+        : Constants.validationMessages.valueShouldBeSolidityAddress;
     default:
       // TODO: validate other types
       return;
@@ -65,10 +65,9 @@ function validateSimpleArray(value: string, elementsType: string): string | unde
     return Constants.validationMessages.valueShouldBeArray;
   }
 
-  const values = value.slice(1, value.length - 1).split(',');
+  const values = value.slice(1, value.length - 1).split(",");
 
-  if (values.length === 0 ||
-    (values.length === 1 && values[0] === '')) {
+  if (values.length === 0 || (values.length === 1 && values[0] === "")) {
     return;
   }
 

@@ -1,13 +1,13 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { TreeView, window } from 'vscode';
-import { IInstruction } from '../models/IInstruction';
-import InstructionDataManager from './instructionDataManager';
-import InstructionDataProvider from './instructionDataProvider';
-import InstructionTreeNode from './instructionTreeNode';
+import { TreeView, window } from "vscode";
+import { IInstruction } from "../models/IInstruction";
+import InstructionDataManager from "./instructionDataManager";
+import InstructionDataProvider from "./instructionDataProvider";
+import InstructionTreeNode from "./instructionTreeNode";
 
-const INSTRUCTION_VIEW_ID = 'InstructionView';
+const INSTRUCTION_VIEW_ID = "InstructionView";
 
 export default class InstructionView {
   private view: TreeView<InstructionTreeNode>;
@@ -15,8 +15,10 @@ export default class InstructionView {
   constructor() {
     const dataManager = new InstructionDataManager();
     this.dataProvider = new InstructionDataProvider(dataManager);
-    this.view = window.createTreeView(INSTRUCTION_VIEW_ID,
-      { treeDataProvider: this.dataProvider, showCollapseAll: true });
+    this.view = window.createTreeView(INSTRUCTION_VIEW_ID, {
+      treeDataProvider: this.dataProvider,
+      showCollapseAll: true,
+    });
   }
 
   public update(newInstructions: IInstruction[]) {

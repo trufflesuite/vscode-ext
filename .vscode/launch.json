@@ -2,16 +2,21 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "envFile": "${workspaceFolder}/.env",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "name": "Run Extension - using .env",
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "preLaunchTask": "Build extension with watcher",
+      "request": "launch",
+      "type": "pwa-extensionHost"
+    },
+    {
       "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
-      "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}"
-      ],
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "Build extension with watcher"
     },
     {
@@ -19,12 +24,8 @@
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
-      "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}"
-      ],
-      "outFiles": [
-        "${workspaceFolder}/out/**/*.js"
-      ],
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "Run extension with Drizzle UI"
     },
     {
@@ -36,9 +37,7 @@
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test"
       ],
-      "outFiles": [
-        "${workspaceFolder}/out/test/**/*.js"
-      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "env": {
         "CODE_TEST": "true"
       },
@@ -50,19 +49,14 @@
       "name": "Debugger Server",
       "cwd": "${workspaceFolder}",
       "program": "${workspaceFolder}/out/src/debugger.js",
-      "args": [ "--server=4711" ]
+      "args": ["--server=4711"]
     },
     {
       "type": "node",
       "request": "launch",
       "name": "Debug Ui tests",
       "program": "${workspaceFolder}/ui-test/node_modules/vscode-extension-tester/out/cli.js",
-      "args": [
-          "run-tests",
-          "ui-test/out/*.test.js",
-          "-s",
-          "ui-test/test-resources"
-      ],
+      "args": ["run-tests", "ui-test/out/*.test.js", "-s", "ui-test/test-resources"],
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/ui-test/out/*/*.js"],
       "preLaunchTask": "Prepare resources for ui-tests"
@@ -71,7 +65,7 @@
   "compounds": [
     {
       "name": "Run Extension and Debugger separately",
-      "configurations": [ "Run Extension", "Debugger Server" ]
+      "configurations": ["Run Extension", "Debugger Server"]
     }
   ]
 }

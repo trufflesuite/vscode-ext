@@ -1,19 +1,19 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 export function getDefinitionTemplate() {
-  const properties: { [key: string]: any; } = {};
+  const properties: { [key: string]: any } = {};
 
   return {
-    // tslint:disable-next-line:max-line-length
-    $schema: 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#',
+    $schema:
+      "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
     actions: {},
-    contentVersion: '1.0.0.0',
+    contentVersion: "1.0.0.0",
     outputs: {},
     parameters: {
       $connections: {
         defaultValue: {},
-        type: 'Object',
+        type: "Object",
       },
     },
     triggers: {
@@ -21,11 +21,11 @@ export function getDefinitionTemplate() {
         inputs: {
           schema: {
             properties,
-            type: 'object',
+            type: "object",
           },
         },
-        kind: 'Http',
-        type: 'Request',
+        kind: "Http",
+        type: "Request",
       },
     },
   };

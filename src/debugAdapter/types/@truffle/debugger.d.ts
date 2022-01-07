@@ -1,28 +1,28 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-declare module '@truffle/debugger' {
+declare module "@truffle/debugger" {
   interface Selectors {
-    solidity: any,
-    evm: any,
-    controller: any,
-    trace: any,
+    solidity: any;
+    evm: any;
+    controller: any;
+    trace: any;
   }
   const selectors: Selectors;
 
   interface Session {
-    removeAllBreakpoints: () => Promise<void>,
-    view: (selectors: any) => any,
-    addBreakpoint: (breakPoint: any) => {},
-    variables: () => Promise<any>,
-    continueUntilBreakpoint: () => Promise<void>,
-    stepNext: () => Promise<void>,
-    stepInto: () => Promise<void>,
-    stepOut: () => Promise<void>,
+    removeAllBreakpoints: () => Promise<void>;
+    view: (selectors: any) => any;
+    addBreakpoint: (breakPoint: any) => {};
+    variables: () => Promise<any>;
+    continueUntilBreakpoint: () => Promise<void>;
+    stepNext: () => Promise<void>;
+    stepInto: () => Promise<void>;
+    stepOut: () => Promise<void>;
   }
 
   interface Debugger {
-    connect: () => Session,
+    connect: () => Session;
   }
 
   function forTx(txHash: string, debugOptions: any): Promise<Debugger>;

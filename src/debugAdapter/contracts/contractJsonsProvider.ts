@@ -1,10 +1,10 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import { CONTRACT_JSON_ENCODING } from '../constants/contractJson';
-import { IContractJsonModel } from '../models/IContractJsonModel';
+import * as fs from "fs-extra";
+import * as path from "path";
+import { CONTRACT_JSON_ENCODING } from "../constants/contractJson";
+import { IContractJsonModel } from "../models/IContractJsonModel";
 
 export class ContractJsonsProvider {
   private contractBuildDirectory: string;
@@ -17,15 +17,17 @@ export class ContractJsonsProvider {
   }
 
   public isDirectoryExist(): Promise<boolean> {
-    return new Promise(((accept: any, reject: any) => {
-      fs.pathExists(this.contractBuildDirectory, (err: any, isExist) => {
-        if (!err) {
-          accept(isExist);
-        } else {
-          reject(`Error while reading ${this.contractBuildDirectory}`);
-        }
-      });
-    }).bind(this));
+    return new Promise(
+      ((accept: any, reject: any) => {
+        fs.pathExists(this.contractBuildDirectory, (err: any, isExist) => {
+          if (!err) {
+            accept(isExist);
+          } else {
+            reject(`Error while reading ${this.contractBuildDirectory}`);
+          }
+        });
+      }).bind(this)
+    );
   }
 
   public async getJsonsContents(): Promise<{ [fileName: string]: IContractJsonModel }> {

@@ -1,9 +1,11 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 export interface IAzureMemberAccessKeysDto {
-  keys: [{
-    keyName: string;
-    value: string
-  }];
+  keys: [
+    {
+      keyName: string;
+      value: string;
+    }
+  ];
 }

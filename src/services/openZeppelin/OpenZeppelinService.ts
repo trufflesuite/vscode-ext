@@ -1,16 +1,19 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import download = require('download');
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import { Constants } from '../../Constants';
-import { getWorkspaceRoot, userSettings } from '../../helpers';
-import { Output } from '../../Output';
-import { ContractService } from '../../services';
-import { Telemetry } from '../../TelemetryClient';
-import calculateHash from './fileHashGenerator';
-import { CurrentOpenZeppelinVersionLocation, InvalidOpenZeppelinVersionException } from './InvalidOpenZeppelinVersionException';
+import download = require("download");
+import * as fs from "fs-extra";
+import * as path from "path";
+import { Constants } from "../../Constants";
+import { getWorkspaceRoot, userSettings } from "../../helpers";
+import { Output } from "../../Output";
+import { ContractService } from "../../services";
+import { Telemetry } from "../../TelemetryClient";
+import calculateHash from "./fileHashGenerator";
+import {
+  CurrentOpenZeppelinVersionLocation,
+  InvalidOpenZeppelinVersionException,
+} from "./InvalidOpenZeppelinVersionException";
 import {
   IDownloadingResult,
   IOZAsset,
@@ -19,17 +22,16 @@ import {
   OZAssetType,
   OZContractValidated,
   PromiseState,
-} from './models';
-import { OpenZeppelinManifest } from './OpenZeppelinManifest';
-import { OpenZeppelinProjectJsonService } from './OpenZeppelinProjectJsonService';
+} from "./models";
+import { OpenZeppelinManifest } from "./OpenZeppelinManifest";
+import { OpenZeppelinProjectJsonService } from "./OpenZeppelinProjectJsonService";
 
-const openZeppelinFolderName = 'openZeppelin';
-const userTmpFolder = '.tmp';
+const openZeppelinFolderName = "openZeppelin";
+const userTmpFolder = ".tmp";
 
 export namespace OpenZeppelinService {
   export function projectJsonExists(): boolean {
-    return getWorkspaceRoot(true) !== undefined
-      && isFileExists(OpenZeppelinProjectJsonService.getProjectJsonPath());
+    return getWorkspaceRoot(true) !== undefined && isFileExists(OpenZeppelinProjectJsonService.getProjectJsonPath());
   }
 
   export async function getCurrentOpenZeppelinVersionAsync(): Promise<string> {
@@ -44,8 +46,9 @@ export namespace OpenZeppelinService {
       const projectMetadata = await OpenZeppelinProjectJsonService.getProjectJson();
       currentVersion = projectMetadata.openZeppelin.version || Constants.firstOZVersion;
     } else {
-      const { defaultValue, userValue } =
-        await userSettings.getConfigurationAsync(Constants.userSettings.ozVersionUserSettingsKey);
+      const { defaultValue, userValue } = await userSettings.getConfigurationAsync(
+        Constants.userSettings.ozVersionUserSettingsKey
+      );
       currentVersion = userValue || defaultValue;
     }
 
@@ -55,7 +58,8 @@ export namespace OpenZeppelinService {
         hasProjectJson
           ? CurrentOpenZeppelinVersionLocation.projectJson
           : CurrentOpenZeppelinVersionLocation.userSettings,
-        Constants.openZeppelin.invalidVersionException);
+        Constants.openZeppelin.invalidVersionException
+      );
     }
 
     return currentVersion;
@@ -84,49 +88,55 @@ export namespace OpenZeppelinService {
     baseUrl: string,
     assets: IOZAsset[],
     overwrite: boolean = false,
-    destinationFolder?: string)
-    : Promise<IDownloadingResult[]> {
-    return Promise.all(assets.map(async (asset) => {
-      const fileUrl = new URL(asset.name, baseUrl).toString();
-      const destinationFilePath = getAssetFullPath(destinationFolder || await getOpenZeppelinFolderPath(), asset);
-      const destinationDirPath = path.dirname(destinationFilePath);
+    destinationFolder?: string
+  ): Promise<IDownloadingResult[]> {
+    return Promise.all(
+      assets.map(async (asset) => {
+        const fileUrl = new URL(asset.name, baseUrl).toString();
+        const destinationFilePath = getAssetFullPath(destinationFolder || (await getOpenZeppelinFolderPath()), asset);
+        const destinationDirPath = path.dirname(destinationFilePath);
 
-      if (fs.existsSync(destinationFilePath)) {
-        if (overwrite) {
-          await fs.chmod(destinationFilePath, 0o222); // reset r/o flag, this allows to overwrite
-        } else {
-          Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - Skipped`);
-          return { state: PromiseState.fileExisted, asset };
+        if (fs.existsSync(destinationFilePath)) {
+          if (overwrite) {
+            await fs.chmod(destinationFilePath, 0o222); // reset r/o flag, this allows to overwrite
+          } else {
+            Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, `${fileUrl} - Skipped`);
+            return { state: PromiseState.fileExisted, asset };
+          }
         }
-      }
 
-      return download(fileUrl, destinationDirPath, { filename: path.basename(destinationFilePath) })
-        .then(async () => {
-          Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - OK`);
-          await fs.chmod(destinationFilePath, 0o444);
-          return { state: PromiseState.fulfilled, asset };
-        })
-        .catch(() => {
-          Output.outputLine(Constants.outputChannel.azureBlockchain, `${fileUrl} - Failed`);
-          return { state: PromiseState.rejected, asset };
-        });
-    }));
+        return download(fileUrl, destinationDirPath, { filename: path.basename(destinationFilePath) })
+          .then(async () => {
+            Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, `${fileUrl} - OK`);
+            await fs.chmod(destinationFilePath, 0o444);
+            return { state: PromiseState.fulfilled, asset };
+          })
+          .catch(() => {
+            Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, `${fileUrl} - Failed`);
+            return { state: PromiseState.rejected, asset };
+          });
+      })
+    );
   }
 
-  export async function updateProjectJsonAsync(version: string, category: IOZContractCategory, assets: IOZAsset[])
-  : Promise<void> {
-    let updatedProjectJson = await OpenZeppelinProjectJsonService
-      .addVersionToProjectJsonAsync(version, false);
-    updatedProjectJson = await OpenZeppelinProjectJsonService
-      .addCategoryToProjectJsonAsync(category, false, updatedProjectJson);
-    updatedProjectJson = await OpenZeppelinProjectJsonService
-      .addAssetsToProjectJsonAsync(assets, updatedProjectJson);
+  export async function updateProjectJsonAsync(
+    version: string,
+    category: IOZContractCategory,
+    assets: IOZAsset[]
+  ): Promise<void> {
+    let updatedProjectJson = await OpenZeppelinProjectJsonService.addVersionToProjectJsonAsync(version, false);
+    updatedProjectJson = await OpenZeppelinProjectJsonService.addCategoryToProjectJsonAsync(
+      category,
+      false,
+      updatedProjectJson
+    );
+    updatedProjectJson = await OpenZeppelinProjectJsonService.addAssetsToProjectJsonAsync(assets, updatedProjectJson);
 
     return OpenZeppelinProjectJsonService.storeProjectJsonAsync(updatedProjectJson);
   }
 
   export function assetHasContracts(asset: IOZAsset): boolean {
-    return (asset.type === OZAssetType.contract) || !!(asset.contracts && asset.contracts.length);
+    return asset.type === OZAssetType.contract || !!(asset.contracts && asset.contracts.length);
   }
 
   export function getContractsNamesFromAsset(asset: IOZAsset): string[] {
@@ -147,7 +157,7 @@ export namespace OpenZeppelinService {
       if (parameters) {
         return parameters.reduce((arr: string[], param) => {
           if (param.value) {
-            if (param.type === 'string') {
+            if (param.type === "string") {
               arr.push(`"${param.value}"`);
             } else if (param.type.match(Constants.validationRegexps.types.simpleArray)) {
               arr.push(getArrayParameterValue(param.value, param.type));
@@ -168,7 +178,7 @@ export namespace OpenZeppelinService {
     return path.parse(asset.name).name;
   }
 
-  export async function getAssetsStatus(assets: IOZAsset[]): Promise<{ existing: IOZAsset[], missing: IOZAsset[] }> {
+  export async function getAssetsStatus(assets: IOZAsset[]): Promise<{ existing: IOZAsset[]; missing: IOZAsset[] }> {
     const openZeppelinSubfolder = await getOpenZeppelinFolderPath();
     const assetsStatuses = assets.map((asset) => {
       const assetPath = getAssetFullPath(openZeppelinSubfolder, asset);
@@ -212,15 +222,18 @@ export namespace OpenZeppelinService {
       return;
     }
 
-    Telemetry.sendEvent('OpenZeppelinService.updateOpenZeppelinContractsAsync.started');
+    Telemetry.sendEvent("OpenZeppelinService.updateOpenZeppelinContractsAsync.started");
     const userTmpFolderPath = path.join(userWorkspace, `${userTmpFolder}${Date.now()}`);
-    const tempNewOzFolder = path.join(userTmpFolderPath, 'new');
-    const tempOldOzFolder = path.join(userTmpFolderPath, 'old');
+    const tempNewOzFolder = path.join(userTmpFolderPath, "new");
+    const tempOldOzFolder = path.join(userTmpFolderPath, "old");
     const tempNewOzContractsFolder = path.join(tempNewOzFolder, openZeppelinFolderName);
 
     const currentAssets = await getAllDownloadedAssetsAsync();
-    const { isDownloadSucceed, newAssets } =
-      await downloadNewVersionOfAssetsAsync(currentAssets, newManifest, tempNewOzContractsFolder);
+    const { isDownloadSucceed, newAssets } = await downloadNewVersionOfAssetsAsync(
+      currentAssets,
+      newManifest,
+      tempNewOzContractsFolder
+    );
 
     if (!isDownloadSucceed) {
       throwOpenZeppelinUpgradeException(userTmpFolderPath);
@@ -249,7 +262,7 @@ export namespace OpenZeppelinService {
       // Ignore exception since upgrade is finished
     }
 
-    Telemetry.sendEvent('OpenZeppelinService.updateOpenZeppelinContractsAsync.finished');
+    Telemetry.sendEvent("OpenZeppelinService.updateOpenZeppelinContractsAsync.finished");
   }
 
   export async function getAssetsWithParameters(): Promise<IOZAsset[]> {
@@ -269,9 +282,10 @@ export namespace OpenZeppelinService {
             const existedContractParameters = assetWithParameters.requiredParameters[currentContractName];
             if (existedContractParameters) {
               for (const parameter of currentContractParameters) {
-                const param = existedContractParameters.find((existedContractParameter) =>
-                  existedContractParameter.name === parameter.name &&
-                  existedContractParameter.type === parameter.type);
+                const param = existedContractParameters.find(
+                  (existedContractParameter) =>
+                    existedContractParameter.name === parameter.name && existedContractParameter.type === parameter.type
+                );
                 if (param) {
                   parameter.value = param.value;
                 }
@@ -291,10 +305,11 @@ export namespace OpenZeppelinService {
 
 function getOzContractsFromProjectMetadata(
   openZeppelinSubfolder: string,
-  userProjectMetadata: IProjectMetadata)
-  : string[] {
-  return Object.values(userProjectMetadata.openZeppelin.assets)
-    .map((asset) => getAssetFullPath(openZeppelinSubfolder, asset));
+  userProjectMetadata: IProjectMetadata
+): string[] {
+  return Object.values(userProjectMetadata.openZeppelin.assets).map((asset) =>
+    getAssetFullPath(openZeppelinSubfolder, asset)
+  );
 }
 
 function getAssetFullPath(baseDir: string, asset: IOZAsset): string {
@@ -305,22 +320,25 @@ function isFileExists(filePath: string): boolean {
   try {
     return fs.lstatSync(filePath).isFile();
   } catch (error) {
-    if (error.code === 'ENOENT') {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return false;
     }
     throw error;
   }
 }
 
-function getOriginalHash(ozContractPath: string, openZeppelinSubfolder: string, userProjectMetadata: IProjectMetadata)
-  : string {
-  const assetName = path.relative(openZeppelinSubfolder, ozContractPath).replace(/\\/g, '/');
+function getOriginalHash(
+  ozContractPath: string,
+  openZeppelinSubfolder: string,
+  userProjectMetadata: IProjectMetadata
+): string {
+  const assetName = path.relative(openZeppelinSubfolder, ozContractPath).replace(/\\/g, "/");
   const originalAsset = userProjectMetadata.openZeppelin.assets.find((i) => i.name === assetName);
 
   if (originalAsset) {
     return originalAsset.hash;
   }
-  return '';
+  return "";
 }
 
 async function moveFolderAsync(folderPath: string, newLocationPath: string): Promise<void> {
@@ -331,8 +349,10 @@ async function moveFolderAsync(folderPath: string, newLocationPath: string): Pro
 
 async function moveProjectJsonAsync(nonUserProjectFolder: string, folderIsDestination: boolean): Promise<void> {
   const userProjectJsonPath = OpenZeppelinProjectJsonService.getProjectJsonPath();
-  const nonUserProjectJsonPath = path
-    .join(nonUserProjectFolder, OpenZeppelinProjectJsonService.getProjectJsonFileName());
+  const nonUserProjectJsonPath = path.join(
+    nonUserProjectFolder,
+    OpenZeppelinProjectJsonService.getProjectJsonFileName()
+  );
   if (folderIsDestination) {
     return fs.rename(userProjectJsonPath, nonUserProjectJsonPath);
   }
@@ -357,13 +377,14 @@ function throwOpenZeppelinUpgradeException(tempFolder: string): void {
 async function downloadNewVersionOfAssetsAsync(
   assets: IOZAsset[],
   newManifest: OpenZeppelinManifest,
-  toFolder: string)
-: Promise<{ isDownloadSucceed: boolean, newAssets: IOZAsset[] }> {
+  toFolder: string
+): Promise<{ isDownloadSucceed: boolean; newAssets: IOZAsset[] }> {
   if (!assets.length) {
     return { isDownloadSucceed: true, newAssets: [] };
   }
 
-  const assetIdsToDownload = newManifest.getAssets()
+  const assetIdsToDownload = newManifest
+    .getAssets()
     .filter((newAsset) => assets.some((asset) => asset.name === newAsset.name)) // Search by name match
     .map((asset) => asset.id);
 
@@ -385,11 +406,11 @@ async function downloadNewVersionOfAssetsAsync(
 }
 
 function getArrayParameterValue(value: string, type: string): string {
-  if (type !== 'string[]') {
+  if (type !== "string[]") {
     return value;
   }
 
-  const elements = value.slice(1, value.length - 1).split(',');
+  const elements = value.slice(1, value.length - 1).split(",");
   const values = elements?.map((element) => `"${element.trim()}"`);
-  return `[${values?.join(', ')}]`;
+  return `[${values?.join(", ")}]`;
 }

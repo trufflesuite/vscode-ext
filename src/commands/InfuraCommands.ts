@@ -1,10 +1,10 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from '../Constants';
-import { showQuickPickMany } from '../helpers';
-import { InfuraResourceExplorer } from '../resourceExplorers';
-import { InfuraServiceClient } from '../services';
+import { Constants } from "../Constants";
+import { showQuickPickMany } from "../helpers";
+import { InfuraResourceExplorer } from "../resourceExplorers";
+import { InfuraServiceClient } from "../services";
 
 export namespace InfuraCommands {
   export async function signIn(): Promise<void> {
@@ -19,14 +19,11 @@ export namespace InfuraCommands {
     const infuraResourceExplorer = new InfuraResourceExplorer();
     const allProjects = await infuraResourceExplorer.getProjectsForQuickPick();
 
-    const selectedProjects = await showQuickPickMany(
-      allProjects,
-      {
-        canPickMany: true,
-        ignoreFocusOut: true,
-        placeHolder: Constants.placeholders.selectProjects,
-      },
-    );
+    const selectedProjects = await showQuickPickMany(allProjects, {
+      canPickMany: true,
+      ignoreFocusOut: true,
+      placeHolder: Constants.placeholders.selectProjects,
+    });
 
     await InfuraServiceClient.setExcludedProjects(allProjects, selectedProjects);
   }

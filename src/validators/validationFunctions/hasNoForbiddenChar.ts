@@ -1,7 +1,7 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { IRule } from '../validator';
+import { IRule } from "../validator";
 
 export class HasNoForbiddenChar implements IRule {
   constructor(private readonly forbiddenChars: RegExp, private readonly errorMessage: string) {}

@@ -1,10 +1,10 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { EventGridManagementClient } from '../ARMBlockchain/EventGridManagementClient';
-import { Constants } from '../Constants';
-import { EventGridItem } from '../Models/QuickPickItems';
-import { AzureResourceExplorer } from './AzureResourceExplorer';
+import { EventGridManagementClient } from "../ARMBlockchain/EventGridManagementClient";
+import { Constants } from "../Constants";
+import { EventGridItem } from "../Models/QuickPickItems";
+import { AzureResourceExplorer } from "./AzureResourceExplorer";
 
 export class EventGridResourceExplorer extends AzureResourceExplorer {
   public async loadEventGridItems(eventGridClient: EventGridManagementClient): Promise<EventGridItem[]> {

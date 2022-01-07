@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {
@@ -13,7 +13,7 @@ import {
   IsNotEmpty,
   IsUrl,
   LengthRange,
-} from './validationFunctions';
+} from "./validationFunctions";
 
 export interface IRule {
   validate(value: string): string | null | Promise<string | null>;
@@ -25,7 +25,7 @@ export class Validator {
   constructor(private readonly value: string) {}
 
   public getErrors(): string | null {
-    return Array.from(this.errors).join('\r\n') || null;
+    return Array.from(this.errors).join("\r\n") || null;
   }
 
   public hasLowerCase(): Validator {
@@ -79,17 +79,17 @@ export class Validator {
   }
 
   public async isAvailable(
-    checkAvailable: (name: string) => Promise<{
-      message: string | null,
-      nameAvailable: boolean,
-      reason: string,
-    } | boolean>,
-    errorMessage?: (error: string) => string,
+    checkAvailable: (name: string) => Promise<
+      | {
+          message: string | null;
+          nameAvailable: boolean;
+          reason: string;
+        }
+      | boolean
+    >,
+    errorMessage?: (error: string) => string
   ): Promise<Validator> {
-    await this.validate(new IsAvailable(
-      checkAvailable,
-      errorMessage,
-    ));
+    await this.validate(new IsAvailable(checkAvailable, errorMessage));
 
     return this;
   }

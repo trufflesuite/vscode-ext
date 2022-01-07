@@ -1,16 +1,15 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { commands, TreeItem, TreeItemCollapsibleState, Uri } from 'vscode';
-import { Constants } from '../../Constants';
-import { Telemetry } from '../../TelemetryClient';
-import { ItemType } from '../ItemType';
-import { IExtensionItem } from './IExtensionItem';
+import { commands, TreeItem, TreeItemCollapsibleState, Uri } from "vscode";
+import { Constants } from "../../Constants";
+import { Telemetry } from "../../TelemetryClient";
+import { ItemType } from "../ItemType";
+import { IExtensionItem } from "./IExtensionItem";
 import Timeout = NodeJS.Timeout;
 
-// tslint:disable-next-line:interface-name
 export interface ExtensionItemData {
-  iconPath?: { light: string | Uri; dark: string | Uri } ;
+  iconPath?: { light: string | Uri; dark: string | Uri };
   contextValue?: string;
 }
 
@@ -22,7 +21,7 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
   protected constructor(
     public readonly itemType: ItemType,
     public readonly label: string,
-    public readonly data: ExtensionItemData,
+    public readonly data: ExtensionItemData
   ) {
     super(label);
 
@@ -47,10 +46,10 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
 
   public addChild(child: IExtensionItem): void {
     if (this.children.some((_child) => _child.label === child.label)) {
-      Telemetry.sendException(new Error(Constants.errorMessageStrings.GetMessageChildAlreadyConnected(
-        Telemetry.obfuscate(child.label || ''),
-      )));
-      throw new Error(Constants.errorMessageStrings.GetMessageChildAlreadyConnected(child.label || ''));
+      Telemetry.sendException(
+        new Error(Constants.errorMessageStrings.GetMessageChildAlreadyConnected(Telemetry.obfuscate(child.label || "")))
+      );
+      throw new Error(Constants.errorMessageStrings.GetMessageChildAlreadyConnected(child.label || ""));
     }
 
     child.addParent(this);
@@ -86,7 +85,7 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
 
   private collapse() {
     if (this.children.length > 0) {
-      Telemetry.sendEvent('ExtensionItem.collapse.childrenLengthGreaterThanZero');
+      Telemetry.sendEvent("ExtensionItem.collapse.childrenLengthGreaterThanZero");
       this.collapsibleState = TreeItemCollapsibleState.Collapsed;
     } else {
       this.collapsibleState = TreeItemCollapsibleState.None;
@@ -97,7 +96,7 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
     clearTimeout(ExtensionItem.timeoutID as Timeout);
     ExtensionItem.timeoutID = setTimeout(async () => {
       try {
-        await commands.executeCommand('azureBlockchainService.refresh');
+        await commands.executeCommand("trufflesuite.refresh");
       } catch (error) {
         Telemetry.sendException(error);
       }

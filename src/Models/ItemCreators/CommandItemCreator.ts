@@ -1,8 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Command } from '../TreeItems';
-import { ItemCreator } from './ItemCreator';
+import { Command } from "../TreeItems";
+import { ItemCreator } from "./ItemCreator";
 
 export class CommandItemCreator extends ItemCreator {
   protected createFromObject(obj: { [key: string]: any }): Command {
@@ -11,9 +11,9 @@ export class CommandItemCreator extends ItemCreator {
     return new Command(label, commandName, args);
   }
 
-  protected getRequiredFields(): Array<{ fieldName: string, type: string }> {
+  protected getRequiredFields(): Array<{ fieldName: string; type: string }> {
     const requiredFields = super.getRequiredFields();
 
-    return requiredFields.concat({ fieldName: 'command', type: 'string' });
+    return requiredFields.concat({ fieldName: "command", type: "string" });
   }
 }

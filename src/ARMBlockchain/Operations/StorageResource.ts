@@ -1,9 +1,9 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { IStorageAccountDto } from '../AzureDto/StorageAccount/StorageAccountDto';
-import { IStorageAccountSasDto } from '../AzureDto/StorageAccount/StorageAccountSasDto';
-import { StorageAccountClient } from '../StorageAccountClient';
+import { IStorageAccountDto } from "../AzureDto/StorageAccount/StorageAccountDto";
+import { IStorageAccountSasDto } from "../AzureDto/StorageAccount/StorageAccountSasDto";
+import { StorageAccountClient } from "../StorageAccountClient";
 
 export class StorageResource {
   constructor(public readonly client: StorageAccountClient) {}

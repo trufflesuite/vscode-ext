@@ -1,10 +1,10 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as semver from 'semver';
-import { commands, Extension, extensions } from 'vscode';
-import { Constants } from '../../Constants';
-import { IExtensionAdapter } from './IExtensionAdapter';
+import * as semver from "semver";
+import { commands, Extension, extensions } from "vscode";
+import { Constants } from "../../Constants";
+import { IExtensionAdapter } from "./IExtensionAdapter";
 
 export class OpenZeppelinExtensionAdapter implements IExtensionAdapter {
   private extensionInfo: any;
@@ -22,8 +22,13 @@ export class OpenZeppelinExtensionAdapter implements IExtensionAdapter {
 
     const version = this.extension.packageJSON.version;
     if (!semver.eq(version, this.extensionInfo.supportedVersion)) {
-      throw new Error(Constants.informationMessage.unsupportedVersionOfExternalExtension(
-        this.extensionInfo.name, version, this.extensionInfo.supportedVersion));
+      throw new Error(
+        Constants.informationMessage.unsupportedVersionOfExternalExtension(
+          this.extensionInfo.name,
+          version,
+          this.extensionInfo.supportedVersion
+        )
+      );
     }
 
     if (!this.extension.isActive) {

@@ -1,9 +1,9 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { commands, ExtensionContext } from 'vscode';
-import { Constants } from '../Constants';
-import { BasicWebView, IWebViewConfig } from './BasicWebView';
+import { commands, ExtensionContext } from "vscode";
+import { Constants } from "../Constants";
+import { BasicWebView, IWebViewConfig } from "./BasicWebView";
 
 export class WelcomePage extends BasicWebView {
   protected readonly config: IWebViewConfig;
@@ -17,20 +17,20 @@ export class WelcomePage extends BasicWebView {
     return false;
   }
 
-  protected async receiveMessage(message: {[key: string]: any}): Promise<void> {
+  protected async receiveMessage(message: { [key: string]: any }): Promise<void> {
     await super.receiveMessage(message);
 
     if (!this.panel) {
       return;
     }
 
-    if (message.command === 'executeCommand') {
-      if (message.value === 'createProject') {
-        await commands.executeCommand('azureBlockchainService.createProject');
+    if (message.command === "executeCommand") {
+      if (message.value === "createProject") {
+        await commands.executeCommand("trufflesuite.createProject");
       }
 
-      if (message.value === 'connectProject') {
-        await commands.executeCommand('azureBlockchainService.connectProject');
+      if (message.value === "connectProject") {
+        await commands.executeCommand("trufflesuite.connectProject");
       }
     }
   }

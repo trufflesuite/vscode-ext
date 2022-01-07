@@ -1,8 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { QuickPickItem } from 'vscode';
-import { AzureSession } from '../../azure-account.api';
+import { QuickPickItem } from "vscode";
+import { AzureSession } from "../../azure-account.api";
 
 export class SubscriptionItem implements QuickPickItem {
   public readonly label: string;

@@ -1,9 +1,9 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as uuid from 'uuid';
-import { Contract } from './Contract';
-import { Network } from './Network';
+import * as uuid from "uuid";
+import { Contract } from "./Contract";
+import { Network } from "./Network";
 
 export class ContractInstance {
   public readonly id: string;
@@ -23,7 +23,7 @@ export class ContractInstance {
     const networks = contract.networks;
     const deployedNetwork = networks[network.id] || {};
 
-    this.address = deployedNetwork.address || '';
+    this.address = deployedNetwork.address || "";
     this.transactionHash = deployedNetwork.transactionHash;
   }
 }

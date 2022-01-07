@@ -1,16 +1,17 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from '../../Constants';
-import { Telemetry } from '../../TelemetryClient';
-import { HttpService } from '../HttpService';
+import { Constants } from "../../Constants";
+import { Telemetry } from "../../TelemetryClient";
+import { HttpService } from "../HttpService";
 
 export async function isGanacheServer(port: number | string): Promise<boolean> {
   try {
     const response = await HttpService.sendRPCRequest(
       `http://${Constants.localhost}:${port}`,
-      Constants.rpcMethods.netListening);
-    return response && !!response.result || false;
+      Constants.rpcMethods.netListening
+    );
+    return (response && !!response.result) || false;
   } catch (error) {
     Telemetry.sendException(error);
     return false;

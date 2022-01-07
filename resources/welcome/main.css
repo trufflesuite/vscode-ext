@@ -5,7 +5,7 @@
 }
 
 .vscode-dark {
-  color: #D4D4D4;
+  color: #d4d4d4;
 }
 
 .vscode-light {
@@ -94,7 +94,7 @@ header p {
 .interactive,
 .quick-starts-blocks,
 .specific-partner {
-  margin-top: 10px
+  margin-top: 10px;
 }
 
 .vscode-dark .interactive,
@@ -105,14 +105,14 @@ header p {
 .quick-starts-blocks,
 .specific-partner,
 .required-app {
-  background-color: #2B2B2B;
+  background-color: #2b2b2b;
 }
 
 .vscode-light .interactive,
 .vscode-light .quick-starts-blocks,
 .vscode-light .specific-partner,
 .vscode-light .required-app {
-  background-color: #F7F7F7;
+  background-color: #f7f7f7;
 }
 
 .vscode-dark .interactive:hover,
@@ -130,7 +130,7 @@ header p {
 .vscode-light .quick-starts-blocks:hover,
 .vscode-light .specific-partner:hover,
 .vscode-light .required-app:hover {
-  background-color: #F0F0F0;
+  background-color: #f0f0f0;
 }
 
 .quick-starts-blocks > div,
@@ -152,7 +152,7 @@ header p {
 
 .vscode-dark .arrow,
 .arrow {
-  border-color: transparent #D4D4D4 #D4D4D4 transparent;
+  border-color: transparent #d4d4d4 #d4d4d4 transparent;
 }
 
 .vscode-light .arrow {
@@ -189,7 +189,7 @@ header p {
   width: 300px;
   height: 44px;
   font-size: 15px;
-  color: #FFFFFF;
+  color: #ffffff;
   text-align: center;
   line-height: 20px;
   padding-top: 12px;
@@ -198,20 +198,20 @@ header p {
 
 .vscode-dark .quick-starts-blocks a,
 .quick-starts-blocks a {
-  background-color: #0062A3;
+  background-color: #0062a3;
 }
 
 .vscode-light .quick-starts-blocks a {
-  background-color: #007ACC;
+  background-color: #007acc;
 }
 
 .vscode-dark .quick-starts-blocks a:hover,
 .quick-starts-blocks a:hover {
-  background-color: #007ACC;
+  background-color: #007acc;
 }
 
 .vscode-light .quick-starts-blocks a:hover {
-  background-color: #0062A3;
+  background-color: #0062a3;
 }
 
 .detail {
@@ -252,7 +252,7 @@ header p {
 
 footer {
   margin: 40px 0;
-  text-align: center
+  text-align: center;
 }
 
 /*#endregion main-content*/
@@ -304,12 +304,12 @@ footer {
   display: block;
   height: 44px;
   font-size: 15px;
-  color: #FFFFFF;
+  color: #ffffff;
   text-align: center;
   line-height: 20px;
   padding-top: 12px;
   border-radius: 4px;
-  background-color: #0062A3;
+  background-color: #0062a3;
   align-self: stretch;
   margin-top: 10px;
   cursor: pointer;
@@ -328,11 +328,13 @@ footer {
 
 /*#region spinner*/
 @keyframes spinner {
-  to {transform: rotate(360deg);}
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .spinner:before {
-  content: '';
+  content: "";
   box-sizing: border-box;
   position: absolute;
   top: 50%;
@@ -343,9 +345,9 @@ footer {
   margin-left: -10px;
   border-radius: 50%;
   border: 2px solid transparent;
-  border-top-color: #FFFFFF;
-  border-bottom-color: #FFFFFF;
-  animation: spinner .8s ease infinite;
+  border-top-color: #ffffff;
+  border-bottom-color: #ffffff;
+  animation: spinner 0.8s ease infinite;
 }
 /*#endregion spinner*/
 
@@ -430,13 +432,13 @@ footer {
 
 .vscode-dark #back-to-top,
 #back-to-top {
-  color: #D4D4D4;
-  background-color: #2B2B2B;
+  color: #d4d4d4;
+  background-color: #2b2b2b;
 }
 
 .vscode-light #back-to-top {
   color: #333333;
-  background-color: #E7E7E7;
+  background-color: #e7e7e7;
 }
 
 .vscode-dark #back-to-top:hover,
@@ -445,9 +447,9 @@ footer {
 }
 
 .vscode-light #back-to-top:hover {
-  background-color: #E0E0E0;
+  background-color: #e0e0e0;
 }
 
 .vscode-dark {
-  background-color: #1E1E1E;
+  background-color: #1e1e1e;
 }

@@ -1,17 +1,17 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import { ProgressLocation, window } from 'vscode';
-import { IGetStorageAccountDto, IStorageAccountDto } from '../ARMBlockchain';
-import { ICreateStorageAccountDto } from '../ARMBlockchain/AzureDto/StorageAccount/CreateStorageAccountDto';
-import { StorageAccountClient } from '../ARMBlockchain/StorageAccountClient';
-import { Constants } from '../Constants';
-import { outputCommandHelper, userSettings } from '../helpers';
-import { ResourceGroupItem } from '../Models/QuickPickItems';
-import { BlobServiceClient } from '../services/storageAccountService/BlobServiceClient';
-import { AzureResourceExplorer } from './AzureResourceExplorer';
+import * as fs from "fs-extra";
+import * as path from "path";
+import { ProgressLocation, window } from "vscode";
+import { IGetStorageAccountDto, IStorageAccountDto } from "../ARMBlockchain";
+import { ICreateStorageAccountDto } from "../ARMBlockchain/AzureDto/StorageAccount/CreateStorageAccountDto";
+import { StorageAccountClient } from "../ARMBlockchain/StorageAccountClient";
+import { Constants } from "../Constants";
+import { outputCommandHelper, userSettings } from "../helpers";
+import { ResourceGroupItem } from "../Models/QuickPickItems";
+import { BlobServiceClient } from "../services/storageAccountService/BlobServiceClient";
+import { AzureResourceExplorer } from "./AzureResourceExplorer";
 
 export class StorageAccountResourceExplorer extends AzureResourceExplorer {
   public async getFileBlobUrls(
@@ -19,7 +19,7 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
     fileNameArray: string[],
     localFilePaths: string,
     subscriptionId: string,
-    resourceGroup: string,
+    resourceGroup: string
   ): Promise<string[]> {
     await this.waitForLogin();
 
@@ -28,7 +28,7 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
 
     await this.createStorageAccountIfDoesNotExist(client, client.location, storageAccountName);
 
-    const containerName = Constants.containerAzureBlockchainExtension;
+    const containerName = Constants.containerTruffleSuiteExtension;
     const sas = await this.getStorageAccountSas(client, storageAccountName);
 
     await this.createContainerIfDoesNotExist(storageAccountName, containerName, sas);
@@ -36,20 +36,28 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
     return window.withProgress(
       { location: ProgressLocation.Window, title: Constants.statusBarMessages.createBlobs },
       async () =>
-        await Promise.all(fileNameArray.map((name, index) =>
-          this.createBlob(storageAccountName, containerName, name, contentArray[index], sas, localFilePaths))),
-      );
+        await Promise.all(
+          fileNameArray.map((name, index) =>
+            this.createBlob(storageAccountName, containerName, name, contentArray[index], sas, localFilePaths)
+          )
+        )
+    );
   }
 
-  public async deleteBlobs(fileUrls: string[], subscriptionId: string, resourceGroup: string, localFilePaths: string)
-  : Promise<void> {
+  public async deleteBlobs(
+    fileUrls: string[],
+    subscriptionId: string,
+    resourceGroup: string,
+    localFilePaths: string
+  ): Promise<void> {
     const client = await this.getStorageAccountClient(subscriptionId, resourceGroup);
 
     await window.withProgress(
       { location: ProgressLocation.Window, title: Constants.statusBarMessages.deleteBlobs },
       async () => {
         await Promise.all(fileUrls.map((url) => this.deleteBlob(new URL(url), client, localFilePaths)));
-      });
+      }
+    );
   }
 
   private async getStorageAccountName(): Promise<string> {
@@ -66,8 +74,8 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
   private async createStorageAccountIfDoesNotExist(
     client: StorageAccountClient,
     location: string,
-    storageAccountName: string)
-  : Promise<void> {
+    storageAccountName: string
+  ): Promise<void> {
     let isOnlyCheckStatus = false;
 
     try {
@@ -78,8 +86,10 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
 
       isOnlyCheckStatus = true;
     } catch (error) {
-      if (!(error.message && error.message.includes('ResourceNotFound'))) {
-        throw error;
+      if (error instanceof Error) {
+        if (!(error.message && error.message.includes("ResourceNotFound"))) {
+          throw error;
+        }
       }
     }
 
@@ -90,49 +100,60 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
     client: StorageAccountClient,
     location: string,
     storageAccountName: string,
-    isOnlyCheckStatus: boolean)
-  : Promise<void> {
+    isOnlyCheckStatus: boolean
+  ): Promise<void> {
     const body: ICreateStorageAccountDto = {
-      kind: 'StorageV2',
+      kind: "StorageV2",
       location,
       sku: {
-        name: 'Standard_LRS',
+        name: "Standard_LRS",
       },
     };
 
-    const action = async () => isOnlyCheckStatus
-      ? null
-      : await client.storageResource.createStorageAccount(storageAccountName, JSON.stringify(body));
+    const action = async () =>
+      isOnlyCheckStatus
+        ? null
+        : await client.storageResource.createStorageAccount(storageAccountName, JSON.stringify(body));
 
     const stateRequest = async () => await client.storageResource.getStorageAccount(storageAccountName);
-    const checkRequestStatusCallback = (storageAccount: IStorageAccountDto | null) => !storageAccount
-      || storageAccount.properties.provisioningState === Constants.provisioningState.resolvingDns
-      || storageAccount.properties.provisioningState === Constants.provisioningState.creating;
+    const checkRequestStatusCallback = (storageAccount: IStorageAccountDto | null) =>
+      !storageAccount ||
+      storageAccount.properties.provisioningState === Constants.provisioningState.resolvingDns ||
+      storageAccount.properties.provisioningState === Constants.provisioningState.creating;
 
     return window.withProgress(
       { location: ProgressLocation.Window, title: Constants.statusBarMessages.createStorageAccount },
-      async () => await outputCommandHelper.awaiter<IStorageAccountDto>(
-        action,
-        stateRequest,
-        checkRequestStatusCallback,
-        () => Promise.resolve(),
-        5000));
+      async () =>
+        await outputCommandHelper.awaiter<IStorageAccountDto>(
+          action,
+          stateRequest,
+          checkRequestStatusCallback,
+          () => Promise.resolve(),
+          5000
+        )
+    );
   }
 
-  private async createContainerIfDoesNotExist(storageAccountName: string, containerName: string, sas: string)
-  : Promise<void> {
+  private async createContainerIfDoesNotExist(
+    storageAccountName: string,
+    containerName: string,
+    sas: string
+  ): Promise<void> {
     try {
       await BlobServiceClient.getContainer(storageAccountName, containerName, sas);
       return;
     } catch (error) {
-      if (!(error.message && error.message.includes('ContainerNotFound'))) {
-        throw error;
+      if (error instanceof Error) {
+        if (!(error.message && error.message.includes("ContainerNotFound"))) {
+          throw error;
+        }
       }
     }
 
     await window.withProgress(
       { location: ProgressLocation.Window, title: Constants.statusBarMessages.createContainer },
-      async () => await BlobServiceClient.createContainer(storageAccountName, containerName, sas));
+      async () => await BlobServiceClient.createContainer(storageAccountName, containerName, sas)
+    );
   }
 
   private async getStorageAccountSas(client: StorageAccountClient, storageAccountName: string): Promise<string> {
@@ -142,12 +163,12 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
     const signedExpiry = new Date(currentTime + 3 * 60000).toISOString();
 
     const body: IGetStorageAccountDto = {
-      keyToSign: 'key1',
+      keyToSign: "key1",
       signedExpiry,
-      signedPermission: 'rwdlacup',
-      signedProtocol: 'https,http',
-      signedResourceTypes: 'sco',
-      signedServices: 'bfqt',
+      signedPermission: "rwdlacup",
+      signedProtocol: "https,http",
+      signedResourceTypes: "sco",
+      signedServices: "bfqt",
       signedStart,
     };
 
@@ -160,7 +181,7 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
     blobName: string,
     body: string,
     sas: string,
-    localFilePaths: string,
+    localFilePaths: string
   ): Promise<string> {
     const url = await BlobServiceClient.createBlob(storageAccountName, containerName, blobName, sas, body);
     const filePath = path.join(localFilePaths, blobName);
@@ -173,7 +194,7 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
 
   private async deleteBlob(url: URL, client: StorageAccountClient, localFilePaths: string): Promise<void> {
     const urlWithAuth = url.origin + url.pathname;
-    const fileName = urlWithAuth.substr(urlWithAuth.lastIndexOf('/') + 1);
+    const fileName = urlWithAuth.substr(urlWithAuth.lastIndexOf("/") + 1);
     const storageAccountName = urlWithAuth.match(/[a-z0-9]*(?=\.blob)/)!.toString();
 
     const sas = await this.getStorageAccountSas(client, storageAccountName);
@@ -204,7 +225,7 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
           customHeaders: {},
         },
         rpRegistrationRetryTimeout: 30,
-      },
+      }
     );
   }
 }

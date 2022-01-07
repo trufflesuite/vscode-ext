@@ -1,8 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { ISkuDto } from '..';
-import { AzureBlockchainServiceClient } from '../AzureBlockchainServiceClient';
+import { ISkuDto } from "..";
+import { AzureBlockchainServiceClient } from "../AzureBlockchainServiceClient";
 
 export class SkuResource {
   constructor(public readonly client: AzureBlockchainServiceClient) {}

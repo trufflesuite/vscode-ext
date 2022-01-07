@@ -1,8 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { IEventGridDto } from '../AzureDto/EventGridDto';
-import { EventGridManagementClient } from '../EventGridManagementClient';
+import { IEventGridDto } from "../AzureDto/EventGridDto";
+import { EventGridManagementClient } from "../EventGridManagementClient";
 
 export class EventGridResource {
   constructor(public readonly client: EventGridManagementClient) {}

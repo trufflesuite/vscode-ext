@@ -1,23 +1,11 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as requestPromise from 'request-promise';
-import {
-  Disposable,
-  Event,
-  EventEmitter,
-  Memento,
-  StatusBarItem,
-  window,
-} from 'vscode';
-import { Constants } from '../../Constants';
-import { IToken, refreshToken, signIn, signOut } from './codeFlowLogin';
-import {
-  ICreateProjectRequestDto,
-  IInfuraProjectDto,
-  IInfuraUserDto,
-  IProjectsResultDto,
-} from './InfuraDto';
+import * as requestPromise from "request-promise";
+import { Disposable, Event, EventEmitter, Memento, StatusBarItem, window } from "vscode";
+import { Constants } from "../../Constants";
+import { IToken, refreshToken, signIn, signOut } from "./codeFlowLogin";
+import { ICreateProjectRequestDto, IInfuraProjectDto, IInfuraUserDto, IProjectsResultDto } from "./InfuraDto";
 
 interface IInfuraCache {
   user: IInfuraUserDto;
@@ -30,7 +18,7 @@ class InfuraClient {
   private readonly disposables: Disposable[];
   private readonly eventEmitter: EventEmitter<string | undefined>;
   private readonly onCacheChange: Event<string | undefined>;
-  private readonly showProjectsFromInfuraCommand = 'azureBlockchainService.showProjectsFromInfuraAccount';
+  private readonly showProjectsFromInfuraCommand = "trufflesuite.showProjectsFromInfuraAccount";
 
   constructor() {
     this.disposables = [];
@@ -92,7 +80,7 @@ class InfuraClient {
   public async getUserData(): Promise<IInfuraUserDto> {
     const url = new URL(Constants.infuraAPIUrls.userMe, Constants.infuraAPIUrls.rootURL).toString();
     const params = {
-      method: 'GET',
+      method: "GET",
       url,
     };
     const response = await this.sendRequest(params);
@@ -112,9 +100,7 @@ class InfuraClient {
   public async getAllowedProjects(): Promise<IInfuraProjectDto[]> {
     const allProjects = await InfuraServiceClient.getProjects();
 
-    return allProjects.filter((project) =>
-      !(this.getExcludedProjects().some((excluded) => excluded.id === project.id)),
-    );
+    return allProjects.filter((project) => !this.getExcludedProjects().some((excluded) => excluded.id === project.id));
   }
 
   public async getProjects(): Promise<IInfuraProjectDto[]> {
@@ -122,14 +108,12 @@ class InfuraClient {
     return projectsDto.projects;
   }
 
-  public async setExcludedProjects(
-    allProjects: IInfuraProjectDto[],
-    selectedProjects: IInfuraProjectDto[],
-  ) {
+  public async setExcludedProjects(allProjects: IInfuraProjectDto[], selectedProjects: IInfuraProjectDto[]) {
     if (this.globalState) {
-      const excludedProjects = selectedProjects.length !== 0
-        ? allProjects.filter((project) => !(selectedProjects.some((selected) => selected.id === project.id)))
-        : allProjects;
+      const excludedProjects =
+        selectedProjects.length !== 0
+          ? allProjects.filter((project) => !selectedProjects.some((selected) => selected.id === project.id))
+          : allProjects;
       await this.globalState.update(Constants.globalStateKeys.infuraExcludedProjectsListKey, excludedProjects);
     }
   }
@@ -137,7 +121,7 @@ class InfuraClient {
   public async getProjectDetails(projectId: string): Promise<IInfuraProjectDto> {
     const url = new URL(`${Constants.infuraAPIUrls.projects}/${projectId}`, Constants.infuraAPIUrls.rootURL).toString();
     const params = {
-      method: 'GET',
+      method: "GET",
       url,
     };
     const response = await this.sendRequest(params);
@@ -151,7 +135,7 @@ class InfuraClient {
     const params = {
       body: project,
       json: true,
-      method: 'POST',
+      method: "POST",
       url,
     };
 
@@ -179,7 +163,7 @@ class InfuraClient {
   private async receiveProjects(): Promise<IProjectsResultDto> {
     const url = new URL(Constants.infuraAPIUrls.projects, Constants.infuraAPIUrls.rootURL).toString();
     const params = {
-      method: 'GET',
+      method: "GET",
       url,
     };
     const response = await this.sendRequest(params);
@@ -236,9 +220,7 @@ class InfuraClient {
     return false;
   }
 
-  private async sendRequest(
-    params: any = {},
-  ): Promise<any> {
+  private async sendRequest(params: any = {}): Promise<any> {
     try {
       return await requestPromise(this.addTokenToParams(params));
     } catch (error) {
@@ -263,23 +245,23 @@ class InfuraClient {
     if (this.statusBarItem) {
       switch (event) {
         case Constants.infuraSigningIn:
-          this.statusBarItem.text = 'Infura: Signing in...';
+          this.statusBarItem.text = "Infura: Signing in...";
           this.statusBarItem.show();
           break;
-        default:
+        default: {
           const infuraCache = this.getInfuraCache();
           if (infuraCache && infuraCache.user && infuraCache.user.email) {
             this.statusBarItem.text = `Infura: ${infuraCache.user.email}`;
             this.statusBarItem.show();
           } else {
-            this.statusBarItem.text = '';
+            this.statusBarItem.text = "";
             this.statusBarItem.hide();
           }
           break;
+        }
       }
     }
   }
 }
 
-// tslint:disable-next-line:variable-name
 export const InfuraServiceClient = new InfuraClient();

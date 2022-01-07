@@ -1,10 +1,10 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { ExtensionContext } from 'vscode';
-import { Constants } from '../Constants';
-import { ContractDB } from '../services';
-import { BasicWebView, IWebViewConfig } from './BasicWebView';
+import { ExtensionContext } from "vscode";
+import { Constants } from "../Constants";
+import { ContractDB } from "../services";
+import { BasicWebView, IWebViewConfig } from "./BasicWebView";
 
 export class ContractUI extends BasicWebView {
   protected readonly config: IWebViewConfig;
@@ -22,7 +22,7 @@ export class ContractUI extends BasicWebView {
     this.documentReady = false;
     this.pending = false;
 
-    ContractDB.bus.on('updateContracts', this._onChangeContract);
+    ContractDB.bus.on("updateContracts", this._onChangeContract);
   }
 
   protected async createAndShow(): Promise<void> {
@@ -34,14 +34,14 @@ export class ContractUI extends BasicWebView {
     return false;
   }
 
-  protected async receiveMessage(message: {[key: string]: any}): Promise<void> {
+  protected async receiveMessage(message: { [key: string]: any }): Promise<void> {
     await super.receiveMessage(message);
 
     if (!this.panel) {
       return;
     }
 
-    if (message.command === 'documentReady') {
+    if (message.command === "documentReady") {
       this.documentReady = true;
       if (this.pending) {
         this.updateContract();
@@ -51,7 +51,7 @@ export class ContractUI extends BasicWebView {
 
   protected dispose(): void {
     super.dispose();
-    ContractDB.bus.off('updateContracts', this._onChangeContract);
+    ContractDB.bus.off("updateContracts", this._onChangeContract);
   }
 
   private async updateContract(): Promise<void> {
@@ -60,7 +60,7 @@ export class ContractUI extends BasicWebView {
       return;
     }
     const contractHistory = await ContractDB.getContractInstances(this.contractName);
-    await this.postMessage({ command: 'contracts', value: contractHistory });
+    await this.postMessage({ command: "contracts", value: contractHistory });
   }
 
   private async onChangeContract(contractNames: string[]): Promise<void> {

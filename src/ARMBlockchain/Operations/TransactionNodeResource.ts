@@ -1,9 +1,9 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { IAzureTransactionNodeDto, ICreateTransactionNodeDto } from '..';
-import { AzureBlockchainServiceClient } from '../AzureBlockchainServiceClient';
-import { IAzureMemberAccessKeysDto } from '../AzureDto/AccessKeysDto';
+import { IAzureTransactionNodeDto, ICreateTransactionNodeDto } from "..";
+import { AzureBlockchainServiceClient } from "../AzureBlockchainServiceClient";
+import { IAzureMemberAccessKeysDto } from "../AzureDto/AccessKeysDto";
 
 export class TransactionNodeResource {
   constructor(public readonly client: AzureBlockchainServiceClient) {}
@@ -32,27 +32,30 @@ export class TransactionNodeResource {
     });
   }
 
-  public createTransactionNode(memberName: string, transactionNodeName: string, body: ICreateTransactionNodeDto)
-  : Promise<IAzureTransactionNodeDto> {
+  public createTransactionNode(
+    memberName: string,
+    transactionNodeName: string,
+    body: ICreateTransactionNodeDto
+  ): Promise<IAzureTransactionNodeDto> {
     return new Promise((resolve, reject) => {
-      return this.client.createTransactionNode(memberName, transactionNodeName, JSON.stringify(body),
+      return this.client.createTransactionNode(
+        memberName,
+        transactionNodeName,
+        JSON.stringify(body),
         (error: Error | null, result?: any) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(Object.assign([], result));
+          if (error) {
+            reject(error);
+          } else {
+            resolve(Object.assign([], result));
+          }
         }
-      });
+      );
     });
   }
 
   public getTransactionNodeAccessKeys(memberName: string, nodeName: string): Promise<IAzureMemberAccessKeysDto> {
     return new Promise((resolve, reject) => {
-      return this.client.getTransactionNodeAccessKeys(
-        memberName,
-        nodeName,
-        (error: Error | null, result?: any,
-      ) => {
+      return this.client.getTransactionNodeAccessKeys(memberName, nodeName, (error: Error | null, result?: any) => {
         if (error) {
           reject(error);
         } else {

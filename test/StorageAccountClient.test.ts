@@ -1,16 +1,16 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from 'assert';
-import { ServiceClientCredentials } from 'ms-rest';
-import * as msrestazure from 'ms-rest-azure';
-import * as sinon from 'sinon';
-import * as uuid from 'uuid';
-import { StorageAccountClient } from '../src/ARMBlockchain/StorageAccountClient';
+import * as assert from "assert";
+import { ServiceClientCredentials } from "ms-rest";
+import * as msrestazure from "ms-rest-azure";
+import * as sinon from "sinon";
+import * as uuid from "uuid";
+import { StorageAccountClient } from "../src/ARMBlockchain/StorageAccountClient";
 
-describe('Unit tests for StorageAccountClient', () => {
+describe("Unit tests for StorageAccountClient", () => {
   let credentials: ServiceClientCredentials;
-  const storageAccountClient = require('../src/ARMBlockchain/StorageAccountClient');
+  const storageAccountClient = require("../src/ARMBlockchain/StorageAccountClient");
   let callbackFunction: (error: Error | null, result?: any) => void;
   let callbackFunctionSpy: any;
   let options: msrestazure.AzureServiceClientOptions;
@@ -26,7 +26,7 @@ describe('Unit tests for StorageAccountClient', () => {
   });
 
   beforeEach(() => {
-    sinon.stub(storageAccountClient.__proto__, 'constructor');
+    sinon.stub(storageAccountClient.__proto__, "constructor");
 
     callbackFunctionSpy = sinon.spy(callbackFunction);
   });
@@ -35,7 +35,7 @@ describe('Unit tests for StorageAccountClient', () => {
     sinon.restore();
   });
 
-  describe('Public methods.', () => {
+  describe("Public methods.", () => {
     let serviceClient: StorageAccountClient;
     let pipelineMock: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], {}>;
     let sendRequestToAzureMock: sinon.SinonStub<any[], any>;
@@ -46,11 +46,11 @@ describe('Unit tests for StorageAccountClient', () => {
         uuid.v4(),
         uuid.v4(),
         uuid.v4(),
-        options,
+        options
       );
       // @ts-ignore
-      pipelineMock = sinon.stub(serviceClient, 'pipeline');
-      sendRequestToAzureMock = sinon.stub(serviceClient, 'sendRequestToAzure' as any);
+      pipelineMock = sinon.stub(serviceClient, "pipeline");
+      sendRequestToAzureMock = sinon.stub(serviceClient, "sendRequestToAzure" as any);
     });
 
     afterEach(() => {
@@ -60,15 +60,22 @@ describe('Unit tests for StorageAccountClient', () => {
     });
 
     const listOfMethod = [
-      { callback: async () => await serviceClient.getStorageAccountList(callbackFunctionSpy),
-        methodName: 'getStorageAccountList' },
-      { callback: async () => await serviceClient.getListAccountSas(uuid.v4(), uuid.v4(), callbackFunctionSpy),
-        methodName: 'getListAccountSas' },
-      { callback: async () => await serviceClient.createStorageAccount(uuid.v4(), uuid.v4(), callbackFunctionSpy),
-        methodName: 'createStorageAccount' },
-      { callback: async () =>
-          await serviceClient.getStorageAccount(uuid.v4(), callbackFunctionSpy),
-        methodName: 'getStorageAccount' },
+      {
+        callback: async () => await serviceClient.getStorageAccountList(callbackFunctionSpy),
+        methodName: "getStorageAccountList",
+      },
+      {
+        callback: async () => await serviceClient.getListAccountSas(uuid.v4(), uuid.v4(), callbackFunctionSpy),
+        methodName: "getListAccountSas",
+      },
+      {
+        callback: async () => await serviceClient.createStorageAccount(uuid.v4(), uuid.v4(), callbackFunctionSpy),
+        methodName: "createStorageAccount",
+      },
+      {
+        callback: async () => await serviceClient.getStorageAccount(uuid.v4(), callbackFunctionSpy),
+        methodName: "getStorageAccount",
+      },
     ];
 
     listOfMethod.forEach((method) => {
@@ -83,11 +90,12 @@ describe('Unit tests for StorageAccountClient', () => {
         await method.callback();
 
         // Assert
-        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
+        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, "sendRequestToAzure should called once");
         assert.strictEqual(
           callbackFunctionSpy.calledOnceWithExactly(error),
           true,
-          'callbackFunction should called once with correct arguments');
+          "callbackFunction should called once with correct arguments"
+        );
       });
 
       it(`${method.methodName} does not return error.`, async () => {
@@ -100,11 +108,12 @@ describe('Unit tests for StorageAccountClient', () => {
         await method.callback();
 
         // Assert
-        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, 'sendRequestToAzure should called once');
+        assert.strictEqual(sendRequestToAzureMock.calledOnce, true, "sendRequestToAzure should called once");
         assert.strictEqual(
           callbackFunctionSpy.calledOnceWithExactly(null, resultElement),
           true,
-          'callbackFunction should called once with correct arguments');
+          "callbackFunction should called once with correct arguments"
+        );
       });
     });
   });

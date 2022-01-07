@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 export enum ItemType {
@@ -28,5 +28,4 @@ export enum ItemType {
   BLOCKCHAIN_DATA_MANAGER_OUTPUT_GROUP = 54,
   BLOCKCHAIN_DATA_MANAGER_OUTPUT = 55,
   BLOCKCHAIN_DATA_MANAGER_APPLICATION = 56,
-
 }

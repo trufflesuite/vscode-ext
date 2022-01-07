@@ -1,10 +1,10 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from 'fs-extra';
-import * as open from 'open';
-import * as path from 'path';
-import { ProgressLocation, QuickPickItem, window } from 'vscode';
+import * as fs from "fs-extra";
+import * as open from "open";
+import * as path from "path";
+import { ProgressLocation, QuickPickItem, window } from "vscode";
 import {
   BlockchainDataManagerResource,
   IAzureBlockchainDataManagerApplicationDto,
@@ -17,18 +17,14 @@ import {
   ICreateBlockchainDataManagerOutputDto,
   ICreateEventGridDto,
   ICreateTransactionNodeDto,
-} from '../ARMBlockchain';
-import { AzureBlockchainServiceClient } from '../ARMBlockchain/AzureBlockchainServiceClient';
-import { EventGridManagementClient } from '../ARMBlockchain/EventGridManagementClient';
-import { TruffleCommands } from '../commands/TruffleCommands';
-import { Constants, NotificationOptions } from '../Constants';
-import {
-  showInputBox,
-  showNotification,
-  showQuickPick,
-} from '../helpers';
-import { CancellationEvent } from '../Models';
-import { ItemType } from '../Models/ItemType';
+} from "../ARMBlockchain";
+import { AzureBlockchainServiceClient } from "../ARMBlockchain/AzureBlockchainServiceClient";
+import { EventGridManagementClient } from "../ARMBlockchain/EventGridManagementClient";
+import { TruffleCommands } from "../commands/TruffleCommands";
+import { Constants, NotificationOptions } from "../Constants";
+import { showInputBox, showNotification, showQuickPick } from "../helpers";
+import { CancellationEvent } from "../Models";
+import { ItemType } from "../Models/ItemType";
 import {
   BlockchainDataManagerInstanceItem,
   ConsortiumItem,
@@ -36,27 +32,27 @@ import {
   ResourceGroupItem,
   SubscriptionItem,
   TransactionNodeItem,
-} from '../Models/QuickPickItems';
+} from "../Models/QuickPickItems";
 import {
   AzureBlockchainProject,
   BlockchainDataManagerInputAndOutput,
   BlockchainDataManagerNetworkNode,
   BlockchainDataManagerProject,
-} from '../Models/TreeItems';
-import { ContractDB, ContractInstanceWithMetadata, ContractService, TreeManager } from '../services';
-import { Telemetry } from '../TelemetryClient';
-import { AzureBlockchainServiceValidator } from '../validators/AzureBlockchainServiceValidator';
-import { AzureResourceExplorer } from './AzureResourceExplorer';
-import { ConsortiumResourceExplorer } from './ConsortiumResourceExplorer';
-import { EventGridResourceExplorer } from './EventGridResourceExplorer';
-import { StorageAccountResourceExplorer } from './StorageAccountResourceExplorer';
+} from "../Models/TreeItems";
+import { ContractDB, ContractInstanceWithMetadata, ContractService, TreeManager } from "../services";
+import { Telemetry } from "../TelemetryClient";
+import { AzureBlockchainServiceValidator } from "../validators/AzureBlockchainServiceValidator";
+import { AzureResourceExplorer } from "./AzureResourceExplorer";
+import { ConsortiumResourceExplorer } from "./ConsortiumResourceExplorer";
+import { EventGridResourceExplorer } from "./EventGridResourceExplorer";
+import { StorageAccountResourceExplorer } from "./StorageAccountResourceExplorer";
 
 export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer {
   public async selectProject(
     existingProjects: string[] = [],
-    createConsortiumCallback: (consortium: AzureBlockchainProject) => Promise<void>)
-  : Promise<BlockchainDataManagerProject> {
-    Telemetry.sendEvent('BlockchainDataManagerResourceExplorer.selectProject');
+    createConsortiumCallback: (consortium: AzureBlockchainProject) => Promise<void>
+  ): Promise<BlockchainDataManagerProject> {
+    Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.selectProject");
     await this.waitForLogin();
 
     const subscriptionItem = await this.getOrSelectSubscriptionItem();
@@ -66,17 +62,23 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     const pick = await showQuickPick(
       [
         { label: Constants.uiCommandStrings.createBlockchainDataManagerProject },
-        ...(await this.getBlockchainDataManagerInstanceItems(azureClient, existingProjects))],
-      { placeHolder: Constants.placeholders.selectBlockchainDataManagerInstance, ignoreFocusOut: true },
+        ...(await this.getBlockchainDataManagerInstanceItems(azureClient, existingProjects)),
+      ],
+      { placeHolder: Constants.placeholders.selectBlockchainDataManagerInstance, ignoreFocusOut: true }
     );
 
     if (pick instanceof BlockchainDataManagerInstanceItem) {
-      Telemetry.sendEvent('BlockchainDataManagerResourceExplorer.selectProject.selectBlockchainDataManagerProject');
+      Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.selectProject.selectBlockchainDataManagerProject");
       return this.getBlockchainDataManagerInstance(pick, azureClient);
     } else {
-      Telemetry.sendEvent('BlockchainDataManagerResourceExplorer.selectProject.createBlockchainDataManagerProject');
+      Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.selectProject.createBlockchainDataManagerProject");
       return this.createProject(
-        new ConsortiumResourceExplorer(), createConsortiumCallback, azureClient, subscriptionItem, resourceGroupItem);
+        new ConsortiumResourceExplorer(),
+        createConsortiumCallback,
+        azureClient,
+        subscriptionItem,
+        resourceGroupItem
+      );
     }
   }
 
@@ -85,9 +87,9 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     createConsortiumCallback: (consortium: AzureBlockchainProject) => Promise<void>,
     azureClient?: AzureBlockchainServiceClient,
     subscriptionItem?: SubscriptionItem,
-    resourceGroupItem?: ResourceGroupItem)
-  : Promise<BlockchainDataManagerProject> {
-    Telemetry.sendEvent('BlockchainDataManagerResourceExplorer.createProject');
+    resourceGroupItem?: ResourceGroupItem
+  ): Promise<BlockchainDataManagerProject> {
+    Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.createProject");
     await this.waitForLogin();
 
     if (!azureClient || !subscriptionItem) {
@@ -100,19 +102,29 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     const selectedConsortium = await this.getSelectedConsortium(consortiumResourceExplorer, azureClient);
 
     if (!(selectedConsortium instanceof ConsortiumItem)) {
-      const child = await consortiumResourceExplorer
-        .createAzureConsortium(azureClient, subscriptionItem, Constants.availableBlockchainDataManagerLocations);
+      const child = await consortiumResourceExplorer.createAzureConsortium(
+        azureClient,
+        subscriptionItem,
+        Constants.availableBlockchainDataManagerLocations
+      );
       await createConsortiumCallback(child);
 
-      Telemetry.sendEvent('BlockchainDataManagerResourceExplorer.createProject.createAzureBlockchainProject');
+      Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.createProject.createAzureBlockchainProject");
       throw new CancellationEvent();
     }
 
-    const selectedMember =
-      await this.getSelectedMember(consortiumResourceExplorer, azureClient, selectedConsortium.memberName);
+    const selectedMember = await this.getSelectedMember(
+      consortiumResourceExplorer,
+      azureClient,
+      selectedConsortium.memberName
+    );
     const bdmItems = await azureClient.bdmResource.getBlockchainDataManagerList();
-    const selectedTransactionNode =
-      await this.getSelectedTransactionNode(azureClient, bdmItems, selectedMember.label, selectedConsortium.location);
+    const selectedTransactionNode = await this.getSelectedTransactionNode(
+      azureClient,
+      bdmItems,
+      selectedMember.label,
+      selectedConsortium.location
+    );
 
     const selectedEventGrid = await this.getSelectedEventGrid(eventGridClient, selectedConsortium.location);
 
@@ -122,13 +134,14 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
       selectedConsortium.location,
       selectedMember.label,
       Constants.getTransactionNodeName(selectedMember.label, selectedTransactionNode.transactionNodeName),
-      selectedEventGrid.url);
+      selectedEventGrid.url
+    );
   }
 
   public async deleteBDMApplication(
     bdmLabel: string,
     application: BlockchainDataManagerNetworkNode,
-    storageAccountResourceExplorer: StorageAccountResourceExplorer,
+    storageAccountResourceExplorer: StorageAccountResourceExplorer
   ): Promise<void> {
     const { label, subscriptionId, resourceGroup, fileUrls } = application;
 
@@ -145,7 +158,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
 
   public async createNewBDMApplication(
     selectedBDM: BlockchainDataManagerProject,
-    storageAccountResourceExplorer: StorageAccountResourceExplorer,
+    storageAccountResourceExplorer: StorageAccountResourceExplorer
   ): Promise<void> {
     const solidityContractsFolderPath = await ContractService.getSolidityContractsFolderPath();
     const contracts = this.getFiles(solidityContractsFolderPath, Constants.contractExtension.sol);
@@ -154,9 +167,10 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
       throw new Error(Constants.errorMessageStrings.SolidityContractsNotFound);
     }
 
-    const contract = await showQuickPick(
-      contracts.map((c) => ({ label: path.parse(c).name })) as QuickPickItem[],
-      { ignoreFocusOut: true, placeHolder: Constants.placeholders.selectContract });
+    const contract = await showQuickPick(contracts.map((c) => ({ label: path.parse(c).name })) as QuickPickItem[], {
+      ignoreFocusOut: true,
+      placeHolder: Constants.placeholders.selectContract,
+    });
 
     const contractInstances = await ContractDB.getContractInstances(contract.label);
 
@@ -179,8 +193,10 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
 
     window.showInformationMessage(Constants.informationMessage.bdm.bdmApplicationNotReady);
 
-    const [abiUrl, bytecodeUrl] =
-      await this.getBlobUrls(applicationName, storageAccountResourceExplorer, selectedBDM, [abi, byteCode]);
+    const [abiUrl, bytecodeUrl] = await this.getBlobUrls(applicationName, storageAccountResourceExplorer, selectedBDM, [
+      abi,
+      byteCode,
+    ]);
 
     return this.createBDMApplication(applicationName, selectedBDM, bytecodeUrl, abiUrl);
   }
@@ -206,7 +222,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     applicationName: string,
     storageAccountResourceExplorer: StorageAccountResourceExplorer,
     bdm: BlockchainDataManagerProject,
-    content: string[],
+    content: string[]
   ): Promise<string[]> {
     const abiFileName = `${bdm.label}_${applicationName}_abi${Constants.contractExtension.json}`;
     const bytecodeFileName = `${bdm.label}_${applicationName}_bytecode${Constants.contractExtension.txt}`;
@@ -217,38 +233,46 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
       [abiFileName, bytecodeFileName],
       localFilePaths,
       bdm.subscriptionId,
-      bdm.resourceGroup);
+      bdm.resourceGroup
+    );
   }
 
   private async createBDMApplication(
     applicationName: string,
     selectedBDM: BlockchainDataManagerProject,
     bytecodeUrl: string,
-    abiUrl: string,
+    abiUrl: string
   ): Promise<void> {
     await window.withProgress(
-      { location: ProgressLocation.Window, title: Constants.statusBarMessages.createBDMApplication},
+      { location: ProgressLocation.Window, title: Constants.statusBarMessages.createBDMApplication },
       async () => {
-      const application =
-        await this.createBlockchainDataManagerApplication(applicationName, selectedBDM, bytecodeUrl, abiUrl);
+        const application = await this.createBlockchainDataManagerApplication(
+          applicationName,
+          selectedBDM,
+          bytecodeUrl,
+          abiUrl
+        );
 
-      selectedBDM.addChild(new BlockchainDataManagerNetworkNode(
-        application.name,
-        '*',
-        selectedBDM.subscriptionId,
-        selectedBDM.resourceGroup,
-        [bytecodeUrl, abiUrl],
-        ItemType.BLOCKCHAIN_DATA_MANAGER_APPLICATION,
-        `${Constants.azureResourceExplorer.portalBasUri}${application.id}`,
-      ));
-    });
+        selectedBDM.addChild(
+          new BlockchainDataManagerNetworkNode(
+            application.name,
+            "*",
+            selectedBDM.subscriptionId,
+            selectedBDM.resourceGroup,
+            [bytecodeUrl, abiUrl],
+            ItemType.BLOCKCHAIN_DATA_MANAGER_APPLICATION,
+            `${Constants.azureResourceExplorer.portalBasUri}${application.id}`
+          )
+        );
+      }
+    );
   }
 
   private async compiledAndDeployContracts(): Promise<void> {
     const answer = await window.showErrorMessage(
       Constants.informationMessage.bdm.contractMustBeDeployedForBDMApplication,
       Constants.informationMessage.compileAndDeployButton,
-      Constants.informationMessage.cancelButton,
+      Constants.informationMessage.cancelButton
     );
 
     if (answer === Constants.informationMessage.compileAndDeployButton) {
@@ -262,7 +286,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     applicationName: string,
     bdm: BlockchainDataManagerProject,
     bytecodeUrl: string,
-    abiUrl: string,
+    abiUrl: string
   ): Promise<IAzureBlockchainDataManagerApplicationDto> {
     const subscriptionItem = await this.getSubscriptionItem(bdm.subscriptionId);
     const azureClient = await this.getAzureClient(subscriptionItem, new ResourceGroupItem(bdm.resourceGroup));
@@ -281,8 +305,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     return azureClient.bdmResource.createBlockchainDataManagerApplication(bdm.label, applicationName, body);
   }
 
-  private async getBDMApplicationName(bdm: BlockchainDataManagerProject, contractName: string)
-  : Promise<string> {
+  private async getBDMApplicationName(bdm: BlockchainDataManagerProject, contractName: string): Promise<string> {
     const subscriptionItem = await this.getSubscriptionItem(bdm.subscriptionId);
     const azureClient = await this.getAzureClient(subscriptionItem, new ResourceGroupItem(bdm.resourceGroup));
 
@@ -301,8 +324,8 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
 
   private async getBlockchainDataManagerInstanceItems(
     azureClient: AzureBlockchainServiceClient,
-    excludedItems: string[] = [])
-  : Promise<QuickPickItem[]> {
+    excludedItems: string[] = []
+  ): Promise<QuickPickItem[]> {
     const items: QuickPickItem[] = [];
 
     const bdmItems = await this.loadBlockchainDataManagerInstanceItems(azureClient, excludedItems);
@@ -314,25 +337,28 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
 
   private async loadBlockchainDataManagerInstanceItems(
     azureClient: AzureBlockchainServiceClient,
-    excludedItems: string[] = [])
-  : Promise<BlockchainDataManagerInstanceItem[]> {
+    excludedItems: string[] = []
+  ): Promise<BlockchainDataManagerInstanceItem[]> {
     const bdmItems = await azureClient.bdmResource.getBlockchainDataManagerList();
 
     return bdmItems
       .filter((item) => !excludedItems.includes(item.name))
-      .map((item) => new BlockchainDataManagerInstanceItem(
-        item.name,
-        azureClient.subscriptionId,
-        azureClient.resourceGroup,
-        item.properties.uniqueId,
-      ))
+      .map(
+        (item) =>
+          new BlockchainDataManagerInstanceItem(
+            item.name,
+            azureClient.subscriptionId,
+            azureClient.resourceGroup,
+            item.properties.uniqueId
+          )
+      )
       .sort((a, b) => a.label.localeCompare(b.label));
   }
 
   private async getBlockchainDataManagerInstance(
     bdmInstanceItem: BlockchainDataManagerInstanceItem,
-    azureClient: AzureBlockchainServiceClient)
-  : Promise<BlockchainDataManagerProject> {
+    azureClient: AzureBlockchainServiceClient
+  ): Promise<BlockchainDataManagerProject> {
     const { bdmName, subscriptionId, resourceGroup } = bdmInstanceItem;
 
     const bdmProject = new BlockchainDataManagerProject(bdmName, subscriptionId, resourceGroup);
@@ -351,47 +377,52 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
 
   private async getBlockchainDataManagerApplications(
     bdmInstanceItem: BlockchainDataManagerInstanceItem,
-    azureClient: AzureBlockchainServiceClient)
-  : Promise<BlockchainDataManagerNetworkNode[]> {
+    azureClient: AzureBlockchainServiceClient
+  ): Promise<BlockchainDataManagerNetworkNode[]> {
     const { bdmName, subscriptionId, resourceGroup } = bdmInstanceItem;
 
     const bdmApplicationList = await azureClient.bdmResource.getBlockchainDataManagerApplicationList(bdmName);
 
     return bdmApplicationList.map((application) => {
       const { abiFileUrl, bytecodeFileUrl } = application.properties.content;
-      const indexRemovingRoute = application.id.lastIndexOf('/artifacts');
-      const url = `${Constants.azureResourceExplorer.portalBasUri}/resource${application.id.slice(0, indexRemovingRoute)}/blockchainapplications`;
+      const indexRemovingRoute = application.id.lastIndexOf("/artifacts");
+      const url = `${Constants.azureResourceExplorer.portalBasUri}/resource${application.id.slice(
+        0,
+        indexRemovingRoute
+      )}/blockchainapplications`;
 
       return new BlockchainDataManagerNetworkNode(
         application.name,
-        '*',
+        "*",
         subscriptionId,
         resourceGroup,
         [abiFileUrl, bytecodeFileUrl],
         ItemType.BLOCKCHAIN_DATA_MANAGER_APPLICATION,
-        url);
-      });
+        url
+      );
+    });
   }
 
   private async getBlockchainDataManagerInputs(
     bdmInputList: IAzureBlockchainDataManagerInputDto[],
     subscriptionId: string,
-    resourceGroup: string)
-  : Promise<BlockchainDataManagerInputAndOutput> {
+    resourceGroup: string
+  ): Promise<BlockchainDataManagerInputAndOutput> {
     const bdmInputs = bdmInputList.map((input) => {
       return new BlockchainDataManagerNetworkNode(
         input.name,
-        '*',
+        "*",
         subscriptionId,
         resourceGroup,
         [],
         ItemType.BLOCKCHAIN_DATA_MANAGER_INPUT,
-        this.getTransactionNodeExternalUrl(input.properties.dataSource.resourceId));
+        this.getTransactionNodeExternalUrl(input.properties.dataSource.resourceId)
+      );
     });
 
     const inputs = new BlockchainDataManagerInputAndOutput(
       ItemType.BLOCKCHAIN_DATA_MANAGER_INPUT_GROUP,
-      Constants.treeItemData.group.bdm.input.label,
+      Constants.treeItemData.group.bdm.input.label
     );
 
     inputs.setChildren(bdmInputs);
@@ -402,24 +433,28 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
   private async getBlockchainDataManagerOutputs(
     bdmOutputList: IAzureBlockchainDataManagerOutputDto[],
     subscriptionId: string,
-    resourceGroup: string)
-  : Promise<BlockchainDataManagerInputAndOutput> {
+    resourceGroup: string
+  ): Promise<BlockchainDataManagerInputAndOutput> {
     const bdmOutputs = bdmOutputList.map((output) => {
-      const indexRemovingRoute = output.id.lastIndexOf('/outputs');
-      const url = `${Constants.azureResourceExplorer.portalBasUri}/resource${output.id.slice(0, indexRemovingRoute)}/outboundconnections`;
+      const indexRemovingRoute = output.id.lastIndexOf("/outputs");
+      const url = `${Constants.azureResourceExplorer.portalBasUri}/resource${output.id.slice(
+        0,
+        indexRemovingRoute
+      )}/outboundconnections`;
       return new BlockchainDataManagerNetworkNode(
-          output.name,
-          '*',
-          subscriptionId,
-          resourceGroup,
-          [],
-          ItemType.BLOCKCHAIN_DATA_MANAGER_OUTPUT,
-          url);
+        output.name,
+        "*",
+        subscriptionId,
+        resourceGroup,
+        [],
+        ItemType.BLOCKCHAIN_DATA_MANAGER_OUTPUT,
+        url
+      );
     });
 
     const outputs = new BlockchainDataManagerInputAndOutput(
       ItemType.BLOCKCHAIN_DATA_MANAGER_OUTPUT_GROUP,
-      Constants.treeItemData.group.bdm.output.label,
+      Constants.treeItemData.group.bdm.output.label
     );
 
     outputs.setChildren(bdmOutputs);
@@ -433,14 +468,14 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     location: string,
     memberName: string,
     transactionNodeName: string,
-    eventGridUrl: string,
+    eventGridUrl: string
   ): Promise<BlockchainDataManagerProject> {
     const { bdmResource, subscriptionId, resourceGroup } = azureClient;
 
     const bodyParamsForCreateBDM: ICreateBlockchainDataManagerDto = {
       location,
       properties: {
-        sku: '',
+        sku: "",
         state: Constants.provisioningState.stopped,
       },
     };
@@ -448,10 +483,10 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     const bodyParamsForCreateBDMInput: ICreateBlockchainDataManagerInputDto = {
       properties: {
         dataSource: {
-          enableBackfilling: 'False',
+          enableBackfilling: "False",
           resourceId: this.getTransactionNodeUrl(subscriptionId, resourceGroup, memberName, transactionNodeName),
         },
-        inputType: 'Ethereum',
+        inputType: "Ethereum",
       },
     };
 
@@ -460,37 +495,48 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
         dataSource: {
           resourceId: eventGridUrl,
         },
-        outputType: 'EventGrid',
+        outputType: "EventGrid",
       },
     };
 
     const connectionName = await this.getBlockchainDataManagerConnectionName();
     const bdmName = await this.getBlockchainDataManagerName(bdmItems);
 
-    return await window.withProgress({
-      location: ProgressLocation.Window,
-      title: `${Constants.statusBarMessages.creatingBlockchainDataManager} - ${bdmName}`,
-    }, async () => {
+    return await window.withProgress(
+      {
+        location: ProgressLocation.Window,
+        title: `${Constants.statusBarMessages.creatingBlockchainDataManager} - ${bdmName}`,
+      },
+      async () => {
+        const createdBDM = await bdmResource.createBlockchainDataManager(bdmName, bodyParamsForCreateBDM);
+        const createdInput = await bdmResource.createBlockchainDataManagerInput(
+          bdmName,
+          transactionNodeName,
+          bodyParamsForCreateBDMInput
+        );
+        const createdOutput = await bdmResource.createBlockchainDataManagerOutput(
+          bdmName,
+          connectionName,
+          bodyParamsForCreateBDMOutput
+        );
+        await this.startBlockchainDataManager(bdmResource, createdBDM.id, bdmName);
 
-      const createdBDM = await bdmResource.createBlockchainDataManager(bdmName, bodyParamsForCreateBDM);
-      const createdInput =
-        await bdmResource.createBlockchainDataManagerInput(bdmName, transactionNodeName, bodyParamsForCreateBDMInput);
-      const createdOutput =
-        await bdmResource.createBlockchainDataManagerOutput(bdmName, connectionName, bodyParamsForCreateBDMOutput);
-      await this.startBlockchainDataManager(bdmResource, createdBDM.id, bdmName);
+        const bdmProject = new BlockchainDataManagerProject(bdmName, subscriptionId, resourceGroup);
+        const bdmInputs = await this.getBlockchainDataManagerInputs([createdInput], subscriptionId, resourceGroup);
+        const bdmOutputs = await this.getBlockchainDataManagerOutputs([createdOutput], subscriptionId, resourceGroup);
 
-      const bdmProject = new BlockchainDataManagerProject(bdmName, subscriptionId, resourceGroup);
-      const bdmInputs = await this.getBlockchainDataManagerInputs([createdInput], subscriptionId, resourceGroup);
-      const bdmOutputs = await this.getBlockchainDataManagerOutputs([createdOutput], subscriptionId, resourceGroup);
+        bdmProject.setChildren([bdmInputs, bdmOutputs]);
 
-      bdmProject.setChildren([bdmInputs, bdmOutputs]);
-
-      return bdmProject;
-    });
+        return bdmProject;
+      }
+    );
   }
 
-  private async startBlockchainDataManager(bdmResource: BlockchainDataManagerResource, url: string, bdmName: string)
-  : Promise<void> {
+  private async startBlockchainDataManager(
+    bdmResource: BlockchainDataManagerResource,
+    url: string,
+    bdmName: string
+  ): Promise<void> {
     await bdmResource.startBlockchainDataManager(bdmName);
     open(`${Constants.azureResourceExplorer.portalBasUri}/resource/${url}`);
   }
@@ -565,80 +611,91 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
 
   private async getSelectedConsortium(
     consortiumResourceExplorer: ConsortiumResourceExplorer,
-    azureClient: AzureBlockchainServiceClient,
+    azureClient: AzureBlockchainServiceClient
   ): Promise<QuickPickItem> {
-    Telemetry.sendEvent('BlockchainDataManagerResourceExplorer.getSelectedConsortium.selectConsortium');
+    Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.getSelectedConsortium.selectConsortium");
 
     const consortiumItems = await consortiumResourceExplorer.loadConsortiumItems(azureClient);
-    const filteredConsortia = consortiumItems
-      .filter((con) => Constants.availableBlockchainDataManagerLocations.includes(con.location));
+    const filteredConsortia = consortiumItems.filter((con) =>
+      Constants.availableBlockchainDataManagerLocations.includes(con.location)
+    );
 
     const quickPickItems = filteredConsortia.length
       ? filteredConsortia
       : [{ label: Constants.uiCommandStrings.createConsortium }];
 
-    return showQuickPick(
-      quickPickItems,
-      { placeHolder: Constants.placeholders.selectConsortium, ignoreFocusOut: true });
+    return showQuickPick(quickPickItems, {
+      placeHolder: Constants.placeholders.selectConsortium,
+      ignoreFocusOut: true,
+    });
   }
 
   private async getSelectedMember(
     consortiumResourceExplorer: ConsortiumResourceExplorer,
     azureClient: AzureBlockchainServiceClient,
-    memberName: string,
+    memberName: string
   ): Promise<QuickPickItem> {
-    Telemetry.sendEvent('BlockchainDataManagerResourceExplorer.getSelectedMember.selectMember');
+    Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.getSelectedMember.selectMember");
 
     const members = await consortiumResourceExplorer.loadMemberItems(azureClient, memberName);
     const memberItems: QuickPickItem[] = members.map((member) => ({ label: member.name }));
 
-    return showQuickPick(
-      memberItems, { placeHolder: Constants.placeholders.selectMember, ignoreFocusOut: true });
+    return showQuickPick(memberItems, { placeHolder: Constants.placeholders.selectMember, ignoreFocusOut: true });
   }
 
   private async getSelectedTransactionNode(
     azureClient: AzureBlockchainServiceClient,
     bdmItems: IAzureBlockchainDataManagerDto[],
     selectedMemberName: string,
-    location: string,
+    location: string
   ): Promise<TransactionNodeItem> {
-    Telemetry.sendEvent('BlockchainDataManagerResourceExplorer.getSelectedTransactionNode.selectTransactionNode');
+    Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.getSelectedTransactionNode.selectTransactionNode");
 
     const { bdmResource, transactionNodeResource } = azureClient;
     let transactionNodeItems: TransactionNodeItem[] = [];
     let filteredTransactionNode: TransactionNodeItem[] = [];
 
-    await window.withProgress({
-      location: ProgressLocation.Window,
-      title: `Getting transaction nodes for member - ${selectedMemberName}`,
-    }, async () => {
-      const bdmInputList: IAzureBlockchainDataManagerInputDto[] = [];
+    await window.withProgress(
+      {
+        location: ProgressLocation.Window,
+        title: `Getting transaction nodes for member - ${selectedMemberName}`,
+      },
+      async () => {
+        const bdmInputList: IAzureBlockchainDataManagerInputDto[] = [];
 
-      await Promise.all(bdmItems.map((bdm) => bdmResource.getBlockchainDataManagerInputList(bdm.name)))
-      .then((result) => {
-        result.forEach((inputs) => {
-          if (inputs.length) {
-            bdmInputList.push(...inputs);
+        await Promise.all(bdmItems.map((bdm) => bdmResource.getBlockchainDataManagerInputList(bdm.name))).then(
+          (result) => {
+            result.forEach((inputs) => {
+              if (inputs.length) {
+                bdmInputList.push(...inputs);
+              }
+            });
           }
-        });
-      });
+        );
 
-      const transactionNodes = await transactionNodeResource.getTransactionNodeList(selectedMemberName);
-      const defaultTransactionNode = await transactionNodeResource
-        .getTransactionNode(selectedMemberName, Constants.defaultInputNameInBdm);
-      defaultTransactionNode.name = selectedMemberName;
+        const transactionNodes = await transactionNodeResource.getTransactionNodeList(selectedMemberName);
+        const defaultTransactionNode = await transactionNodeResource.getTransactionNode(
+          selectedMemberName,
+          Constants.defaultInputNameInBdm
+        );
+        defaultTransactionNode.name = selectedMemberName;
 
-      transactionNodeItems = [defaultTransactionNode, ...transactionNodes]
-        .map((tn) => new TransactionNodeItem(tn.name, tn.id, tn.properties.provisioningState));
+        transactionNodeItems = [defaultTransactionNode, ...transactionNodes].map(
+          (tn) => new TransactionNodeItem(tn.name, tn.id, tn.properties.provisioningState)
+        );
 
-      filteredTransactionNode = transactionNodeItems
-        .filter((tn) => tn.provisioningState === Constants.provisioningState.succeeded &&
-          !bdmInputList.some((input) => input.properties.dataSource.resourceId === tn.url));
-    });
+        filteredTransactionNode = transactionNodeItems.filter(
+          (tn) =>
+            tn.provisioningState === Constants.provisioningState.succeeded &&
+            !bdmInputList.some((input) => input.properties.dataSource.resourceId === tn.url)
+        );
+      }
+    );
 
     const selectedTransactionNode = await showQuickPick(
-      [ { label: Constants.uiCommandStrings.createTransactionNode}, ...filteredTransactionNode ],
-      { placeHolder: Constants.placeholders.selectTransactionNode, ignoreFocusOut: true });
+      [{ label: Constants.uiCommandStrings.createTransactionNode }, ...filteredTransactionNode],
+      { placeHolder: Constants.placeholders.selectTransactionNode, ignoreFocusOut: true }
+    );
 
     if (selectedTransactionNode instanceof TransactionNodeItem) {
       return selectedTransactionNode;
@@ -646,20 +703,25 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
 
     await this.createdTransactionNode(selectedMemberName, location, azureClient, transactionNodeItems);
 
-    Telemetry.sendEvent('BlockchainDataManagerResourceExplorer.getSelectedTransactionNode.cancellationCreatingTransactionNode');
+    Telemetry.sendEvent(
+      "BlockchainDataManagerResourceExplorer.getSelectedTransactionNode.cancellationCreatingTransactionNode"
+    );
     throw new CancellationEvent();
   }
 
-  private async getSelectedEventGrid(eventGridClient: EventGridManagementClient, location: string)
-  : Promise<EventGridItem> {
-    Telemetry.sendEvent('BlockchainDataManagerResourceExplorer.getSelectedEventGrid.selectEventGrid');
+  private async getSelectedEventGrid(
+    eventGridClient: EventGridManagementClient,
+    location: string
+  ): Promise<EventGridItem> {
+    Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.getSelectedEventGrid.selectEventGrid");
 
     const eventGridResourceExplore = new EventGridResourceExplorer();
     const eventGridList = await eventGridResourceExplore.loadEventGridItems(eventGridClient);
 
     const selectedEventGrid = await showQuickPick(
       [{ label: Constants.uiCommandStrings.createEventGrid }, ...eventGridList],
-      { placeHolder: Constants.placeholders.selectEventGrid, ignoreFocusOut: true });
+      { placeHolder: Constants.placeholders.selectEventGrid, ignoreFocusOut: true }
+    );
 
     if (selectedEventGrid instanceof EventGridItem) {
       return selectedEventGrid;
@@ -667,25 +729,27 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
 
     await this.getCreatedEventGrid(eventGridClient, location, eventGridList);
 
-    Telemetry.sendEvent('BlockchainDataManagerResourceExplorer.getSelectedEventGrid.cancellationCreatingEventGrid');
+    Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.getSelectedEventGrid.cancellationCreatingEventGrid");
     throw new CancellationEvent();
   }
 
   private async getCreatedEventGrid(
     eventGridClient: EventGridManagementClient,
     location: string,
-    eventGridList: EventGridItem[])
-  : Promise<void> {
-    Telemetry.sendEvent('BlockchainDataManagerResourceExplorer.getCreatedEventGrid.createEventGrid');
+    eventGridList: EventGridItem[]
+  ): Promise<void> {
+    Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.getCreatedEventGrid.createEventGrid");
 
     const bodyParamsForCreateEventGrid: ICreateEventGridDto = { location };
 
     const eventGridName = await this.getEventGridName(eventGridList);
-    const eventGrid = await eventGridClient.eventGridResource
-      .createEventGrid(eventGridName, JSON.stringify(bodyParamsForCreateEventGrid));
+    const eventGrid = await eventGridClient.eventGridResource.createEventGrid(
+      eventGridName,
+      JSON.stringify(bodyParamsForCreateEventGrid)
+    );
 
     showNotification({
-      message: Constants.informationMessage.provisioningResource(Constants.azureBlockchainResourceName.eventGrid),
+      message: Constants.informationMessage.provisioningResource(Constants.trufflesuiteResourceName.eventGrid),
       type: NotificationOptions.info,
     });
     open(`${Constants.azureResourceExplorer.portalBasUri}/resource/${eventGrid.id}`);
@@ -695,16 +759,17 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     memberName: string,
     location: string,
     azureClient: AzureBlockchainServiceClient,
-    transactionNodeItems: TransactionNodeItem[])
-  : Promise<void> {
-    Telemetry.sendEvent('BlockchainDataManagerResourceExplorer.createdTransactionNode.createTransactionNode');
+    transactionNodeItems: TransactionNodeItem[]
+  ): Promise<void> {
+    Telemetry.sendEvent("BlockchainDataManagerResourceExplorer.createdTransactionNode.createTransactionNode");
 
     const transactionNodeName = await this.getTransactionNodeName(transactionNodeItems);
     const transactionNodePassword = await showInputBox({
       ignoreFocusOut: true,
       password: true,
       prompt: Constants.paletteLabels.enterTransactionNodePassword,
-      validateInput: AzureBlockchainServiceValidator.validateAccessPassword});
+      validateInput: AzureBlockchainServiceValidator.validateAccessPassword,
+    });
 
     const bodyParamsTransactionNode: ICreateTransactionNodeDto = {
       location,
@@ -713,11 +778,14 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
       },
     };
 
-    const createdTransactionNode = await azureClient.transactionNodeResource
-      .createTransactionNode(memberName, transactionNodeName, bodyParamsTransactionNode);
+    const createdTransactionNode = await azureClient.transactionNodeResource.createTransactionNode(
+      memberName,
+      transactionNodeName,
+      bodyParamsTransactionNode
+    );
 
     showNotification({
-      message: Constants.informationMessage.provisioningResource(Constants.azureBlockchainResourceName.transactionNode),
+      message: Constants.informationMessage.provisioningResource(Constants.trufflesuiteResourceName.transactionNode),
       type: NotificationOptions.info,
     });
     open(this.getTransactionNodeExternalUrl(createdTransactionNode.id));
@@ -727,32 +795,38 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     subscriptionId: string,
     resourceGroup: string,
     memberName: string,
-    transactionNodeName: string)
-  : string {
-    return `/subscriptions/${subscriptionId}/resourceGroups/${resourceGroup}/` +
-          `providers/Microsoft.Blockchain/blockchainMembers/${memberName}/transactionNodes/${transactionNodeName}`;
+    transactionNodeName: string
+  ): string {
+    return (
+      `/subscriptions/${subscriptionId}/resourceGroups/${resourceGroup}/` +
+      `providers/Microsoft.Blockchain/blockchainMembers/${memberName}/transactionNodes/${transactionNodeName}`
+    );
   }
 
   private getTransactionNodeExternalUrl(url: string): string {
-    const firstMark = 'blockchainMembers/';
-    const nodeName = 'nodeName';
+    const firstMark = "blockchainMembers/";
+    const nodeName = "nodeName";
 
     const idxOfMemberAndTransactionNode = url.lastIndexOf(firstMark) + firstMark.length;
-    const relativeInternalPath = url.substring(0, idxOfMemberAndTransactionNode).replace(/\//g, '%2F');
-    let memberAndTransactionNode = url.substring(idxOfMemberAndTransactionNode)
-      .replace('transactionNodes', nodeName);
+    const relativeInternalPath = url.substring(0, idxOfMemberAndTransactionNode).replace(/\//g, "%2F");
+    let memberAndTransactionNode = url.substring(idxOfMemberAndTransactionNode).replace("transactionNodes", nodeName);
 
     if (memberAndTransactionNode.includes(Constants.defaultInputNameInBdm)) {
-      const memberName = memberAndTransactionNode.substring(0, memberAndTransactionNode.indexOf('/' + nodeName));
+      const memberName = memberAndTransactionNode.substring(0, memberAndTransactionNode.indexOf("/" + nodeName));
       memberAndTransactionNode = memberAndTransactionNode.replace(Constants.defaultInputNameInBdm, memberName);
     }
 
-    return `${Constants.azureResourceExplorer.portalBladeUri}/overview/memberResourceId/` +
-      relativeInternalPath + memberAndTransactionNode;
+    return (
+      `${Constants.azureResourceExplorer.portalBladeUri}/overview/memberResourceId/` +
+      relativeInternalPath +
+      memberAndTransactionNode
+    );
   }
 
-  private async getAzureClient(subscriptionItem: SubscriptionItem, resourceGroupItem: ResourceGroupItem)
-    : Promise<AzureBlockchainServiceClient> {
+  private async getAzureClient(
+    subscriptionItem: SubscriptionItem,
+    resourceGroupItem: ResourceGroupItem
+  ): Promise<AzureBlockchainServiceClient> {
     return new AzureBlockchainServiceClient(
       subscriptionItem.session.credentials,
       subscriptionItem.subscriptionId,
@@ -769,12 +843,14 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
           customHeaders: {},
         },
         rpRegistrationRetryTimeout: 30,
-      },
+      }
     );
   }
 
-  private async getEventGridClient(subscriptionItem: SubscriptionItem, resourceGroupItem: ResourceGroupItem)
-    : Promise<EventGridManagementClient> {
+  private async getEventGridClient(
+    subscriptionItem: SubscriptionItem,
+    resourceGroupItem: ResourceGroupItem
+  ): Promise<EventGridManagementClient> {
     return new EventGridManagementClient(
       subscriptionItem.session.credentials,
       subscriptionItem.subscriptionId,
@@ -791,7 +867,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
           customHeaders: {},
         },
         rpRegistrationRetryTimeout: 30,
-      },
+      }
     );
   }
 }

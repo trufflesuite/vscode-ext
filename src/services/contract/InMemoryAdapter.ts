@@ -1,14 +1,14 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from '../../Constants';
-import { Output } from '../../Output';
-import { Telemetry } from '../../TelemetryClient';
-import { NetworkService } from '../NetworkService';
-import { AbstractAdapter } from './AbstractAdapter';
-import { Contract } from './Contract';
-import { ContractInstanceWithMetadata } from './ContractInstanceWithMetadata';
-import { ContractService } from './ContractService';
+import { Constants } from "../../Constants";
+import { Output } from "../../Output";
+import { Telemetry } from "../../TelemetryClient";
+import { NetworkService } from "../NetworkService";
+import { AbstractAdapter } from "./AbstractAdapter";
+import { Contract } from "./Contract";
+import { ContractInstanceWithMetadata } from "./ContractInstanceWithMetadata";
+import { ContractService } from "./ContractService";
 import NetworkMap = NetworkService.NetworkMap;
 
 // This class works only with workspace
@@ -33,8 +33,10 @@ export class InMemoryAdapter extends AbstractAdapter {
     return this.getHistory(contractName);
   }
 
-  public async getContractInstance(contractName: string, instanceId: string)
-  : Promise<ContractInstanceWithMetadata | undefined> {
+  public async getContractInstance(
+    contractName: string,
+    instanceId: string
+  ): Promise<ContractInstanceWithMetadata | undefined> {
     const history = await this.getHistory(contractName);
     return history.find((contractInstance) => contractInstance.id === instanceId);
   }
@@ -82,15 +84,17 @@ export class InMemoryAdapter extends AbstractAdapter {
         networkMaps = await NetworkService.getNetworkMaps();
       }
     } catch (error) {
-      Telemetry.sendException(error);
-      Output.outputLine(Constants.outputChannel.azureBlockchain, error.message);
+      Telemetry.sendException(error as Error);
+      Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, (error as Error).message);
     }
 
     return [contracts, networkMaps];
   }
 
-  private getHistoryFromCompiledContract(contract: Contract, networkMaps: NetworkMap[])
-  : ContractInstanceWithMetadata[] {
+  private getHistoryFromCompiledContract(
+    contract: Contract,
+    networkMaps: NetworkMap[]
+  ): ContractInstanceWithMetadata[] {
     return Object.keys(contract.networks).map((networkKey) => {
       const foundNetwork = networkMaps.find((item) => item.network.id === networkKey);
       if (foundNetwork) {

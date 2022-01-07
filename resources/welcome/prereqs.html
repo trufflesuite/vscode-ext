@@ -1,127 +1,116 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <link rel="stylesheet" href="{{root}}/resources/welcome/main.css" />
-    </head>
-    <body class="vscode-dark">
-        <div id="content">
-            <div id="main-content">
-                <div class="required-block">
-                    <div>
-                        <h2>Required apps</h2>
-                        <br />
-                        This extension requires your development machine have
-                        the following tools already installed. These cannot be
-                        installed directly by the extension. If you do not have
-                        these tools already installed, the links below will take
-                        you to the download page
-                        <ul>
-                            <li>Node JS</li>
-                            <li>Git</li>
-                            <li>Python</li>
-                        </ul>
-                        <p>
-                            <a href="https://aka.ms/vscodebcextensionwiki"
-                                >Click here</a
-                            >
-                            to learn more about this extension, and view the
-                            users guide
-                        </p>
-                        <div class="required">
-                            <div id="node" class="required-app disabled">
-                                <img src="{{root}}/images/NodeLogo.png" />
-                                <div class="description">
-                                    Required version:
-                                    <span class="version">10.15.0</span>
-                                </div>
-                                <a class="spinner" href="https://nodejs.org"
-                                    ><span>Install Node.js</span></a
-                                >
-                            </div>
-                            <div id="git" class="required-app disabled">
-                                <img src="{{root}}/images/GitLogo.png" />
-                                <div class="description">
-                                    Required version:
-                                    <span class="version">2.10.0</span>
-                                </div>
-                                <a
-                                    class="spinner"
-                                    href="https://git-scm.com/downloads"
-                                    ><span>Install Git</span></a
-                                >
-                            </div>
-                            <div id="npm" class="required-app disabled">
-                                <img src="{{root}}/images/NpmLogo.png" />
-                                <div class="description">
-                                    Required version:
-                                    <span class="version">6.4.1</span>
-                                </div>
-                                <a
-                                    id="installNpm"
-                                    class="spinner action"
-                                    title="Install NPM"
-                                    ><span>Install NPM</span></a
-                                >
-                            </div>
-                        </div>
-                        <p>
-                            At this time, while the extension is still in
-                            public-preview, you will also need to install the
-                            Truffle Suite of developer tools. Click the links
-                            below to install the Truffle tools directly from
-                            this extension
-                        </p>
-                        <div class="required">
-                            <div id="truffle" class="required-app disabled">
-                                <img src="{{root}}/images/TruffleLogo.svg" />
-                                <div class="description">
-                                    Required version:
-                                    <span class="version">5.0.0</span>
-                                </div>
-                                <a
-                                    id="installTruffle"
-                                    class="spinner action"
-                                    title="Install Truffle"
-                                    ><span>Install Truffle Suite</span></a
-                                >
-                            </div>
-                            <div id="ganache-cli" class="required-app disabled">
-                                <img src="{{root}}/images/GanacheLogo.png" />
-                                <div class="description">
-                                    Required version:
-                                    <span class="version">6.0.0</span>
-                                </div>
-                                <a
-                                    id="installGanache"
-                                    class="spinner action"
-                                    title="Install Ganache"
-                                    ><span>Install Ganache CLI</span></a
-                                >
-                            </div>
-                        </div>
-                    </div>
+  <head>
+    <link rel="stylesheet" href="{{root}}/resources/welcome/main.css" />
+  </head>
+  <body class="vscode-dark">
+    <div id="content">
+      <div id="main-content">
+        <div class="required-block">
+          <div>
+            <h2>Required apps</h2>
+            <br />
+            This extension requires your development machine have the following
+            tools already installed. These cannot be installed directly by the
+            extension. If you do not have these tools already installed, the
+            links below will take you to the download page
+            <ul>
+              <li>Node JS</li>
+              <li>Git</li>
+            </ul>
+            <p>
+              <a href="https://github.com/trufflesuite/vscode-ext/wiki">Click here</a>
+              to learn more about this extension, and view the users guide
+            </p>
+            <div class="required">
+              <div id="node" class="required-app disabled">
+                <img src="{{root}}/images/NodeLogo.png" />
+                <div class="description">
+                  Required version:
+                  <span class="version">^14.0.0</span>
                 </div>
-
-                <p class="showOnStartup">
-                    <input
-                        type="checkbox"
-                        id="showOnStartup"
-                        class="checkbox"
-                        checked="checked"
-                    />
-                    <label class="caption" for="showOnStartup"
-                        >Show this page on startup</label
-                    >
-                </p>
+                <a class="spinner" href="https://nodejs.org"
+                  ><span>Install Node.js</span></a
+                >
+              </div>
+              <div id="git" class="required-app disabled">
+                <img src="{{root}}/images/GitLogo.png" />
+                <div class="description">
+                  Required version:
+                  <span class="version">2.10.0</span>
+                </div>
+                <a class="spinner" href="https://git-scm.com/downloads"
+                  ><span>Install Git</span></a
+                >
+              </div>
+              <div id="npm" class="required-app disabled">
+                <img src="{{root}}/images/NpmLogo.png" />
+                <div class="description">
+                  Required version:
+                  <span class="version">^7.18.1</span>
+                </div>
+                <a id="installNpm" class="spinner action" title="Install NPM"
+                  ><span>Install NPM</span></a
+                >
+              </div>
             </div>
+            <p>
+              At this time, while the extension is still in public-preview, you
+              will also need to install the Truffle Suite of developer tools.
+              Click the links below to install the Truffle tools directly from
+              this extension
+            </p>
+            <div class="required">
+              <div id="truffle" class="required-app disabled">
+                <img src="{{root}}/images/TruffleLogo.svg" />
+                <div class="description">
+                  Required version:
+                  <span class="version">^5.0.0</span>
+                </div>
+                <a
+                  id="installTruffle"
+                  class="spinner action"
+                  title="Install Truffle"
+                  ><span>Install Truffle Suite</span></a
+                >
+              </div>
+              <div id="ganache-cli" class="required-app disabled">
+                <img src="{{root}}/images/GanacheLogo.png" />
+                <div class="description">
+                  Required version:
+                  <span class="version">^6.0.0</span>
+                </div>
+                <a
+                  id="installGanache"
+                  class="spinner action"
+                  title="Install Ganache"
+                  ><span>Install Ganache</span></a
+                >
+              </div>
+            </div>
+          </div>
         </div>
-        <script
-            type="text/javascript"
-            src="{{root}}/resources/welcome/jquery-3.3.1.min.js"
-        ></script>
-        <script
-            type="text/javascript"
-            src="{{root}}/resources/welcome/main.js"
-        ></script>
-    </body>
+
+        <p class="showOnStartup">
+          <input
+            type="checkbox"
+            id="showOnStartup"
+            class="checkbox"
+            checked="checked"
+          />
+          <label class="caption" for="showOnStartup"
+            >Show this page on startup</label
+          >
+        </p>
+      </div>
+    </div>
+    <script
+      type="text/javascript"
+      src="{{root}}/resources/welcome/jquery-3.3.1.min.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="{{root}}/resources/welcome/main.js"
+    ></script>
+  </body>
 </html>

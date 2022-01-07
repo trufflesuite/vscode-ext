@@ -1,23 +1,21 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { commands, ExtensionContext, Uri, window, workspace } from 'vscode';
+import { commands, ExtensionContext, Uri, window, workspace } from "vscode";
 import {
-  DebuggerCommands,
   GanacheCommands,
   InfuraCommands,
-  LogicAppCommands,
   OpenZeppelinCommands,
   ProjectCommands,
   sdkCoreCommands,
   ServiceCommands,
   TruffleCommands,
-} from './commands';
-import { Constants } from './Constants';
-import { CommandContext, isWorkspaceOpen, openZeppelinHelper, required, setCommandContext } from './helpers';
-import { CancellationEvent } from './Models';
-import { Output } from './Output';
-import { ChangelogPage, RequirementsPage, WelcomePage } from './pages';
+} from "./commands";
+import { Constants } from "./Constants";
+import { CommandContext, isWorkspaceOpen, openZeppelinHelper, required, setCommandContext } from "./helpers";
+import { CancellationEvent } from "./Models";
+import { Output } from "./Output";
+import { ChangelogPage, RequirementsPage, WelcomePage } from "./pages";
 import {
   AdapterType,
   ContractDB,
@@ -26,11 +24,11 @@ import {
   MnemonicRepository,
   TreeManager,
   TreeService,
-} from './services';
-import { Telemetry } from './TelemetryClient';
-import { NetworkNodeView, ProjectView } from './ViewItems';
+} from "./services";
+import { Telemetry } from "./TelemetryClient";
+import { NetworkNodeView, ProjectView } from "./ViewItems";
 
-import { DebuggerConfiguration } from './debugAdapter/configuration/debuggerConfiguration';
+import { DebuggerConfiguration } from "./debugAdapter/configuration/debuggerConfiguration";
 
 export async function activate(context: ExtensionContext) {
   if (process.env.CODE_TEST) {
@@ -43,7 +41,8 @@ export async function activate(context: ExtensionContext) {
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
   TreeManager.initialize(context.globalState);
-  TreeService.initialize('AzureBlockchain');
+  // FIXME: i think this is breaking things..
+  TreeService.initialize("AzureBlockchain");
   await sdkCoreCommands.initialize(context.globalState);
 
   setCommandContext(CommandContext.Enabled, true);
@@ -56,130 +55,147 @@ export async function activate(context: ExtensionContext) {
   await welcomePage.checkAndShow();
   await changelogPage.checkAndShow();
 
-  //#region azureBlockchain extension commands
-  const refresh = commands.registerCommand('azureBlockchainService.refresh', (element) => {
+  //#region trufflesuite extension commands
+  const refresh = commands.registerCommand("trufflesuite.refresh", (element) => {
     TreeService.refresh(element);
   });
-  const showWelcomePage = commands.registerCommand('azureBlockchainService.showWelcomePage', async () => {
+  const showWelcomePage = commands.registerCommand("trufflesuite.showWelcomePage", async () => {
     return welcomePage.show();
   });
-  const showRequirementsPage = commands.registerCommand('azureBlockchainService.showRequirementsPage',
+  const showRequirementsPage = commands.registerCommand(
+    "trufflesuite.showRequirementsPage",
     async (checkShowOnStartup: boolean) => {
       return checkShowOnStartup ? await requirementsPage.checkAndShow() : await requirementsPage.show();
-    });
+    }
+  );
   //#endregion
 
   //#region Ganache extension commands
-  const startGanacheServer = commands.registerCommand('azureBlockchainService.startGanacheServer',
+  const startGanacheServer = commands.registerCommand(
+    "trufflesuite.startGanacheServer",
     async (viewItem?: ProjectView) => {
       await tryExecute(() => GanacheCommands.startGanacheCmd(viewItem));
-    });
+    }
+  );
 
-  const stopGanacheServer = commands.registerCommand('azureBlockchainService.stopGanacheServer',
+  const stopGanacheServer = commands.registerCommand(
+    "trufflesuite.stopGanacheServer",
     async (viewItem?: ProjectView) => {
       await tryExecute(() => GanacheCommands.stopGanacheCmd(viewItem));
-    });
+    }
+  );
   //#endregion
 
   //#region truffle commands
-  const newSolidityProject = commands.registerCommand('truffle.newSolidityProject', async () => {
+  const newSolidityProject = commands.registerCommand("truffle.newSolidityProject", async () => {
     await tryExecute(() => ProjectCommands.newSolidityProject());
   });
-  const buildContracts = commands.registerCommand('azureBlockchainService.buildContracts', async () => {
+  const buildContracts = commands.registerCommand("trufflesuite.buildContracts", async () => {
     await tryExecute(() => sdkCoreCommands.build());
   });
-  const deployContracts = commands.registerCommand('azureBlockchainService.deployContracts', async () => {
+  const deployContracts = commands.registerCommand("trufflesuite.deployContracts", async () => {
     await tryExecute(() => sdkCoreCommands.deploy());
   });
-  const copyByteCode = commands.registerCommand('contract.copyByteCode', async (uri: Uri) => {
+  const copyByteCode = commands.registerCommand("contract.copyByteCode", async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeBytecodeToBuffer(uri));
   });
-  const copyDeployedByteCode = commands.registerCommand('contract.copyDeployedByteCode', async (uri: Uri) => {
+  const copyDeployedByteCode = commands.registerCommand("contract.copyDeployedByteCode", async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeDeployedBytecodeToBuffer(uri));
   });
-  const copyABI = commands.registerCommand('contract.copyABI', async (uri: Uri) => {
+  const copyABI = commands.registerCommand("contract.copyABI", async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeAbiToBuffer(uri));
   });
-  const copyRPCEndpointAddress = commands.registerCommand('azureBlockchainService.copyRPCEndpointAddress',
+  const copyRPCEndpointAddress = commands.registerCommand(
+    "trufflesuite.copyRPCEndpointAddress",
     async (viewItem: NetworkNodeView) => {
       await tryExecute(() => TruffleCommands.writeRPCEndpointAddressToBuffer(viewItem));
-    });
-  const getPrivateKeyFromMnemonic = commands.registerCommand('azureBlockchainService.getPrivateKey', async () => {
+    }
+  );
+  const getPrivateKeyFromMnemonic = commands.registerCommand("trufflesuite.getPrivateKey", async () => {
     await tryExecute(() => TruffleCommands.getPrivateKeyFromMnemonic());
   });
   //#endregion
 
   //#region services with dialog
-  const createProject = commands.registerCommand('azureBlockchainService.createProject', async () => {
+  const createProject = commands.registerCommand("trufflesuite.createProject", async () => {
     await tryExecute(() => ServiceCommands.createProject());
   });
-  const connectProject = commands.registerCommand('azureBlockchainService.connectProject', async () => {
+  const connectProject = commands.registerCommand("trufflesuite.connectProject", async () => {
     await tryExecute(() => ServiceCommands.connectProject());
   });
-  const disconnectProject = commands.registerCommand('azureBlockchainService.disconnectProject',
+  const disconnectProject = commands.registerCommand(
+    "trufflesuite.disconnectProject",
     async (viewItem: ProjectView) => {
       await tryExecute(() => ServiceCommands.disconnectProject(viewItem));
-    });
-  const openAtAzurePortal = commands.registerCommand('azureBlockchainService.openAtAzurePortal',
-    async (viewItem: NetworkNodeView) => ServiceCommands.openAtAzurePortal(viewItem));
+    }
+  );
+  const openAtAzurePortal = commands.registerCommand(
+    "trufflesuite.openAtAzurePortal",
+    async (viewItem: NetworkNodeView) => ServiceCommands.openAtAzurePortal(viewItem)
+  );
   //#endregion
 
   //#region Infura commands
-  const signInToInfuraAccount = commands.registerCommand('azureBlockchainService.signInToInfuraAccount', async () => {
+  const signInToInfuraAccount = commands.registerCommand("trufflesuite.signInToInfuraAccount", async () => {
     await tryExecute(() => InfuraCommands.signIn());
   });
-  const signOutOfInfuraAccount = commands.registerCommand('azureBlockchainService.signOutOfInfuraAccount', async () => {
+  const signOutOfInfuraAccount = commands.registerCommand("trufflesuite.signOutOfInfuraAccount", async () => {
     await tryExecute(() => InfuraCommands.signOut());
   });
   const showProjectsFromInfuraAccount = commands.registerCommand(
-    'azureBlockchainService.showProjectsFromInfuraAccount',
+    "trufflesuite.showProjectsFromInfuraAccount",
     async () => {
       await tryExecute(() => InfuraCommands.showProjectsFromAccount());
-    });
+    }
+  );
   //#endregion
 
   //#region contract commands
-  const createNewBDMApplication = commands.registerCommand('azureBlockchainService.createNewBDMApplication',
-    async (viewItem: ProjectView) => {
-      await tryExecute(() => ServiceCommands.createNewBDMApplication(viewItem));
-    });
-  const deleteBDMApplication = commands.registerCommand('azureBlockchainService.deleteBDMApplication',
-    async (viewItem: NetworkNodeView) => await tryExecute(() => ServiceCommands.deleteBDMApplication(viewItem)));
+  // const createNewBDMApplication = commands.registerCommand(
+  //   "trufflesuite.createNewBDMApplication",
+  //   async (viewItem: ProjectView) => {
+  //     await tryExecute(() => ServiceCommands.createNewBDMApplication(viewItem));
+  //   }
+  // );
+  // const deleteBDMApplication = commands.registerCommand(
+  //   "trufflesuite.deleteBDMApplication",
+  //   async (viewItem: NetworkNodeView) => await tryExecute(() => ServiceCommands.deleteBDMApplication(viewItem))
+  // );
   //#endregion
 
   //#region open zeppelin commands
-  const openZeppelinAddCategory = commands.registerCommand('openZeppelin.addCategory', async () => {
+  const openZeppelinAddCategory = commands.registerCommand("openZeppelin.addCategory", async () => {
     await tryExecute(() => OpenZeppelinCommands.addCategory());
   });
   //#endregion
 
   //#region logic app commands
-  const generateMicroservicesWorkflows = commands.registerCommand(
-    'azureBlockchainService.generateMicroservicesWorkflows',
-    async (filePath: Uri | undefined) => {
-      await tryExecute(async () => await LogicAppCommands.generateMicroservicesWorkflows(filePath));
-    });
-  const generateDataPublishingWorkflows = commands.registerCommand(
-    'azureBlockchainService.generateDataPublishingWorkflows',
-    async (filePath: Uri | undefined) => {
-      await tryExecute(async () => await LogicAppCommands.generateDataPublishingWorkflows(filePath));
-    });
-  const generateEventPublishingWorkflows = commands.registerCommand(
-    'azureBlockchainService.generateEventPublishingWorkflows',
-    async (filePath: Uri | undefined) => {
-      await tryExecute(async () => await LogicAppCommands.generateEventPublishingWorkflows(filePath));
-    });
-  const generateReportPublishingWorkflows = commands.registerCommand(
-    'azureBlockchainService.generateReportPublishingWorkflows',
-    async (filePath: Uri | undefined) => {
-      await tryExecute(async () => await LogicAppCommands.generateReportPublishingWorkflows(filePath));
-    });
+  // const generateMicroservicesWorkflows = commands.registerCommand(
+  //   'trufflesuite.generateMicroservicesWorkflows',
+  //   async (filePath: Uri | undefined) => {
+  //     await tryExecute(async () => await LogicAppCommands.generateMicroservicesWorkflows(filePath));
+  //   });
+  // const generateDataPublishingWorkflows = commands.registerCommand(
+  //   'trufflesuite.generateDataPublishingWorkflows',
+  //   async (filePath: Uri | undefined) => {
+  //     await tryExecute(async () => await LogicAppCommands.generateDataPublishingWorkflows(filePath));
+  //   });
+  // const generateEventPublishingWorkflows = commands.registerCommand(
+  //   'trufflesuite.generateEventPublishingWorkflows',
+  //   async (filePath: Uri | undefined) => {
+  //     await tryExecute(async () => await LogicAppCommands.generateEventPublishingWorkflows(filePath));
+  //   });
+  // const generateReportPublishingWorkflows = commands.registerCommand(
+  //   'trufflesuite.generateReportPublishingWorkflows',
+  //   async (filePath: Uri | undefined) => {
+  //     await tryExecute(async () => await LogicAppCommands.generateReportPublishingWorkflows(filePath));
+  //   });
   //#endregion
 
   //#region debugger commands
-  const startDebugger = commands.registerCommand('extension.truffle.debugTransaction', async () => {
-    await tryExecute(() => DebuggerCommands.startSolidityDebugger());
-  });
+  // const startDebugger = commands.registerCommand('extension.truffle.debugTransaction', async () => {
+  //   await tryExecute(() => DebuggerCommands.startSolidityDebugger());
+  // });
   //#endregion
 
   //#region other subscriptions
@@ -197,10 +213,10 @@ export async function activate(context: ExtensionContext) {
     newSolidityProject,
     buildContracts,
     deployContracts,
-    createNewBDMApplication,
+    // createNewBDMApplication,
     createProject,
     connectProject,
-    deleteBDMApplication,
+    // deleteBDMApplication,
     disconnectProject,
     copyByteCode,
     copyDeployedByteCode,
@@ -208,12 +224,11 @@ export async function activate(context: ExtensionContext) {
     copyRPCEndpointAddress,
     startGanacheServer,
     stopGanacheServer,
-    generateMicroservicesWorkflows,
-    generateDataPublishingWorkflows,
-    generateEventPublishingWorkflows,
-    generateReportPublishingWorkflows,
+    // generateMicroservicesWorkflows,
+    // generateDataPublishingWorkflows,
+    // generateEventPublishingWorkflows,
+    // generateReportPublishingWorkflows,
     getPrivateKeyFromMnemonic,
-    startDebugger,
     signInToInfuraAccount,
     signOutOfInfuraAccount,
     showProjectsFromInfuraAccount,
@@ -249,7 +264,7 @@ async function tryExecute(func: () => Promise<any>, errorMessage: string | null 
     if (error instanceof CancellationEvent) {
       return;
     }
-    window.showErrorMessage(errorMessage || error.message);
+    window.showErrorMessage(errorMessage || (error as Error).message);
   }
 }
 

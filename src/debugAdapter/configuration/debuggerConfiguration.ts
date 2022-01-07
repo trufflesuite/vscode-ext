@@ -1,11 +1,11 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { debug, ExtensionContext } from 'vscode';
-import { DEBUG_TYPE, EMBED_DEBUG_ADAPTER } from '../constants/debugAdapter';
-import DebugAdapterTrackerFactory from '../debugAdapterTracker/debugAdapterTrackerFactory';
-import DebugAdapterDescriptorFactory from './debugAdapterDescriptorFactory';
-import DebuggerConfigurationProvider from './debugConfigurationProvider';
+import { debug, ExtensionContext } from "vscode";
+import { DEBUG_TYPE, EMBED_DEBUG_ADAPTER } from "../constants/debugAdapter";
+import DebugAdapterTrackerFactory from "../debugAdapterTracker/debugAdapterTrackerFactory";
+import DebugAdapterDescriptorFactory from "./debugAdapterDescriptorFactory";
+import DebuggerConfigurationProvider from "./debugConfigurationProvider";
 
 export class DebuggerConfiguration {
   public static initialize(context: ExtensionContext) {
