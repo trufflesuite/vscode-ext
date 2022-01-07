@@ -73,8 +73,8 @@ jobs:
 
       - name: configure package flags
         if: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
-        env:
-          VSCE_FLAGS: '--pre-release'
+        run:
+           echo "VSCE_FLAGS=--pre-release" >> $GITHUB_ENV
 
       - name: compile and create vsix
         run: yarn package ${{ env.VSCE_FLAGS }}
