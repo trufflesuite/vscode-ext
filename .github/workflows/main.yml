@@ -12,6 +12,8 @@ jobs:
   cicd:
     name: cicd
     runs-on: windows-latest
+    env:
+      VSCE_FLAGS: '' # empty by default
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
@@ -38,6 +40,7 @@ jobs:
           echo "::Minor: ${{ steps.gitversion.outputs.minor }}::"
           echo "::Patch: ${{ steps.gitversion.outputs.patch }}::"
           echo "::MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}::"
+          echo "::PreRelease: ${{ steps.gitversion.outputs.preReleaseTag }}::"
           echo "::SemVer: ${{ steps.gitversion.outputs.semVer }}::"
           echo "::PackageName: ${{steps.packageJson.outputs.packageName}} ::"
 
@@ -58,9 +61,7 @@ jobs:
         with:
           files: "${{github.workspace}}/package.json"
           patch-syntax: |
-            = /version => "${{ steps.gitversion.outputs.semVer }}"
-            = /displayName => "Truffle VSCode Chocolate Factory. TEST"
-            = /description => "Trufflesuite for Blockchain Development. TEST"
+            = /version => "${{ steps.gitversion.outputs.majorMinorPatch }}"
             = /aiKey => "${{ secrets.AIKEY }}"
 
       - name: add version in CHANGELOG.md
@@ -68,10 +69,15 @@ jobs:
         with:
           files: "${{github.workspace}}/CHANGELOG.md"
         env:
-          VERSION: "${{ steps.gitversion.outputs.semVer }}"
+          VERSION: "${{ steps.gitversion.outputs.majorMinorPatch }}"
+
+      - name: configure package flags
+        if: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
+        env:
+          VSCE_FLAGS: '--pre-release'
 
       - name: compile and create vsix
-        run: yarn package
+        run: yarn package ${{ env.VSCE_FLAGS }}
 
       - name: print vsix path
         run: |
@@ -80,8 +86,8 @@ jobs:
       - name: upload vsix as artifact
         uses: actions/upload-artifact@v1
         with:
-          name: ${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.semVer}}.vsix
-          path: ${{github.workspace}}/${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.semVer}}.vsix
+          name: ${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}${{ env.VSCE_FLAGS }}.vsix
+          path: ${{github.workspace}}/${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}${{ env.VSCE_FLAGS }}.vsix
 #      - name: publish to marketplace
 #        if: github.ref == 'refs/heads/master'
 #        run: npm run deploy ${{ env.PAT }}
