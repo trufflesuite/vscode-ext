@@ -1,7 +1,5 @@
 # Trufflesuite for VSCode
 
-[![Version](https://vsmarketplacebadge.apphb.com/version/AzBlockchain.azure-blockchain.svg)](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-logicapps) [![Installs](https://vsmarketplacebadge.apphb.com/installs/AzBlockchain.azure-blockchain.svg)](https://marketplace.visualstudio.com/items?itemName=AzBlockchain.azure-blockchain) [![Rating](https://vsmarketplacebadge.apphb.com/rating-star/AzBlockchain.azure-blockchain.svg)](https://marketplace.visualstudio.com/items?itemName=AzBlockchain.azure-blockchain#review-details) [![Build status](https://msazure.visualstudio.com/Blockchain/_apis/build/status/Blockchain-VS-Extensions/Blockchain-VS-Extension-Prod)](https://msazure.visualstudio.com/Blockchain/_build/latest?definitionId=71311)
-
 The extension simplifies how you create, build and deploy smart contracts on Ethereum ledgers using the Trufflesuite of tools.
 
 - If you are doing open source blockchain development, the extension has built in integration for open source tools such as [Truffle/Ganache](https://trufflesuite.com/), [Infura](https://infura.io/), and [OpenZeppelin](https://openzeppelin.com/). An Azure subscription is optional.
