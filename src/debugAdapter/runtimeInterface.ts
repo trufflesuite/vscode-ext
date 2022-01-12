@@ -5,6 +5,7 @@ import truffleDebugger from "@truffle/debugger";
 import {EventEmitter} from "events";
 import {relative as pathRelative} from "path";
 import {filterContractsWithAddress, prepareContracts} from "./contracts/contractsPrepareHelpers";
+import {translateTruffleVariables} from "./helpers";
 import {DebuggerTypes} from "./models/debuggerTypes";
 import {ICallInfo} from "./models/ICallInfo";
 import {IContractModel} from "./models/IContractModel";
@@ -104,10 +105,11 @@ export default class RuntimeInterface extends EventEmitter {
   public async variables(/* args?: DebugProtocol.VariablesArguments */): Promise<any> {
     if (this._session) {
       const variables = await this._session.variables();
+      const transformed = translateTruffleVariables(variables);
       // FIXME: This is no longer a function. Can we just use the actual variables as they now come back?
       // return truffleDebugUtils.nativize(variables);
-      console.log("variables call: ", {variables: JSON.stringify(variables)});
-      return variables;
+      console.log("variables call: ", {variables, transformed});
+      return transformed;
     } else {
       return Promise.resolve({});
     }
