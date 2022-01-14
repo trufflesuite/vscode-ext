@@ -21,6 +21,7 @@
     "noUnusedParameters": true,
     "allowJs": true,
     "checkJs": false,
+    "skipLibCheck": true,
     "typeRoots": ["./node_modules/@types", "./node_modules/@machinomy", "./src/debugger/types"]
   },
   "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.json", "test/**/*.js", "test/**/*.ts", "test/**/*.json"],

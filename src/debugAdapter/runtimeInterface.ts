@@ -70,6 +70,7 @@ export default class RuntimeInterface extends EventEmitter {
     };
 
     this._numBreakpoints++;
+    // TODO: we might need to make this addBreakpoint lazy on session init.
     await this._session.addBreakpoint(breakpoint);
     return breakpoint;
   }
@@ -118,7 +119,7 @@ export default class RuntimeInterface extends EventEmitter {
   public async continue(): Promise<void> {
     this.validateSession();
     await this._session!.continueUntilBreakpoint();
-    this.processSteping("stopOnBreakpoint");
+    this.processStepping("stopOnBreakpoint");
   }
 
   public continueReverse(): void {
@@ -129,19 +130,19 @@ export default class RuntimeInterface extends EventEmitter {
   public async stepNext(): Promise<void> {
     this.validateSession();
     await this._session!.stepNext();
-    this.processSteping("stopOnStepOver");
+    this.processStepping("stopOnStepOver");
   }
 
   public async stepIn(): Promise<void> {
     this.validateSession();
     await this._session!.stepInto();
-    this.processSteping("stopOnStepIn");
+    this.processStepping("stopOnStepIn");
   }
 
   public async stepOut(): Promise<void> {
     this.validateSession();
     await this._session!.stepOut();
-    this.processSteping("stopOnStepOut");
+    this.processStepping("stopOnStepOut");
   }
 
   public async attach(txHash: string, workingDirectory: string): Promise<void> {
@@ -194,7 +195,7 @@ export default class RuntimeInterface extends EventEmitter {
     return this._isDebuggerAttached;
   }
 
-  private processSteping(event: any) {
+  private processStepping(event: any) {
     const isEndOfTransactionTrace = this._session!.view(this._selectors.trace.finished);
     if (isEndOfTransactionTrace) {
       this.sendEvent("end");

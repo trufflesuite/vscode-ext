@@ -556,6 +556,7 @@
     "clean": "npx rimraf -- ./out/*"
   },
   "devDependencies": {
+    "@types/big.js": "^6.1.2",
     "@types/copy-webpack-plugin": "^8.0.1",
     "@types/download": "^6.2.4",
     "@types/estree": "^0.0.39",
