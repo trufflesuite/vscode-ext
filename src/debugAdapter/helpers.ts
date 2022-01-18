@@ -94,6 +94,7 @@ function enumFullName(value: Format.Values.EnumValue): string {
 
 type TranslatedResult = {
   value: any;
+  type: string;
   solidity: Format.Values.Result;
 };
 
@@ -104,6 +105,14 @@ function translateContractValue(value: Format.Values.ContractValueInfo): string 
     case "unknown":
       return `${value.address} of unknown class`;
   }
+}
+
+function createResult(variable: Format.Values.Result, value: any): TranslatedResult {
+  return {
+    value,
+    type: variable.type.typeClass,
+    solidity: variable,
+  };
 }
 
 /**
@@ -119,115 +128,77 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
       switch (variable.type.typeClass) {
         case "uint":
         case "int":
-          return {
-            value: (<UintValue>variable).value.asBN.toString(),
-            solidity: variable,
-          };
+          return createResult(variable, (<UintValue>variable).value.asBN.toString());
         case "fixed":
         case "ufixed":
           //note: because this is just for display, we don't bother adjusting the magic values Big.NE or Big.PE;
           //we'll trust those to their defaults
-          return {
-            value: (<FixedValue>variable).value.asBig.toString(),
-            solidity: variable,
-          };
+          return createResult(variable, (<FixedValue>variable).value.asBig.toString());
         case "bool":
-          return {
-            value: (<BoolValue>variable).value.asBoolean,
-            solidity: variable,
-          };
+          return createResult(variable, (<BoolValue>variable).value.asBoolean);
         case "bytes":
           switch (variable.type.kind) {
             case "static":
-              return {
-                value: (<BytesStaticValue>variable).value.asHex,
-                solidity: variable,
-              };
+              return createResult(variable, (<BytesStaticValue>variable).value.asHex);
             case "dynamic":
-              return {
-                value: `hex: ${(<BytesDynamicValue>variable).value.asHex.slice(2)}`,
-                solidity: variable,
-              };
+              return createResult(variable, `hex: ${(<BytesDynamicValue>variable).value.asHex.slice(2)}`);
             default:
-              return {
-                value: (<BytesValue>variable).value.asHex,
-                solidity: variable,
-              };
+              return createResult(variable, (<BytesValue>variable).value.asHex);
           }
         case "address":
-          return {
-            value: (<AddressValue>variable).value.asAddress,
-            solidity: variable,
-          };
+          return createResult(variable, (<AddressValue>variable).value.asAddress);
         case "string": {
           switch ((<StringValue>variable).value.kind) {
             case "valid":
-              return {
-                value: (<StringValueInfoValid>variable.value).asString,
-                solidity: variable,
-              };
+              return createResult(variable, (<StringValueInfoValid>variable.value).asString);
             case "malformed":
               //note: this will turn malformed utf-8 into replacement characters (U+FFFD)
               //note we need to cut off the 0x prefix
-              return {
-                value: Buffer.from((<StringValueInfoMalformed>variable.value).asHex.slice(2), "hex").toString(),
-                solidity: variable,
-              };
+              return createResult(
+                variable,
+                Buffer.from((<StringValueInfoMalformed>variable.value).asHex.slice(2), "hex").toString()
+              );
             default:
-              return {
-                value: variable.value,
-                solidity: variable,
-              };
+              return createResult(variable, variable.value);
           }
         }
         case "array": {
           const coercedResult = <ArrayValue>variable;
           if (coercedResult.reference !== undefined) {
-            return {
-              value: formatCircular(coercedResult.reference),
-              solidity: variable,
-            };
+            return createResult(variable, formatCircular(coercedResult.reference));
           }
-          return {
-            // tail loop
-            value: coercedResult.value.map((element: Result) => translate(element)),
-            solidity: variable,
-          };
+          return createResult(
+            variable,
+            coercedResult.value.map((element: Result) => translate(element))
+          );
         }
         case "mapping":
-          return {
-            value: new Map(
+          return createResult(
+            variable,
+            new Map(
               (<Format.Values.MappingValue>variable).value.map(({key, value}) => [translate(key), translate(value)])
-            ),
-            solidity: variable,
-          };
-
+            )
+          );
         case "struct": {
           const coercedResult = <Format.Values.StructValue>variable;
           if (coercedResult.reference !== undefined) {
-            return {
-              value: formatCircular(coercedResult.reference),
-              solidity: variable,
-            };
+            return createResult(variable, formatCircular(coercedResult.reference));
           }
-          return {
-            value: Object.assign(
+          return createResult(
+            variable,
+            Object.assign(
               {},
               ...coercedResult.value.map(({name, value}) => ({
                 [name]: translate(value),
               }))
-            ),
-            solidity: variable,
-          };
+            )
+          );
         }
         case "userDefinedValueType": {
           const typeName = Format.Types.typeStringWithoutLocation(variable.type);
           const coercedResult = <Format.Values.UserDefinedValueTypeValue>variable;
           const inspectOfUnderlying = translate(coercedResult.value);
-          return {
-            value: `${typeName}.wrap(${inspectOfUnderlying})`, //note only the underlying part is stylized
-            solidity: variable,
-          };
+          return createResult(variable, `${typeName}.wrap(${inspectOfUnderlying})`); //note only the underlying part is stylized
         }
         case "tuple": {
           const coercedResult = <Format.Values.TupleValue>variable;
@@ -235,64 +206,55 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
           //if not, just do an array.
           //(good behavior in the mixed case is hard, unfortunately)
           if (coercedResult.value.every(({name}) => name)) {
-            return {
-              value: Object.assign(
+            return createResult(
+              variable,
+              Object.assign(
                 {},
                 ...coercedResult.value.map(({name, value}) => ({
                   [<string>name]: translate(value),
                 }))
-              ),
-              solidity: variable,
-            };
+              )
+            );
           } else {
-            return {
-              value: coercedResult.value.map(({value}) => translate(value)),
-              solidity: variable,
-            };
+            return createResult(
+              variable,
+              coercedResult.value.map(({value}) => translate(value))
+            );
           }
         }
         case "type": {
           switch (variable.type.type.typeClass) {
             case "contract":
               //same as struct case but w/o circularity check
-              return {
-                value: Object.assign(
+              return createResult(
+                variable,
+                Object.assign(
                   {},
                   ...(<Format.Values.TypeValueContract>variable).value.map(({name, value}) => ({
                     [name]: translate(value),
                   }))
-                ),
-                solidity: variable,
-              };
+                )
+              );
             case "enum":
             default: {
-              return {
-                value: enumTypeName(variable.type.type),
-                solidity: variable,
-              };
+              return createResult(variable, enumTypeName(variable.type.type));
             }
           }
         }
         case "magic":
-          return {
-            value: Object.assign(
+          return createResult(
+            variable,
+            Object.assign(
               {},
               ...Object.entries((<Format.Values.MagicValue>variable).value).map(([key, value]) => ({
                 [key]: translate(value),
               }))
-            ),
-            solidity: variable,
-          };
-        case "enum": {
-          return {
-            value: enumFullName(<Format.Values.EnumValue>variable), //not stylized
-            solidity: variable,
-          };
-        }
-        case "contract": {
-          return {value: translateContractValue((<Format.Values.ContractValue>variable).value), solidity: variable};
-        }
-
+            )
+          );
+        case "enum":
+          return createResult(variable, enumFullName(<Format.Values.EnumValue>variable)); //not stylized
+        case "contract":
+          return createResult(variable, translateContractValue((<Format.Values.ContractValue>variable).value));
         case "function":
           switch (variable.type.visibility) {
             case "external": {
@@ -311,68 +273,46 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
               const secondLine = `${contractString}]`;
               const breakingSpace = firstLine.length + secondLine.length + 1 > breaklength ? "\n" : " ";
               //now, put it together
-              return {
-                value: firstLine + breakingSpace + secondLine,
-                solidity: variable,
-              };
+              return createResult(variable, firstLine + breakingSpace + secondLine);
             }
             case "internal": {
               const coercedResult = <Format.Values.FunctionInternalValue>variable;
               switch (coercedResult.value.kind) {
                 case "function":
                   if (coercedResult.value.definedIn) {
-                    return {
-                      value: `[Function: ${coercedResult.value.definedIn.typeName}.${coercedResult.value.name}]`,
-                      solidity: variable,
-                    };
+                    return createResult(
+                      variable,
+                      `[Function: ${coercedResult.value.definedIn.typeName}.${coercedResult.value.name}]`
+                    );
                   } else {
-                    return {
-                      value: `[Function: ${coercedResult.value.name}]`,
-                      solidity: variable,
-                    };
+                    return createResult(variable, `[Function: ${coercedResult.value.name}]`);
                   }
                 case "exception":
-                  return {
-                    value:
-                      coercedResult.value.deployedProgramCounter === 0
-                        ? `[Function: <zero>]`
-                        : `[Function: <uninitialized>]`,
-                    solidity: variable,
-                  };
+                  return createResult(
+                    variable,
+                    coercedResult.value.deployedProgramCounter === 0
+                      ? `[Function: <zero>]`
+                      : `[Function: <uninitialized>]`
+                  );
                 case "unknown":
                   const firstLine = `[Function: decoding not supported (raw info:`;
                   const secondLine = `deployed PC=${coercedResult.value.deployedProgramCounter}, constructor PC=${coercedResult.value.constructorProgramCounter})]`;
                   const breakingSpace = firstLine.length + secondLine.length + 1 > breaklength ? "\n" : " ";
                   //now, put it together
-                  return {
-                    value: firstLine + breakingSpace + secondLine,
-                    solidity: variable,
-                  };
+                  return createResult(variable, firstLine + breakingSpace + secondLine);
                 default:
-                  return {
-                    value: "DEFAULT:" + variable.value,
-                    solidity: variable,
-                  };
+                  return createResult(variable, "DEFAULT:" + variable.value);
               }
             }
             default:
-              return {
-                value: "DEFAULT:" + variable.value,
-                solidity: variable,
-              };
+              return createResult(variable, "DEFAULT:" + variable.value);
           }
         default:
-          return {
-            value: "DEFAULT:" + variable.value,
-            solidity: variable,
-          };
+          return createResult(variable, "DEFAULT:" + variable.value);
       }
     case "error": {
       // debug("variable: %O", variable);
-      return {
-        value: getErrorResult(variable, breaklength),
-        solidity: variable,
-      };
+      return createResult(variable, getErrorResult(variable, breaklength));
     }
   }
 }
