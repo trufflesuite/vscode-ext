@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import path from "path";
-import {debug, DebugConfiguration, QuickPickItem, workspace} from "vscode";
+import {debug, DebugConfiguration, QuickPickItem, workspace, WorkspaceFolder} from "vscode";
 import {DEBUG_TYPE} from "../debugAdapter/constants/debugAdapter";
 import {DebugNetwork} from "../debugAdapter/debugNetwork";
 import {TransactionProvider} from "../debugAdapter/transaction/transactionProvider";
@@ -20,9 +20,15 @@ export namespace DebuggerCommands {
     const debugNetwork = new DebugNetwork(workingDirectory);
     await debugNetwork.load();
     const contractBuildDir = debugNetwork.getTruffleConfiguration()!.contracts_build_directory;
+    // const buildDir = debugNetwork.getTruffleConfiguration()!.build_directory;
+    // TODO: here we need to work on the build. see if our fancy dan output is present.
+    // console.log("Build config:", {buildDir, contractBuildDir, truffleConfig: debugNetwork.getTruffleConfiguration()});
+
     const debugNetworkOptions = debugNetwork.getNetwork()!.options;
     const web3 = new Web3Wrapper(debugNetworkOptions);
     const providerUrl = web3.getProviderUrl();
+
+    const workspaceFolder = undefined; // getWorkspaceRoot();
 
     if (debugNetwork.isLocalNetwork()) {
       // if local service then provide last transactions to choose
@@ -36,7 +42,7 @@ export namespace DebuggerCommands {
 
       const txHash = txHashSelection.label;
       const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
-      debug.startDebugging(undefined, config).then(() => {
+      debug.startDebugging(workspaceFolder, config).then(() => {
         Telemetry.sendEvent("DebuggerCommands.startSolidityDebugger.commandFinished");
       });
     } else {
@@ -45,7 +51,7 @@ export namespace DebuggerCommands {
       const txHash = await showInputBox({placeHolder});
       if (txHash) {
         const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
-        debug.startDebugging(undefined, config).then(() => {
+        debug.startDebugging(workspaceFolder, config).then(() => {
           Telemetry.sendEvent("DebuggerCommands.startSolidityDebugger.commandFinished");
         });
       }
@@ -63,12 +69,16 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
   });
 }
 
-function getWorkingDirectory() {
+function getRootWorkspace(): WorkspaceFolder | undefined {
   if (typeof workspace.workspaceFolders === "undefined" || workspace.workspaceFolders.length === 0) {
-    return "";
+    return undefined;
   }
+  return workspace.workspaceFolders[0];
+}
 
-  return workspace.workspaceFolders[0].uri.fsPath;
+function getWorkingDirectory(): string {
+  const wsf = getRootWorkspace();
+  return wsf === undefined ? "" : wsf.uri.fsPath;
 }
 
 function generateDebugAdapterConfig(txHash: string, workingDirectory: string, providerUrl: string): DebugConfiguration {

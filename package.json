@@ -278,13 +278,13 @@
         "category": "Truffle"
       },
       {
-        "command": "trufflesuite.getPrivateKey",
-        "title": "Retrieve private key",
+        "command": "extension.truffle.debugTransaction",
+        "title": "Debug Transaction",
         "category": "Truffle"
       },
       {
-        "command": "openZeppelin.addCategory",
-        "title": "Add contracts from OpenZeppelin",
+        "command": "trufflesuite.getPrivateKey",
+        "title": "Retrieve private key",
         "category": "Truffle"
       },
       {
@@ -494,7 +494,7 @@
                 },
                 "workingDirectory": {
                   "type": "string",
-                  "description": "Directory of truffle box",
+                  "description": "Directory of truffle project",
                   "default": "${workspaceFolder}"
                 },
                 "providerUrl": {

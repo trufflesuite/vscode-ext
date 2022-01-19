@@ -42,6 +42,7 @@ export class DebugNetwork {
     const configuration = await this._basedConfig!.getConfiguration(this.workingDirectory);
 
     return {
+      build_directory: this.relativeToAbsolutePath(configuration.build_directory),
       contracts_build_directory: this.relativeToAbsolutePath(configuration.contracts_build_directory),
       contracts_directory: this.relativeToAbsolutePath(configuration.contracts_directory),
       migrations_directory: this.relativeToAbsolutePath(configuration.migrations_directory),

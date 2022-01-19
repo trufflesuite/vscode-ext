@@ -57,7 +57,11 @@ interface IExtendedQuickPickItem extends QuickPickItem {
 }
 
 export namespace TruffleCommands {
-  export async function buildContracts(): Promise<void> {
+  /**
+   * Call the truffle command line compiler
+   * @param args a list of optional compile command args to append in certain circumstances
+   */
+  export async function buildContracts(...args: Array<string>): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.buildContracts.commandStarted");
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
       if (!(await required.checkAppsSilent(RequiredApps.truffle))) {
@@ -65,7 +69,8 @@ export namespace TruffleCommands {
         await required.installTruffle(required.Scope.locally);
       }
 
-      await outputCommandHelper.executeCommand(getWorkspaceRoot(), "npx", RequiredApps.truffle, "compile");
+      // await outputCommandHelper.executeCommand(getWorkspaceRoot(), "npx", RequiredApps.truffle, "compile");
+      await outputCommandHelper.executeCommand(getWorkspaceRoot(), "npx", RequiredApps.truffle, "compile", ...args);
     });
 
     Telemetry.sendEvent("TruffleCommands.buildContracts.commandFinished");

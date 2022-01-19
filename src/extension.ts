@@ -42,7 +42,6 @@ export async function activate(context: ExtensionContext) {
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
   TreeManager.initialize(context.globalState);
-  // FIXME: i think this is breaking things..
   TreeService.initialize("Trufflesuite");
   await sdkCoreCommands.initialize(context.globalState);
 

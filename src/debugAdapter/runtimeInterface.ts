@@ -106,11 +106,7 @@ export default class RuntimeInterface extends EventEmitter {
   public async variables(/* args?: DebugProtocol.VariablesArguments */): Promise<any> {
     if (this._session) {
       const variables = await this._session.variables();
-      const transformed = translateTruffleVariables(variables);
-      // FIXME: This is no longer a function. Can we just use the actual variables as they now come back?
-      // return truffleDebugUtils.nativize(variables);
-      console.log("variables call: ", {variables, transformed});
-      return transformed;
+      return translateTruffleVariables(variables);
     } else {
       return Promise.resolve({});
     }
@@ -144,7 +140,11 @@ export default class RuntimeInterface extends EventEmitter {
     await this._session!.stepOut();
     this.processStepping("stopOnStepOut");
   }
-
+  /**
+   * FIXME: rework this
+   * @param txHash
+   * @param workingDirectory
+   */
   public async attach(txHash: string, workingDirectory: string): Promise<void> {
     const result = await prepareContracts(workingDirectory);
 

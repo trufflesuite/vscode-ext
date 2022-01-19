@@ -110,6 +110,7 @@ export namespace ConfigurationReader {
 
   export interface IConfiguration {
     contracts_directory: string;
+    build_directory: string;
     contracts_build_directory: string;
     migrations_directory: string;
     networks?: INetwork[];
@@ -265,6 +266,7 @@ export namespace ConfigurationReader {
 
   function getDefaultConfiguration(): IConfiguration {
     return {
+      build_directory: path.join("./", "build"),
       contracts_build_directory: path.join("./", "build", "contracts"),
       contracts_directory: path.join("./", "contracts"),
       migrations_directory: path.join("./", "migrations"),
@@ -489,8 +491,10 @@ export namespace ConfigurationReader {
   }
 
   function jsonToConfiguration(truffleConfig: {[key: string]: any}): IConfiguration {
-    const {contracts_directory, contracts_build_directory, migrations_directory} = getDefaultConfiguration();
+    const {build_directory, contracts_directory, contracts_build_directory, migrations_directory} =
+      getDefaultConfiguration();
 
+    truffleConfig.build_directory = truffleConfig.build_directory || build_directory;
     truffleConfig.contracts_directory = truffleConfig.contracts_directory || contracts_directory;
     truffleConfig.contracts_build_directory = truffleConfig.contracts_build_directory || contracts_build_directory;
     truffleConfig.migrations_directory = truffleConfig.migrations_directory || migrations_directory;

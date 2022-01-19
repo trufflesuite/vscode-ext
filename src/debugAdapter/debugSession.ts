@@ -25,6 +25,7 @@ import {DebuggerTypes} from "./models/debuggerTypes";
 import RuntimeInterface from "./runtimeInterface";
 import VariablesHandler from "./variablesHandler";
 
+/// TODO: Is this used anymore?
 export class SolidityDebugSession extends LoggingDebugSession {
   private _runtime: RuntimeInterface;
   private _variablesHandler: VariablesHandler;

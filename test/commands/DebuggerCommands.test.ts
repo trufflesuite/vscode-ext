@@ -27,7 +27,7 @@ describe("DebuggerCommands unit tests", () => {
     sinon.stub(DebugNetwork.prototype, "load").resolves();
     sinon
       .stub(DebugNetwork.prototype, "getTruffleConfiguration")
-      .returns({contracts_build_directory: "", contracts_directory: "", migrations_directory: ""});
+      .returns({build_directory: "", contracts_build_directory: "", contracts_directory: "", migrations_directory: ""});
     sinon
       .stub(DebugNetwork.prototype, "getNetwork")
       .returns({name: "development", options: {host: "127.0.0.1", port: 8545, network_id: "*"}});
