@@ -28,7 +28,7 @@ export namespace DebuggerCommands {
     const web3 = new Web3Wrapper(debugNetworkOptions);
     const providerUrl = web3.getProviderUrl();
 
-    const workspaceFolder = undefined; // getWorkspaceRoot();
+    const workspaceFolder = getRootWorkspace();
 
     if (debugNetwork.isLocalNetwork()) {
       // if local service then provide last transactions to choose

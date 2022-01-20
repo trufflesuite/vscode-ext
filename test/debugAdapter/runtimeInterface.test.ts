@@ -14,7 +14,7 @@ describe("RuntimeInterface unit tests", () => {
   beforeEach(async () => {
     sinon
       .stub(contractsPrepareHelpers, "prepareContracts")
-      .resolves({contracts: contractsMock, provider: {}, files: []});
+      .resolves({contracts: contractsMock, lookupMap: new Map(), resolved: [], provider: {}, files: []});
   });
 
   afterEach(() => {

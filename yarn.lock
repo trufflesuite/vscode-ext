@@ -504,6 +504,13 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@babel/runtime@^7.15.4":
+  version "7.16.7"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.16.7.tgz#03ff99f64106588c9c403c6ecb8c3bafbbdff1fa"
+  integrity sha512-9E9FJowqAsytyOY6LG+1KuueckRL+aQW+mKvXRXnuFGyRAyepJPmEo9vgMfXUA6O9u3IeEdv9MAkppFcaQwogQ==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
 "@babel/template@^7.16.0":
   version "7.16.0"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.16.0.tgz#d16a35ebf4cd74e202083356fab21dd89363ddd6"
@@ -1976,6 +1983,29 @@
     "@truffle/error" "^0.0.14"
     colors "1.4.0"
 
+"@truffle/compile-solidity@^6.0.8":
+  version "6.0.8"
+  resolved "https://registry.yarnpkg.com/@truffle/compile-solidity/-/compile-solidity-6.0.8.tgz#96b0334c8f637995acac94f200a3711ba2955246"
+  integrity sha512-4QMpNkMVQlIJ9K9OwW/vzlIsQj/yvcpgNgO+0TpRJ6on7hSPXlLzP//DZj3wRQ+Ld1CRnTtNi/KTYwe1ciTd8A==
+  dependencies:
+    "@truffle/compile-common" "^0.7.24"
+    "@truffle/config" "^1.3.14"
+    "@truffle/contract-sources" "^0.1.12"
+    "@truffle/expect" "^0.0.18"
+    "@truffle/profiler" "^0.1.6"
+    axios "^0.21.1"
+    axios-retry "^3.1.9"
+    debug "^4.3.1"
+    fs-extra "^9.1.0"
+    iter-tools "^7.0.2"
+    lodash.clonedeep "^4.5.0"
+    lodash.partition "^4.6.0"
+    ora "^3.4.0"
+    original-require "^1.0.1"
+    require-from-string "^2.0.2"
+    semver "^7.3.4"
+    solc "0.8.10"
+
 "@truffle/config@^1.3.14":
   version "1.3.14"
   resolved "https://registry.yarnpkg.com/@truffle/config/-/config-1.3.14.tgz#2bfd91d534cf6ccc3acc2f697030b0899ce223d3"
@@ -2000,6 +2030,14 @@
     ajv "^6.10.0"
     debug "^4.3.1"
 
+"@truffle/contract-schema@^3.4.4":
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/@truffle/contract-schema/-/contract-schema-3.4.4.tgz#e98f30c5db91f8ca6f239f2a27029b05e3dadf5b"
+  integrity sha512-xWgrm6WRM2jmT04w7dP7aVbS2qyP9XPmH/mybQtFXMjJ/8BZlp0yltC8QOs8sGl6q8Ws7acp19YtRkLdK6SsmQ==
+  dependencies:
+    ajv "^6.10.0"
+    debug "^4.3.1"
+
 "@truffle/contract-sources@^0.1.12":
   version "0.1.12"
   resolved "https://registry.yarnpkg.com/@truffle/contract-sources/-/contract-sources-0.1.12.tgz#7a3dfec1bcf6f3632c0f54e522fb6f12b0bdf34b"
@@ -2017,6 +2055,26 @@
     "@truffle/blockchain-utils" "^0.0.31"
     "@truffle/contract-schema" "^3.4.3"
     "@truffle/debug-utils" "^6.0.1"
+    "@truffle/error" "^0.0.14"
+    "@truffle/interface-adapter" "^0.5.8"
+    bignumber.js "^7.2.1"
+    debug "^4.3.1"
+    ethers "^4.0.32"
+    web3 "1.5.3"
+    web3-core-helpers "1.5.3"
+    web3-core-promievent "1.5.3"
+    web3-eth-abi "1.5.3"
+    web3-utils "1.5.3"
+
+"@truffle/contract@^4.4.4":
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/@truffle/contract/-/contract-4.4.4.tgz#b668f0ef6ebfb0cec38a4f754e0d7bcf1a49b2a8"
+  integrity sha512-OrMunu8vfHkBPAwZc4te9CIg/+Cc4txmc/iJmMwxZ6m1lf0dOG837IjMD0KGSkvpO59KW/eiqEK7VF/cewjN6A==
+  dependencies:
+    "@ensdomains/ensjs" "^2.0.1"
+    "@truffle/blockchain-utils" "^0.0.31"
+    "@truffle/contract-schema" "^3.4.4"
+    "@truffle/debug-utils" "^6.0.4"
     "@truffle/error" "^0.0.14"
     "@truffle/interface-adapter" "^0.5.8"
     bignumber.js "^7.2.1"
@@ -2085,10 +2143,10 @@
     debug "^4.3.1"
     highlightjs-solidity "^2.0.3"
 
-"@truffle/debugger@^9.2.10":
-  version "9.2.10"
-  resolved "https://registry.yarnpkg.com/@truffle/debugger/-/debugger-9.2.10.tgz#cceeaf31fb2bbe299cba8981ad3a17df7445778c"
-  integrity sha512-KEMSpD22FUE/ta9416nBPoXliCJ8it40DSgviovuNsPIVuxl2ZBewWvG9Xn2gMvz18Kg5U5UP2LecBW5LA8q0g==
+"@truffle/debugger@^9.2.11":
+  version "9.2.11"
+  resolved "https://registry.yarnpkg.com/@truffle/debugger/-/debugger-9.2.11.tgz#2753d678ca8f3859b5c4fe29a5acbba716084c73"
+  integrity sha512-cPsr6+1iSA2E7S9xqY1CILlralkg5XBukaMcFttjiW8SSWmv8xad0HqTdVPvun5cdJUBz03mmay5ieGcnhUtlg==
   dependencies:
     "@truffle/abi-utils" "^0.2.6"
     "@truffle/codec" "^0.11.22"
@@ -2206,6 +2264,14 @@
   dependencies:
     spinnies "^0.5.1"
 
+"@truffle/profiler@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@truffle/profiler/-/profiler-0.1.6.tgz#98d97c1b882ca40aa841312717a5310ed69ad648"
+  integrity sha512-OBdVjtyHD2Cjz1r/vg/adLC2h2efbaXRBKraR3SJP9r5R2FxDxT1hdBJEetY7Fg9u6a/RSyVwdqN6c7UCjJkTQ==
+  dependencies:
+    "@truffle/contract-sources" "^0.1.12"
+    debug "^4.3.1"
+
 "@truffle/provider@^0.2.42":
   version "0.2.42"
   resolved "https://registry.yarnpkg.com/@truffle/provider/-/provider-0.2.42.tgz#9da6a144b3c9188cdb587451dd7bd907b4c7164b"
@@ -2232,6 +2298,21 @@
     "@truffle/expect" "^0.0.18"
     "@truffle/provisioner" "^0.2.37"
     abi-to-sol "^0.5.1"
+    debug "^4.3.1"
+    detect-installed "^2.0.4"
+    get-installed-path "^4.0.8"
+    glob "^7.1.6"
+
+"@truffle/resolver@^8.0.2":
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/@truffle/resolver/-/resolver-8.0.2.tgz#1b8caa5a02f4030f10459e16a5d882f06d251c83"
+  integrity sha512-6gRu7ERU6w6/csS28qHFZ0kwVE3xNzajYoPBwITF0bD/K75LOMo3CGrBSaW0r8I5tB4U7GUl+09QreGOBYiHig==
+  dependencies:
+    "@truffle/contract" "^4.4.4"
+    "@truffle/contract-sources" "^0.1.12"
+    "@truffle/expect" "^0.0.18"
+    "@truffle/provisioner" "^0.2.37"
+    abi-to-sol "^0.5.2"
     debug "^4.3.1"
     detect-installed "^2.0.4"
     get-installed-path "^4.0.8"
@@ -3001,7 +3082,7 @@ abi-decoder@^2.4.0:
     web3-eth-abi "^1.2.1"
     web3-utils "^1.2.1"
 
-abi-to-sol@^0.5.1:
+abi-to-sol@^0.5.1, abi-to-sol@^0.5.2:
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/abi-to-sol/-/abi-to-sol-0.5.2.tgz#d672c1b2bade42f35c3b30679ffcc8825ebf6afb"
   integrity sha512-1rrxupCHnhZxJxYfssKi90SIOnPyCdI1wJK+BYd6cNLtunRzWJOkVo9o9YP73LQR7tu7F2LFBb7OLc2Hje6ZAQ==
@@ -3811,6 +3892,14 @@ aws4@^1.8.0:
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.11.0.tgz#d61f46d83b2519250e2784daf5b09479a8b41c59"
   integrity sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==
+
+axios-retry@^3.1.9:
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/axios-retry/-/axios-retry-3.2.4.tgz#f447a53c3456f5bfeca18f20c3a3272207d082ae"
+  integrity sha512-Co3UXiv4npi6lM963mfnuH90/YFLKWWDmoBYfxkHT5xtkSSWNqK9zdG3fw5/CP/dsoKB5aMMJCsgab+tp1OxLQ==
+  dependencies:
+    "@babel/runtime" "^7.15.4"
+    is-retry-allowed "^2.2.0"
 
 axios@^0.20.0:
   version "0.20.0"
@@ -5158,6 +5247,11 @@ combined-stream@^1.0.6, combined-stream@^1.0.8, combined-stream@~1.0.6:
   dependencies:
     delayed-stream "~1.0.0"
 
+command-exists@^1.2.8:
+  version "1.2.9"
+  resolved "https://registry.yarnpkg.com/command-exists/-/command-exists-1.2.9.tgz#c50725af3808c8ab0260fd60b01fbfa25b954f69"
+  integrity sha512-LTQ/SGc+s0Xc0Fu5WaKnR0YiygZkm9eKFvyS+fRsU7/ZWFF8ykFM6Pc9aCVf1+xasOOZpO3BAVgVrKvsqKHV7w==
+
 commander@^2.14.1, commander@^2.15.0, commander@^2.20.0, commander@^2.20.3, commander@^2.8.1, commander@^2.9.0:
   version "2.20.3"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
@@ -5167,6 +5261,11 @@ commander@^7.0.0:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/commander/-/commander-7.2.0.tgz#a36cb57d0b501ce108e4d20559a150a391d97ab7"
   integrity sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==
+
+commander@^8.1.0:
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-8.3.0.tgz#4837ea1b2da67b9c616a67afbb0fafee567bca66"
+  integrity sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==
 
 comment-parser@1.3.0:
   version "1.3.0"
@@ -7615,6 +7714,11 @@ follow-redirects@^1.10.0, follow-redirects@^1.14.0:
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.6.tgz#8cfb281bbc035b3c067d6cd975b0f6ade6e855cd"
   integrity sha512-fhUl5EwSJbbl8AR+uYL2KQDxLkdSjZGR36xy46AO7cOMTrCMON6Sa28FmAnC2tRTDbd/Uuzz3aJBv7EBN7JH8A==
 
+follow-redirects@^1.12.1:
+  version "1.14.7"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.7.tgz#2004c02eb9436eee9a21446a6477debf17e81685"
+  integrity sha512-+hbxoLbFMbRKDwohX8GkTataGqO6Jb7jGwpAlwgy2bIz25XtRm7KEzJM76R1WiNT5SwZkX4Y75SwBolkpmE7iQ==
+
 for-each@^0.3.3:
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/for-each/-/for-each-0.3.3.tgz#69b447e88a0a5d32c3e7084f3f1710034b21376e"
@@ -9475,6 +9579,11 @@ is-retry-allowed@^1.0.0, is-retry-allowed@^1.1.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/is-retry-allowed/-/is-retry-allowed-1.2.0.tgz#d778488bd0a4666a3be8a1482b9f2baafedea8b4"
   integrity sha512-RUbUeKwvm3XG2VYamhJL1xFktgjvPzL0Hq8C+6yrWIswDy3BIXGqCxhxkc30N9jqK311gVU137K8Ei55/zVJRg==
+
+is-retry-allowed@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/is-retry-allowed/-/is-retry-allowed-2.2.0.tgz#88f34cbd236e043e71b6932d09b0c65fb7b4d71d"
+  integrity sha512-XVm7LOeLpTW4jV19QSH38vkswxoLud8sQ57YwJVTPWdiaI9I8keEhGFpBlslyVsgdQy4Opg8QOLb8YRgsyZiQg==
 
 is-set@^2.0.2:
   version "2.0.2"
@@ -13522,7 +13631,7 @@ require-from-string@^1.1.0:
   resolved "https://registry.yarnpkg.com/require-from-string/-/require-from-string-1.2.1.tgz#529c9ccef27380adfec9a2f965b649bbee636418"
   integrity sha1-UpyczvJzgK3+yaL5ZbZJu+5jZBg=
 
-require-from-string@^2.0.2:
+require-from-string@^2.0.0, require-from-string@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/require-from-string/-/require-from-string-2.0.2.tgz#89a7fdd938261267318eafe14f9c32e598c36909"
   integrity sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==
@@ -14200,6 +14309,21 @@ socketcluster-client@^14.2.1:
     sc-formatter "^3.0.1"
     uuid "3.2.1"
     ws "^7.5.0"
+
+solc@0.8.10:
+  version "0.8.10"
+  resolved "https://registry.yarnpkg.com/solc/-/solc-0.8.10.tgz#3f761794677a36cdd8054f4ec57d84bab8455358"
+  integrity sha512-I/Mcn6J5bEtJqveNLplQm9IRrhemm6v+qkw5S2+wM4x9HItJ1sYdrqVTN3j4DMhFDM3ZbvM0QywVzpPx666PHw==
+  dependencies:
+    command-exists "^1.2.8"
+    commander "^8.1.0"
+    follow-redirects "^1.12.1"
+    fs-extra "^0.30.0"
+    js-sha3 "0.8.0"
+    memorystream "^0.3.1"
+    require-from-string "^2.0.0"
+    semver "^5.5.0"
+    tmp "0.0.33"
 
 solc@^0.4.20:
   version "0.4.26"
@@ -14995,7 +15119,7 @@ title-case@^2.1.0:
     no-case "^2.2.0"
     upper-case "^1.0.3"
 
-tmp@^0.0.33:
+tmp@0.0.33, tmp@^0.0.33:
   version "0.0.33"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.0.33.tgz#6d34335889768d21b2bcda0aa277ced3b1bfadf9"
   integrity sha512-jRCJlojKnZ3addtTOjdIqoRuPEKBvNXcGYqzO6zWZX8KfKEpnGY5jfggJQ3EjKuu8D4bJRr0y+cYJFmYbImXGw==

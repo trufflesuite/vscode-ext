@@ -18,6 +18,7 @@ export default class RuntimeInterface extends EventEmitter {
   private _numBreakpoints: number;
   private _deployedContracts: IContractModel[];
   private _initialBreakPoints: Array<{path: string; lines: number[]}>;
+  private _fileLookupMap: Map<string, string>;
 
   constructor() {
     super();
@@ -27,6 +28,7 @@ export default class RuntimeInterface extends EventEmitter {
     this._isDebuggerAttached = false;
     this._initialBreakPoints = [];
     this._deployedContracts = [];
+    this._fileLookupMap = new Map();
   }
 
   public clearBreakpoints(): Promise<void> {
@@ -155,6 +157,7 @@ export default class RuntimeInterface extends EventEmitter {
       files: result.files,
       provider: result.provider,
     };
+    this._fileLookupMap = result.lookupMap;
     this._session = await this.generateSession(txHash, options);
     this._isDebuggerAttached = true;
   }
@@ -166,10 +169,12 @@ export default class RuntimeInterface extends EventEmitter {
     if (!sourcePath) {
       throw new Error("No source file");
     }
+    // so if we have a file in a location that doesn't map 1:1 to the actual file name in the compiler we map it here...
+    const file = this._fileLookupMap.has(sourcePath) ? this._fileLookupMap.get(sourcePath) : sourcePath;
 
     return {
       column: currentLocation.sourceRange ? currentLocation.sourceRange.lines.start.column : 0,
-      file: sourcePath,
+      file,
       line: currentLocation.sourceRange ? currentLocation.sourceRange.lines.start.line : 0,
     };
   }
