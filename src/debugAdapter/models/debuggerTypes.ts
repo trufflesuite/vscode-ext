@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { DebugProtocol } from "vscode-debugprotocol";
-import { EVENT_TYPES } from "../constants/debugAdapter";
+import {DebugProtocol} from "vscode-debugprotocol";
+import {EVENT_TYPES} from "../constants/debugAdapter";
 
 export namespace DebuggerTypes {
   export interface IBreakpoint {
     id: number;
-    sourceId: number;
+    sourceId: string;
     line: number;
   }
 
