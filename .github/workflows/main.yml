@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - "feat/**" # match an pushes on feature/* and feature/<any sub branch>/*
+      - develop
       - master
     paths-ignore: # dont run when changes made to these folders
       - ".vscode/**"
@@ -12,6 +12,8 @@ jobs:
   cicd:
     name: cicd
     runs-on: windows-latest
+    env:
+      VSCE_FLAGS: '--pre-release' # have to set as pre-release here. env is not working as expected.
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
@@ -38,6 +40,7 @@ jobs:
           echo "::Minor: ${{ steps.gitversion.outputs.minor }}::"
           echo "::Patch: ${{ steps.gitversion.outputs.patch }}::"
           echo "::MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}::"
+          echo "::PreRelease: ${{ steps.gitversion.outputs.preReleaseTag }}::"
           echo "::SemVer: ${{ steps.gitversion.outputs.semVer }}::"
           echo "::PackageName: ${{steps.packageJson.outputs.packageName}} ::"
 
@@ -58,9 +61,7 @@ jobs:
         with:
           files: "${{github.workspace}}/package.json"
           patch-syntax: |
-            = /version => "${{ steps.gitversion.outputs.semVer }}"
-            = /displayName => "Truffle VSCode Chocolate Factory. TEST"
-            = /description => "Trufflesuite for Blockchain Development. TEST"
+            = /version => "${{ steps.gitversion.outputs.majorMinorPatch }}"
             = /aiKey => "${{ secrets.AIKEY }}"
 
       - name: add version in CHANGELOG.md
@@ -68,10 +69,20 @@ jobs:
         with:
           files: "${{github.workspace}}/CHANGELOG.md"
         env:
-          VERSION: "${{ steps.gitversion.outputs.semVer }}"
+          VERSION: "${{ steps.gitversion.outputs.majorMinorPatch }}"
+
+      - name: configure package flags
+        id: package_flags
+        if: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
+        run: |
+           echo "VSCE_FLAGS=--pre-release --yarn " >> $GITHUB_ENV
+           echo "flags_set=true" >> $GITHUB_ENV
 
       - name: compile and create vsix
-        run: yarn package
+        run: |
+          echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} ::"
+          yarn package --pre-release
+          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}.vsix" >> $GITHUB_ENV
 
       - name: print vsix path
         run: |
@@ -80,8 +91,8 @@ jobs:
       - name: upload vsix as artifact
         uses: actions/upload-artifact@v1
         with:
-          name: ${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.semVer}}.vsix
-          path: ${{github.workspace}}/${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.semVer}}.vsix
+          name: ${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}.vsix
+          path: ${{github.workspace}}/${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}.vsix
 #      - name: publish to marketplace
 #        if: github.ref == 'refs/heads/master'
 #        run: npm run deploy ${{ env.PAT }}

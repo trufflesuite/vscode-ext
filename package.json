@@ -1,11 +1,11 @@
 {
   "name": "trufflesuite-vscode",
   "displayName": "Trufflesuite for VSCode",
-  "description": "Develop, deploy and debug on the Ethereum Ecosystem from inside VSCode.",
+  "description": "Develop and deploy on the Ethereum Ecosystem with VSCode.",
   "publisher": "trufflesuite-csi",
   "preview": true,
   "icon": "images/TruffleLogo.png",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/trufflesuite/vscode-ext"
@@ -16,7 +16,7 @@
   "homepage": "https://github.com/trufflesuite/vscode-ext/blob/master/README.md",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.60.0"
+    "vscode": "^1.63.0"
   },
   "keywords": [
     "blockchain",
@@ -35,6 +35,7 @@
     "Extension Packs",
     "Programming Languages"
   ],
+  "categories": [],
   "aiKey": "INSERTAIKEY",
   "main": "./out/src/extension.js",
   "activationEvents": [
