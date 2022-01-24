@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - "feat/**" # match an pushes on feature/* and feature/<any sub branch>/*
+      - develop
       - master
     paths-ignore: # dont run when changes made to these folders
       - ".vscode/**"
