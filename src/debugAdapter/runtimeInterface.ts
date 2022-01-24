@@ -3,7 +3,6 @@
 
 import truffleDebugger from "@truffle/debugger";
 import {EventEmitter} from "events";
-import {relative as pathRelative} from "path";
 import {filterContractsWithAddress, prepareContracts} from "./contracts/contractsPrepareHelpers";
 import {translateTruffleVariables} from "./helpers";
 import {DebuggerTypes} from "./models/debuggerTypes";
@@ -59,16 +58,12 @@ export default class RuntimeInterface extends EventEmitter {
     }
 
     // we'll need the debugger-internal ID of this source
-    const debuggerSources: any = this._session.view(this._selectors.solidity.info.sources);
-    const matchingSource: any = Object.values(debuggerSources).find(
-      (source: any) => pathRelative(source.sourcePath, filePath) === ""
-    );
-    const sourceId = matchingSource.id;
+    const debuggerSource: any = this._session.view(this._selectors.solidity.current.source);
 
     const breakpoint: DebuggerTypes.IBreakpoint = {
       id: this._numBreakpoints,
       line,
-      sourceId,
+      sourceId: debuggerSource.id,
     };
 
     this._numBreakpoints++;
