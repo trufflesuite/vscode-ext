@@ -52,7 +52,7 @@ export default class RuntimeInterface extends EventEmitter {
     this._initialBreakPoints.length = 0; // remove them since they are no longer needed
   }
 
-  public async setBreakpoint(filePath: string, line: number): Promise<DebuggerTypes.IBreakpoint | null> {
+  public async setBreakpoint(_filePath: string, line: number): Promise<DebuggerTypes.IBreakpoint | null> {
     if (!this._session) {
       return Promise.resolve(null);
     }
