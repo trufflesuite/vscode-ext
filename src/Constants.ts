@@ -345,7 +345,7 @@ export class Constants {
       local: {
         contextValue: "service",
         iconPath: {dark: "", light: ""},
-        label: "Local Service",
+        label: "Ganache Service",
         prefix: "loc",
       },
     },
@@ -451,7 +451,7 @@ export class Constants {
     onlyNumberAllowed: "Value after ':' should be a number.",
     openZeppelinFilesAreInvalid: Constants.getMessageOpenZeppelinFilesAreInvalid,
     portAlreadyInUse: "This port is already in use. Choose another one.",
-    portNotInUseGanache: "No local service running on port. Please start service or select another port.",
+    portNotInUseGanache: "No local ganache service running on port. Please start service or select another port.",
     projectAlreadyExists: "Network already exists.",
     projectAlreadyExistsOnInfura: "Project already exist with the same name on Infura.",
     projectIdAlreadyExists: "Network with project ID already exists.",

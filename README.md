@@ -71,13 +71,12 @@ The extension has integrated Ganache directly into the IDE to further lower the 
 
    b. Next click Create a new network.
 
-   c. Select Local Service
+   c. Select Ganahce Service
 
    d. Provide a name for this service that will be referenced when targeting it from deployment.
 
    e. Enter the port number to use for this local network.
 
-   ![Custom local service](https://github.com/Azure-Samples/blockchain-devkit/raw/master/media/extensionMedia/truffleCustomDeploy.gif)
 
 </details>
 
