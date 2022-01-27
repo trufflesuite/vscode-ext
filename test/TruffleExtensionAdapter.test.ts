@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as sinon from "sinon";
-import { TruffleCommands } from "../src/commands/TruffleCommands";
-import { TruffleExtensionAdapter } from "../src/services/extensionAdapter";
+import assert from "assert";
+import sinon from "sinon";
+import {TruffleCommands} from "../src/commands/TruffleCommands";
+import {TruffleExtensionAdapter} from "../src/services/extensionAdapter";
 
 describe("TruffleExtensionAdapter", () => {
   let buildContractsMock: sinon.SinonStub<any>;

@@ -1,21 +1,21 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import rewire = require("rewire");
-import * as sinon from "sinon";
-import uuid = require("uuid");
-import { QuickPickOptions } from "vscode";
-import { Constants } from "../../../src/Constants";
+import assert from "assert";
+import rewire from "rewire";
+import sinon from "sinon";
+import uuid from "uuid";
+import {QuickPickOptions} from "vscode";
+import {Constants} from "../../../src/Constants";
 import * as helpers from "../../../src/helpers";
-import { ItemType } from "../../../src/Models";
+import {ItemType} from "../../../src/Models";
 import {
   AzureBlockchainProject,
   AzureBlockchainService,
   BlockchainDataManagerProject,
   BlockchainDataManagerService,
 } from "../../../src/Models/TreeItems";
-import { TreeManager } from "../../../src/services";
+import {TreeManager} from "../../../src/services";
 
 describe("Create Service", () => {
   afterEach(() => {

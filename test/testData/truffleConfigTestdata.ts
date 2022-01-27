@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from "fs-extra";
-import * as path from "path";
+import fs from "fs-extra";
+import path from "path";
 
 export const referenceMnemonic = "some menmonic some menmonic some menmonic some menmonic some menmonic some menmonic";
 

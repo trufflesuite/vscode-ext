@@ -1,15 +1,15 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Memento, window } from "vscode";
-import { Constants } from "../Constants";
+import {Memento, window} from "vscode";
+import {Constants} from "../Constants";
 import {
   // getWorkspaceRoot,
   // outputCommandHelper,
   // showNotificationConfirmationDialog,
   userSettings,
 } from "../helpers";
-import { IExtensionAdapter, OpenZeppelinExtensionAdapter, TruffleExtensionAdapter } from "../services/extensionAdapter";
+import {IExtensionAdapter, OpenZeppelinExtensionAdapter, TruffleExtensionAdapter} from "../services/extensionAdapter";
 
 class SdkCoreCommands {
   // @ts-ignore
@@ -26,9 +26,13 @@ class SdkCoreCommands {
     });
   }
 
-  public async build(): Promise<void> {
+  /**
+   *  call build on an extension
+   * @param args an array of compile/build time args you want to pass to the task (optional)
+   */
+  public async build(...args: Array<string>): Promise<void> {
     // await this.notifyAboutOpenZeppelinSdk();
-    return this.extensionAdapter.build();
+    return this.extensionAdapter.build(...args);
   }
 
   public async deploy(): Promise<void> {

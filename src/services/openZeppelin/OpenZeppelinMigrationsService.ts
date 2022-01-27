@@ -1,14 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from "fs-extra";
-import * as path from "path";
-import { OpenZeppelinService } from "..";
-import { Constants } from "../../Constants";
-import { Output } from "../../Output";
-import { ContractService } from "../../services";
-import { IOZAsset, OZAssetType } from "./models";
-import { OpenZeppelinProjectJsonService } from "./OpenZeppelinProjectJsonService";
+import fs from "fs-extra";
+import path from "path";
+import {OpenZeppelinService} from "..";
+import {Constants} from "../../Constants";
+import {Output} from "../../Output";
+import {ContractService} from "../../services";
+import {IOZAsset, OZAssetType} from "./models";
+import {OpenZeppelinProjectJsonService} from "./OpenZeppelinProjectJsonService";
 
 const migrationFilename = "99_deploy_openzeppelin.js";
 
@@ -111,5 +111,5 @@ async function saveMigrationContent(content: string): Promise<void> {
     `New migration for OpenZeppelin contracts was stored to file ${migrationFilename}`
   );
 
-  return fs.writeFile(filePath, content, { encoding: "utf8" });
+  return fs.writeFile(filePath, content, {encoding: "utf8"});
 }

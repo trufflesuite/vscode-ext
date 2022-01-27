@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from "../Constants";
-import { EnumStorage } from "../Models";
-import { Output } from "../Output";
-import { Telemetry } from "../TelemetryClient";
+import {Constants} from "../Constants";
+import {EnumStorage} from "../Models";
+import {Output} from "../Output";
+import {Telemetry} from "../TelemetryClient";
 
 interface INode {
   id: number;
@@ -19,17 +19,19 @@ interface IEnumNode extends INode {
   members: INode[];
 }
 
-export function extractEnumsInfoSafe(contractName: string, ast: { [key: string]: any }): EnumStorage {
+export function extractEnumsInfoSafe(contractName: string, ast: {[key: string]: any}): EnumStorage {
   try {
     return extractEnumsInfo(contractName, ast);
   } catch (error) {
-    Output.outputLine(Constants.outputChannel.telemetryClient, error.message);
-    Telemetry.sendException(error);
+    if (error instanceof Error) {
+      Output.outputLine(Constants.outputChannel.telemetryClient, error.message);
+      Telemetry.sendException(error);
+    }
   }
   return new EnumStorage();
 }
 
-export function extractEnumsInfo(contractName: string, ast: { [key: string]: any }): EnumStorage {
+export function extractEnumsInfo(contractName: string, ast: {[key: string]: any}): EnumStorage {
   if (!ast) {
     throw new Error(Constants.errorMessageStrings.AstIsEmpty);
   }
@@ -57,7 +59,7 @@ export function extractEnumsInfo(contractName: string, ast: { [key: string]: any
           const offset = enm.members[0].id;
           // collect enum items. ids does not equal uint values,
           // so i think we should just set first as '0' and so on
-          const enumItems = enm.members.map((enumMember) => ({ name: enumMember.name, value: enumMember.id - offset }));
+          const enumItems = enm.members.map((enumMember) => ({name: enumMember.name, value: enumMember.id - offset}));
           // method name + parameter name as uniq key
           if (!result.methods[method.name]) {
             result.methods[method.name] = {};

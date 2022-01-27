@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as semver from "semver";
-import { commands, Extension, extensions } from "vscode";
-import { Constants } from "../../Constants";
-import { IExtensionAdapter } from "./IExtensionAdapter";
+import semver from "semver";
+import {commands, Extension, extensions} from "vscode";
+import {Constants} from "../../Constants";
+import {IExtensionAdapter} from "./IExtensionAdapter";
 
 export class OpenZeppelinExtensionAdapter implements IExtensionAdapter {
   private extensionInfo: any;

@@ -5,9 +5,9 @@
 
 declare var global: any;
 
-import * as fs from "fs";
-import * as glob from "glob";
-import * as paths from "path";
+import fs from "fs";
+import glob from "glob";
+import paths from "path";
 
 const istanbul = require("istanbul");
 const Mocha = require("mocha");
@@ -57,13 +57,13 @@ function run(testsRoot: string, clb: any): any {
   }
 
   // Glob test files
-  glob("**/**.test.js", { cwd: testsRoot }, (error, files): any => {
+  glob("**/**.test.js", {cwd: testsRoot}, (error: any, files: any): any => {
     if (error) {
       return clb(error);
     }
     try {
       // Fill into Mocha
-      files.forEach((f): Mocha => mocha.addFile(paths.join(testsRoot, f)));
+      files.forEach((f: any): Mocha => mocha.addFile(paths.join(testsRoot, f)));
       // Run the tests
       let failureCount = 0;
 
@@ -104,7 +104,7 @@ class CoverageRunner {
     // Set up Code Coverage, hooking require so that instrumented code is returned
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
-    self.instrumenter = new istanbul.Instrumenter({ coverageVariable: self.coverageVar });
+    self.instrumenter = new istanbul.Instrumenter({coverageVariable: self.coverageVar});
     const sourceRoot = paths.join(self.testsRoot, self.options.relativeSourcePath);
 
     // Glob source files
@@ -136,7 +136,7 @@ class CoverageRunner {
     // are required, the instrumented version is pulled in instead. These instrumented versions
     // write to a global coverage variable with hit counts whenever they are accessed
     self.transformer = self.instrumenter.instrumentSync.bind(self.instrumenter);
-    const hookOpts = { verbose: false, extensions: [".js"] };
+    const hookOpts = {verbose: false, extensions: [".js"]};
     istanbul.hook.hookRequire(self.matchFn, self.transformer, hookOpts);
 
     // initialize the global variable to stop mocha from complaining about leaks

@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as os from "os";
-import * as path from "path";
-import { ExtensionContext, extensions } from "vscode";
-import { IOZAsset } from "./services/openZeppelin/models";
+import os from "os";
+import path from "path";
+import {ExtensionContext, extensions} from "vscode";
+import {IOZAsset} from "./services/openZeppelin/models";
 
 const extensionId = "trufflesuite-csi.trufflesuite-vscode";
 const packageJSON = extensions.getExtension(extensionId)!.packageJSON;
@@ -98,7 +98,7 @@ export class Constants {
   };
 
   // Values are quite brittle and don't map directly to the requirements.html screen.
-  public static requiredVersions: { [key: string]: string | { min: string; max: string } } = {
+  public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
     [RequiredApps.ganache]: {
       max: "7.1.0",
       min: "6.0.0",
@@ -248,18 +248,18 @@ export class Constants {
       azure: {
         member: {
           contextValue: "member",
-          iconPath: { dark: "", light: "" },
+          iconPath: {dark: "", light: ""},
         },
       },
       bdm: {
         input: {
           contextValue: "inputGroup",
-          iconPath: { dark: "", light: "" },
+          iconPath: {dark: "", light: ""},
           label: "Inputs",
         },
         output: {
           contextValue: "outputGroup",
-          iconPath: { dark: "", light: "" },
+          iconPath: {dark: "", light: ""},
           label: "Outputs",
         },
       },
@@ -267,84 +267,84 @@ export class Constants {
     network: {
       azure: {
         contextValue: "network",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       bdm: {
         application: {
           contextValue: "bdmApplication",
-          iconPath: { dark: "", light: "" },
+          iconPath: {dark: "", light: ""},
         },
         input: {
           contextValue: "input",
-          iconPath: { dark: "", light: "" },
+          iconPath: {dark: "", light: ""},
         },
         output: {
           contextValue: "output",
-          iconPath: { dark: "", light: "" },
+          iconPath: {dark: "", light: ""},
         },
       },
       default: {
         contextValue: "network",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       infura: {
         contextValue: "network",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       local: {
         contextValue: "localnetwork",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
     },
     project: {
       azure: {
         contextValue: "project",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       bdm: {
         contextValue: "bdmproject",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       default: {
         contextValue: "project",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       infura: {
         contextValue: "project",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       local: {
         contextValue: "localproject",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
     },
     service: {
       azure: {
         contextValue: "service",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
         label: "Azure Service",
         prefix: "abs",
       },
       bdm: {
         contextValue: "service",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
         label: "Blockchain Data Manager",
         prefix: "bdm",
       },
       default: {
         contextValue: "service",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
         label: "Default Service",
       },
       infura: {
         contextValue: "service",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
         label: "Infura Service",
         prefix: "inf",
       },
       local: {
         contextValue: "service",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
         label: "Local Service",
         prefix: "loc",
       },
@@ -504,7 +504,7 @@ export class Constants {
 
   // More information see here
   // https://ethereum.stackexchange.com/questions/17051/how-to-select-a-network-id-or-is-there-a-list-of-network-ids
-  public static infuraEndpointsIds: { [key: string]: number } = {
+  public static infuraEndpointsIds: {[key: string]: number} = {
     goerli: 5,
     kovan: 42,
     mainnet: 1,
@@ -712,9 +712,9 @@ export class Constants {
   };
 
   public static azureApps = {
-    AzureFunction: { label: "Azure Function", serviceType: 2, outputDir: "generatedAzureFunction" },
-    FlowApp: { label: "Flow App", serviceType: 0, outputDir: "generatedFlowApp" },
-    LogicApp: { label: "Logic App", serviceType: 1, outputDir: "generatedLogicApp" },
+    AzureFunction: {label: "Azure Function", serviceType: 2, outputDir: "generatedAzureFunction"},
+    FlowApp: {label: "Flow App", serviceType: 0, outputDir: "generatedFlowApp"},
+    LogicApp: {label: "Logic App", serviceType: 1, outputDir: "generatedLogicApp"},
   };
 
   public static azureApiVersions = {

@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as fs from "fs-extra";
-import * as path from "path";
-import { ContractInstanceWithMetadata } from "../src/services";
-import { Contract } from "../src/services/contract/Contract";
+import assert from "assert";
+import fs from "fs-extra";
+import path from "path";
+import {ContractInstanceWithMetadata} from "../src/services";
+import {Contract} from "../src/services/contract/Contract";
 
 describe("ContractInstanceWithMetadata ExtractEnumsInfo tests", () => {
   const testContractFilePath = path.join(__dirname, "testData", "enumTestContract.json");
@@ -18,7 +18,7 @@ describe("ContractInstanceWithMetadata ExtractEnumsInfo tests", () => {
     // Act and Assert
     assert.doesNotThrow(() => {
       // @ts-ignore
-      const instance = new ContractInstanceWithMetadata(contract, { id: "testNetworkKey" }, null);
+      const instance = new ContractInstanceWithMetadata(contract, {id: "testNetworkKey"}, null);
     }, "ExtractEnumsInfo() failed the ContractInstance constructor");
   });
 
@@ -48,7 +48,7 @@ describe("ContractInstanceWithMetadata ExtractEnumsInfo tests", () => {
     before(() => {
       const fileData = fs.readFileSync(testContractFilePath, "utf-8");
       const contract = new Contract(JSON.parse(fileData));
-      instance = new ContractInstanceWithMetadata(contract, { id: "testNetworkKey" }, null);
+      instance = new ContractInstanceWithMetadata(contract, {id: "testNetworkKey"}, null);
     });
 
     it("methods parameters section", async () => {
@@ -75,7 +75,7 @@ describe("ContractInstanceWithMetadata ExtractEnumsInfo tests", () => {
       );
       assert.deepStrictEqual(
         instance.enumsInfo.methods.SendRequest,
-        { state: stateEnumCollection },
+        {state: stateEnumCollection},
         "Arguments for SendRequest method are extracted incorrect"
       );
       assert.deepStrictEqual(

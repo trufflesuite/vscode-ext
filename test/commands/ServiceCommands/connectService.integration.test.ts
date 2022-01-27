@@ -1,18 +1,18 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import rewire = require("rewire");
-import * as sinon from "sinon";
-import * as uuid from "uuid";
-import * as vscode from "vscode";
-import { Constants } from "../../../src/Constants";
-import { ItemType } from "../../../src/Models";
-import { AzureBlockchainService, InfuraProject, Project } from "../../../src/Models/TreeItems";
-import { InfuraResourceExplorer } from "../../../src/resourceExplorers";
-import { GanacheService, TreeManager } from "../../../src/services";
-import { AzureAccountHelper } from "../../testHelpers/AzureAccountHelper";
-const { project } = Constants.treeItemData;
+import assert from "assert";
+import rewire from "rewire";
+import sinon from "sinon";
+import uuid from "uuid";
+import vscode from "vscode";
+import {Constants} from "../../../src/Constants";
+import {ItemType} from "../../../src/Models";
+import {AzureBlockchainService, InfuraProject, Project} from "../../../src/Models/TreeItems";
+import {InfuraResourceExplorer} from "../../../src/resourceExplorers";
+import {GanacheService, TreeManager} from "../../../src/services";
+import {AzureAccountHelper} from "../../testHelpers/AzureAccountHelper";
+const {project} = Constants.treeItemData;
 
 describe("Service Commands", () => {
   let vscodeWindowMock: sinon.SinonMock;
@@ -48,7 +48,7 @@ describe("Service Commands", () => {
 
         startGanacheServerStub = sinon
           .stub(GanacheService, "startGanacheServer")
-          .callsFake(() => Promise.resolve({ pid: 1234, port: 4321 }));
+          .callsFake(() => Promise.resolve({pid: 1234, port: 4321}));
 
         sinon.stub(GanacheService, "getPortStatus").resolves(GanacheService.PortStatus.FREE);
 

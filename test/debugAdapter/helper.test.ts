@@ -1,14 +1,14 @@
-import * as assert from "assert";
-import { platform } from "os";
+import assert from "assert";
+import {platform} from "os";
 import * as helpers from "../../src/debugAdapter/helpers";
 
 describe("helpers unit tests", () => {
   it("groupBy should return correct result", () => {
     const keyValue1 = "1";
     const keyValue2 = "2";
-    const elA = { a: keyValue1, b: 1 };
-    const elB = { a: keyValue1, b: 2 };
-    const elC = { a: keyValue2, b: 3 };
+    const elA = {a: keyValue1, b: 1};
+    const elB = {a: keyValue1, b: 2};
+    const elC = {a: keyValue2, b: 3};
     const arrayMock = [elA, elB, elC];
     const groups = helpers.groupBy(arrayMock, "a");
 

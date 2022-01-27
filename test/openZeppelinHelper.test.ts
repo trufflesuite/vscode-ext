@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import rewire = require("rewire");
-import * as sinon from "sinon";
+import assert from "assert";
+import rewire from "rewire";
+import sinon from "sinon";
 import * as helpers from "../src/helpers";
-import { OpenZeppelinService } from "../src/services";
-import { IOZAsset, IOZContractCategory } from "../src/services/openZeppelin/models";
-import { OpenZeppelinManifest } from "../src/services/openZeppelin/OpenZeppelinManifest";
+import {OpenZeppelinService} from "../src/services";
+import {IOZAsset, IOZContractCategory} from "../src/services/openZeppelin/models";
+import {OpenZeppelinManifest} from "../src/services/openZeppelin/OpenZeppelinManifest";
 
 describe("OpenZeppelinHelper", () => {
   afterEach(() => {

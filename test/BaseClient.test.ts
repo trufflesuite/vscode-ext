@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import { ServiceClientCredentials } from "ms-rest";
-import * as msrestazure from "ms-rest-azure";
-import * as sinon from "sinon";
-import * as uuid from "uuid";
-import { BaseClient } from "../src/ARMBlockchain/BaseClient";
-import { Constants } from "../src/Constants";
+import assert from "assert";
+import {ServiceClientCredentials} from "ms-rest";
+import msrestazure from "ms-rest-azure";
+import sinon from "sinon";
+import uuid from "uuid";
+import {BaseClient} from "../src/ARMBlockchain/BaseClient";
+import {Constants} from "../src/Constants";
 
 describe("Unit tests for BaseClient", () => {
   let credentials: ServiceClientCredentials;

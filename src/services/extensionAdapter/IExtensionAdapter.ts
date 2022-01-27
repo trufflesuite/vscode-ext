@@ -3,6 +3,6 @@
 
 export interface IExtensionAdapter {
   validateExtension: () => Promise<void>;
-  build: () => Promise<void>;
+  build: (...args: Array<string>) => Promise<void>;
   deploy: () => Promise<void>;
 }

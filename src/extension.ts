@@ -1,8 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { commands, ExtensionContext, Uri, window, workspace } from "vscode";
+import {commands, ExtensionContext, Uri, window, workspace} from "vscode";
 import {
+  DebuggerCommands,
   GanacheCommands,
   InfuraCommands,
   OpenZeppelinCommands,
@@ -11,11 +12,11 @@ import {
   ServiceCommands,
   TruffleCommands,
 } from "./commands";
-import { Constants } from "./Constants";
-import { CommandContext, isWorkspaceOpen, openZeppelinHelper, required, setCommandContext } from "./helpers";
-import { CancellationEvent } from "./Models";
-import { Output } from "./Output";
-import { ChangelogPage, RequirementsPage, WelcomePage } from "./pages";
+import {Constants} from "./Constants";
+import {CommandContext, isWorkspaceOpen, openZeppelinHelper, required, setCommandContext} from "./helpers";
+import {CancellationEvent} from "./Models";
+import {Output} from "./Output";
+import {ChangelogPage, RequirementsPage, WelcomePage} from "./pages";
 import {
   AdapterType,
   ContractDB,
@@ -25,10 +26,10 @@ import {
   TreeManager,
   TreeService,
 } from "./services";
-import { Telemetry } from "./TelemetryClient";
-import { NetworkNodeView, ProjectView } from "./ViewItems";
+import {Telemetry} from "./TelemetryClient";
+import {NetworkNodeView, ProjectView} from "./ViewItems";
 
-import { DebuggerConfiguration } from "./debugAdapter/configuration/debuggerConfiguration";
+import {DebuggerConfiguration} from "./debugAdapter/configuration/debuggerConfiguration";
 
 export async function activate(context: ExtensionContext) {
   if (process.env.CODE_TEST) {
@@ -41,8 +42,7 @@ export async function activate(context: ExtensionContext) {
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
   TreeManager.initialize(context.globalState);
-  // FIXME: i think this is breaking things..
-  TreeService.initialize("AzureBlockchain");
+  TreeService.initialize("Trufflesuite");
   await sdkCoreCommands.initialize(context.globalState);
 
   setCommandContext(CommandContext.Enabled, true);
@@ -193,9 +193,9 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region debugger commands
-  // const startDebugger = commands.registerCommand('extension.truffle.debugTransaction', async () => {
-  //   await tryExecute(() => DebuggerCommands.startSolidityDebugger());
-  // });
+  const startDebugger = commands.registerCommand("extension.truffle.debugTransaction", async () => {
+    await tryExecute(() => DebuggerCommands.startSolidityDebugger());
+  });
   //#endregion
 
   //#region other subscriptions
@@ -222,6 +222,7 @@ export async function activate(context: ExtensionContext) {
     copyDeployedByteCode,
     copyABI,
     copyRPCEndpointAddress,
+    startDebugger,
     startGanacheServer,
     stopGanacheServer,
     // generateMicroservicesWorkflows,

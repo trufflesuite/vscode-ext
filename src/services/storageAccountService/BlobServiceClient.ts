@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { HttpMethods, WebResource } from "ms-rest";
-import * as requestPromise from "request-promise";
-import { Constants } from "../../Constants";
-import { Telemetry } from "../../TelemetryClient";
+import {HttpMethods, WebResource} from "ms-rest";
+import requestPromise from "request-promise";
+import {Constants} from "../../Constants";
+import {Telemetry} from "../../TelemetryClient";
 
 class BlobClient {
   public async createBlob(
@@ -55,7 +55,7 @@ class BlobClient {
     url: string,
     method: HttpMethods,
     body?: string,
-    headers: { [key: string]: string } = {}
+    headers: {[key: string]: string} = {}
   ): WebResource {
     const httpRequest = new WebResource();
 
@@ -70,9 +70,9 @@ class BlobClient {
   private async sendRequest(params: any = {}): Promise<any> {
     let responseBody;
     try {
-      responseBody = await requestPromise({ ...params });
+      responseBody = await requestPromise({...params});
     } catch (error) {
-      if (!error.message.includes("ContainerNotFound")) {
+      if (!(error as Error).message.includes("ContainerNotFound")) {
         Telemetry.sendException(new Error("BlobServiceClient.sendRequest.error"));
       }
 
@@ -84,7 +84,7 @@ class BlobClient {
       return responseBody ? JSON.parse(responseBody) : null;
     } catch (error) {
       Telemetry.sendException(new Error("Invalid JSON"));
-      throw new Error(`Error '${error.message}' occurred in deserialize the responseBody`);
+      throw new Error(`Error '${(error as Error).message}' occurred in deserialize the responseBody`);
     }
   }
 }

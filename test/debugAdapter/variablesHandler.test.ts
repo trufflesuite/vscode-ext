@@ -1,7 +1,7 @@
-import * as assert from "assert";
-import * as sinon from "sinon";
-import { Handles } from "vscode-debugadapter";
-import { OBJECT_VARIABLE_DISPLAY_NAME, SCOPES } from "../../src/debugAdapter/constants/variablesView";
+import assert from "assert";
+import sinon from "sinon";
+import {Handles} from "vscode-debugadapter";
+import {OBJECT_VARIABLE_DISPLAY_NAME, SCOPES} from "../../src/debugAdapter/constants/variablesView";
 import RuntimeInterface from "../../src/debugAdapter/runtimeInterface";
 import VariablesHandler from "../../src/debugAdapter/variablesHandler";
 
@@ -14,7 +14,7 @@ describe("VariablesHandler unit tests", () => {
   describe("getVariableAttributesByVariableRef - when SCOPES.all.ref is requested", () => {
     it("getVariableAttributesByVariableRef should pass when variables contain array property", async () => {
       // Arrange
-      sinon.stub(RuntimeInterface.prototype, "variables").resolves({ [arrayProp.key]: arrayProp.value });
+      sinon.stub(RuntimeInterface.prototype, "variables").resolves({[arrayProp.key]: arrayProp.value});
       // Act
       const variablesHandler = new VariablesHandler(runtimeInterface);
       const result = await variablesHandler.getVariableAttributesByVariableRef(SCOPES.all.ref);
@@ -27,7 +27,7 @@ describe("VariablesHandler unit tests", () => {
 
     it("getVariableAttributesByVariableRef should pass when variables contain boolean property", async () => {
       // Arrange
-      sinon.stub(RuntimeInterface.prototype, "variables").resolves({ [boolProp.key]: boolProp.value });
+      sinon.stub(RuntimeInterface.prototype, "variables").resolves({[boolProp.key]: boolProp.value});
       // Act
       const variablesHandler = new VariablesHandler(runtimeInterface);
       const result = await variablesHandler.getVariableAttributesByVariableRef(SCOPES.all.ref);
@@ -40,7 +40,7 @@ describe("VariablesHandler unit tests", () => {
 
     it("getVariableAttributesByVariableRef should pass when variables contain null property", async () => {
       // Arrange
-      sinon.stub(RuntimeInterface.prototype, "variables").resolves({ [nullProp.key]: nullProp.value });
+      sinon.stub(RuntimeInterface.prototype, "variables").resolves({[nullProp.key]: nullProp.value});
       // Act
       const variablesHandler = new VariablesHandler(runtimeInterface);
       const result = await variablesHandler.getVariableAttributesByVariableRef(SCOPES.all.ref);
@@ -53,7 +53,7 @@ describe("VariablesHandler unit tests", () => {
 
     it("getVariableAttributesByVariableRef should pass when variables contain number property", async () => {
       // Arrange
-      sinon.stub(RuntimeInterface.prototype, "variables").resolves({ [numProp.key]: numProp.value });
+      sinon.stub(RuntimeInterface.prototype, "variables").resolves({[numProp.key]: numProp.value});
       // Act
       const variablesHandler = new VariablesHandler(runtimeInterface);
       const result = await variablesHandler.getVariableAttributesByVariableRef(SCOPES.all.ref);
@@ -66,7 +66,7 @@ describe("VariablesHandler unit tests", () => {
 
     it("getVariableAttributesByVariableRef should pass when variables contain object property", async () => {
       // Arrange
-      sinon.stub(RuntimeInterface.prototype, "variables").resolves({ [objProp.key]: objProp.value });
+      sinon.stub(RuntimeInterface.prototype, "variables").resolves({[objProp.key]: objProp.value});
       const generateVariablesAttrKeyStub = sinon.stub(VariablesHandler.prototype, "generateVariablesAttrKey" as any);
       // Act
       const variablesHandler = new VariablesHandler(runtimeInterface);
@@ -89,7 +89,7 @@ describe("VariablesHandler unit tests", () => {
 
     it("getVariableAttributesByVariableRef should call handles.create when variables contain object property", async () => {
       // Arrange
-      sinon.stub(RuntimeInterface.prototype, "variables").resolves({ [objProp.key]: objProp.value });
+      sinon.stub(RuntimeInterface.prototype, "variables").resolves({[objProp.key]: objProp.value});
       const variablePath = `/${objProp.key}`;
       const handlesCreateStub = sinon.stub(Handles.prototype, "create").returns(123);
       // Act
@@ -113,7 +113,7 @@ describe("VariablesHandler unit tests", () => {
 
     it("getVariableAttributesByVariableRef should pass when variables contain string property", async () => {
       // Arrange
-      sinon.stub(RuntimeInterface.prototype, "variables").resolves({ [stringProp.key]: stringProp.value });
+      sinon.stub(RuntimeInterface.prototype, "variables").resolves({[stringProp.key]: stringProp.value});
       // Act
       const variablesHandler = new VariablesHandler(runtimeInterface);
       const result = await variablesHandler.getVariableAttributesByVariableRef(SCOPES.all.ref);
@@ -126,7 +126,7 @@ describe("VariablesHandler unit tests", () => {
 
     it("getVariableAttributesByVariableRef should pass when variables contain undefined property", async () => {
       // Arrange
-      sinon.stub(RuntimeInterface.prototype, "variables").resolves({ [undefinedProp.key]: undefinedProp.value });
+      sinon.stub(RuntimeInterface.prototype, "variables").resolves({[undefinedProp.key]: undefinedProp.value});
       // Act
       const variablesHandler = new VariablesHandler(runtimeInterface);
       const result = await variablesHandler.getVariableAttributesByVariableRef(SCOPES.all.ref);
@@ -142,10 +142,10 @@ describe("VariablesHandler unit tests", () => {
   it("getVariableAttributesByVariableRef should pass when variableReference is not SCOPE.all.ref", async () => {
     // Arrange
     const nestedVariableReference = 987;
-    const nestedObjectTestProperty = { key: "Test", value: "Test" };
-    const nestedObjectValue = { [nestedObjectTestProperty.key]: nestedObjectTestProperty.value };
-    const nestedObject = { key: "NestedVariable", value: nestedObjectValue };
-    const objectVariable = { key: "TestVariable", value: { [nestedObject.key]: nestedObject.value } };
+    const nestedObjectTestProperty = {key: "Test", value: "Test"};
+    const nestedObjectValue = {[nestedObjectTestProperty.key]: nestedObjectTestProperty.value};
+    const nestedObject = {key: "NestedVariable", value: nestedObjectValue};
+    const objectVariable = {key: "TestVariable", value: {[nestedObject.key]: nestedObject.value}};
     // variables structure:
     // variables = {
     //   TestVariable: {
@@ -154,7 +154,7 @@ describe("VariablesHandler unit tests", () => {
     //     },
     //   },
     // }
-    sinon.stub(RuntimeInterface.prototype, "variables").resolves({ [objectVariable.key]: objectVariable.value });
+    sinon.stub(RuntimeInterface.prototype, "variables").resolves({[objectVariable.key]: objectVariable.value});
     sinon
       .stub(Handles.prototype, "get")
       .withArgs(nestedVariableReference)
@@ -176,7 +176,7 @@ describe("VariablesHandler unit tests", () => {
     it("should pass when expression is simple", async () => {
       // Arrange
       const variableKey = "key";
-      const variables = { [variableKey]: "test" };
+      const variables = {[variableKey]: "test"};
       sinon.stub(RuntimeInterface.prototype, "variables").resolves(variables);
       const testExpression = variableKey;
 
@@ -221,10 +221,10 @@ describe("VariablesHandler unit tests", () => {
   });
 });
 
-const arrayProp = { key: "arrayProp", value: [1, 2] };
-const boolProp = { key: "boolProp", value: true };
-const nullProp = { key: "nullProp", value: null };
-const numProp = { key: "numProp", value: 123 };
-const objProp = { key: "objProp", value: { a: 1 } };
-const stringProp = { key: "stringProp", value: "test" };
-const undefinedProp = { key: "undefinedProp", value: undefined };
+const arrayProp = {key: "arrayProp", value: [1, 2]};
+const boolProp = {key: "boolProp", value: true};
+const nullProp = {key: "nullProp", value: null};
+const numProp = {key: "numProp", value: 123};
+const objProp = {key: "objProp", value: {a: 1}};
+const stringProp = {key: "stringProp", value: "test"};
+const undefinedProp = {key: "undefinedProp", value: undefined};

@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as uuid from "uuid";
-import * as vscode from "vscode";
-import { AzureAccount } from "../../src/azure-account.api";
+import uuid from "uuid";
+import vscode from "vscode";
+import {AzureAccount} from "../../src/azure-account.api";
 
 export namespace AzureAccountHelper {
   export const mockExtension: vscode.Extension<AzureAccount> = {

@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as uuid from "uuid";
-import { Contract } from "./Contract";
-import { Network } from "./Network";
+import uuid from "uuid";
+import {Contract} from "./Contract";
+import {Network} from "./Network";
 
 export class ContractInstance {
   public readonly id: string;

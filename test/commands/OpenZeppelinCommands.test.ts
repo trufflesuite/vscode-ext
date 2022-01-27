@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as path from "path";
-import rewire = require("rewire");
-import * as sinon from "sinon";
+import assert from "assert";
+import path from "path";
+import rewire from "rewire";
+import sinon from "sinon";
 import uuid = require("uuid");
 import {
   CancellationToken,
@@ -16,12 +16,12 @@ import {
   QuickPickOptions,
   window,
 } from "vscode";
-import { Constants } from "../../src/Constants";
+import {Constants} from "../../src/Constants";
 import * as helpers from "../../src/helpers";
-import { openZeppelinHelper } from "../../src/helpers";
-import { TruffleConfiguration } from "../../src/helpers/truffleConfig";
-import { CancellationEvent } from "../../src/Models";
-import { OpenZeppelinMigrationsService, OpenZeppelinService } from "../../src/services";
+import {openZeppelinHelper} from "../../src/helpers";
+import {TruffleConfiguration} from "../../src/helpers/truffleConfig";
+import {CancellationEvent} from "../../src/Models";
+import {OpenZeppelinMigrationsService, OpenZeppelinService} from "../../src/services";
 import {
   IDownloadingResult,
   IOZAsset,
@@ -29,7 +29,7 @@ import {
   OZAssetType,
   PromiseState,
 } from "../../src/services/openZeppelin/models";
-import { OpenZeppelinManifest } from "../../src/services/openZeppelin/OpenZeppelinManifest";
+import {OpenZeppelinManifest} from "../../src/services/openZeppelin/OpenZeppelinManifest";
 
 describe("OpenZeppelinCommands tests", () => {
   let testCategories: IOZContractCategory[];
@@ -81,7 +81,7 @@ describe("OpenZeppelinCommands tests", () => {
 
     sinon
       .stub(TruffleConfiguration.TruffleConfig.prototype, "getConfiguration")
-      .returns(Promise.resolve({ contracts_directory: uuid.v4() } as TruffleConfiguration.IConfiguration));
+      .returns(Promise.resolve({contracts_directory: uuid.v4()} as TruffleConfiguration.IConfiguration));
 
     getAssetsStatusStub = sinon.stub(OpenZeppelinService, "getAssetsStatus");
     downloadAssetsAsyncStub = sinon.stub(OpenZeppelinService, "downloadAssetsAsync");
@@ -94,7 +94,7 @@ describe("OpenZeppelinCommands tests", () => {
     sinon.stub(openZeppelinHelper, "tryGetCurrentOpenZeppelinVersionAsync").resolves("version");
     sinon.stub(openZeppelinHelper, "createManifestAsync").resolves(mockOpenZeppelinManifest);
 
-    getAssetsStatusStub.returns({ existing: [], missing: testAssets });
+    getAssetsStatusStub.returns({existing: [], missing: testAssets});
 
     showQuickPickStub = sinon.stub(window, "showQuickPick");
     showInformationMessageStub = sinon.stub(window, "showInformationMessage");
@@ -278,10 +278,10 @@ describe("OpenZeppelinCommands tests", () => {
   it("addCategory should show error message if some files failed on downloading and allow to retry", async () => {
     // Arrange
     const rejectedAssets = [
-      { asset: {} as IOZAsset, state: PromiseState.rejected },
-      { asset: {} as IOZAsset, state: PromiseState.rejected },
+      {asset: {} as IOZAsset, state: PromiseState.rejected},
+      {asset: {} as IOZAsset, state: PromiseState.rejected},
     ];
-    downloadAssetsAsyncStub.resolves([{ asset: {} as IOZAsset, state: PromiseState.fulfilled }, ...rejectedAssets]);
+    downloadAssetsAsyncStub.resolves([{asset: {} as IOZAsset, state: PromiseState.fulfilled}, ...rejectedAssets]);
     showErrorMessageStub
       .onCall(0)
       .returns(Constants.openZeppelin.retryButtonTitle)

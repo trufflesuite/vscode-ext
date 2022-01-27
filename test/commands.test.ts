@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import assert = require("assert");
-import * as cp from "child_process";
-import events = require("events");
-import * as os from "os";
-import rewire = require("rewire");
-import * as sinon from "sinon";
-import stream = require("stream");
+import assert from "assert";
+import cp from "child_process";
+import events from "events";
+import os from "os";
+import rewire from "rewire";
+import sinon from "sinon";
+import stream from "stream";
 import * as outputCommandHelper from "../src/helpers/command";
 
 describe("Commands helper", () => {
@@ -19,8 +19,8 @@ describe("Commands helper", () => {
   });
 
   const cases = [
-    { workingDirectory: "defined", tmpdirExecuted: false },
-    { workingDirectory: undefined, tmpdirExecuted: true },
+    {workingDirectory: "defined", tmpdirExecuted: false},
+    {workingDirectory: undefined, tmpdirExecuted: true},
   ];
 
   cases.forEach((testCase) => {
@@ -65,7 +65,7 @@ describe("Commands helper", () => {
       // eslint-disable-next-line no-async-promise-executor
       await new Promise<void>(async (resolve) => {
         setTimeout(async () => {
-          await processMock.stdout.emit("data", "test stdout");
+          await processMock.stdout!.emit("data", "test stdout");
           await processMock.emit("exit", 0);
           resolve();
         }, 500);
@@ -91,7 +91,7 @@ describe("Commands helper", () => {
       // eslint-disable-next-line no-async-promise-executor
       await new Promise<void>(async (resolve) => {
         setTimeout(async () => {
-          await processMock.stderr.emit("data", "test stdout");
+          await processMock.stderr!.emit("data", "test stdout");
           await processMock.emit("exit", 0);
           resolve();
         }, 500);
@@ -121,7 +121,7 @@ describe("Commands helper", () => {
       // eslint-disable-next-line no-async-promise-executor
       await new Promise<void>(async (resolve) => {
         setTimeout(async () => {
-          await processMock.stderr.emit("data", "test stdout");
+          await processMock.stderr!.emit("data", "test stdout");
           await processMock.emit("close", 0);
           resolve();
         }, 500);
@@ -177,7 +177,7 @@ describe("Commands helper", () => {
 
   describe("tryExecuteCommandInFork", () => {
     const modulePath = "some_path";
-    const messageData = { command: "truffleConfig", message: "{ result: 'some message data' }" };
+    const messageData = {command: "truffleConfig", message: "{ result: 'some message data' }"};
 
     let childProcessMock: sinon.SinonMock;
     let processMock: cp.ChildProcess;

@@ -7,13 +7,13 @@
 import * as acorn from "acorn";
 // @ts-ignore
 import * as walk from "acorn-walk";
-import { generate } from "astring";
-import * as bip39 from "bip39";
-import * as crypto from "crypto";
-import * as ESTree from "estree";
-import * as fs from "fs-extra";
-import * as path from "path";
-import { tryExecuteCommandInFork } from "./cmdCommandExecutor";
+import {generate} from "astring";
+import {entropyToMnemonic} from "bip39";
+import crypto from "crypto";
+import ESTree from "estree";
+import fs from "fs-extra";
+import path from "path";
+import {tryExecuteCommandInFork} from "./cmdCommandExecutor";
 
 export namespace ConfigurationReader {
   const notAllowedSymbols = new RegExp(
@@ -110,6 +110,7 @@ export namespace ConfigurationReader {
 
   export interface IConfiguration {
     contracts_directory: string;
+    build_directory: string;
     contracts_build_directory: string;
     migrations_directory: string;
     networks?: INetwork[];
@@ -120,7 +121,7 @@ export namespace ConfigurationReader {
   }
 
   export function generateMnemonic(): string {
-    return bip39.entropyToMnemonic(crypto.randomBytes(16).toString("hex"));
+    return entropyToMnemonic(crypto.randomBytes(16).toString("hex"));
   }
 
   /**
@@ -151,7 +152,7 @@ export namespace ConfigurationReader {
     }
 
     public writeAST(): void {
-      return fs.writeFileSync(this.filePath, generate(this.ast, { comments: true }));
+      return fs.writeFileSync(this.filePath, generate(this.ast, {comments: true}));
     }
 
     public getNetworks(): INetwork[] {
@@ -265,6 +266,7 @@ export namespace ConfigurationReader {
 
   function getDefaultConfiguration(): IConfiguration {
     return {
+      build_directory: path.join("./", "build"),
       contracts_build_directory: path.join("./", "build", "contracts"),
       contracts_directory: path.join("./", "contracts"),
       migrations_directory: path.join("./", "migrations"),
@@ -488,9 +490,11 @@ export namespace ConfigurationReader {
     };
   }
 
-  function jsonToConfiguration(truffleConfig: { [key: string]: any }): IConfiguration {
-    const { contracts_directory, contracts_build_directory, migrations_directory } = getDefaultConfiguration();
+  function jsonToConfiguration(truffleConfig: {[key: string]: any}): IConfiguration {
+    const {build_directory, contracts_directory, contracts_build_directory, migrations_directory} =
+      getDefaultConfiguration();
 
+    truffleConfig.build_directory = truffleConfig.build_directory || build_directory;
     truffleConfig.contracts_directory = truffleConfig.contracts_directory || contracts_directory;
     truffleConfig.contracts_build_directory = truffleConfig.contracts_build_directory || contracts_build_directory;
     truffleConfig.migrations_directory = truffleConfig.migrations_directory || migrations_directory;

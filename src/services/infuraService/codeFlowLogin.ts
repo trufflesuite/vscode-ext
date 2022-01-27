@@ -1,15 +1,15 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as crypto from "crypto";
-import * as fs from "fs-extra";
-import * as http from "http";
-import * as open from "open";
-import * as querystring from "querystring";
-import * as requestPromise from "request-promise";
-import * as url from "url";
-import { Constants } from "../../Constants";
-import { Telemetry } from "../../TelemetryClient";
+import crypto from "crypto";
+import fs from "fs-extra";
+import http from "http";
+import open from "open";
+import querystring from "querystring";
+import requestPromise from "request-promise";
+import url from "url";
+import {Constants} from "../../Constants";
+import {Telemetry} from "../../TelemetryClient";
 
 interface IDeferred<T> {
   resolve: (result: T | Promise<T>) => void;
@@ -33,12 +33,12 @@ const commonRequestParams = {
 };
 
 export async function signIn() {
-  const { server, codePromise } = createServer();
+  const {server, codePromise} = createServer();
 
   try {
     await startServer(server);
 
-    const authParams = { response_type: "code", state: crypto.randomBytes(20).toString("hex") };
+    const authParams = {response_type: "code", state: crypto.randomBytes(20).toString("hex")};
     const authorizationUrl = new url.URL(Constants.infuraAuthUrls.authURL, Constants.infuraAuthUrls.baseURL);
 
     authorizationUrl.search = queryString(authParams);
@@ -49,7 +49,7 @@ export async function signIn() {
 
     return await getToken(code);
   } catch (error) {
-    Telemetry.sendException(error);
+    Telemetry.sendException(error as Error);
     throw error;
   } finally {
     setTimeout(() => server.close(), closeTimeout);
@@ -57,24 +57,24 @@ export async function signIn() {
 }
 
 export async function signOut(token: string): Promise<void> {
-  const queryParams = queryString({ grant_type: Constants.infuraRequestGrantType.authorizationCode, token });
-  const options = { body: queryParams, headers: { "Content-Type": "application/x-www-form-urlencoded" } };
+  const queryParams = queryString({grant_type: Constants.infuraRequestGrantType.authorizationCode, token});
+  const options = {body: queryParams, headers: {"Content-Type": "application/x-www-form-urlencoded"}};
   const requestUrl = new url.URL(Constants.infuraAuthUrls.revoke, Constants.infuraAuthUrls.baseURL);
 
   requestPromise.post(requestUrl.toString(), options);
 }
 
 export async function refreshToken(token: string): Promise<IToken> {
-  return await tokenRequest({ grant_type: Constants.infuraRequestGrantType.refreshToken, refresh_token: token });
+  return await tokenRequest({grant_type: Constants.infuraRequestGrantType.refreshToken, refresh_token: token});
 }
 
 async function getToken(code: string): Promise<IToken> {
-  return await tokenRequest({ code, grant_type: Constants.infuraRequestGrantType.authorizationCode });
+  return await tokenRequest({code, grant_type: Constants.infuraRequestGrantType.authorizationCode});
 }
 
 async function tokenRequest(params: any): Promise<IToken> {
   const queryParams = queryString(params);
-  const options = { body: queryParams, headers: { "Content-Type": "application/x-www-form-urlencoded" } };
+  const options = {body: queryParams, headers: {"Content-Type": "application/x-www-form-urlencoded"}};
   const requestUrl = new url.URL(Constants.infuraAuthUrls.tokenURL, Constants.infuraAuthUrls.baseURL);
   const response = await requestPromise.post(requestUrl.toString(), options);
   const result = JSON.parse(response);
@@ -97,7 +97,7 @@ function queryString(options: any): string {
 
 function createServer() {
   let deferredCode: IDeferred<string>;
-  const codePromise = new Promise<string>((resolve, reject) => (deferredCode = { resolve, reject }));
+  const codePromise = new Promise<string>((resolve, reject) => (deferredCode = {resolve, reject}));
   const codeTimer = setTimeout(() => deferredCode.reject(new Error("Timeout waiting for code")), defaultTimeout);
   const cancelCodeTimer = () => clearTimeout(codeTimer);
 
@@ -110,11 +110,11 @@ function createServer() {
 
         if (!error && code) {
           deferredCode.resolve(code);
-          res.writeHead(302, { Location: "/" });
+          res.writeHead(302, {Location: "/"});
         } else {
           const err = new Error(error || "No code received.");
           deferredCode.reject(err);
-          res.writeHead(302, { Location: `/?error=${querystring.escape(err.message)}` });
+          res.writeHead(302, {Location: `/?error=${querystring.escape(err.message)}`});
         }
         res.end();
         break;
@@ -142,7 +142,7 @@ function createServer() {
 
 function startServer(server: http.Server): Promise<number> {
   let deferredCode: IDeferred<number>;
-  const portPromise = new Promise<number>((resolve, reject) => (deferredCode = { resolve, reject }));
+  const portPromise = new Promise<number>((resolve, reject) => (deferredCode = {resolve, reject}));
   const portTimer = setTimeout(() => deferredCode.reject(new Error("Timeout waiting for port")), closeTimeout);
   const cancelPortTimer = () => clearTimeout(portTimer);
 

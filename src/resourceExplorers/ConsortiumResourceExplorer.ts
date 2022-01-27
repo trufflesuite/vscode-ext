@@ -1,17 +1,17 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as open from "open";
-import { ProgressLocation, QuickPickItem, window } from "vscode";
-import { IAzureConsortiumDto, IAzureConsortiumMemberDto, ICreateQuorumMember, ISkuDto } from "../ARMBlockchain";
-import { AzureBlockchainServiceClient } from "../ARMBlockchain/AzureBlockchainServiceClient";
-import { Constants } from "../Constants";
-import { showInputBox, showQuickPick } from "../helpers";
-import { ConsortiumItem, LocationItem, ResourceGroupItem, SkuItem, SubscriptionItem } from "../Models/QuickPickItems";
-import { AzureBlockchainNetworkNode, AzureBlockchainProject, Member } from "../Models/TreeItems";
-import { Telemetry } from "../TelemetryClient";
-import { AzureBlockchainServiceValidator } from "../validators/AzureBlockchainServiceValidator";
-import { AzureResourceExplorer } from "./AzureResourceExplorer";
+import open from "open";
+import {ProgressLocation, QuickPickItem, window} from "vscode";
+import {IAzureConsortiumDto, IAzureConsortiumMemberDto, ICreateQuorumMember, ISkuDto} from "../ARMBlockchain";
+import {AzureBlockchainServiceClient} from "../ARMBlockchain/AzureBlockchainServiceClient";
+import {Constants} from "../Constants";
+import {showInputBox, showQuickPick} from "../helpers";
+import {ConsortiumItem, LocationItem, ResourceGroupItem, SkuItem, SubscriptionItem} from "../Models/QuickPickItems";
+import {AzureBlockchainNetworkNode, AzureBlockchainProject, Member} from "../Models/TreeItems";
+import {Telemetry} from "../TelemetryClient";
+import {AzureBlockchainServiceValidator} from "../validators/AzureBlockchainServiceValidator";
+import {AzureResourceExplorer} from "./AzureResourceExplorer";
 
 export class ConsortiumResourceExplorer extends AzureResourceExplorer {
   public async createProject(): Promise<AzureBlockchainProject> {
@@ -114,7 +114,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
     azureClient: AzureBlockchainServiceClient,
     memberName: string
   ): Promise<AzureBlockchainNetworkNode[]> {
-    const { subscriptionId, resourceGroup } = azureClient;
+    const {subscriptionId, resourceGroup} = azureClient;
 
     try {
       const transactionNodes = await azureClient.transactionNodeResource.getTransactionNodeList(memberName);
@@ -188,7 +188,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
     azureClient: AzureBlockchainServiceClient,
     consortiumItems: ConsortiumItem
   ): Promise<AzureBlockchainProject> {
-    const { consortiumName, subscriptionId, resourceGroup, memberName } = consortiumItems;
+    const {consortiumName, subscriptionId, resourceGroup, memberName} = consortiumItems;
 
     const memberItems = await this.loadMemberItems(azureClient, memberName);
 
@@ -232,7 +232,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
   }
 
   private async getOrSelectConsortiumProtocol(): Promise<string> {
-    const pick = await showQuickPick([{ label: "Quorum" }] as QuickPickItem[], {
+    const pick = await showQuickPick([{label: "Quorum"}] as QuickPickItem[], {
       ignoreFocusOut: true,
       placeHolder: Constants.paletteLabels.selectConsortiumProtocol,
     });
@@ -320,7 +320,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
     excludedItems?: string[]
   ): Promise<QuickPickItem[]> {
     const items: QuickPickItem[] = [];
-    const createConsortiumItem: QuickPickItem = { label: "$(plus) Create Consortium" };
+    const createConsortiumItem: QuickPickItem = {label: "$(plus) Create Consortium"};
     const consortiumItems = await this.loadConsortiumItems(azureClient, excludedItems);
 
     items.push(createConsortiumItem, ...consortiumItems);
@@ -349,7 +349,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
       ignoreFocusOut: true,
       prompt,
       validateInput: async (name) => {
-        return window.withProgress({ location: ProgressLocation.Notification, title: notificationTitle }, async () =>
+        return window.withProgress({location: ProgressLocation.Notification, title: notificationTitle}, async () =>
           validateInput(name)
         );
       },

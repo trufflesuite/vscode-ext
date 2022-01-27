@@ -2,13 +2,13 @@
 // Licensed under the MIT license.
 
 import download = require("download");
-import * as fs from "fs-extra";
-import * as path from "path";
-import { Constants } from "../../Constants";
-import { getWorkspaceRoot, userSettings } from "../../helpers";
-import { Output } from "../../Output";
-import { ContractService } from "../../services";
-import { Telemetry } from "../../TelemetryClient";
+import fs from "fs-extra";
+import path from "path";
+import {Constants} from "../../Constants";
+import {getWorkspaceRoot, userSettings} from "../../helpers";
+import {Output} from "../../Output";
+import {ContractService} from "../../services";
+import {Telemetry} from "../../TelemetryClient";
 import calculateHash from "./fileHashGenerator";
 import {
   CurrentOpenZeppelinVersionLocation,
@@ -23,8 +23,8 @@ import {
   OZContractValidated,
   PromiseState,
 } from "./models";
-import { OpenZeppelinManifest } from "./OpenZeppelinManifest";
-import { OpenZeppelinProjectJsonService } from "./OpenZeppelinProjectJsonService";
+import {OpenZeppelinManifest} from "./OpenZeppelinManifest";
+import {OpenZeppelinProjectJsonService} from "./OpenZeppelinProjectJsonService";
 
 const openZeppelinFolderName = "openZeppelin";
 const userTmpFolder = ".tmp";
@@ -46,7 +46,7 @@ export namespace OpenZeppelinService {
       const projectMetadata = await OpenZeppelinProjectJsonService.getProjectJson();
       currentVersion = projectMetadata.openZeppelin.version || Constants.firstOZVersion;
     } else {
-      const { defaultValue, userValue } = await userSettings.getConfigurationAsync(
+      const {defaultValue, userValue} = await userSettings.getConfigurationAsync(
         Constants.userSettings.ozVersionUserSettingsKey
       );
       currentVersion = userValue || defaultValue;
@@ -74,7 +74,7 @@ export namespace OpenZeppelinService {
   }
 
   export async function getLatestOpenZeppelinVersionAsync(): Promise<string> {
-    const { defaultValue } = await userSettings.getConfigurationAsync(Constants.userSettings.ozVersionUserSettingsKey);
+    const {defaultValue} = await userSettings.getConfigurationAsync(Constants.userSettings.ozVersionUserSettingsKey);
     return defaultValue;
   }
 
@@ -101,19 +101,19 @@ export namespace OpenZeppelinService {
             await fs.chmod(destinationFilePath, 0o222); // reset r/o flag, this allows to overwrite
           } else {
             Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, `${fileUrl} - Skipped`);
-            return { state: PromiseState.fileExisted, asset };
+            return {state: PromiseState.fileExisted, asset};
           }
         }
 
-        return download(fileUrl, destinationDirPath, { filename: path.basename(destinationFilePath) })
+        return download(fileUrl, destinationDirPath, {filename: path.basename(destinationFilePath)})
           .then(async () => {
             Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, `${fileUrl} - OK`);
             await fs.chmod(destinationFilePath, 0o444);
-            return { state: PromiseState.fulfilled, asset };
+            return {state: PromiseState.fulfilled, asset};
           })
           .catch(() => {
             Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, `${fileUrl} - Failed`);
-            return { state: PromiseState.rejected, asset };
+            return {state: PromiseState.rejected, asset};
           });
       })
     );
@@ -178,12 +178,12 @@ export namespace OpenZeppelinService {
     return path.parse(asset.name).name;
   }
 
-  export async function getAssetsStatus(assets: IOZAsset[]): Promise<{ existing: IOZAsset[]; missing: IOZAsset[] }> {
+  export async function getAssetsStatus(assets: IOZAsset[]): Promise<{existing: IOZAsset[]; missing: IOZAsset[]}> {
     const openZeppelinSubfolder = await getOpenZeppelinFolderPath();
     const assetsStatuses = assets.map((asset) => {
       const assetPath = getAssetFullPath(openZeppelinSubfolder, asset);
 
-      return { asset, exists: fs.existsSync(assetPath) };
+      return {asset, exists: fs.existsSync(assetPath)};
     });
 
     return {
@@ -229,7 +229,7 @@ export namespace OpenZeppelinService {
     const tempNewOzContractsFolder = path.join(tempNewOzFolder, openZeppelinFolderName);
 
     const currentAssets = await getAllDownloadedAssetsAsync();
-    const { isDownloadSucceed, newAssets } = await downloadNewVersionOfAssetsAsync(
+    const {isDownloadSucceed, newAssets} = await downloadNewVersionOfAssetsAsync(
       currentAssets,
       newManifest,
       tempNewOzContractsFolder
@@ -378,9 +378,9 @@ async function downloadNewVersionOfAssetsAsync(
   assets: IOZAsset[],
   newManifest: OpenZeppelinManifest,
   toFolder: string
-): Promise<{ isDownloadSucceed: boolean; newAssets: IOZAsset[] }> {
+): Promise<{isDownloadSucceed: boolean; newAssets: IOZAsset[]}> {
   if (!assets.length) {
-    return { isDownloadSucceed: true, newAssets: [] };
+    return {isDownloadSucceed: true, newAssets: []};
   }
 
   const assetIdsToDownload = newManifest
@@ -389,7 +389,7 @@ async function downloadNewVersionOfAssetsAsync(
     .map((asset) => asset.id);
 
   if (!assetIdsToDownload.length) {
-    return { isDownloadSucceed: true, newAssets: [] };
+    return {isDownloadSucceed: true, newAssets: []};
   }
 
   const newAssets = newManifest.collectAssetsWithDependencies(assetIdsToDownload);
@@ -399,10 +399,10 @@ async function downloadNewVersionOfAssetsAsync(
   const isDownloadFailed = downloadResult.some((result) => result.state === PromiseState.rejected);
 
   if (isDownloadFailed) {
-    return { isDownloadSucceed: false, newAssets: [] };
+    return {isDownloadSucceed: false, newAssets: []};
   }
 
-  return { isDownloadSucceed: true, newAssets };
+  return {isDownloadSucceed: true, newAssets};
 }
 
 function getArrayParameterValue(value: string, type: string): string {

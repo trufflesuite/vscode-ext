@@ -1,15 +1,15 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { commands, TreeItem, TreeItemCollapsibleState, Uri } from "vscode";
-import { Constants } from "../../Constants";
-import { Telemetry } from "../../TelemetryClient";
-import { ItemType } from "../ItemType";
-import { IExtensionItem } from "./IExtensionItem";
+import {commands, TreeItem, TreeItemCollapsibleState, Uri} from "vscode";
+import {Constants} from "../../Constants";
+import {Telemetry} from "../../TelemetryClient";
+import {ItemType} from "../ItemType";
+import {IExtensionItem} from "./IExtensionItem";
 import Timeout = NodeJS.Timeout;
 
 export interface ExtensionItemData {
-  iconPath?: { light: string | Uri; dark: string | Uri };
+  iconPath?: {light: string | Uri; dark: string | Uri};
   contextValue?: string;
 }
 
@@ -74,7 +74,7 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
     return this.refreshTree();
   }
 
-  public toJSON(): { [key: string]: any } {
+  public toJSON(): {[key: string]: any} {
     return {
       children: this.children,
       description: this.description,
@@ -98,7 +98,7 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
       try {
         await commands.executeCommand("trufflesuite.refresh");
       } catch (error) {
-        Telemetry.sendException(error);
+        Telemetry.sendException(error as Error);
       }
     }, 300);
   }

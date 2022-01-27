@@ -1,19 +1,19 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import rewire = require("rewire");
-import * as sinon from "sinon";
-import uuid = require("uuid");
-import { extensions } from "vscode";
+import assert from "assert";
+import rewire from "rewire";
+import sinon from "sinon";
+import uuid from "uuid";
+import {extensions} from "vscode";
 import * as helpers from "../../../src/helpers";
-import { ItemType } from "../../../src/Models";
-import { BlockchainDataManagerNetworkNode, BlockchainDataManagerProject } from "../../../src/Models/TreeItems";
-import { BlockchainDataManagerResourceExplorer } from "../../../src/resourceExplorers/BlockchainDataManagerResourceExplorer";
-import { TreeManager } from "../../../src/services/tree/TreeManager";
-import { NetworkNodeView } from "../../../src/ViewItems/NetworkNodeView";
-import { ProjectView } from "../../../src/ViewItems/ProjectView";
-import { AzureAccountHelper } from "../../testHelpers/AzureAccountHelper";
+import {ItemType} from "../../../src/Models";
+import {BlockchainDataManagerNetworkNode, BlockchainDataManagerProject} from "../../../src/Models/TreeItems";
+import {BlockchainDataManagerResourceExplorer} from "../../../src/resourceExplorers/BlockchainDataManagerResourceExplorer";
+import {TreeManager} from "../../../src/services/tree/TreeManager";
+import {NetworkNodeView} from "../../../src/ViewItems/NetworkNodeView";
+import {ProjectView} from "../../../src/ViewItems/ProjectView";
+import {AzureAccountHelper} from "../../testHelpers/AzureAccountHelper";
 
 describe.skip("BDM methods", () => {
   beforeEach(() => {

@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as url from "url";
-import { IOZAsset, IOZContractCategory, IOZMetadata } from "./models";
+import url from "url";
+import {IOZAsset, IOZContractCategory, IOZMetadata} from "./models";
 
 const categoryWithoutDocumentation = "mocks";
 

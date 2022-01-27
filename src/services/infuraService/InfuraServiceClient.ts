@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as requestPromise from "request-promise";
-import { Disposable, Event, EventEmitter, Memento, StatusBarItem, window } from "vscode";
-import { Constants } from "../../Constants";
-import { IToken, refreshToken, signIn, signOut } from "./codeFlowLogin";
-import { ICreateProjectRequestDto, IInfuraProjectDto, IInfuraUserDto, IProjectsResultDto } from "./InfuraDto";
+import requestPromise from "request-promise";
+import {Disposable, Event, EventEmitter, Memento, StatusBarItem, window} from "vscode";
+import {Constants} from "../../Constants";
+import {IToken, refreshToken, signIn, signOut} from "./codeFlowLogin";
+import {ICreateProjectRequestDto, IInfuraProjectDto, IInfuraUserDto, IProjectsResultDto} from "./InfuraDto";
 
 interface IInfuraCache {
   user: IInfuraUserDto;
@@ -185,7 +185,7 @@ class InfuraClient {
   }
 
   private async updateCredentials(user: any, tokens: IToken): Promise<void> {
-    await this.updateInfuraCache({ user, tokens });
+    await this.updateInfuraCache({user, tokens});
 
     if (tokens && !user.email) {
       this.eventEmitter.fire(Constants.infuraSigningIn);
@@ -224,7 +224,7 @@ class InfuraClient {
     try {
       return await requestPromise(this.addTokenToParams(params));
     } catch (error) {
-      if (error.response && error.response.statusCode === 401) {
+      if ((error as any).response && (error as any).response.statusCode === 401) {
         await this.signInSilently();
         return await requestPromise(this.addTokenToParams(params));
       } else {
@@ -236,7 +236,7 @@ class InfuraClient {
   private addTokenToParams(params: any): any {
     const infuraCache = this.getInfuraCache();
     if (infuraCache) {
-      return { ...params, auth: { bearer: infuraCache.tokens.accessToken } };
+      return {...params, auth: {bearer: infuraCache.tokens.accessToken}};
     }
     throw new Error(Constants.errorMessageStrings.InfuraUnauthorized);
   }

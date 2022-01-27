@@ -1,48 +1,45 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as sinon from "sinon";
-import * as uuid from "uuid";
-import { CancellationToken, Progress, ProgressOptions, window } from "vscode";
-import { TruffleCommands } from "../../src/commands/TruffleCommands";
+import assert from "assert";
+import {SinonMock, SinonExpectation, SinonStub, mock, stub, restore} from "sinon";
+import uuid from "uuid";
+import {CancellationToken, Progress, ProgressOptions, window} from "vscode";
+import {TruffleCommands} from "../../src/commands/TruffleCommands";
 import * as helpers from "../../src/helpers";
 import * as commands from "../../src/helpers/command";
-import { TestConstants } from "../TestConstants";
+import {TestConstants} from "../TestConstants";
 
 describe("BuildContracts Command", () => {
   describe("Integration test", async () => {
-    let requiredMock: sinon.SinonMock;
+    let requiredMock: SinonMock;
     let getWorkspaceRootMock: any;
-    let checkAppsSilent: sinon.SinonExpectation;
-    let installTruffle: sinon.SinonExpectation;
-    let commandContextMock: sinon.SinonMock;
-    let executeCommandMock: sinon.SinonExpectation;
-    let withProgressStub: sinon.SinonStub<
-      [ProgressOptions, (progress: Progress<any>, token: CancellationToken) => any],
-      any
-    >;
+    let checkAppsSilent: SinonExpectation;
+    let installTruffle: SinonExpectation;
+    let commandContextMock: SinonMock;
+    let executeCommandMock: SinonExpectation;
+    let withProgressStub: SinonStub<[ProgressOptions, (progress: Progress<any>, token: CancellationToken) => any], any>;
 
     beforeEach(() => {
-      requiredMock = sinon.mock(helpers.required);
+      requiredMock = mock(helpers.required);
 
-      getWorkspaceRootMock = sinon.stub(helpers, "getWorkspaceRoot");
+      getWorkspaceRootMock = stub(helpers, "getWorkspaceRoot");
       getWorkspaceRootMock.returns(uuid.v4());
 
       checkAppsSilent = requiredMock.expects("checkAppsSilent");
       installTruffle = requiredMock.expects("installTruffle");
 
-      commandContextMock = sinon.mock(commands);
+      commandContextMock = mock(commands);
       executeCommandMock = commandContextMock.expects("executeCommand");
 
-      withProgressStub = sinon.stub(window, "withProgress");
+      withProgressStub = stub(window, "withProgress");
       withProgressStub.callsFake(async (...args: any[]) => {
         return args[1]();
       });
     });
 
     afterEach(() => {
-      sinon.restore();
+      restore();
     });
 
     it("should not throw exception when truffle already installed", async () => {
