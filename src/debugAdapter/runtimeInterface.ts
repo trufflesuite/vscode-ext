@@ -1,6 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+process.env.DEBUG = "debugger:session";
+// @ts-ignore
+process.browser = true;
+// @ts-ignore
+global.window = {process: {type: "renderer"}};
+
 import truffleDebugger from "@truffle/debugger";
 import {EventEmitter} from "events";
 import {filterContractsWithAddress, prepareContracts} from "./contracts/contractsPrepareHelpers";
