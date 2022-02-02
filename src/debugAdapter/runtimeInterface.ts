@@ -1,6 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+process.env.DEBUG = "debugger:session";
+// @ts-ignore
+process.browser = true;
+// @ts-ignore
+global.window = {process: {type: "renderer"}};
+
 import truffleDebugger from "@truffle/debugger";
 import {EventEmitter} from "events";
 import {filterContractsWithAddress, prepareContracts} from "./contracts/contractsPrepareHelpers";
@@ -52,7 +58,7 @@ export default class RuntimeInterface extends EventEmitter {
     this._initialBreakPoints.length = 0; // remove them since they are no longer needed
   }
 
-  public async setBreakpoint(filePath: string, line: number): Promise<DebuggerTypes.IBreakpoint | null> {
+  public async setBreakpoint(_filePath: string, line: number): Promise<DebuggerTypes.IBreakpoint | null> {
     if (!this._session) {
       return Promise.resolve(null);
     }

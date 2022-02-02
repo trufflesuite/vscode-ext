@@ -8,6 +8,7 @@
       "runtimeExecutable": "${execPath}",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
       "envFile": "${workspaceFolder}/.env",
+      "outputCapture": "console",
       "env": {
         "DEBUG": "*"
       },
