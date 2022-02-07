@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-process.env.DEBUG = "debugger:session";
+// process.env.DEBUG = "debugger:session";
 // @ts-ignore
 process.browser = true;
 // @ts-ignore

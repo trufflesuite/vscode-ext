@@ -5,6 +5,7 @@ import path from "path";
 import {debug, DebugConfiguration, QuickPickItem, workspace, WorkspaceFolder} from "vscode";
 import {DEBUG_TYPE} from "../debugAdapter/constants/debugAdapter";
 import {DebugNetwork} from "../debugAdapter/debugNetwork";
+import {shortenHash} from "../debugAdapter/functions";
 import {TransactionProvider} from "../debugAdapter/transaction/transactionProvider";
 import {Web3Wrapper} from "../debugAdapter/web3Wrapper";
 import {showInputBox, showQuickPick} from "../helpers/userInteraction";
@@ -64,8 +65,9 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
   const txInfos = await txProvider.getTransactionsInfo(txHashes);
 
   return txInfos.map((txInfo) => {
+    const label = shortenHash(txInfo.hash);
     const description = generateDescription(txInfo.contractName, txInfo.methodName);
-    return {alwaysShow: true, label: txInfo.hash, description} as QuickPickItem;
+    return {alwaysShow: true, label, description} as QuickPickItem;
   });
 }
 

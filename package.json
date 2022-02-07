@@ -35,7 +35,6 @@
     "Extension Packs",
     "Programming Languages"
   ],
-  "categories": [],
   "aiKey": "INSERTAIKEY",
   "main": "./out/src/extension.js",
   "activationEvents": [

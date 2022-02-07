@@ -10,7 +10,7 @@
       "envFile": "${workspaceFolder}/.env",
       "outputCapture": "console",
       "env": {
-        "DEBUG": "*"
+        "DEBUG": "debugger:session:*"
       },
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
