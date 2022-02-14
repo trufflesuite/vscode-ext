@@ -41,7 +41,7 @@ export namespace DebuggerCommands {
         placeHolder: "Enter the transaction hash to debug",
       });
 
-      const txHash = txHashSelection.label;
+      const txHash = txHashSelection.detail || txHashSelection.label;
       const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
       debug.startDebugging(workspaceFolder, config).then(() => {
         Telemetry.sendEvent("DebuggerCommands.startSolidityDebugger.commandFinished");
@@ -67,7 +67,7 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
   return txInfos.map((txInfo) => {
     const label = shortenHash(txInfo.hash);
     const description = generateDescription(txInfo.contractName, txInfo.methodName);
-    return {alwaysShow: true, label, description} as QuickPickItem;
+    return {alwaysShow: true, label, description, detail: txInfo.hash} as QuickPickItem;
   });
 }
 
