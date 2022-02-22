@@ -54,6 +54,7 @@ export class Constants {
     migrations_directory: path.join("./", "migrations"),
   };
 
+  // FIXME: change this...
   public static defaultTruffleBox = "Azure-Samples/Blockchain-Ethereum-Template";
   public static defaultDebounceTimeout = 300;
   public static defaultInputNameInBdm = "transaction-node";

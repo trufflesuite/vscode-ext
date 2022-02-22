@@ -10,7 +10,7 @@ global.window = {process: {type: "renderer"}};
 import truffleDebugger from "@truffle/debugger";
 import {EventEmitter} from "events";
 import {filterContractsWithAddress, prepareContracts} from "./contracts/contractsPrepareHelpers";
-import {translateTruffleVariables} from "./helpers";
+import {TranslatedResult, translateTruffleVariables} from "./helpers";
 import {DebuggerTypes} from "./models/debuggerTypes";
 import {ICallInfo} from "./models/ICallInfo";
 import {IContractModel} from "./models/IContractModel";
@@ -106,7 +106,13 @@ export default class RuntimeInterface extends EventEmitter {
     return result;
   }
 
-  public async variables(/* args?: DebugProtocol.VariablesArguments */): Promise<any> {
+  /**
+   * TODO: This method should return something more usable than an any object. An array of objects or a map seems
+   * a better fit for this kind of thing.
+   *
+   * @returns the object of all the variables. keyed om variable name.
+   */
+  public async variables(/* args?: DebugProtocol.VariablesArguments */): Promise<Record<string, TranslatedResult>> {
     if (this._session) {
       const variables = await this._session.variables();
       return translateTruffleVariables(variables);

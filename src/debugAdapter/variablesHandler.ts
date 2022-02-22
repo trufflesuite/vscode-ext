@@ -1,11 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Handles, Scope } from "vscode-debugadapter";
-import { DebugProtocol } from "vscode-debugprotocol";
-import { OBJECT_VARIABLE_DISPLAY_NAME, SCOPES } from "./constants/variablesView";
-import { IExpressionEval } from "./models/IExpressionEval";
+import {Handles, Scope} from "vscode-debugadapter";
+import {DebugProtocol} from "vscode-debugprotocol";
+import {OBJECT_VARIABLE_DISPLAY_NAME, SCOPES} from "./constants/variablesView";
+import {TranslatedResult} from "./helpers";
+import {IExpressionEval} from "./models/IExpressionEval";
 import RuntimeInterface from "./runtimeInterface";
+import _ from "lodash";
 
 export default class VariablesHandler {
   private _runtime: RuntimeInterface;
@@ -29,20 +31,20 @@ export default class VariablesHandler {
 
   public async getVariableAttributesByVariableRef(variablesReference: number): Promise<DebugProtocol.Variable[]> {
     let result: DebugProtocol.Variable[] = [];
-    let variable: any;
+    let variables: Record<string, TranslatedResult>;
     let variablePath: string = "";
     switch (variablesReference) {
       case SCOPES.all.ref:
-        variable = await this._runtime.variables();
-        result = this.mapToDebuggableVariables(variablePath, variable);
+        variables = await this._runtime.variables();
+        result = this.mapToDebuggableVariables(variablePath, variables);
         break;
       default:
         // requesting object variable
         variablePath = this._handles.get(variablesReference);
-        variable = await this._runtime.variables();
-        variable = this.getVariableAttriburesByKeyPath(variablePath, variable);
-
-        result = this.mapToDebuggableVariables(variablePath, variable);
+        variables = await this._runtime.variables();
+        variables = this.getVariableAttributesByKeyPath(variablePath, variables);
+        //console.log("obj var: ", {variables, variablePath, tr});
+        result = this.mapToDebuggableVariables(variablePath, variables);
     }
 
     return result;
@@ -52,7 +54,7 @@ export default class VariablesHandler {
   // expression = "parent.childA.child1"
   public async evaluateExpression(expression: string): Promise<IExpressionEval> {
     const variablesObj = await this._runtime.variables();
-    const variable = this.getVariableAttriburesByKeyPath(expression, variablesObj);
+    const variable = this.getVariableAttributesByKeyPath(expression, variablesObj);
     const isObjType = this.isSpecificObjectTypeValue(variable, typeof variable);
     return {
       result: this.getDisplayValue(variable, isObjType),
@@ -64,48 +66,66 @@ export default class VariablesHandler {
     return !Array.isArray(value) && value !== null && value !== undefined && valueType === "object";
   }
 
-  // replace "." by "/" and generate "/path/to/variable"
+  // generate "path.to.attribute"
   private generateVariablesAttrKey(variablePath: string, attribute: string): string {
-    return `${variablePath.replace(/\./g, "/")}/${attribute.replace(/\./g, "/")}`;
+    if (_.isEmpty(variablePath)) {
+      return attribute;
+    } else {
+      return `${_.trimStart(variablePath, ".")}.${attribute}`;
+    }
   }
 
-  private getVariableAttriburesByKeyPath(keyPath: string, variable: any): any {
-    // keyPath = "/parent/childA/child1"
-    // or keyPath = "parent.childA.child1"
-    let keys = keyPath.split(/\/|\./);
-    if (keys[0] === "") {
-      keys = keys.slice(1);
-    }
+  private getVariableAttributesByKeyPath(keyPath: string, variable: Record<string, TranslatedResult>): any {
+    // trim off the first . to make object get work properly.
+    // let key = keyPath;
+    // if(keyPath.indexOf('.') === 0){
+    //   key = _.trimStart(key, '.');
+    // }
+    console.log("getVariableAttributesByKeyPath", {keyPath, variable});
     try {
-      keys.forEach((key) => {
-        variable = variable[key];
-      });
+      return _.get(variable, keyPath);
     } catch (e) {
-      return undefined;
+      return {} as TranslatedResult;
     }
-    return variable;
   }
 
-  private mapToDebuggableVariables(variablePath: string, variable: any): DebugProtocol.Variable[] {
+  /**
+   * This will translate the internal variables to the DebugProtocol equivalent. This is used for UI representation fixes.
+   *
+   * @param variablePath
+   * @param variable
+   * @returns
+   */
+  private mapToDebuggableVariables(
+    variablePath: string,
+    variable: Record<string, TranslatedResult>
+  ): DebugProtocol.Variable[] {
     const result: DebugProtocol.Variable[] = [];
+    console.error("mapToDebuggableVariables:", {variablePath, variable});
+
     for (const attr in variable) {
-      if (variable.hasOwnProperty(attr)) {
+      // remove our metadata fields...
+      if (variable.hasOwnProperty(attr) && attr !== "typeName") {
         const value = variable[attr];
-        const type = typeof value;
-        const isRef = this.isSpecificObjectTypeValue(value, type);
-        result.push({
-          name: attr,
-          type,
-          value: this.getDisplayValue(value, isRef),
-          variablesReference: isRef ? this._handles.create(this.generateVariablesAttrKey(variablePath, attr)) : 0,
-        });
+        result.push(this.buildResult(value, attr, variablePath));
       }
     }
-
+    console.log("results:", {variablePath, result});
     return result;
   }
 
-  private getDisplayValue(obj: any, isSpecificObjectType: boolean) {
-    return isSpecificObjectType ? OBJECT_VARIABLE_DISPLAY_NAME : JSON.stringify(obj);
+  private buildResult(value: TranslatedResult, attr: string, variablePath: string): DebugProtocol.Variable {
+    const type = typeof value;
+    const isRef = this.isSpecificObjectTypeValue(value, type);
+    return {
+      name: attr,
+      type,
+      value: this.getDisplayValue(value, isRef),
+      variablesReference: isRef ? this._handles.create(this.generateVariablesAttrKey(variablePath, attr)) : 0,
+    };
+  }
+
+  private getDisplayValue(obj: TranslatedResult, isSpecificObjectType: boolean) {
+    return isSpecificObjectType ? obj.typeName || OBJECT_VARIABLE_DISPLAY_NAME : JSON.stringify(obj);
   }
 }
