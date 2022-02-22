@@ -107,12 +107,12 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   /**
-   * TODO: This method should return something more usable than an any object. An array of objects or a map seems
-   * a better fit for this kind of thing.
    *
-   * @returns the object of all the variables. keyed om variable name.
+   * @returns the object of all the variables. keyed on variable name.
    */
-  public async variables(/* args?: DebugProtocol.VariablesArguments */): Promise<Record<string, TranslatedResult>> {
+  public async variables(/* args?: DebugProtocol.VariablesArguments */): Promise<
+    Record<string, TranslatedResult> | any
+  > {
     if (this._session) {
       const variables = await this._session.variables();
       return translateTruffleVariables(variables);
