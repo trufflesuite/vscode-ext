@@ -482,6 +482,7 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
         RequiredApps.truffle,
         "migrate",
         "--reset",
+        "--compile-all",
         "--network",
         networkName
       );

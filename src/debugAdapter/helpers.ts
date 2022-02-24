@@ -60,17 +60,22 @@ export function groupBy(array: any[], key: any) {
   return groupedArray;
 }
 
-export function translateTruffleVariables(truffleVariables: any): any {
-  // FIXME: convert variables.
-  const ret: any = {};
-
+/**
+ * This will translate the debugger variables into something a bit more human readable for the
+ * debugger view to use. The use of {@type any} is due to the path traversal the debugger uses up a little bit.
+ *
+ * @param truffleVariables the variables from the truffle debugger
+ * @returns A mapped list of solidity variables in a shape that is helpful in the debugger.
+ */
+export function translateTruffleVariables(truffleVariables: any): Record<string, TranslatedResult> {
+  // TODO: convert variables.
+  const ret: Record<string, TranslatedResult> = {};
   // so for key in object values. call the recursive looper.
   for (const [k, v] of Object.entries(truffleVariables)) {
     // k  // Type is string
     // v  // Type is any/Result from codec land.
     ret[k] = translate(<Result>v);
   }
-
   return ret;
 }
 
@@ -92,10 +97,13 @@ function enumFullName(value: Format.Values.EnumValue): string {
   }
 }
 
-type TranslatedResult = {
+/**
+ * Type to encapsulate a Debugger result that will come back to the debugger UI.
+ */
+export type TranslatedResult = {
   value: any;
-  type: string;
-  solidity: Format.Values.Result;
+  typeName: string;
+  //solidity: Format.Values.Result;
 };
 
 function translateContractValue(value: Format.Values.ContractValueInfo): string {
@@ -107,11 +115,15 @@ function translateContractValue(value: Format.Values.ContractValueInfo): string 
   }
 }
 
-function createResult(variable: Format.Values.Result, value: any): TranslatedResult {
+function createResult(
+  variable: Format.Values.Result,
+  value: any,
+  typeName: string = variable.type.typeClass
+): TranslatedResult {
   return {
     value,
-    type: variable.type.typeClass,
-    solidity: variable,
+    typeName,
+    //solidity: variable,
   };
 }
 
@@ -128,35 +140,40 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
       switch (variable.type.typeClass) {
         case "uint":
         case "int":
-          return createResult(variable, (<UintValue>variable).value.asBN.toString());
+          return createResult(variable, (<UintValue>variable).value.asBN.toString(), variable.type.typeHint);
         case "fixed":
         case "ufixed":
           //note: because this is just for display, we don't bother adjusting the magic values Big.NE or Big.PE;
           //we'll trust those to their defaults
-          return createResult(variable, (<FixedValue>variable).value.asBig.toString());
+          return createResult(variable, (<FixedValue>variable).value.asBig.toString(), variable.type.typeHint);
         case "bool":
-          return createResult(variable, (<BoolValue>variable).value.asBoolean);
+          return createResult(variable, (<BoolValue>variable).value.asBoolean, variable.type.typeHint);
         case "bytes":
           switch (variable.type.kind) {
             case "static":
-              return createResult(variable, (<BytesStaticValue>variable).value.asHex);
+              return createResult(variable, (<BytesStaticValue>variable).value.asHex, variable.type.typeHint);
             case "dynamic":
-              return createResult(variable, `hex: ${(<BytesDynamicValue>variable).value.asHex.slice(2)}`);
+              return createResult(
+                variable,
+                `hex: ${(<BytesDynamicValue>variable).value.asHex.slice(2)}`,
+                variable.type.typeHint
+              );
             default:
-              return createResult(variable, (<BytesValue>variable).value.asHex);
+              return createResult(variable, (<BytesValue>variable).value.asHex, (<BytesValue>variable).type.typeHint);
           }
         case "address":
           return createResult(variable, (<AddressValue>variable).value.asAddress);
         case "string": {
           switch ((<StringValue>variable).value.kind) {
             case "valid":
-              return createResult(variable, (<StringValueInfoValid>variable.value).asString);
+              return createResult(variable, (<StringValueInfoValid>variable.value).asString, variable.type.typeHint);
             case "malformed":
               //note: this will turn malformed utf-8 into replacement characters (U+FFFD)
               //note we need to cut off the 0x prefix
               return createResult(
                 variable,
-                Buffer.from((<StringValueInfoMalformed>variable.value).asHex.slice(2), "hex").toString()
+                Buffer.from((<StringValueInfoMalformed>variable.value).asHex.slice(2), "hex").toString(),
+                variable.type.typeHint
               );
             default:
               return createResult(variable, variable.value);
@@ -165,14 +182,16 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
         case "array": {
           const coercedResult = <ArrayValue>variable;
           if (coercedResult.reference !== undefined) {
-            return createResult(variable, formatCircular(coercedResult.reference));
+            return createResult(variable, formatCircular(coercedResult.reference), variable.type.typeHint);
           }
           return createResult(
             variable,
-            coercedResult.value.map((element: Result) => translate(element))
+            coercedResult.value.map((element: Result) => translate(element)),
+            variable.type.typeHint
           );
         }
         case "mapping":
+          // maybe the mapping type here can be fixed a bit?
           return createResult(
             variable,
             new Map(
@@ -198,7 +217,7 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
           const typeName = Format.Types.typeStringWithoutLocation(variable.type);
           const coercedResult = <Format.Values.UserDefinedValueTypeValue>variable;
           const inspectOfUnderlying = translate(coercedResult.value);
-          return createResult(variable, `${typeName}.wrap(${inspectOfUnderlying})`); //note only the underlying part is stylized
+          return createResult(variable, `${typeName}.wrap(${inspectOfUnderlying})`, coercedResult.type.typeName); //note only the underlying part is stylized
         }
         case "tuple": {
           const coercedResult = <Format.Values.TupleValue>variable;
@@ -213,12 +232,14 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
                 ...coercedResult.value.map(({name, value}) => ({
                   [<string>name]: translate(value),
                 }))
-              )
+              ),
+              coercedResult.type.typeHint
             );
           } else {
             return createResult(
               variable,
-              coercedResult.value.map(({value}) => translate(value))
+              coercedResult.value.map(({value}) => translate(value)),
+              coercedResult.type.typeHint
             );
           }
         }
@@ -232,7 +253,9 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
                   {},
                   ...(<Format.Values.TypeValueContract>variable).value.map(({name, value}) => ({
                     [name]: translate(value),
-                  }))
+                  })),
+                  // FIXME: could be wrong?
+                  (<Format.Values.TypeValueContract>variable).type.type.typeName
                 )
               );
             case "enum":
@@ -311,7 +334,6 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
           return createResult(variable, "DEFAULT:" + variable.value);
       }
     case "error": {
-      // debug("variable: %O", variable);
       return createResult(variable, getErrorResult(variable, breaklength));
     }
   }

@@ -460,82 +460,82 @@
           "id": "InstructionView",
           "name": "Instructions"
         }
-       ]
-      },
-      "debuggers": [
-        {
-          "type": "truffle",
-          "label": "Truffle Debugger",
-          "program": "./out/src/debugger.js",
-          "runtime": "node",
-          "configurationAttributes": {
-            "launch": {
-              "required": [],
-              "properties": {
-                "stopOnEntry": {
-                  "type": "boolean",
-                  "description": "Automatically stop after launch.",
-                  "default": true
-                },
-                "trace": {
-                  "type": "boolean",
-                  "description": "Enable logging of the Debug Adapter Protocol.",
-                  "default": true
-                },
-                "txHash": {
-                  "type": "string",
-                  "description": "Transaction hash to debug",
-                  "default": "0x"
-                },
-                "files": {
-                  "type": "string[]",
-                  "description": "Array of file paths of solidity files to debug",
-                  "default": []
-                },
-                "workingDirectory": {
-                  "type": "string",
-                  "description": "Directory of truffle project",
-                  "default": "${workspaceFolder}"
-                },
-                "providerUrl": {
-                  "type": "string",
-                  "description": "URL of provider",
-                  "default": "http://127.0.0.1:8545"
-                }
+      ]
+    },
+    "debuggers": [
+      {
+        "type": "truffle",
+        "label": "Truffle Debugger",
+        "program": "./out/src/debugger.js",
+        "runtime": "node",
+        "configurationAttributes": {
+          "launch": {
+            "required": [],
+            "properties": {
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "Automatically stop after launch.",
+                "default": true
+              },
+              "trace": {
+                "type": "boolean",
+                "description": "Enable logging of the Debug Adapter Protocol.",
+                "default": true
+              },
+              "txHash": {
+                "type": "string",
+                "description": "Transaction hash to debug",
+                "default": "0x"
+              },
+              "files": {
+                "type": "string[]",
+                "description": "Array of file paths of solidity files to debug",
+                "default": []
+              },
+              "workingDirectory": {
+                "type": "string",
+                "description": "Directory of truffle project",
+                "default": "${workspaceFolder}"
+              },
+              "providerUrl": {
+                "type": "string",
+                "description": "URL of provider",
+                "default": "http://127.0.0.1:8545"
               }
             }
-          },
-          "initialConfigurations": [
-            {
+          }
+        },
+        "initialConfigurations": [
+          {
+            "type": "truffle",
+            "request": "launch",
+            "name": "Debug Transaction with Truffle",
+            "stopOnEntry": false,
+            "txHash": "0x",
+            "files": [],
+            "workingDirectory": "${workspaceFolder}",
+            "providerUrl": "http://127.0.0.1:8545"
+          }
+        ],
+        "configurationSnippets": [
+          {
+            "label": "Truffle Debugger: Launch",
+            "description": "Runs the Truffle debugger (truffle) and attaches to a TestRPC instance",
+            "body": {
               "type": "truffle",
               "request": "launch",
               "name": "Debug Transaction with Truffle",
               "stopOnEntry": false,
               "txHash": "0x",
               "files": [],
-              "workingDirectory": "${workspaceFolder}",
+              "workingDirectory": "^\"\\${workspaceFolder}/",
               "providerUrl": "http://127.0.0.1:8545"
             }
-          ],
-          "configurationSnippets": [
-            {
-              "label": "Truffle Debugger: Launch",
-              "description": "Runs the Truffle debugger (truffle) and attaches to a TestRPC instance",
-              "body": {
-                "type": "truffle",
-                "request": "launch",
-                "name": "Debug Transaction with Truffle",
-                "stopOnEntry": false,
-                "txHash": "0x",
-                "files": [],
-                "workingDirectory": "^\"\\${workspaceFolder}/",
-                "providerUrl": "http://127.0.0.1:8545"
-              }
-            }
-          ],
-          "variables": {}
-        }
-      ]
+          }
+        ],
+        "variables": {}
+      }
+    ]
   },
   "scripts": {
     "package": "npx vsce package",
@@ -564,6 +564,7 @@
     "@types/glob": "^7.1.1",
     "@types/hdkey": "^0.7.0",
     "@types/istanbul": "^0.4.30",
+    "@types/lodash": "4.14.178",
     "@types/mocha": "^5.2.7",
     "@types/request": "^2.48.1",
     "@types/request-promise": "^4.1.44",
@@ -614,6 +615,7 @@
     "download": "^7.1.0",
     "fs-extra": "^7.0.1",
     "hdkey": "^1.1.1",
+    "lodash": "4.17.21",
     "ms-rest": "^2.5.0",
     "ms-rest-azure": "^2.6.0",
     "open": "^6.4.0",
