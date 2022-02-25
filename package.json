@@ -53,7 +53,6 @@
     "onCommand:trufflesuite.createProject",
     "onCommand:trufflesuite.disconnectProject",
     "onCommand:extension.truffle.debugTransaction",
-    "onCommand:openZeppelin.addCategory",
     "onCommand:trufflesuite.signInToInfuraAccount",
     "onCommand:trufflesuite.signOutOfInfuraAccount",
     "onCommand:trufflesuite.openAtAzurePortal",
@@ -181,11 +180,6 @@
       {
         "command": "trufflesuite.getPrivateKey",
         "title": "Retrieve private key",
-        "category": "Blockchain"
-      },
-      {
-        "command": "openZeppelin.addCategory",
-        "title": "Add contracts from OpenZeppelin",
         "category": "Blockchain"
       },
       {
@@ -337,10 +331,6 @@
         },
         {
           "when": "false",
-          "command": "openZeppelin.addCategory"
-        },
-        {
-          "when": "false",
           "command": "trufflesuite.openAtAzurePortal"
         }
       ],
@@ -440,11 +430,6 @@
           "when": "resourceLangId == json",
           "command": "contract.copyABI",
           "group": "9_copyFromContractGroup"
-        },
-        {
-          "when": "resourceLangId == solidity",
-          "command": "openZeppelin.addCategory",
-          "group": "8_buildContractGroup"
         }
       ]
     },

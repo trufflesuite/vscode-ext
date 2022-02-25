@@ -10,7 +10,6 @@ import {QuickPickItem, Uri, window} from "vscode";
 import {Constants, RequiredApps} from "../Constants";
 import {
   getWorkspaceRoot,
-  openZeppelinHelper,
   outputCommandHelper,
   required,
   showConfirmPaidOperationDialog,
@@ -32,10 +31,8 @@ import {
   ContractService,
   GanacheService,
   MnemonicRepository,
-  OpenZeppelinService,
   TreeManager,
 } from "../services";
-import {OZContractValidated} from "../services/openZeppelin/models";
 import {Telemetry} from "../TelemetryClient";
 import {NetworkNodeView} from "../ViewItems";
 import {ServiceCommands} from "./ServiceCommands";
@@ -79,7 +76,7 @@ export namespace TruffleCommands {
   export async function deployContracts(): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.deployContracts.commandStarted");
 
-    await checkOpenZeppelinIfUsed();
+    // await checkOpenZeppelinIfUsed();
 
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
     const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri);
@@ -234,17 +231,17 @@ export namespace TruffleCommands {
   }
 }
 
-async function checkOpenZeppelinIfUsed(): Promise<void> {
-  if (OpenZeppelinService.projectJsonExists()) {
-    if (await openZeppelinHelper.shouldUpgradeOpenZeppelinAsync()) {
-      await openZeppelinHelper.upgradeOpenZeppelinContractsAsync();
-      await openZeppelinHelper.upgradeOpenZeppelinUserSettingsAsync();
-    }
+// async function checkOpenZeppelinIfUsed(): Promise<void> {
+//   if (OpenZeppelinService.projectJsonExists()) {
+//     if (await openZeppelinHelper.shouldUpgradeOpenZeppelinAsync()) {
+//       await openZeppelinHelper.upgradeOpenZeppelinContractsAsync();
+//       await openZeppelinHelper.upgradeOpenZeppelinUserSettingsAsync();
+//     }
 
-    await validateOpenZeppelinContracts();
-    await openZeppelinHelper.defineContractRequiredParameters();
-  }
-}
+//     await validateOpenZeppelinContracts();
+//     await openZeppelinHelper.defineContractRequiredParameters();
+//   }
+// }
 
 function removeDuplicateNetworks(deployDestinations: IDeployDestinationItem[]): IDeployDestinationItem[] {
   return deployDestinations.filter((destination, index, destinations) => {
@@ -273,36 +270,36 @@ async function installRequiredDependencies(): Promise<void> {
   }
 }
 
-async function validateOpenZeppelinContracts(): Promise<void> {
-  const validatedContracts = await OpenZeppelinService.validateContractsAsync();
-  validatedContracts.forEach((ozContract: OZContractValidated) => {
-    if (ozContract.isExistedOnDisk) {
-      Output.outputLine(
-        "",
-        ozContract.isHashValid
-          ? Constants.openZeppelin.validHashMessage(ozContract.contractPath)
-          : Constants.openZeppelin.invalidHashMessage(ozContract.contractPath)
-      );
-    } else {
-      Output.outputLine("", Constants.openZeppelin.contractNotExistedOnDisk(ozContract.contractPath));
-    }
-  });
+// async function validateOpenZeppelinContracts(): Promise<void> {
+//   const validatedContracts = await OpenZeppelinService.validateContractsAsync();
+//   validatedContracts.forEach((ozContract: OZContractValidated) => {
+//     if (ozContract.isExistedOnDisk) {
+//       Output.outputLine(
+//         "",
+//         ozContract.isHashValid
+//           ? Constants.openZeppelin.validHashMessage(ozContract.contractPath)
+//           : Constants.openZeppelin.invalidHashMessage(ozContract.contractPath)
+//       );
+//     } else {
+//       Output.outputLine("", Constants.openZeppelin.contractNotExistedOnDisk(ozContract.contractPath));
+//     }
+//   });
 
-  const invalidContractsPaths = validatedContracts
-    .filter((ozContract: OZContractValidated) => !ozContract.isExistedOnDisk || !ozContract.isHashValid)
-    .map((ozContract: OZContractValidated) => ozContract.contractPath);
+//   const invalidContractsPaths = validatedContracts
+//     .filter((ozContract: OZContractValidated) => !ozContract.isExistedOnDisk || !ozContract.isHashValid)
+//     .map((ozContract: OZContractValidated) => ozContract.contractPath);
 
-  if (invalidContractsPaths.length !== 0) {
-    const errorMsg = Constants.validationMessages.openZeppelinFilesAreInvalid(invalidContractsPaths);
-    const error = new Error(errorMsg);
-    window.showErrorMessage(errorMsg);
-    const obfuscatedPaths = invalidContractsPaths.map((invalidContractsPath) =>
-      Telemetry.obfuscate(invalidContractsPath)
-    );
-    Telemetry.sendException(new Error(Constants.validationMessages.openZeppelinFilesAreInvalid(obfuscatedPaths)));
-    throw error;
-  }
-}
+//   if (invalidContractsPaths.length !== 0) {
+//     const errorMsg = Constants.validationMessages.openZeppelinFilesAreInvalid(invalidContractsPaths);
+//     const error = new Error(errorMsg);
+//     window.showErrorMessage(errorMsg);
+//     const obfuscatedPaths = invalidContractsPaths.map((invalidContractsPath) =>
+//       Telemetry.obfuscate(invalidContractsPath)
+//     );
+//     Telemetry.sendException(new Error(Constants.validationMessages.openZeppelinFilesAreInvalid(obfuscatedPaths)));
+//     throw error;
+//   }
+// }
 
 function getDefaultDeployDestinations(truffleConfigPath: string): IDeployDestinationItem[] {
   return [
