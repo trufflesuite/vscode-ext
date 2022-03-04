@@ -74,7 +74,7 @@ export default class RuntimeInterface extends EventEmitter {
 
     this._numBreakpoints++;
     // TODO: we might need to make this addBreakpoint lazy on session init.
-    await this._session.addBreakpoint(breakpoint);
+    this._session.addBreakpoint(breakpoint);
     return breakpoint;
   }
 

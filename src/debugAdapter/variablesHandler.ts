@@ -81,7 +81,7 @@ export default class VariablesHandler {
     // if(keyPath.indexOf('.') === 0){
     //   key = _.trimStart(key, '.');
     // }
-    console.log("getVariableAttributesByKeyPath", {keyPath, variable});
+    // console.log("getVariableAttributesByKeyPath", {keyPath, variable});
     try {
       return _.get(variable, keyPath);
     } catch (e) {
@@ -101,7 +101,7 @@ export default class VariablesHandler {
     variable: Record<string, TranslatedResult>
   ): DebugProtocol.Variable[] {
     const result: DebugProtocol.Variable[] = [];
-    console.error("mapToDebuggableVariables:", {variablePath, variable});
+    // console.error("mapToDebuggableVariables:", {variablePath, variable});
 
     for (const attr in variable) {
       // remove our metadata fields...
@@ -110,7 +110,7 @@ export default class VariablesHandler {
         result.push(this.buildResult(value, attr, variablePath));
       }
     }
-    console.log("results:", {variablePath, result});
+    // console.log("results:", {variablePath, result});
     return result;
   }
 
