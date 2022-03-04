@@ -84,6 +84,15 @@ export async function activate(context: ExtensionContext) {
       await tryExecute(() => GanacheCommands.stopGanacheCmd(viewItem));
     }
   );
+
+  const resartGanacheServer = commands.registerCommand(
+    "trufflesuite.restartGanacheServer",
+    async (viewItem?: ProjectView) => {
+      await tryExecute(() => GanacheCommands.stopGanacheCmd(viewItem)).then(() =>
+        tryExecute(() => GanacheCommands.startGanacheCmd(viewItem))
+      );
+    }
+  );
   //#endregion
 
   //#region truffle commands
@@ -225,6 +234,7 @@ export async function activate(context: ExtensionContext) {
     startDebugger,
     startGanacheServer,
     stopGanacheServer,
+    resartGanacheServer,
     // generateMicroservicesWorkflows,
     // generateDataPublishingWorkflows,
     // generateEventPublishingWorkflows,

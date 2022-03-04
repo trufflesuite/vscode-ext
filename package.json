@@ -155,12 +155,17 @@
       },
       {
         "command": "trufflesuite.startGanacheServer",
-        "title": "Start Ganache Server",
+        "title": "Start Ganache",
         "category": "Blockchain"
       },
       {
         "command": "trufflesuite.stopGanacheServer",
-        "title": "Stop Ganache Server",
+        "title": "Stop Ganache",
+        "category": "Blockchain"
+      },
+      {
+        "command": "trufflesuite.restartGanacheServer",
+        "title": "Restart Ganache",
         "category": "Blockchain"
       },
       {
@@ -259,12 +264,17 @@
       },
       {
         "command": "trufflesuite.startGanacheServer",
-        "title": "Start Ganache Server",
+        "title": "Start Ganache",
         "category": "Truffle"
       },
       {
         "command": "trufflesuite.stopGanacheServer",
-        "title": "Stop Ganache Server",
+        "title": "Stop Ganache",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.restartGanacheServer",
+        "title": "Restart Ganache",
         "category": "Truffle"
       },
       {
@@ -378,6 +388,11 @@
           "command": "trufflesuite.stopGanacheServer",
           "when": "view == Trufflesuite && viewItem == localproject",
           "group": "truffleSuite-1@1"
+        },
+        {
+          "command": "trufflesuite.restartGanacheServer",
+          "when": "view == Trufflesuite && viewItem == localproject",
+          "group": "truffleSuite-1@2"
         },
         {
           "command": "trufflesuite.disconnectProject",
