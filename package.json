@@ -41,9 +41,9 @@
     "onView:truffle-vscode.truffle",
     "onCommand:truffle-vscode.showWelcomePage",
     "onCommand:truffle-vscode.refresh",
-    "onCommand:contract.copyByteCode",
-    "onCommand:contract.copyDeployedByteCode",
-    "onCommand:contract.copyABI",
+    "onCommand:truffle-contract.copyByteCode",
+    "onCommand:truffle-contract.copyDeployedByteCode",
+    "onCommand:truffle-contract.copyABI",
     "onCommand:truffle-vscode.createLocalUI",
     "onCommand:truffle-vscode.newSolidityProject",
     "onCommand:truffle-vscode.buildContracts",
@@ -104,17 +104,17 @@
         }
       },
       {
-        "command": "contract.copyByteCode",
+        "command": "truffle-contract.copyByteCode",
         "title": "Copy Constructor Bytecode",
         "category": "Blockchain"
       },
       {
-        "command": "contract.copyDeployedByteCode",
+        "command": "truffle-contract.copyDeployedByteCode",
         "title": "Copy Transaction Bytecode",
         "category": "Blockchain"
       },
       {
-        "command": "contract.copyABI",
+        "command": "truffle-contract.copyABI",
         "title": "Copy Contract ABI",
         "category": "Blockchain"
       },
@@ -213,17 +213,17 @@
         }
       },
       {
-        "command": "contract.copyByteCode",
+        "command": "truffle-contract.copyByteCode",
         "title": "Copy Constructor Bytecode",
         "category": "Truffle"
       },
       {
-        "command": "contract.copyDeployedByteCode",
+        "command": "truffle-contract.copyDeployedByteCode",
         "title": "Copy Transaction Bytecode",
         "category": "Truffle"
       },
       {
-        "command": "contract.copyABI",
+        "command": "truffle-contract.copyABI",
         "title": "Copy Contract ABI",
         "category": "Truffle"
       },
@@ -327,15 +327,15 @@
         },
         {
           "when": "false",
-          "command": "contract.copyByteCode"
+          "command": "truffle-contract.copyByteCode"
         },
         {
           "when": "false",
-          "command": "contract.copyDeployedByteCode"
+          "command": "truffle-contract.copyDeployedByteCode"
         },
         {
           "when": "false",
-          "command": "contract.copyABI"
+          "command": "truffle-contract.copyABI"
         },
         {
           "when": "truffle-vscode:isWorkspaceOpen",
@@ -443,17 +443,17 @@
         },
         {
           "when": "resourceLangId == json",
-          "command": "contract.copyByteCode",
+          "command": "truffle-contract.copyByteCode",
           "group": "9_copyFromContractGroup"
         },
         {
           "when": "resourceLangId == json",
-          "command": "contract.copyDeployedByteCode",
+          "command": "truffle-contract.copyDeployedByteCode",
           "group": "9_copyFromContractGroup"
         },
         {
           "when": "resourceLangId == json",
-          "command": "contract.copyABI",
+          "command": "truffle-contract.copyABI",
           "group": "9_copyFromContractGroup"
         },
         {

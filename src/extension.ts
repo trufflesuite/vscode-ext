@@ -105,13 +105,13 @@ export async function activate(context: ExtensionContext) {
   const deployContracts = commands.registerCommand("truffle-vscode.deployContracts", async () => {
     await tryExecute(() => sdkCoreCommands.deploy());
   });
-  const copyByteCode = commands.registerCommand("contract.copyByteCode", async (uri: Uri) => {
+  const copyByteCode = commands.registerCommand("truffle-contract.copyByteCode", async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeBytecodeToBuffer(uri));
   });
-  const copyDeployedByteCode = commands.registerCommand("contract.copyDeployedByteCode", async (uri: Uri) => {
+  const copyDeployedByteCode = commands.registerCommand("truffle-contract.copyDeployedByteCode", async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeDeployedBytecodeToBuffer(uri));
   });
-  const copyABI = commands.registerCommand("contract.copyABI", async (uri: Uri) => {
+  const copyABI = commands.registerCommand("truffle-contract.copyABI", async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeAbiToBuffer(uri));
   });
   const copyRPCEndpointAddress = commands.registerCommand(
