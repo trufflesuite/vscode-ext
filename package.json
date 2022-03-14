@@ -5,7 +5,7 @@
   "publisher": "trufflesuite-csi",
   "preview": true,
   "icon": "images/TruffleLogo.png",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/trufflesuite/vscode-ext"
