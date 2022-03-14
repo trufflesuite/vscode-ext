@@ -6,7 +6,7 @@ import path from "path";
 import {ExtensionContext, extensions} from "vscode";
 import {IOZAsset} from "./services/openZeppelin/models";
 
-const extensionId = "trufflesuite-csi.trufflesuite-vscode";
+const extensionId = "trufflesuite-csi.truffle-vscode";
 const packageJSON = extensions.getExtension(extensionId)!.packageJSON;
 
 export enum RequiredApps {
@@ -765,9 +765,9 @@ export class Constants {
   public static allOpenZeppelinVersions = ["2.3.0", "2.4.0", "2.5.0", "3.4.0", "4.4.0"];
 
   public static userSettings = {
-    coreSdkSettingsKey: "trufflesuite.coreSDK",
-    ozVersionUserSettingsKey: "trufflesuite.openZeppelin.version",
-    storageAccountUserSettingsKey: "trufflesuite.storageAccount.name",
+    coreSdkSettingsKey: "truffle-vscode.coreSDK",
+    ozVersionUserSettingsKey: "truffle-vscode.openZeppelin.version",
+    storageAccountUserSettingsKey: "truffle-vscode.storageAccount.name",
   };
 
   public static bdmApplicationRequestParameters = {

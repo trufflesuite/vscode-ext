@@ -45,7 +45,7 @@ describe("Unit tests GanacheCommands", () => {
     sinon.restore();
   });
 
-  it("startGanacheCmd executes trufflesuite.showRequirementsPage cmd when not all app are installed", async () => {
+  it("startGanacheCmd executes truffle-vscode.showRequirementsPage cmd when not all app are installed", async () => {
     // Arrange
     checkAppsStub = sinon.stub(required, "checkApps").returns(Promise.resolve(false));
     const executeCommandStub = sinon.stub(commands, "executeCommand");

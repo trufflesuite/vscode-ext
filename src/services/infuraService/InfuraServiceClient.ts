@@ -18,7 +18,7 @@ class InfuraClient {
   private readonly disposables: Disposable[];
   private readonly eventEmitter: EventEmitter<string | undefined>;
   private readonly onCacheChange: Event<string | undefined>;
-  private readonly showProjectsFromInfuraCommand = "trufflesuite.showProjectsFromInfuraAccount";
+  private readonly showProjectsFromInfuraCommand = "truffle-vscode.showProjectsFromInfuraAccount";
 
   constructor() {
     this.disposables = [];

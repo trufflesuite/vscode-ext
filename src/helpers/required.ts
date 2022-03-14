@@ -48,10 +48,10 @@ export namespace required {
       const details = Constants.informationMessage.seeDetailsRequirementsPage;
       window.showErrorMessage(`${message}. ${details}`, Constants.informationMessage.detailsButton).then((answer) => {
         if (answer) {
-          commands.executeCommand("trufflesuite.showRequirementsPage");
+          commands.executeCommand("truffle-vscode.showRequirementsPage");
         }
       });
-      commands.executeCommand("trufflesuite.showRequirementsPage", true);
+      commands.executeCommand("truffle-vscode.showRequirementsPage", true);
     }
 
     return valid;
@@ -73,7 +73,7 @@ export namespace required {
       const message = Constants.errorMessageStrings.RequiredAppsAreNotInstalled;
       const details = Constants.informationMessage.seeDetailsRequirementsPage;
       window.showErrorMessage(`${message}. ${details}`);
-      commands.executeCommand("trufflesuite.showRequirementsPage");
+      commands.executeCommand("truffle-vscode.showRequirementsPage");
     }
 
     return valid;

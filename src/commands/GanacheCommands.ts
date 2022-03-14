@@ -17,7 +17,7 @@ export namespace GanacheCommands {
 
     if (!(await required.checkApps(RequiredApps.node))) {
       Telemetry.sendEvent("GanacheCommands.startGanacheCmd.nodeIsNotInstalled");
-      commands.executeCommand("trufflesuite.showRequirementsPage");
+      commands.executeCommand("truffle-vscode.showRequirementsPage");
       return;
     }
     const port = await getGanachePort(projectView);
