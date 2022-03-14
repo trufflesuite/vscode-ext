@@ -33,7 +33,7 @@ export class Constants {
   public static extensionKey = packageJSON.aiKey;
 
   public static outputChannel = {
-    truffleSuiteForVSCode: "Trufflesuite for VSCode",
+    truffleForVSCode: "Truffle for VSCode",
     executeCommand: "Execute command",
     ganacheCommands: "Ganache Server",
     logicAppGenerator: "Logic App Generator",
@@ -57,7 +57,7 @@ export class Constants {
   public static defaultTruffleBox = "truffle-box/vscode-starter-box";
   public static defaultDebounceTimeout = 300;
   public static defaultInputNameInBdm = "transaction-node";
-  public static containerTruffleSuiteExtension = "container-trufflesuite-extension";
+  public static containerTruffleExtension = "container-truffle-extension";
 
   public static infuraHost = "infura.io";
   public static localhost = "127.0.0.1";
@@ -69,7 +69,7 @@ export class Constants {
   public static ganacheRetryTimeout = 2000; // milliseconds
   public static ganacheRetryAttempts = 5;
 
-  public static trufflesuiteResourceName = {
+  public static truffleResourceName = {
     eventGrid: "Event Grid",
     transactionNode: "Transaction Node",
   };
@@ -151,7 +151,7 @@ export class Constants {
       changelogPath: "",
       path: "",
       showOnStartup: "showOnStartupChangelog",
-      title: "Trufflesuite Development Kit for Ethereum Changelog",
+      title: "Truffle Development Kit for Ethereum Changelog",
       viewType: "changelog",
     },
     contractUI: {
@@ -163,13 +163,13 @@ export class Constants {
     requirements: {
       path: "",
       showOnStartup: "showOnStartupRequirementsPage",
-      title: "Trufflesuite Development Kit - Preview",
+      title: "Truffle Development Kit - Preview",
       viewType: "requirementsPage",
     },
     welcome: {
       path: "",
       showOnStartup: "showOnStartupWelcomePage",
-      title: "Welcome to Trufflesuite",
+      title: "Welcome to Truffle",
       viewType: "welcomePage",
     },
   };

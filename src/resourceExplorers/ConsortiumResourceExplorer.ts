@@ -215,7 +215,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
   }
 
   private getConsortiumName(azureClient: AzureBlockchainServiceClient): Promise<string> {
-    return this.getTrufflesuiteServiceName(
+    return this.getTruffleServiceName(
       Constants.paletteLabels.enterConsortiumName,
       Constants.informationMessage.consortiumNameValidating,
       (name) =>
@@ -224,7 +224,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
   }
 
   private getConsortiumMemberName(azureClient: AzureBlockchainServiceClient): Promise<string> {
-    return this.getTrufflesuiteServiceName(
+    return this.getTruffleServiceName(
       Constants.paletteLabels.enterMemberName,
       Constants.informationMessage.memberNameValidating,
       (name) => AzureBlockchainServiceValidator.validateAzureBlockchainResourceName(name, azureClient.memberResource)
@@ -340,7 +340,7 @@ export class ConsortiumResourceExplorer extends AzureResourceExplorer {
     );
   }
 
-  private getTrufflesuiteServiceName(
+  private getTruffleServiceName(
     prompt: string,
     notificationTitle: string,
     validateInput: (value: string) => Promise<string | undefined | null>

@@ -42,7 +42,7 @@ export async function activate(context: ExtensionContext) {
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
   TreeManager.initialize(context.globalState);
-  TreeService.initialize("Trufflesuite");
+  TreeService.initialize("truffle-vscode.truffle");
   await sdkCoreCommands.initialize(context.globalState);
 
   setCommandContext(CommandContext.Enabled, true);

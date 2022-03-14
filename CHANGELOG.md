@@ -1,12 +1,12 @@
 # Change Log
 
-All notable changes to the "Trufflesuite" extension will be documented in this file.
+All notable changes to the "Truffle" extension will be documented in this file.
 
 ## 2.0.0
 
 ### Enhancements
 
-- This is the first iteration of the plugin as Trufflesuite for VSCode.
+- This is the first iteration of the plugin as Truffle for VSCode.
 
 ## 1.6.2
 

@@ -100,19 +100,19 @@ export namespace OpenZeppelinService {
           if (overwrite) {
             await fs.chmod(destinationFilePath, 0o222); // reset r/o flag, this allows to overwrite
           } else {
-            Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, `${fileUrl} - Skipped`);
+            Output.outputLine(Constants.outputChannel.truffleForVSCode, `${fileUrl} - Skipped`);
             return {state: PromiseState.fileExisted, asset};
           }
         }
 
         return download(fileUrl, destinationDirPath, {filename: path.basename(destinationFilePath)})
           .then(async () => {
-            Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, `${fileUrl} - OK`);
+            Output.outputLine(Constants.outputChannel.truffleForVSCode, `${fileUrl} - OK`);
             await fs.chmod(destinationFilePath, 0o444);
             return {state: PromiseState.fulfilled, asset};
           })
           .catch(() => {
-            Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, `${fileUrl} - Failed`);
+            Output.outputLine(Constants.outputChannel.truffleForVSCode, `${fileUrl} - Failed`);
             return {state: PromiseState.rejected, asset};
           });
       })
