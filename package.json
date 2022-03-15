@@ -480,7 +480,7 @@
     "debuggers": [
       {
         "type": "truffle",
-        "label": "Truffle Debugger",
+        "label": "Truffle - Debugger",
         "program": "./out/src/debugger.js",
         "runtime": "node",
         "configurationAttributes": {
@@ -524,7 +524,7 @@
           {
             "type": "truffle",
             "request": "launch",
-            "name": "Debug Transaction with Truffle",
+            "name": "Truffle - Debug Transaction",
             "stopOnEntry": false,
             "txHash": "0x",
             "files": [],
@@ -534,7 +534,7 @@
         ],
         "configurationSnippets": [
           {
-            "label": "Truffle Debugger: Launch",
+            "label": "Truffle - Debugger Launch",
             "description": "Runs the Truffle debugger (truffle) and attaches to a TestRPC instance",
             "body": {
               "type": "truffle",

@@ -8,7 +8,7 @@ import {Constants} from "../Constants";
 import {getWorkspaceRoot, showIgnorableNotification} from "../helpers";
 import {showInputBox, showQuickPick} from "../helpers/userInteraction";
 import {ResourceGroupItem, SubscriptionItem} from "../Models/QuickPickItems";
-import {Output} from "../Output";
+// import {Output} from "../Output";
 import {AzureResourceExplorer} from "../resourceExplorers";
 import {ContractService} from "../services";
 import {Telemetry} from "../TelemetryClient";
@@ -269,6 +269,6 @@ export class LogicAppGenerator {
     await fs.mkdirp(path.dirname(filePath));
     await fs.writeFile(filePath, file.get_GeneratedCode());
 
-    Output.outputLine(Constants.outputChannel.logicAppGenerator, "Saved file to " + filePath);
+    //Output.outputLine(Constants.outputChannel.logicAppGenerator, "Saved file to " + filePath);
   }
 }

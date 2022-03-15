@@ -34,12 +34,12 @@ export class Constants {
 
   public static outputChannel = {
     truffleForVSCode: "Truffle for VSCode",
-    executeCommand: "Execute command",
-    ganacheCommands: "Ganache Server",
-    logicAppGenerator: "Logic App Generator",
-    requirements: "Requirements",
-    telemetryClient: "Telemetry Client",
-    treeManager: "Service Tree Manager",
+    executeCommand: "Truffle: Execute command",
+    ganacheCommands: "Truffle: Ganache Server",
+    //logicAppGenerator: "Logic App Generator",
+    requirements: "Truffle: Requirements",
+    telemetryClient: "Truffle: Telemetry Client",
+    treeManager: "Truffle: Service Tree Manager",
   };
 
   public static truffleConfigRequireNames = {
@@ -849,8 +849,8 @@ export class Constants {
   public static externalExtensions: Record<string, any> = {
     OpenZeppelin: {
       commands: {
-        buildContracts: "oz.build.command",
-        deployContracts: "oz.deploy.command",
+        buildContracts: "truffle-oz.build.command",
+        deployContracts: "truffle-oz.deploy.command",
       },
       name: "truffle-oz.extension.name",
       supportedVersion: "1.0.0",

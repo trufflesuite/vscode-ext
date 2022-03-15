@@ -6,14 +6,13 @@ import {
   DebuggerCommands,
   GanacheCommands,
   InfuraCommands,
-  OpenZeppelinCommands,
   ProjectCommands,
   sdkCoreCommands,
   ServiceCommands,
   TruffleCommands,
 } from "./commands";
 import {Constants} from "./Constants";
-import {CommandContext, isWorkspaceOpen, openZeppelinHelper, required, setCommandContext} from "./helpers";
+import {CommandContext, isWorkspaceOpen, required, setCommandContext} from "./helpers";
 import {CancellationEvent} from "./Models";
 import {Output} from "./Output";
 import {ChangelogPage, RequirementsPage, WelcomePage} from "./pages";
@@ -173,9 +172,9 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region open zeppelin commands
-  const openZeppelinAddCategory = commands.registerCommand("truffle-oz.addCategory", async () => {
-    await tryExecute(() => OpenZeppelinCommands.addCategory());
-  });
+  // const openZeppelinAddCategory = commands.registerCommand("truffle-oz.addCategory", async () => {
+  //   await tryExecute(() => OpenZeppelinCommands.addCategory());
+  // });
   //#endregion
 
   //#region logic app commands
@@ -243,7 +242,7 @@ export async function activate(context: ExtensionContext) {
     signInToInfuraAccount,
     signOutOfInfuraAccount,
     showProjectsFromInfuraAccount,
-    openZeppelinAddCategory,
+    //openZeppelinAddCategory,
     openAtAzurePortal,
     changeCoreSdkConfigurationListener,
   ];
@@ -253,7 +252,7 @@ export async function activate(context: ExtensionContext) {
 
   Telemetry.sendEvent(Constants.telemetryEvents.extensionActivated);
 
-  checkAndUpgradeOpenZeppelinAsync();
+  // checkAndUpgradeOpenZeppelinAsync();
 }
 
 export async function deactivate(): Promise<void> {
@@ -279,9 +278,9 @@ async function tryExecute(func: () => Promise<any>, errorMessage: string | null 
   }
 }
 
-async function checkAndUpgradeOpenZeppelinAsync(): Promise<void> {
-  if (await openZeppelinHelper.shouldUpgradeOpenZeppelinAsync()) {
-    await openZeppelinHelper.upgradeOpenZeppelinUserSettingsAsync();
-    await openZeppelinHelper.upgradeOpenZeppelinContractsAsync();
-  }
-}
+// async function checkAndUpgradeOpenZeppelinAsync(): Promise<void> {
+//   if (await openZeppelinHelper.shouldUpgradeOpenZeppelinAsync()) {
+//     await openZeppelinHelper.upgradeOpenZeppelinUserSettingsAsync();
+//     await openZeppelinHelper.upgradeOpenZeppelinContractsAsync();
+//   }
+// }
