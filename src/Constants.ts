@@ -852,7 +852,7 @@ export class Constants {
         buildContracts: "oz.build.command",
         deployContracts: "oz.deploy.command",
       },
-      name: "openZeppelin.extension.name",
+      name: "truffle-oz.extension.name",
       supportedVersion: "1.0.0",
     },
   };

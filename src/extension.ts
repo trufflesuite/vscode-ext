@@ -173,7 +173,7 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region open zeppelin commands
-  const openZeppelinAddCategory = commands.registerCommand("openZeppelin.addCategory", async () => {
+  const openZeppelinAddCategory = commands.registerCommand("truffle-oz.addCategory", async () => {
     await tryExecute(() => OpenZeppelinCommands.addCategory());
   });
   //#endregion
@@ -202,7 +202,7 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region debugger commands
-  const startDebugger = commands.registerCommand("extension.truffle-vscode.debugTransaction", async () => {
+  const startDebugger = commands.registerCommand("truffle-vscode.debugTransaction", async () => {
     await tryExecute(() => DebuggerCommands.startSolidityDebugger());
   });
   //#endregion
