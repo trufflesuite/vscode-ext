@@ -53,7 +53,7 @@ describe("RuntimeInterface unit tests", () => {
     const sessionSelectorView = (selector: any) => {
       if (selector === truffleDebugger.selectors.controller.current.location) {
         return {};
-      } else if (selector === truffleDebugger.selectors.solidity.current.source) {
+      } else if (selector === truffleDebugger.selectors.sourcemapping.current.source) {
         return undefined;
       }
       return {};

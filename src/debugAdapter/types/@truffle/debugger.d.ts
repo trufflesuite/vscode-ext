@@ -10,7 +10,7 @@ declare module "@truffle/debugger" {
   // import type Web3 from "web3";
   interface Selectors {
     // FIXME: there are more selectors in the latest release we can add in here?
-    solidity: any;
+    sourcemapping: any;
     evm: any;
     controller: any;
     trace: any;
