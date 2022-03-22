@@ -472,7 +472,7 @@
       ],
       "debug": [
         {
-          "id": "InstructionView",
+          "id": "DebugInstructionView",
           "name": "Instructions"
         }
       ]
