@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { TreeView, window } from "vscode";
-import { IInstruction } from "../models/IInstruction";
+import {TreeView, window} from "vscode";
+import {IInstruction} from "../models/IInstruction";
 import InstructionDataManager from "./instructionDataManager";
 import InstructionDataProvider from "./instructionDataProvider";
 import InstructionTreeNode from "./instructionTreeNode";
 
-const INSTRUCTION_VIEW_ID = "InstructionView";
+const INSTRUCTION_VIEW_ID = "DebugInstructionView";
 
 export default class InstructionView {
   private view: TreeView<InstructionTreeNode>;
@@ -28,7 +28,7 @@ export default class InstructionView {
   public revealInstruction(instruction: IInstruction) {
     if (this.view.visible) {
       const treeNode = new InstructionTreeNode(undefined, undefined, instruction);
-      this.view.reveal(treeNode, { focus: true, select: true, expand: true });
+      this.view.reveal(treeNode, {focus: true, select: true, expand: true});
     }
   }
 }
