@@ -53,7 +53,6 @@
     "onCommand:trufflesuite.createProject",
     "onCommand:trufflesuite.disconnectProject",
     "onCommand:extension.truffle.debugTransaction",
-    "onCommand:openZeppelin.addCategory",
     "onCommand:trufflesuite.signInToInfuraAccount",
     "onCommand:trufflesuite.signOutOfInfuraAccount",
     "onCommand:trufflesuite.openAtAzurePortal",
@@ -68,11 +67,6 @@
           "default": false,
           "description": "Disable notification on long running tasks."
         },
-        "trufflesuite.openZeppelin.version": {
-          "type": "string",
-          "default": "2.5.0",
-          "scope": "The latest Open Zeppelin version"
-        },
         "trufflesuite.storageAccount.name": {
           "type": "string",
           "scope": "Storage Account name"
@@ -82,8 +76,7 @@
           "scope": "Core SDK for extensions backend",
           "default": "Truffle",
           "enum": [
-            "Truffle",
-            "OpenZeppelin"
+            "Truffle"
           ]
         }
       }
@@ -186,11 +179,6 @@
       {
         "command": "trufflesuite.getPrivateKey",
         "title": "Retrieve private key",
-        "category": "Blockchain"
-      },
-      {
-        "command": "openZeppelin.addCategory",
-        "title": "Add contracts from OpenZeppelin",
         "category": "Blockchain"
       },
       {
@@ -347,10 +335,6 @@
         },
         {
           "when": "false",
-          "command": "openZeppelin.addCategory"
-        },
-        {
-          "when": "false",
           "command": "trufflesuite.openAtAzurePortal"
         }
       ],
@@ -455,11 +439,6 @@
           "when": "resourceLangId == json",
           "command": "contract.copyABI",
           "group": "9_copyFromContractGroup"
-        },
-        {
-          "when": "resourceLangId == solidity",
-          "command": "openZeppelin.addCategory",
-          "group": "8_buildContractGroup"
         }
       ]
     },

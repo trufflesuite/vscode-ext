@@ -9,7 +9,7 @@ import {
   // showNotificationConfirmationDialog,
   userSettings,
 } from "../helpers";
-import {IExtensionAdapter, OpenZeppelinExtensionAdapter, TruffleExtensionAdapter} from "../services/extensionAdapter";
+import {IExtensionAdapter, TruffleExtensionAdapter} from "../services/extensionAdapter";
 
 class SdkCoreCommands {
   // @ts-ignore
@@ -31,12 +31,10 @@ class SdkCoreCommands {
    * @param args an array of compile/build time args you want to pass to the task (optional)
    */
   public async build(...args: Array<string>): Promise<void> {
-    // await this.notifyAboutOpenZeppelinSdk();
     return this.extensionAdapter.build(...args);
   }
 
   public async deploy(): Promise<void> {
-    // await this.notifyAboutOpenZeppelinSdk();
     return this.extensionAdapter.deploy();
   }
 
@@ -46,39 +44,10 @@ class SdkCoreCommands {
 
   private getExtensionAdapter(sdk: string): IExtensionAdapter {
     switch (sdk) {
-      case Constants.coreSdk.openZeppelin:
-        return new OpenZeppelinExtensionAdapter();
       default:
         return new TruffleExtensionAdapter();
     }
   }
-
-  // TODO: uncomment this once openzeppelin extension is ready
-  /* private async notifyAboutOpenZeppelinSdk() {
-    const isNotified = this.globalState!.get(Constants.globalStateKeys.isNotifiedAboutOZSdk);
-
-    if (!isNotified) {
-      const sdk = await this.getCoreSdk();
-      if (sdk.userValue !== Constants.coreSdk.openZeppelin) {
-        const answer = await showNotificationConfirmationDialog(
-          Constants.informationMessage.ozFrameworkIsAvailableNow,
-          Constants.installationDialogResult.install,
-          Constants.installationDialogResult.cancel);
-        if (answer) {
-          await outputCommandHelper.executeCommand(
-            getWorkspaceRoot(true),
-            `code --install-extension ${Constants.externalExtensions.openZeppelin.name}@'+
-            `${Constants.externalExtensions.openZeppelin.supportedVersion}`);
-          await userSettings.updateConfigurationAsync(
-            Constants.userSettings.coreSdkSettingsKey,
-            Constants.coreSdk.openZeppelin);
-        }
-      }
-
-      await this.globalState!.update(Constants.globalStateKeys.isNotifiedAboutOZSdk, true);
-      await this.initialize(this.globalState!);
-    }
-  } */
 }
 
 export const sdkCoreCommands = new SdkCoreCommands();

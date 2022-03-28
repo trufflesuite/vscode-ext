@@ -4,7 +4,6 @@
 import os from "os";
 import path from "path";
 import {ExtensionContext, extensions} from "vscode";
-import {IOZAsset} from "./services/openZeppelin/models";
 
 const extensionId = "trufflesuite-csi.trufflesuite-vscode";
 const packageJSON = extensions.getExtension(extensionId)!.packageJSON;
@@ -449,7 +448,6 @@ export class Constants {
     noUpperCaseLetter: "Password should have at least one uppercase letter from A to Z.",
     onlyLowerCaseAllowed: "Only lower case allowed.",
     onlyNumberAllowed: "Value after ':' should be a number.",
-    openZeppelinFilesAreInvalid: Constants.getMessageOpenZeppelinFilesAreInvalid,
     portAlreadyInUse: "This port is already in use. Choose another one.",
     portNotInUseGanache: "No local ganache service running on port. Please start service or select another port.",
     projectAlreadyExists: "Network already exists.",
@@ -657,7 +655,6 @@ export class Constants {
     memberNameValidating: "Member name validating...",
     networkIsNotReady: Constants.getNetworkIsNotReadyMessage,
     openButton: "Open",
-    ozFrameworkIsAvailableNow: "You can now use OpenZeppelin framework as well as Truffle",
     privateKeyWasCopiedToClipboard: "Private key was copied to clipboard",
     provisioningResource: (name: string) =>
       `${name} is provisioning. The provisioning status can be viewed in the Azure portal. ` +
@@ -759,14 +756,8 @@ export class Constants {
     string: "string",
     uint: "uint",
   };
-
-  // FIXME: revise the openzeppelin versions to work properly.
-  public static firstOZVersion = "2.3.0";
-  public static allOpenZeppelinVersions = ["2.3.0", "2.4.0", "2.5.0", "3.4.0", "4.4.0"];
-
   public static userSettings = {
     coreSdkSettingsKey: "trufflesuite.coreSDK",
-    ozVersionUserSettingsKey: "trufflesuite.openZeppelin.version",
     storageAccountUserSettingsKey: "trufflesuite.storageAccount.name",
   };
 
@@ -776,85 +767,7 @@ export class Constants {
   };
 
   public static coreSdk = {
-    openZeppelin: "OpenZeppelin",
     truffle: "Truffle",
-  };
-
-  public static openZeppelin = {
-    cancelButtonTitle: "Cancel",
-    contractsUpgradeIsFailed: "Upgrade of OpenZeppelin contracts has failed",
-    contactParameterInformation(contractName: string, parameterName: string, parameterType: string) {
-      return `Contract: ${contractName}. Parameter: ${parameterName}: ${parameterType}`;
-    },
-    descriptionDownloadingFailed: "Description downloading failed",
-    downloadingContractsFromOpenZeppelin: "Downloading contracts from OpenZeppelin",
-    exploreDownloadedContractsInfo: "Explore more information about the contracts downloaded",
-    invalidVersionException: "Invalid version. All OpenZeppelin work will be stopped",
-    moreDetailsButtonTitle: "More details",
-    newVersionAvailable:
-      "There is a new version of your OpenZeppelin contracts available. Would you like to download the latest version?",
-    overwriteExistedContracts: "Overwrite existed contracts",
-    projectFileName: "project.json",
-    replaceButtonTitle: "Replace",
-    retryButtonTitle: "Retry",
-    retryDownloading: "Retry downloading",
-    saveSpecifiedParameters: "Not all contract parameters were defined. Do you want to save the progress?",
-    selectCategoryForDownloading: "Select category for downloading",
-    skipButtonTitle: "Skip files",
-    specifyContractParameters: "Some contracts have parameters required for deploy. Do you want to specify them?",
-    upgradeOpenZeppelin: "Upgrading OpenZeppelin",
-    hashCalculationFailed(errorMessage: string): string {
-      return `Error while calculating file hash. Message: ${errorMessage}`;
-    },
-    wereNotDownloaded(count: number): string {
-      return `OpenZeppelin: Some files (${count}) were not downloaded`;
-    },
-    wereDownloaded(count: number): string {
-      return `OpenZeppelin: (${count}) files were stored`;
-    },
-    alreadyExisted(existing: IOZAsset[]): string {
-      return (
-        `OpenZeppelin: (${existing.length}) files already exist on disk: ` +
-        existing
-          .slice(0, 3)
-          .map((contract) => contract.name)
-          .join(" ") +
-        (existing.length > 3 ? "..." : "")
-      );
-    },
-    invalidHashMessage(contractPath: string): string {
-      return `${contractPath} - invalid hash`;
-    },
-    validHashMessage(contractPath: string): string {
-      return `${contractPath} - valid hash`;
-    },
-    contractNotExistedOnDisk(contractPath: string): string {
-      return `${contractPath} - not existed on disk`;
-    },
-    categoryWillDownloaded(categoryName: string): string {
-      return `OpenZeppelin category will be downloaded: ${categoryName}`;
-    },
-    fileNow(count: number): string {
-      return `${count} file(s) on OpenZeppelin library now`;
-    },
-    invalidVersionDialog(version: string, location: string, lastVersion: string) {
-      return (
-        `There is invalid OpenZeppelin version (${version}) in ${location}. ` +
-        `Do you want to use the latest one (${lastVersion})?`
-      );
-    },
-  };
-
-  // TODO: add real extensions information when they will be released
-  public static externalExtensions: Record<string, any> = {
-    OpenZeppelin: {
-      commands: {
-        buildContracts: "oz.build.command",
-        deployContracts: "oz.deploy.command",
-      },
-      name: "openZeppelin.extension.name",
-      supportedVersion: "1.0.0",
-    },
   };
 
   public static initialize(context: ExtensionContext) {
@@ -1006,12 +919,6 @@ export class Constants {
   private static getMessageInputHasUnresolvedSymbols(unresolvedSymbols: string): string {
     return `Input value must not have '${unresolvedSymbols}'.`;
   }
-
-  private static getMessageOpenZeppelinFilesAreInvalid(invalidFilePaths: string[]): string {
-    return `OpenZeppelin files have been modified or removed:
-      ${invalidFilePaths.join("; ")}. Please revert changes or download them again.`;
-  }
-
   private static getNetworkIsNotReadyMessage(itemType: string) {
     switch (itemType) {
       case "AzureBlockchainNetworkNode":
