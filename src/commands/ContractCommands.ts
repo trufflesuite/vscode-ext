@@ -1,12 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { commands, ExtensionContext, Uri, window } from "vscode";
-import { Constants } from "../Constants";
-import { CancellationEvent } from "../Models";
-import { ContractUI } from "../pages/ContractUI";
-import { ContractDB, ContractService } from "../services";
-import { Telemetry } from "../TelemetryClient";
+import {commands, ExtensionContext, Uri, window} from "vscode";
+import {Constants} from "../Constants";
+import {CancellationEvent} from "../Models";
+import {ContractUI} from "../pages/ContractUI";
+import {ContractDB, ContractService} from "../services";
+import {Telemetry} from "../TelemetryClient";
 
 export namespace ContractCommands {
   export async function showSmartContractPage(context: ExtensionContext, uri: Uri): Promise<void> {
@@ -26,7 +26,7 @@ export namespace ContractCommands {
 
       if (result === Constants.informationMessage.deployButton) {
         Telemetry.sendEvent("ContractCommands.showSmartContract.deployContracts");
-        await commands.executeCommand("truffle.deployContracts");
+        await commands.executeCommand("truffle-vscode.deployContracts");
       } else {
         Telemetry.sendEvent("ContractCommands.showSmartContract.userCancellation");
         throw new CancellationEvent();

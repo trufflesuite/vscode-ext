@@ -1,6 +1,6 @@
-# Trufflesuite for VSCode
+# Truffle for VSCode
 
-The extension simplifies how you create, build and deploy smart contracts on Ethereum ledgers using the Trufflesuite of tools.
+The extension simplifies how you create, build and deploy smart contracts on Ethereum ledgers using the Truffle of tools.
 
 - If you are doing open source blockchain development, the extension has built in integration for open source tools such as [Truffle/Ganache](https://trufflesuite.com/), [Infura](https://infura.io/).
 - If you are doing Azure development, an Azure subscription is required, log into your Azure subscription or create a [free account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F) before you begin. Enjoy the same integration of open source tools with Azure hosted blockchain networks such as [Hyperledger Besu](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/consensys.quorum-dev-quickstart) or the enterprise supported [Quorum Blockchain Service](https://azuremarketplace.microsoft.com/en-gb/marketplace/apps/consensys.qbs-contact-me)
@@ -12,7 +12,7 @@ The extension simplifies how you create, build and deploy smart contracts on Eth
 
 ## Create a new smart contract project
 
-The Trufflesuite for VSCode was built to work effectively for both new users to Ethereum, but not get in the way for those familiar with the process. One of the primary goals is to help users create a project structure for developing smart contracts, help in the compilation and building of these assets, deployment of these assets to blockchain endpoints as well as debugging of these contracts.
+The Truffle for VSCode was built to work effectively for both new users to Ethereum, but not get in the way for those familiar with the process. One of the primary goals is to help users create a project structure for developing smart contracts, help in the compilation and building of these assets, deployment of these assets to blockchain endpoints as well as debugging of these contracts.
 
 Developers that are familiar with Truffle Suite may use the Truffle command line `e.g., truffle init` directly from the VS Code terminal, if they like.
 

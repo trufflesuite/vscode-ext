@@ -7,7 +7,7 @@ import InstructionDataManager from "./instructionDataManager";
 import InstructionDataProvider from "./instructionDataProvider";
 import InstructionTreeNode from "./instructionTreeNode";
 
-const INSTRUCTION_VIEW_ID = "DebugInstructionView";
+const INSTRUCTION_VIEW_ID = "truffle-vscode.InstructionView";
 
 export default class InstructionView {
   private view: TreeView<InstructionTreeNode>;

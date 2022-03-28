@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { OutputChannel, window } from "vscode";
-import { Constants } from "./Constants";
+import {OutputChannel, window} from "vscode";
+import {Constants} from "./Constants";
 
 export class Output {
   public static output(label: string, message: string): void {
@@ -25,9 +25,7 @@ export class Output {
     this._outputChannel.dispose();
   }
 
-  private static _outputChannel: OutputChannel = window.createOutputChannel(
-    Constants.outputChannel.truffleSuiteForVSCode
-  );
+  private static _outputChannel: OutputChannel = window.createOutputChannel(Constants.outputChannel.truffleForVSCode);
 
   private static formatMessage(label: string = "", message: string = ""): string {
     return `${label ? `[${label}] ` : ""}${message}`;

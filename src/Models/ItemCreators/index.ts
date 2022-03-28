@@ -3,7 +3,7 @@
 
 export * from "./AzureBlockchainNetworkNodeItemCreator";
 export * from "./AzureBlockchainProjectItemCreator";
-export * from "./TrufflesuiteServiceItemCreator";
+export * from "./TruffleServiceItemCreator";
 export * from "./BlockchainDataManager/BlockchainDataManagerNetworkNodeItemCreator";
 export * from "./BlockchainDataManager/BlockchainDataManagerProjectItemCreator";
 export * from "./BlockchainDataManager/BlockchainDataManagerServiceItemCreator";

@@ -135,7 +135,7 @@ export async function showNotification(options: Notification.IShowNotificationOp
 }
 
 export async function showIgnorableNotification(message: string, fn: () => Promise<any>): Promise<void> {
-  const ignoreNotification = workspace.getConfiguration("trufflesuite").get("ignoreLongRunningTaskNotification");
+  const ignoreNotification = workspace.getConfiguration("truffle-vscode").get("ignoreLongRunningTaskNotification");
 
   await window.withProgress(
     {

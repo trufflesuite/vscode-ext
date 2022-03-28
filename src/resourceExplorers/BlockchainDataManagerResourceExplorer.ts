@@ -749,7 +749,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     );
 
     showNotification({
-      message: Constants.informationMessage.provisioningResource(Constants.trufflesuiteResourceName.eventGrid),
+      message: Constants.informationMessage.provisioningResource(Constants.truffleResourceName.eventGrid),
       type: NotificationOptions.info,
     });
     open(`${Constants.azureResourceExplorer.portalBasUri}/resource/${eventGrid.id}`);
@@ -785,7 +785,7 @@ export class BlockchainDataManagerResourceExplorer extends AzureResourceExplorer
     );
 
     showNotification({
-      message: Constants.informationMessage.provisioningResource(Constants.trufflesuiteResourceName.transactionNode),
+      message: Constants.informationMessage.provisioningResource(Constants.truffleResourceName.transactionNode),
       type: NotificationOptions.info,
     });
     open(this.getTransactionNodeExternalUrl(createdTransactionNode.id));
