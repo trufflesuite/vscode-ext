@@ -32,8 +32,6 @@ import {
 } from "../../src/Models/TreeItems";
 import {ConsortiumResourceExplorer} from "../../src/resourceExplorers";
 import {GanacheService, MnemonicRepository, TreeManager} from "../../src/services";
-// import {OpenZeppelinService} from "../../src/services";
-// import {OZContractValidated} from "../../src/services/openZeppelin/models";
 import {TestConstants} from "../TestConstants";
 import {AzureAccountHelper} from "../testHelpers/AzureAccountHelper";
 const {service} = Constants.treeItemData;
@@ -81,14 +79,7 @@ describe("TruffleCommands", () => {
 
       let getExtensionMock: any;
 
-      // let openZeppelinvalidateContractsAsyncMock: any;
-      // let projectJsonExistsStub: sinon.SinonStub<[], boolean>;
-      // let shouldUpgradeOpenZeppelinAsyncStub: sinon.SinonStub<[], Promise<boolean>>;
-
       beforeEach(async () => {
-        // sinon.stub(helpers.openZeppelinHelper, "tryGetCurrentOpenZeppelinVersionAsync");
-        // sinon.stub(helpers.openZeppelinHelper, "defineContractRequiredParameters");
-        // sinon.stub(OpenZeppelinMigrationsService, "generateMigrations");
         getWorkspaceRootMock = sinon.stub(helpers, "getWorkspaceRoot");
 
         requiredMock = sinon.mock(helpers.required);
@@ -135,14 +126,6 @@ describe("TruffleCommands", () => {
         getAccessKeysMock = sinon.stub(ConsortiumResourceExplorer.prototype, "getAccessKeys");
 
         getExtensionMock = sinon.stub(vscode.extensions, "getExtension").returns(AzureAccountHelper.mockExtension);
-
-        // projectJsonExistsStub = sinon.stub(OpenZeppelinService, "projectJsonExists").returns(false);
-        // shouldUpgradeOpenZeppelinAsyncStub = sinon
-        //   .stub(openZeppelinHelper, "shouldUpgradeOpenZeppelinAsync")
-        //   .resolves(false);
-
-        // const openZeppelinServiceMock = sinon.mock(OpenZeppelinService);
-        // openZeppelinvalidateContractsAsyncMock = openZeppelinServiceMock.expects("validateContractsAsync").resolves([]);
       });
 
       afterEach(() => {
@@ -254,70 +237,6 @@ describe("TruffleCommands", () => {
           "installTruffleHdWalletProvider should not be called"
         );
       });
-
-      // it("to development should complete successfully with updating OpenZeppelin", async () => {
-      //   // Arrange
-      //   checkAppsSilentMock.returns(true);
-      //   getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-      //   executeCommandMock.returns(uuid.v4());
-      //   isHdWalletProviderRequiredMock.returns(false);
-      //   projectJsonExistsStub.returns(true);
-      //   shouldUpgradeOpenZeppelinAsyncStub.resolves(true);
-
-      //   const updateOpenZeppelinInUserSettingsSpy = sinon
-      //     .stub(helpers.openZeppelinHelper, "upgradeOpenZeppelinUserSettingsAsync")
-      //     .resolves();
-      //   const updateOpenZeppelinContractsSpy = sinon
-      //     .stub(helpers.openZeppelinHelper, "upgradeOpenZeppelinContractsAsync")
-      //     .resolves();
-
-      //   const truffleCommandsRewire = rewire("../../src/commands/TruffleCommands");
-      //   truffleCommandsRewire.__set__("validateOpenZeppelinContracts", sinon.mock());
-      //   const validateOpenZeppelinContractsMock = truffleCommandsRewire.__get__("validateOpenZeppelinContracts");
-
-      //   showQuickPickMock.onCall(0).callsFake((items: any) => {
-      //     return items.find((item: any) => item.label === TestConstants.servicesNames.development);
-      //   });
-
-      //   // Act
-      //   await truffleCommandsRewire.TruffleCommands.deployContracts();
-
-      //   // Assert
-      //   assert.strictEqual(showQuickPickMock.calledOnce, true, "showQuickPick should be called once");
-      //   assert.strictEqual(showInputBoxMock.called, false, "showInputBox should not be called");
-      //   assert.strictEqual(checkAppsSilentMock.calledOnce, true, "checkAppsSilent should be called once");
-      //   assert.strictEqual(installTruffleMock.called, false, "installTruffle should not be called");
-      //   assert.strictEqual(getWorkspaceRootMock.called, true, "getWorkspaceRoot should be called");
-      //   assert.strictEqual(executeCommandMock.called, true, "executeCommand should be called");
-      //   assert.strictEqual(startGanacheServerMock.called, true, "startGanacheServer should be called");
-      //   assert.strictEqual(truffleConfigSetNetworkMock.called, false, "truffleConfig.setNetwork should not be called");
-      //   assert.strictEqual(
-      //     isHdWalletProviderRequiredMock.calledOnce,
-      //     true,
-      //     "isHdWalletProviderRequired should be called"
-      //   );
-      //   assert.strictEqual(
-      //     updateOpenZeppelinInUserSettingsSpy.called,
-      //     true,
-      //     "updateOpenZeppelinInUserSettings should be called"
-      //   );
-      //   assert.strictEqual(updateOpenZeppelinContractsSpy.called, true, "updateOpenZeppelinContracts should be called");
-      //   assert.strictEqual(
-      //     validateOpenZeppelinContractsMock.calledOnce,
-      //     true,
-      //     "validateOpenZeppelinContracts should be called"
-      //   );
-      //   assert.strictEqual(
-      //     checkHdWalletProviderVersionMock.calledOnce,
-      //     false,
-      //     "checkHdWalletProviderVersion should not be called"
-      //   );
-      //   assert.strictEqual(
-      //     installTruffleHdWalletProviderMock.calledOnce,
-      //     false,
-      //     "installTruffleHdWalletProvider should not be called"
-      //   );
-      // });
 
       it("to development should throw exception when there is an error on command execution", async () => {
         // Arrange
@@ -649,65 +568,6 @@ describe("TruffleCommands", () => {
         // Assert
         assert.strictEqual(isBDMExist, false, "deploy destination list should not have Blockchain Data Manager");
       });
-
-      // describe("validating openZeppelin contracts before deploy", () => {
-      //   beforeEach(() => {
-      //     checkAppsSilentMock.resolves(true);
-      //     getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-      //     showInputBoxMock.returns(Constants.confirmationDialogResult.yes);
-      //     executeCommandMock.returns(uuid.v4());
-
-      //     showQuickPickMock.onCall(0).callsFake((items: any) => {
-      //       return items.find((item: any) => item.label === TestConstants.servicesNames.testNetwork);
-      //     });
-      //   });
-
-      //   afterEach(() => {
-      //     sinon.restore();
-      //   });
-
-      //   it("should pass when openZeppelin contracts are valid", async () => {
-      //     // Arrange
-      //     projectJsonExistsStub.returns(true);
-      //     openZeppelinvalidateContractsAsyncMock.resolves([new OZContractValidated("1", true, true)]);
-
-      //     // Act
-      //     await TruffleCommands.deployContracts();
-
-      //     // Assert
-      //     assert.strictEqual(executeCommandMock.called, true, "executeCommand should be called");
-      //   });
-
-      //   it("should throw error when downloaded openZeppelin contract has invalid hash", async () => {
-      //     // Arrange
-      //     projectJsonExistsStub.returns(true);
-      //     openZeppelinvalidateContractsAsyncMock.resolves([new OZContractValidated("1", true, false)]);
-
-      //     // Act and Assert
-      //     await assert.rejects(TruffleCommands.deployContracts(), Error);
-      //   });
-
-      //   it("should throw error when downloaded openZeppelin contract doesn't exist on the disk", async () => {
-      //     // Arrange
-      //     projectJsonExistsStub.returns(true);
-      //     openZeppelinvalidateContractsAsyncMock.resolves([new OZContractValidated("1", false)]);
-
-      //     // Act and Assert
-      //     await assert.rejects(TruffleCommands.deployContracts(), Error);
-      //   });
-
-      //   it("should throw error when any downloaded openZeppelin contract is invalid", async () => {
-      //     // Arrange
-      //     projectJsonExistsStub.returns(true);
-      //     openZeppelinvalidateContractsAsyncMock.resolves([
-      //       new OZContractValidated("1", true, false),
-      //       new OZContractValidated("2", true, true),
-      //     ]);
-
-      //     // Act and Assert
-      //     await assert.rejects(TruffleCommands.deployContracts(), Error);
-      //   });
-      // });
     });
   });
 });

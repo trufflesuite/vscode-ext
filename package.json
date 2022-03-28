@@ -67,11 +67,6 @@
           "default": false,
           "description": "Disable notification on long running tasks."
         },
-        "trufflesuite.openZeppelin.version": {
-          "type": "string",
-          "default": "2.5.0",
-          "scope": "The latest Open Zeppelin version"
-        },
         "trufflesuite.storageAccount.name": {
           "type": "string",
           "scope": "Storage Account name"
@@ -81,8 +76,7 @@
           "scope": "Core SDK for extensions backend",
           "default": "Truffle",
           "enum": [
-            "Truffle",
-            "OpenZeppelin"
+            "Truffle"
           ]
         }
       }
