@@ -64,7 +64,7 @@ export default class RuntimeInterface extends EventEmitter {
     }
 
     // we'll need the debugger-internal ID of this source
-    const debuggerSource: any = this._session.view(this._selectors.solidity.current.source);
+    const debuggerSource: any = this._session.view(this._selectors.sourcemapping.current.source);
 
     const breakpoint: DebuggerTypes.IBreakpoint = {
       id: this._numBreakpoints,
@@ -172,7 +172,7 @@ export default class RuntimeInterface extends EventEmitter {
   public currentLine(): DebuggerTypes.IFrame {
     this.validateSession();
     const currentLocation = this._session!.view(this._selectors.controller.current.location);
-    const sourcePath = this._session!.view(this._selectors.solidity.current.source).sourcePath;
+    const sourcePath = this._session!.view(this._selectors.sourcemapping.current.source).sourcePath;
     if (!sourcePath) {
       throw new Error("No source file");
     }
@@ -194,7 +194,7 @@ export default class RuntimeInterface extends EventEmitter {
 
   public getCurrentInstructionStep(): IInstruction {
     this.validateSession();
-    return this._session!.view(this._selectors.solidity.current.instruction) as IInstruction;
+    return this._session!.view(this._selectors.sourcemapping.current.instruction) as IInstruction;
   }
 
   public sendEvent(event: string, ...args: any[]) {
