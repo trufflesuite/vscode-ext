@@ -19,17 +19,7 @@
     "vscode": "^1.63.0"
   },
   "keywords": [
-    "blockchain",
-    "ethereum",
-    "debugger",
-    "debuggers",
-    "snippet",
-    "truffle",
-    "solidity",
-    "truffle suite",
-    "ganache",
-    "ganache-cli",
-    "evm"
+    "truffle"
   ],
   "categories": [
     "Extension Packs",
