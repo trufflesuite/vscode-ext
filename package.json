@@ -360,52 +360,52 @@
       "view/item/context": [
         {
           "command": "truffle-vscode.disconnectProject",
-          "when": "view == truffle-vscode. && viewItem == project",
+          "when": "view == truffle-vscode.truffle && viewItem == project",
           "group": "truffle-0@0"
         },
         {
           "command": "truffle-vscode.startGanacheServer",
-          "when": "view == truffle-vscode. && viewItem == localproject",
+          "when": "view == truffle-vscode.truffle && viewItem == localproject",
           "group": "truffle-1@0"
         },
         {
           "command": "truffle-vscode.stopGanacheServer",
-          "when": "view == truffle-vscode. && viewItem == localproject",
+          "when": "view == truffle-vscode.truffle && viewItem == localproject",
           "group": "truffle-1@1"
         },
         {
           "command": "truffle-vscode.restartGanacheServer",
-          "when": "view == truffle-vscode. && viewItem == localproject",
+          "when": "view == truffle-vscode.truffle && viewItem == localproject",
           "group": "truffle-1@2"
         },
         {
           "command": "truffle-vscode.disconnectProject",
-          "when": "view == truffle-vscode. && viewItem == localproject",
+          "when": "view == truffle-vscode.truffle && viewItem == localproject",
           "group": "truffle-0@0"
         },
         {
           "command": "truffle-vscode.disconnectProject",
-          "when": "view == truffle-vscode. && viewItem == bdmproject",
+          "when": "view == truffle-vscode.truffle && viewItem == bdmproject",
           "group": "truffle-0@0"
         },
         {
           "command": "truffle-vscode.copyRPCEndpointAddress",
-          "when": "view == truffle-vscode. && viewItem == network",
+          "when": "view == truffle-vscode.truffle && viewItem == network",
           "group": "truffle-0@0"
         },
         {
           "command": "truffle-vscode.copyRPCEndpointAddress",
-          "when": "view == truffle-vscode. && viewItem == localnetwork",
+          "when": "view == truffle-vscode.truffle && viewItem == localnetwork",
           "group": "truffle-0@0"
         },
         {
           "command": "truffle-vscode.openAtAzurePortal",
-          "when": "view == truffle-vscode. && viewItem == input",
+          "when": "view == truffle-vscode.truffle && viewItem == input",
           "group": "truffle-0@0"
         },
         {
           "command": "truffle-vscode.openAtAzurePortal",
-          "when": "view == truffle-vscode. && viewItem == output",
+          "when": "view == truffle-vscode.truffle && viewItem == output",
           "group": "truffle-0@0"
         }
       ],
