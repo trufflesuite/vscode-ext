@@ -171,12 +171,6 @@ export async function activate(context: ExtensionContext) {
   // );
   //#endregion
 
-  //#region open zeppelin commands
-  // const openZeppelinAddCategory = commands.registerCommand("truffle-oz.addCategory", async () => {
-  //   await tryExecute(() => OpenZeppelinCommands.addCategory());
-  // });
-  //#endregion
-
   //#region logic app commands
   // const generateMicroservicesWorkflows = commands.registerCommand(
   //   'truffle-vscode.generateMicroservicesWorkflows',
@@ -242,7 +236,6 @@ export async function activate(context: ExtensionContext) {
     signInToInfuraAccount,
     signOutOfInfuraAccount,
     showProjectsFromInfuraAccount,
-    //openZeppelinAddCategory,
     openAtAzurePortal,
     changeCoreSdkConfigurationListener,
   ];
@@ -251,8 +244,6 @@ export async function activate(context: ExtensionContext) {
   required.checkAllApps();
 
   Telemetry.sendEvent(Constants.telemetryEvents.extensionActivated);
-
-  // checkAndUpgradeOpenZeppelinAsync();
 }
 
 export async function deactivate(): Promise<void> {
@@ -277,10 +268,3 @@ async function tryExecute(func: () => Promise<any>, errorMessage: string | null 
     window.showErrorMessage(errorMessage || (error as Error).message);
   }
 }
-
-// async function checkAndUpgradeOpenZeppelinAsync(): Promise<void> {
-//   if (await openZeppelinHelper.shouldUpgradeOpenZeppelinAsync()) {
-//     await openZeppelinHelper.upgradeOpenZeppelinUserSettingsAsync();
-//     await openZeppelinHelper.upgradeOpenZeppelinContractsAsync();
-//   }
-// }

@@ -12,8 +12,5 @@ export * from "./ganache/GanacheServiceClient";
 export * from "./MnemonicRepository";
 export * from "./tree/TreeManager";
 export * from "./tree/TreeService";
-export * from "./openZeppelin/OpenZeppelinService";
-export * from "./openZeppelin/OpenZeppelinMigrationsService";
 export * from "./infuraService/InfuraServiceClient";
-export * from "./openZeppelin/OpenZeppelinProjectJsonService";
 export * from "./storageAccountService/BlobServiceClient";

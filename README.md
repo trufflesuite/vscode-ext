@@ -2,7 +2,7 @@
 
 The extension simplifies how you create, build and deploy smart contracts on Ethereum ledgers using the Truffle of tools.
 
-- If you are doing open source blockchain development, the extension has built in integration for open source tools such as [Truffle/Ganache](https://trufflesuite.com/), [Infura](https://infura.io/), and [OpenZeppelin](https://openzeppelin.com/).
+- If you are doing open source blockchain development, the extension has built in integration for open source tools such as [Truffle/Ganache](https://trufflesuite.com/), [Infura](https://infura.io/).
 - If you are doing Azure development, an Azure subscription is required, log into your Azure subscription or create a [free account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F) before you begin. Enjoy the same integration of open source tools with Azure hosted blockchain networks such as [Hyperledger Besu](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/consensys.quorum-dev-quickstart) or the enterprise supported [Quorum Blockchain Service](https://azuremarketplace.microsoft.com/en-gb/marketplace/apps/consensys.qbs-contact-me)
 
 # Open Source Ethereum development

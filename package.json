@@ -53,7 +53,6 @@
     "onCommand:truffle-vscode.createProject",
     "onCommand:truffle-vscode.disconnectProject",
     "onCommand:truffle-vscode.debugTransaction",
-    "onCommand:openZeppelin.addCategory",
     "onCommand:truffle-vscode.signInToInfuraAccount",
     "onCommand:truffle-vscode.signOutOfInfuraAccount",
     "onCommand:truffle-vscode.openAtAzurePortal",
@@ -68,11 +67,6 @@
           "default": false,
           "description": "Disable notification on long running tasks."
         },
-        "truffle-vscode.openZeppelin.version": {
-          "type": "string",
-          "default": "2.5.0",
-          "scope": "The latest Open Zeppelin version"
-        },
         "truffle-vscode.storageAccount.name": {
           "type": "string",
           "scope": "Storage Account name"
@@ -82,8 +76,7 @@
           "scope": "Core SDK for extensions backend",
           "default": "Truffle",
           "enum": [
-            "Truffle",
-            "OpenZeppelin"
+            "Truffle"
           ]
         }
       }
@@ -186,11 +179,6 @@
       {
         "command": "truffle-vscode.getPrivateKey",
         "title": "Retrieve private key",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-oz.addCategory",
-        "title": "Add contracts from OpenZeppelin",
         "category": "Blockchain"
       },
       {
@@ -347,10 +335,6 @@
         },
         {
           "when": "false",
-          "command": "truffle-oz.addCategory"
-        },
-        {
-          "when": "false",
           "command": "truffle-vscode.openAtAzurePortal"
         }
       ],
@@ -455,11 +439,6 @@
           "when": "resourceLangId == json",
           "command": "truffle-contract.copyABI",
           "group": "9_copyFromContractGroup"
-        },
-        {
-          "when": "resourceLangId == solidity",
-          "command": "truffle-oz.addCategory",
-          "group": "8_buildContractGroup"
         }
       ]
     },
@@ -641,7 +620,7 @@
     "@truffle/codec": "^0.11.22",
     "@truffle/compile-solidity": "^6.0.8",
     "@truffle/debug-utils": "^6.0.4",
-    "@truffle/debugger": "^9.2.11",
+    "@truffle/debugger": "^10.0.0",
     "@truffle/resolver": "^8.0.2",
     "ts-node": "^10.4.0",
     "uuid": "^3.3.2",
