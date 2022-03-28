@@ -5,7 +5,7 @@
   "publisher": "trufflesuite-csi",
   "preview": true,
   "icon": "images/TruffleLogo.png",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/trufflesuite/vscode-ext"
@@ -154,12 +154,17 @@
       },
       {
         "command": "trufflesuite.startGanacheServer",
-        "title": "Start Ganache Server",
+        "title": "Start Ganache",
         "category": "Blockchain"
       },
       {
         "command": "trufflesuite.stopGanacheServer",
-        "title": "Stop Ganache Server",
+        "title": "Stop Ganache",
+        "category": "Blockchain"
+      },
+      {
+        "command": "trufflesuite.restartGanacheServer",
+        "title": "Restart Ganache",
         "category": "Blockchain"
       },
       {
@@ -253,12 +258,17 @@
       },
       {
         "command": "trufflesuite.startGanacheServer",
-        "title": "Start Ganache Server",
+        "title": "Start Ganache",
         "category": "Truffle"
       },
       {
         "command": "trufflesuite.stopGanacheServer",
-        "title": "Stop Ganache Server",
+        "title": "Stop Ganache",
+        "category": "Truffle"
+      },
+      {
+        "command": "trufflesuite.restartGanacheServer",
+        "title": "Restart Ganache",
         "category": "Truffle"
       },
       {
@@ -370,6 +380,11 @@
           "group": "truffleSuite-1@1"
         },
         {
+          "command": "trufflesuite.restartGanacheServer",
+          "when": "view == Trufflesuite && viewItem == localproject",
+          "group": "truffleSuite-1@2"
+        },
+        {
           "command": "trufflesuite.disconnectProject",
           "when": "view == Trufflesuite && viewItem == localproject",
           "group": "truffleSuite-0@0"
@@ -442,7 +457,7 @@
       ],
       "debug": [
         {
-          "id": "InstructionView",
+          "id": "DebugInstructionView",
           "name": "Instructions"
         }
       ]
@@ -611,7 +626,7 @@
     "@truffle/codec": "^0.11.22",
     "@truffle/compile-solidity": "^6.0.8",
     "@truffle/debug-utils": "^6.0.4",
-    "@truffle/debugger": "^9.2.11",
+    "@truffle/debugger": "^10.0.0",
     "@truffle/resolver": "^8.0.2",
     "ts-node": "^10.4.0",
     "uuid": "^3.3.2",

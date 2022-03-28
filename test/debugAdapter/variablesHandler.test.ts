@@ -90,7 +90,7 @@ describe("VariablesHandler unit tests", () => {
     it("getVariableAttributesByVariableRef should call handles.create when variables contain object property", async () => {
       // Arrange
       sinon.stub(RuntimeInterface.prototype, "variables").resolves({[objProp.key]: objProp.value});
-      const variablePath = `/${objProp.key}`;
+      const variablePath = `${objProp.key}`;
       const handlesCreateStub = sinon.stub(Handles.prototype, "create").returns(123);
       // Act
       const variablesHandler = new VariablesHandler(runtimeInterface);
@@ -158,7 +158,7 @@ describe("VariablesHandler unit tests", () => {
     sinon
       .stub(Handles.prototype, "get")
       .withArgs(nestedVariableReference)
-      .returns(`/${objectVariable.key}/${nestedObject.key}`);
+      .returns(`${objectVariable.key}.${nestedObject.key}`);
     // Act
     const variablesHandler = new VariablesHandler(runtimeInterface);
     const result = await variablesHandler.getVariableAttributesByVariableRef(nestedVariableReference);

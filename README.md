@@ -2,7 +2,7 @@
 
 The extension simplifies how you create, build and deploy smart contracts on Ethereum ledgers using the Trufflesuite of tools.
 
-- If you are doing open source blockchain development, the extension has built in integration for open source tools such as [Truffle/Ganache](https://trufflesuite.com/), [Infura](https://infura.io/), and [OpenZeppelin](https://openzeppelin.com/). An Azure subscription is optional.
+- If you are doing open source blockchain development, the extension has built in integration for open source tools such as [Truffle/Ganache](https://trufflesuite.com/), [Infura](https://infura.io/), and [OpenZeppelin](https://openzeppelin.com/).
 - If you are doing Azure development, an Azure subscription is required, log into your Azure subscription or create a [free account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F) before you begin. Enjoy the same integration of open source tools with Azure hosted blockchain networks such as [Hyperledger Besu](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/consensys.quorum-dev-quickstart) or the enterprise supported [Quorum Blockchain Service](https://azuremarketplace.microsoft.com/en-gb/marketplace/apps/consensys.qbs-contact-me)
 
 # Open Source Ethereum development
@@ -71,7 +71,7 @@ The extension has integrated Ganache directly into the IDE to further lower the 
 
    b. Next click Create a new network.
 
-   c. Select Ganahce Service
+   c. Select Ganache Service
 
    d. Provide a name for this service that will be referenced when targeting it from deployment.
 
@@ -185,4 +185,4 @@ MIT
 
 ## Telemetry
 
-VS Code collects usage data and sends it to Microsoft to help improve their products and services. Read their [privacy statement](https://go.microsoft.com/fwlink/?LinkID=528096&clcid=0x409) to learn more. If you don’t wish to send usage data to Microsoft, you can set the `telemetry.enableTelemetry` setting to `false`. Learn more at their [FAQ](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting).
+VS Code collects usage data and sends it to ConsenSys to help improve their products and services. Read their [privacy statement](https://consensys.net/privacy-policy/) to learn more. If you don’t wish to send usage data to ConsenSys, you can set the `telemetry.enableTelemetry` setting to `false`. Learn more at their [FAQ](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting).

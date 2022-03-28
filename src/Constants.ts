@@ -54,8 +54,7 @@ export class Constants {
     migrations_directory: path.join("./", "migrations"),
   };
 
-  // FIXME: change this...
-  public static defaultTruffleBox = "Azure-Samples/Blockchain-Ethereum-Template";
+  public static defaultTruffleBox = "truffle-box/vscode-starter-box";
   public static defaultDebounceTimeout = 300;
   public static defaultInputNameInBdm = "transaction-node";
   public static containerTruffleSuiteExtension = "container-trufflesuite-extension";
@@ -101,7 +100,7 @@ export class Constants {
   // Values are quite brittle and don't map directly to the requirements.html screen.
   public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
     [RequiredApps.ganache]: {
-      max: "7.1.0",
+      max: "8.0.0",
       min: "6.0.0",
     },
     [RequiredApps.git]: "2.10.0",
@@ -115,7 +114,7 @@ export class Constants {
     },
     [RequiredApps.npm]: {
       max: "9.0.0",
-      min: "v6.14.15",
+      min: "6.14.15",
     },
     [RequiredApps.truffle]: {
       max: "6.0.0",

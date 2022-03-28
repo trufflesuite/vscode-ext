@@ -18,6 +18,6 @@ module.exports = function (callback) {
     providerUrl = currentProvider.connection.url;
   }
   var result = "provider%=" + JSON.stringify({ url: providerUrl, protocol: protocol });
-  console.log(result);
+  // console.log(result);
   callback();
 };
