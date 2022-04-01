@@ -90,7 +90,7 @@ jobs:
         run: |
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} ::"
           yarn package --pre-release --yarn
-          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}.vsix" >> $GITHUB_ENV
+          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}.vsix" >> $GITHUB_ENV
 
       - name: print vsix path
         run: |
