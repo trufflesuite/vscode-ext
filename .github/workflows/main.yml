@@ -83,14 +83,14 @@ jobs:
         run: |
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} ::"
           yarn package
-          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}-RELEASE.vsix" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}.vsix" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: compile and create vsix Develop PreRelease
         if: github.ref == 'refs/heads/develop'
         run: |
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} :: $GITHUB_ENV"
           yarn package --pre-release --yarn
-          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}-PRERELEASE.vsix" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}.vsix" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: print vsix path
         run: |
