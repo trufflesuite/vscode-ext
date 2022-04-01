@@ -75,24 +75,24 @@ jobs:
         id: package_flags
         if: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
         run: |
-           echo "VSCE_FLAGS='--pre-release --yarn '" | Out-File -FilePath $env:GITHUB_ENV -Append
-           echo "flags_set='true'" | Out-File -FilePath $env:GITHUB_ENV -Append
+           echo "VSCE_FLAGS=--pre-release --yarn " | Out-File -FilePath $env:GITHUB_ENV -Append
+           echo "flags_set=true" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: compile and create vsix MASTER Release
         if: github.ref == 'refs/heads/master'
         run: |
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} ::"
           yarn package
-          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}.vsix" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo "vsix_type='-RELEASE'" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: compile and create vsix Develop PreRelease
         if: github.ref == 'refs/heads/develop'
         run: |
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} :: $GITHUB_ENV"
-          yarn package --pre-release --yarn
-          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}.vsix" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "vsix_type='-PRE_RELEASE'" | Out-File -FilePath $env:GITHUB_ENV -Append
+          yarn package ${{ env.VSCE_FLAGS }}
+          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "vsix_type=-PRE_RELEASE" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: print vsix path
         run: |
@@ -101,8 +101,8 @@ jobs:
       - name: upload vsix as artifact
         uses: actions/upload-artifact@v1
         with:
-          name: ${{ env.vsix_path }}
-          path: ${{ github.workspace }}/${{ env.vsix_path }}${{ env.vsix_type }}
+          name: ${{ env.vsix_path }}.vsix
+          path: ${{ github.workspace }}/${{ env.vsix_path }}${{ env.vsix_type }}.vsix
 
 #      - name: publish to marketplace
 #        if: github.ref == 'refs/heads/master'
