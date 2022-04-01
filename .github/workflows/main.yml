@@ -101,8 +101,8 @@ jobs:
       - name: upload vsix as artifact
         uses: actions/upload-artifact@v1
         with:
-          name: ${{ env.vsix_path }}.vsix
-          path: ${{ github.workspace }}/${{ env.vsix_path }}${{ env.vsix_type }}.vsix
+          path: ${{ github.workspace }}/${{ env.vsix_path }}.vsix
+          name: ${{ env.vsix_path }}${{ env.vsix_type }}.vsix
 
 #      - name: publish to marketplace
 #        if: github.ref == 'refs/heads/master'
