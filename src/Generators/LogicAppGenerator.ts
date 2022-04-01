@@ -1,18 +1,18 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from "fs-extra";
-import * as path from "path";
-import { Uri, window } from "vscode";
-import { Constants } from "../Constants";
-import { getWorkspaceRoot, showIgnorableNotification } from "../helpers";
-import { showInputBox, showQuickPick } from "../helpers/userInteraction";
-import { ResourceGroupItem, SubscriptionItem } from "../Models/QuickPickItems";
-import { Output } from "../Output";
-import { AzureResourceExplorer } from "../resourceExplorers";
-import { ContractService } from "../services";
-import { Telemetry } from "../TelemetryClient";
-import { buildContract } from "./AbiDeserialiser";
+import fs from "fs-extra";
+import path from "path";
+import {Uri, window} from "vscode";
+import {Constants} from "../Constants";
+import {getWorkspaceRoot, showIgnorableNotification} from "../helpers";
+import {showInputBox, showQuickPick} from "../helpers/userInteraction";
+import {ResourceGroupItem, SubscriptionItem} from "../Models/QuickPickItems";
+// import {Output} from "../Output";
+import {AzureResourceExplorer} from "../resourceExplorers";
+import {ContractService} from "../services";
+import {Telemetry} from "../TelemetryClient";
+import {buildContract} from "./AbiDeserialiser";
 import "./Nethereum.Generators.DuoCode";
 
 interface ILogicAppData {
@@ -59,7 +59,7 @@ export class LogicAppGenerator {
     const logicAppData = await this.getLogicAppData(workflowType);
     await showIgnorableNotification(Constants.statusBarMessages.generatingLogicApp(logicAppData.label), async () => {
       for (const file of filePaths) {
-        const contract = await fs.readJson(file, { encoding: "utf8" });
+        const contract = await fs.readJson(file, {encoding: "utf8"});
         const generatedFiles: any[] = this.getGenerator(contract, logicAppData).GenerateAll();
         for (const generatedFile of generatedFiles) {
           await this.writeFile(generatedFile);
@@ -113,7 +113,7 @@ export class LogicAppGenerator {
 
   private async getLogicAppData(workflowType: string): Promise<ILogicAppData> {
     const azureAppItem: IAzureAppsItem = await this.getAzureAppItem(workflowType);
-    const contractAddress = await showInputBox({ ignoreFocusOut: true, value: "contract address" });
+    const contractAddress = await showInputBox({ignoreFocusOut: true, value: "contract address"});
     const [subscriptionItem, resourceGroupItem] = await this.selectSubscriptionAndResourceGroup();
     const logicAppData: ILogicAppData = {
       contractAddress,
@@ -127,7 +127,7 @@ export class LogicAppGenerator {
 
     if (workflowType === Constants.microservicesWorkflows.Messaging) {
       Telemetry.sendEvent("LogicAppGenerator.getLogicAppData.workflowTypeIsMessaging");
-      logicAppData.topicName = await showInputBox({ ignoreFocusOut: true, value: "topic name" });
+      logicAppData.topicName = await showInputBox({ignoreFocusOut: true, value: "topic name"});
       logicAppData.messagingType = await this.getMessagingType();
     }
 
@@ -135,7 +135,7 @@ export class LogicAppGenerator {
   }
 
   private getGenerator(contract: any, logicAppData: ILogicAppData) {
-    const { Service, Data, Messaging, Reporting } = Constants.microservicesWorkflows;
+    const {Service, Data, Messaging, Reporting} = Constants.microservicesWorkflows;
 
     switch (logicAppData.workflowType) {
       case Service:
@@ -175,16 +175,16 @@ export class LogicAppGenerator {
       items.push(Constants.azureApps.AzureFunction);
     }
 
-    return await showQuickPick(items, { ignoreFocusOut: true });
+    return await showQuickPick(items, {ignoreFocusOut: true});
   }
 
   private async getMessagingType(): Promise<number> {
     const items = [
-      { label: "Event Grid", messagingType: 0 },
-      { label: "Service Bus", messagingType: 1 },
+      {label: "Event Grid", messagingType: 0},
+      {label: "Service Bus", messagingType: 1},
     ];
 
-    const item = await showQuickPick(items, { ignoreFocusOut: true });
+    const item = await showQuickPick(items, {ignoreFocusOut: true});
     return item.messagingType;
   }
 
@@ -269,6 +269,6 @@ export class LogicAppGenerator {
     await fs.mkdirp(path.dirname(filePath));
     await fs.writeFile(filePath, file.get_GeneratedCode());
 
-    Output.outputLine(Constants.outputChannel.logicAppGenerator, "Saved file to " + filePath);
+    //Output.outputLine(Constants.outputChannel.logicAppGenerator, "Saved file to " + filePath);
   }
 }

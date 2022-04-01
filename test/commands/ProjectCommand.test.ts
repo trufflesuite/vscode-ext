@@ -2,14 +2,14 @@
 // Licensed under the MIT license.
 
 import * as assert from "assert";
-import * as fs from "fs-extra";
-import rewire = require("rewire");
-import * as sinon from "sinon";
-import { CancellationToken, Progress, ProgressOptions, window, workspace } from "vscode";
-import { Constants, RequiredApps } from "../../src/Constants";
+import fs from "fs-extra";
+import rewire from "rewire";
+import sinon from "sinon";
+import {CancellationToken, Progress, ProgressOptions, window, workspace} from "vscode";
+import {Constants, RequiredApps} from "../../src/Constants";
 import * as helpers from "../../src/helpers";
-import { CancellationEvent } from "../../src/Models";
-import { Output } from "../../src/Output";
+import {CancellationEvent} from "../../src/Models";
+import {Output} from "../../src/Output";
 
 describe("ProjectCommands", () => {
   describe("Unit tests", () => {

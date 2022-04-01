@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as requestPromise from "request-promise";
-import { Constants } from "../Constants";
-import { Telemetry } from "../TelemetryClient";
+import requestPromise from "request-promise";
+import {Constants} from "../Constants";
+import {Telemetry} from "../TelemetryClient";
 
 const requestTimeout = 10000;
 
@@ -12,7 +12,7 @@ export namespace HttpService {
     host: string,
     methodName: string,
     parameters?: string[]
-  ): Promise<{ result?: any; error?: any } | undefined> {
+  ): Promise<{result?: any; error?: any} | undefined> {
     const address = hasProtocol(host) ? host : `${Constants.networkProtocols.http}${host}`;
     return requestPromise
       .post(address, {

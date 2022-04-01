@@ -2,13 +2,19 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "envFile": "${workspaceFolder}/.env",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "type": "pwa-extensionHost",
+      "request": "launch",
       "name": "Run Extension - using .env",
+      "runtimeExecutable": "${execPath}",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "envFile": "${workspaceFolder}/.env",
+      "outputCapture": "console",
+      "env": {
+        "DEBUG": "debugger:session:*"
+      },
+      "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/out/**/*.js"],
       "preLaunchTask": "Build extension with watcher",
-      "request": "launch",
-      "type": "pwa-extensionHost"
     },
     {
       "name": "Run Extension",

@@ -1,15 +1,15 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import rewire = require("rewire");
-import * as sinon from "sinon";
-import uuid = require("uuid");
-import * as vscode from "vscode";
-import { RequiredApps } from "../src/Constants";
+import assert from "assert";
+import rewire from "rewire";
+import sinon from "sinon";
+import uuid from "uuid";
+import vscode from "vscode";
+import {RequiredApps} from "../src/Constants";
 import * as helpers from "../src/helpers";
 import * as commands from "../src/helpers/command";
-import { TestConstants } from "./TestConstants";
+import {TestConstants} from "./TestConstants";
 
 const nodeValidVersion: commands.ICommandResult = {
   cmdOutput: "v16.10.0",

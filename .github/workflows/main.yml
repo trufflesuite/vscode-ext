@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - "feat/**" # match an pushes on feature/* and feature/<any sub branch>/*
+      - develop
       - master
     paths-ignore: # dont run when changes made to these folders
       - ".vscode/**"
@@ -13,7 +13,7 @@ jobs:
     name: cicd
     runs-on: windows-latest
     env:
-      VSCE_FLAGS: '--pre-release' # have to set as pre-release here. env is not working as expected.
+      VSCE_FLAGS: ''
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
@@ -75,24 +75,35 @@ jobs:
         id: package_flags
         if: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
         run: |
-           echo "VSCE_FLAGS=--pre-release --yarn " >> $GITHUB_ENV
-           echo "flags_set=true" >> $GITHUB_ENV
+           echo "VSCE_FLAGS=--pre-release --yarn " | Out-File -FilePath $env:GITHUB_ENV -Append
+           echo "flags_set=true" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-      - name: compile and create vsix
+      - name: compile and create vsix MASTER Release
+        if: github.ref == 'refs/heads/master'
         run: |
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} ::"
-          yarn package --pre-release
-          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}.vsix" >> $GITHUB_ENV
+          yarn package
+          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "vsix_type='-RELEASE'" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: compile and create vsix Develop PreRelease
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} :: $GITHUB_ENV"
+          yarn package ${{ env.VSCE_FLAGS }}
+          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "vsix_type=-PRE_RELEASE" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: print vsix path
         run: |
-          echo "::VSIX Path: ${{ env.vsix_path }}::"
+          echo "::VSIX Path: ${{ env.vsix_path }}:: TYPE: ${{ env.vsix_type }}"
 
       - name: upload vsix as artifact
         uses: actions/upload-artifact@v1
         with:
-          name: ${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}.vsix
-          path: ${{github.workspace}}/${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}.vsix
+          path: ${{ github.workspace }}/${{ env.vsix_path }}.vsix
+          name: ${{ env.vsix_path }}${{ env.vsix_type }}.vsix
+
 #      - name: publish to marketplace
 #        if: github.ref == 'refs/heads/master'
 #        run: npm run deploy ${{ env.PAT }}

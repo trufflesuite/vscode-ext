@@ -1,24 +1,18 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as cp from "child_process";
-import * as rp from "request-promise";
-import * as sinon from "sinon";
-import * as stream from "stream";
-import * as vscode from "vscode";
-import { GanacheCommands } from "../../src/commands";
+import assert from "assert";
+import cp, {ChildProcess} from "child_process";
+import rp from "request-promise";
+import sinon from "sinon";
+import stream from "stream";
+import vscode from "vscode";
+import {GanacheCommands} from "../../src/commands";
 import * as commands from "../../src/helpers/command";
 import * as shell from "../../src/helpers/shell";
-import {
-  AzureBlockchainService,
-  IExtensionItem,
-  LocalProject,
-  LocalService,
-  Service,
-} from "../../src/Models/TreeItems";
-import { TreeManager } from "../../src/services";
-import { ProjectView } from "../../src/ViewItems";
+import {AzureBlockchainService, IExtensionItem, LocalProject, LocalService, Service} from "../../src/Models/TreeItems";
+import {TreeManager} from "../../src/services";
+import {ProjectView} from "../../src/ViewItems";
 
 describe("Integration tests GanacheCommands", () => {
   const defaultPort = 8545;
@@ -68,15 +62,17 @@ describe("Integration tests GanacheCommands", () => {
   it("startGanacheCmd should execute npx cmd", async () => {
     // Arrange
     nodeVersion = "v16.4.0";
-    const spawnStub = sinon.stub(cp, "spawn").returns(processMock as cp.ChildProcess);
+    const spawnStub = sinon.stub(cp, "spawn").returns(processMock as ChildProcess);
     sinon.stub(shell, "findPid").resolves(Number.NaN);
     sinon.replace(commands, "tryExecuteCommand", tryExecuteCommandFake);
 
-    const response = { result: "OK" };
+    const response = {result: "OK"};
     sinon.stub(rp, "post").resolves(response);
 
     // Act
-    await GanacheCommands.startGanacheCmd(projectView);
+    await GanacheCommands.startGanacheCmd(projectView).catch((r) => {
+      assert.fail(r);
+    });
 
     // Assert
     assert.strictEqual(spawnStub.called, true, "should execute external command ");

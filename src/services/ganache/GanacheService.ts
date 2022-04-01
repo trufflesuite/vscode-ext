@@ -1,14 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { ChildProcess } from "child_process";
-import { OutputChannel, window } from "vscode";
-import { Constants, RequiredApps } from "../../Constants";
-import { shell, spawnProcess } from "../../helpers";
-import { findPid, killPid } from "../../helpers/shell";
-import { Telemetry } from "../../TelemetryClient";
-import { UrlValidator } from "../../validators/UrlValidator";
-import { isGanacheServer, waitGanacheStarted } from "./GanacheServiceClient";
+import {ChildProcess} from "child_process";
+import {OutputChannel, window} from "vscode";
+import {Constants, RequiredApps} from "../../Constants";
+import {shell, spawnProcess} from "../../helpers";
+import {findPid, killPid} from "../../helpers/shell";
+import {Telemetry} from "../../TelemetryClient";
+import {UrlValidator} from "../../validators/UrlValidator";
+import {isGanacheServer, waitGanacheStarted} from "./GanacheServiceClient";
 
 export namespace GanacheService {
   export interface IGanacheProcess {
@@ -18,7 +18,7 @@ export namespace GanacheService {
     process?: ChildProcess;
   }
 
-  export const ganacheProcesses: { [port: string]: IGanacheProcess } = {};
+  export const ganacheProcesses: {[port: string]: IGanacheProcess} = {};
 
   export enum PortStatus {
     FREE = 0,
@@ -29,15 +29,15 @@ export namespace GanacheService {
   export async function getPortStatus(port: number | string): Promise<PortStatus> {
     if (!isNaN(await shell.findPid(port))) {
       if (await isGanacheServer(port)) {
-        Telemetry.sendEvent("GanacheService.isGanacheServerRunning.isGanacheServer", { port: "" + port });
+        Telemetry.sendEvent("GanacheService.isGanacheServerRunning.isGanacheServer", {port: "" + port});
         return PortStatus.GANACHE;
       } else {
-        Telemetry.sendEvent("GanacheService.isGanacheServerRunning.portIsBusy", { port: "" + port });
+        Telemetry.sendEvent("GanacheService.isGanacheServerRunning.portIsBusy", {port: "" + port});
         return PortStatus.NOT_GANACHE;
       }
     }
 
-    Telemetry.sendEvent("GanacheService.isGanacheServerRunning.portIsFree", { port: "" + port });
+    Telemetry.sendEvent("GanacheService.isGanacheServerRunning.portIsFree", {port: "" + port});
     return PortStatus.FREE;
   }
 
@@ -56,7 +56,7 @@ export namespace GanacheService {
 
     if (portStatus === PortStatus.GANACHE) {
       const pid = await findPid(port);
-      ganacheProcesses[port] = { pid, port };
+      ganacheProcesses[port] = {pid, port};
     }
 
     if (portStatus === PortStatus.FREE) {
@@ -86,14 +86,14 @@ export namespace GanacheService {
   async function spawnGanacheServer(port: number | string): Promise<IGanacheProcess> {
     const process = spawnProcess(undefined, "npx", [RequiredApps.ganache, `-p ${port}`]);
     const output = window.createOutputChannel(`${Constants.outputChannel.ganacheCommands}:${port}`);
-    const ganacheProcess = { port, process, output } as IGanacheProcess;
+    const ganacheProcess = {port, process, output} as IGanacheProcess;
 
     try {
       addAllListeners(output, port, process);
       await waitGanacheStarted(port, Constants.ganacheRetryAttempts);
       ganacheProcess.pid = await findPid(port);
     } catch (error) {
-      Telemetry.sendException(error);
+      Telemetry.sendException(error as Error);
       await stopGanacheProcess(ganacheProcess, true);
       throw error;
     }
@@ -106,7 +106,7 @@ export namespace GanacheService {
       return;
     }
 
-    const { output, pid, port, process } = ganacheProcess;
+    const {output, pid, port, process} = ganacheProcess;
     delete ganacheProcesses[port];
 
     if (process) {
@@ -124,11 +124,11 @@ export namespace GanacheService {
   }
 
   function addAllListeners(output: OutputChannel, port: number | string, process: ChildProcess): void {
-    process.stdout.on("data", (data: string | Buffer) => {
+    process.stdout!.on("data", (data: string | Buffer) => {
       output.appendLine(data.toString());
     });
 
-    process.stderr.on("data", (data: string | Buffer) => {
+    process.stderr!.on("data", (data: string | Buffer) => {
       output.appendLine(data.toString());
     });
 
@@ -138,8 +138,8 @@ export namespace GanacheService {
   }
 
   function removeAllListeners(process: ChildProcess): void {
-    process.stdout.removeAllListeners();
-    process.stderr.removeAllListeners();
+    process.stdout!.removeAllListeners();
+    process.stderr!.removeAllListeners();
     process.removeAllListeners();
   }
 }

@@ -1,12 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import { ServiceClientCredentials } from "ms-rest";
-import * as msrestazure from "ms-rest-azure";
-import * as sinon from "sinon";
-import * as uuid from "uuid";
-import { EventGridManagementClient } from "../src/ARMBlockchain/EventGridManagementClient";
+import assert from "assert";
+import {ServiceClientCredentials} from "ms-rest";
+import msrestazure from "ms-rest-azure";
+import sinon from "sinon";
+import uuid from "uuid";
+import {EventGridManagementClient} from "../src/ARMBlockchain/EventGridManagementClient";
 
 describe("Unit tests for EventGridManagementClient", () => {
   let credentials: ServiceClientCredentials;

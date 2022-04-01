@@ -1,17 +1,17 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as cp from "child_process";
-import * as sinon from "sinon";
-import * as stream from "stream";
-import { OutputChannel, window } from "vscode";
-import { Constants } from "../../src/Constants";
+import assert from "assert";
+import cp from "child_process";
+import sinon from "sinon";
+import stream from "stream";
+import {OutputChannel, window} from "vscode";
+import {Constants} from "../../src/Constants";
 import * as outputCommandHelper from "../../src/helpers";
 import * as shell from "../../src/helpers/shell";
-import { GanacheService } from "../../src/services";
+import {GanacheService} from "../../src/services";
 import * as GanacheServiceClient from "../../src/services/ganache/GanacheServiceClient";
-import { UrlValidator } from "../../src/validators/UrlValidator";
+import {UrlValidator} from "../../src/validators/UrlValidator";
 
 const defaultPort = "8545";
 const testPortsList = ["8451", "8452", "8453"];
@@ -82,7 +82,7 @@ describe("Unit tests GanacheService", () => {
 
       // Assert
       assert.strictEqual(urlValidatorSpy.called, true);
-      assert.deepStrictEqual(result, { pid: 312, port });
+      assert.deepStrictEqual(result, {pid: 312, port});
     });
   });
 
@@ -246,10 +246,10 @@ describe("Unit tests GanacheService", () => {
   });
 
   const getPortFromUrlCases = [
-    { url: "http://example.com:8454", expectation: "8454" },
-    { url: "ftp://example.com:123", expectation: "123" },
-    { url: "http://example.com", expectation: Constants.defaultLocalhostPort.toString() },
-    { url: "http:8454", expectation: "8454" },
+    {url: "http://example.com:8454", expectation: "8454"},
+    {url: "ftp://example.com:123", expectation: "123"},
+    {url: "http://example.com", expectation: Constants.defaultLocalhostPort.toString()},
+    {url: "http:8454", expectation: "8454"},
   ];
 
   getPortFromUrlCases.forEach((testcase) => {

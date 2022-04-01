@@ -1,14 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import { ChildProcess } from "child_process";
-import * as sinon from "sinon";
-import { commands, OutputChannel, QuickPickItem, window } from "vscode";
-import { GanacheCommands } from "../../src/commands";
-import { Constants, RequiredApps } from "../../src/Constants";
+import assert from "assert";
+import {ChildProcess} from "child_process";
+import sinon from "sinon";
+import {commands, OutputChannel, QuickPickItem, window} from "vscode";
+import {GanacheCommands} from "../../src/commands";
+import {Constants, RequiredApps} from "../../src/Constants";
 import * as helpers from "../../src/helpers";
-import { required } from "../../src/helpers";
+import {required} from "../../src/helpers";
 import * as shell from "../../src/helpers/shell";
 import {
   AzureBlockchainProject,
@@ -18,10 +18,10 @@ import {
   LocalService,
   Service,
 } from "../../src/Models/TreeItems";
-import { GanacheService, TreeManager } from "../../src/services";
+import {GanacheService, TreeManager} from "../../src/services";
 import * as GanacheServiceClient from "../../src/services/ganache/GanacheServiceClient";
-import { ProjectView } from "../../src/ViewItems";
-import { TestConstants } from "../TestConstants";
+import {ProjectView} from "../../src/ViewItems";
+import {TestConstants} from "../TestConstants";
 
 describe("Unit tests GanacheCommands", () => {
   let checkAppsStub: sinon.SinonStub<RequiredApps[], Promise<boolean>>;
@@ -45,7 +45,7 @@ describe("Unit tests GanacheCommands", () => {
     sinon.restore();
   });
 
-  it("startGanacheCmd executes trufflesuite.showRequirementsPage cmd when not all app are installed", async () => {
+  it("startGanacheCmd executes truffle-vscode.showRequirementsPage cmd when not all app are installed", async () => {
     // Arrange
     checkAppsStub = sinon.stub(required, "checkApps").returns(Promise.resolve(false));
     const executeCommandStub = sinon.stub(commands, "executeCommand");
@@ -65,7 +65,7 @@ describe("Unit tests GanacheCommands", () => {
     checkAppsStub = sinon.stub(required, "checkApps").returns(Promise.resolve(true));
     const startGanacheServerStub = sinon
       .stub(GanacheService, "startGanacheServer")
-      .returns(Promise.resolve({ pid: 1234, port: testPort }));
+      .returns(Promise.resolve({pid: 1234, port: testPort}));
     const showInformationMessageStub = sinon.stub(window, "showInformationMessage");
 
     // Act

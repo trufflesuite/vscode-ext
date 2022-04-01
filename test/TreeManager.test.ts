@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import rewire = require("rewire");
+import assert from "assert";
+import rewire from "rewire";
 
 describe("TreeManager tests", () => {
   const numberOfElements = 4;

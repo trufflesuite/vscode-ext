@@ -1,16 +1,15 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as bip39 from "bip39";
-import * as fs from "fs-extra";
+import {mnemonicToSeed} from "bip39";
+import fs from "fs-extra";
 // @ts-ignore
-import * as hdkey from "hdkey";
-import * as path from "path";
-import { QuickPickItem, Uri, window } from "vscode";
-import { Constants, RequiredApps } from "../Constants";
+import hdkey from "hdkey";
+import path from "path";
+import {QuickPickItem, Uri, window} from "vscode";
+import {Constants, RequiredApps} from "../Constants";
 import {
   getWorkspaceRoot,
-  openZeppelinHelper,
   outputCommandHelper,
   required,
   showConfirmPaidOperationDialog,
@@ -21,24 +20,22 @@ import {
   TruffleConfiguration,
   vscodeEnvironment,
 } from "../helpers";
-import { IDeployDestination, ItemType } from "../Models";
-import { NetworkForContractItem } from "../Models/QuickPickItems/NetworkForContractItem";
-import { AzureBlockchainProject, InfuraProject, LocalProject, LocalService } from "../Models/TreeItems";
-import { Project } from "../Models/TreeItems";
-import { Output } from "../Output";
+import {IDeployDestination, ItemType} from "../Models";
+import {NetworkForContractItem} from "../Models/QuickPickItems/NetworkForContractItem";
+import {AzureBlockchainProject, InfuraProject, LocalProject, LocalService} from "../Models/TreeItems";
+import {Project} from "../Models/TreeItems";
+import {Output} from "../Output";
 import {
   ContractDB,
   ContractInstanceWithMetadata,
   ContractService,
   GanacheService,
   MnemonicRepository,
-  OpenZeppelinService,
   TreeManager,
 } from "../services";
-import { OZContractValidated } from "../services/openZeppelin/models";
-import { Telemetry } from "../TelemetryClient";
-import { NetworkNodeView } from "../ViewItems";
-import { ServiceCommands } from "./ServiceCommands";
+import {Telemetry} from "../TelemetryClient";
+import {NetworkNodeView} from "../ViewItems";
+import {ServiceCommands} from "./ServiceCommands";
 
 interface IDeployDestinationItem {
   cmd: () => Promise<void>;
@@ -57,15 +54,18 @@ interface IExtendedQuickPickItem extends QuickPickItem {
 }
 
 export namespace TruffleCommands {
-  export async function buildContracts(): Promise<void> {
+  /**
+   * Call the truffle command line compiler
+   * @param args a list of optional compile command args to append in certain circumstances
+   */
+  export async function buildContracts(...args: Array<string>): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.buildContracts.commandStarted");
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
       if (!(await required.checkAppsSilent(RequiredApps.truffle))) {
         Telemetry.sendEvent("TruffleCommands.buildContracts.truffleInstallation");
         await required.installTruffle(required.Scope.locally);
       }
-
-      await outputCommandHelper.executeCommand(getWorkspaceRoot(), "npx", RequiredApps.truffle, "compile");
+      await outputCommandHelper.executeCommand(getWorkspaceRoot(), "npx", RequiredApps.truffle, "compile", ...args);
     });
 
     Telemetry.sendEvent("TruffleCommands.buildContracts.commandFinished");
@@ -73,8 +73,6 @@ export namespace TruffleCommands {
 
   export async function deployContracts(): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.deployContracts.commandStarted");
-
-    await checkOpenZeppelinIfUsed();
 
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
     const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri);
@@ -215,7 +213,7 @@ export namespace TruffleCommands {
     }
 
     try {
-      const buffer = await bip39.mnemonicToSeed(mnemonic);
+      const buffer = await mnemonicToSeed(mnemonic);
       const key = hdkey.fromMasterSeed(buffer);
       const childKey = key.derive("m/44'/60'/0'/0/0");
       const privateKey = childKey.privateKey.toString("hex");
@@ -226,18 +224,6 @@ export namespace TruffleCommands {
       window.showErrorMessage(Constants.errorMessageStrings.InvalidMnemonic);
     }
     Telemetry.sendEvent("TruffleCommands.getPrivateKeyFromMnemonic.commandFinished");
-  }
-}
-
-async function checkOpenZeppelinIfUsed(): Promise<void> {
-  if (OpenZeppelinService.projectJsonExists()) {
-    if (await openZeppelinHelper.shouldUpgradeOpenZeppelinAsync()) {
-      await openZeppelinHelper.upgradeOpenZeppelinContractsAsync();
-      await openZeppelinHelper.upgradeOpenZeppelinUserSettingsAsync();
-    }
-
-    await validateOpenZeppelinContracts();
-    await openZeppelinHelper.defineContractRequiredParameters();
   }
 }
 
@@ -255,7 +241,7 @@ async function installRequiredDependencies(): Promise<void> {
 
   if ((await required.isHdWalletProviderRequired()) && !(await required.checkHdWalletProviderVersion())) {
     if (!(await required.isDefaultProject())) {
-      const { cancelButton, installButton, requiresDependency } = Constants.informationMessage;
+      const {cancelButton, installButton, requiresDependency} = Constants.informationMessage;
       const answer = await window.showInformationMessage(requiresDependency, installButton, cancelButton);
 
       if (answer !== installButton) {
@@ -265,37 +251,6 @@ async function installRequiredDependencies(): Promise<void> {
 
     Telemetry.sendEvent("TruffleCommands.installRequiredDependencies.installTruffleHdWalletProvider");
     await required.installTruffleHdWalletProvider();
-  }
-}
-
-async function validateOpenZeppelinContracts(): Promise<void> {
-  const validatedContracts = await OpenZeppelinService.validateContractsAsync();
-  validatedContracts.forEach((ozContract: OZContractValidated) => {
-    if (ozContract.isExistedOnDisk) {
-      Output.outputLine(
-        "",
-        ozContract.isHashValid
-          ? Constants.openZeppelin.validHashMessage(ozContract.contractPath)
-          : Constants.openZeppelin.invalidHashMessage(ozContract.contractPath)
-      );
-    } else {
-      Output.outputLine("", Constants.openZeppelin.contractNotExistedOnDisk(ozContract.contractPath));
-    }
-  });
-
-  const invalidContractsPaths = validatedContracts
-    .filter((ozContract: OZContractValidated) => !ozContract.isExistedOnDisk || !ozContract.isHashValid)
-    .map((ozContract: OZContractValidated) => ozContract.contractPath);
-
-  if (invalidContractsPaths.length !== 0) {
-    const errorMsg = Constants.validationMessages.openZeppelinFilesAreInvalid(invalidContractsPaths);
-    const error = new Error(errorMsg);
-    window.showErrorMessage(errorMsg);
-    const obfuscatedPaths = invalidContractsPaths.map((invalidContractsPath) =>
-      Telemetry.obfuscate(invalidContractsPath)
-    );
-    Telemetry.sendException(new Error(Constants.validationMessages.openZeppelinFilesAreInvalid(obfuscatedPaths)));
-    throw error;
   }
 }
 
@@ -361,7 +316,7 @@ async function getProjectDeployDestinationItems(
   }
 
   return destinations.map((destination) => {
-    const { description, detail, getTruffleNetwork, label, networkId, networkType, port } = destination;
+    const {description, detail, getTruffleNetwork, label, networkId, networkType, port} = destination;
 
     return {
       cmd: getServiceCreateFunction(networkType, getTruffleNetwork, truffleConfigPath, port),
@@ -477,15 +432,16 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
         RequiredApps.truffle,
         "migrate",
         "--reset",
+        "--compile-all",
         "--network",
         networkName
       );
-      Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, Constants.informationMessage.deploySucceeded);
+      Output.outputLine(Constants.outputChannel.truffleForVSCode, Constants.informationMessage.deploySucceeded);
       Telemetry.sendEvent("TruffleCommands.deployToNetwork.deployedSuccessfully", {
         destination: telemetryHelper.mapNetworkName(networkName),
       });
     } catch (error) {
-      Output.outputLine(Constants.outputChannel.truffleSuiteForVSCode, Constants.informationMessage.deployFailed);
+      Output.outputLine(Constants.outputChannel.truffleForVSCode, Constants.informationMessage.deployFailed);
       Telemetry.sendEvent("TruffleCommands.deployToNetwork.deployedFailed", {
         destination: telemetryHelper.mapNetworkName(networkName),
       });

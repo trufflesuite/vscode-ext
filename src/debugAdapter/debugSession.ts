@@ -1,4 +1,4 @@
-import { basename } from "path";
+import {basename} from "path";
 import {
   Breakpoint,
   BreakpointEvent,
@@ -12,7 +12,7 @@ import {
   TerminatedEvent,
   Thread,
 } from "vscode-debugadapter";
-import { DebugProtocol } from "vscode-debugprotocol";
+import {DebugProtocol} from "vscode-debugprotocol";
 import {
   ERROR_MESSAGE_ID,
   EVALUATE_REQUEST_TYPES,
@@ -20,8 +20,8 @@ import {
   EVENT_TYPES,
   MAIN_THREAD,
 } from "./constants/debugAdapter";
-import { GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS } from "./constants/debugSessionCommands";
-import { DebuggerTypes } from "./models/debuggerTypes";
+import {GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS} from "./constants/debugSessionCommands";
+import {DebuggerTypes} from "./models/debuggerTypes";
 import RuntimeInterface from "./runtimeInterface";
 import VariablesHandler from "./variablesHandler";
 
@@ -58,7 +58,7 @@ export class SolidityDebugSession extends LoggingDebugSession {
     });
     this._runtime.on(EVENT_TYPES.breakpointValidated, (bp: DebuggerTypes.IBreakpoint) => {
       this.sendEvent(
-        new BreakpointEvent(EVENT_REASONS.changed, { verified: true, id: bp.id } as DebugProtocol.Breakpoint)
+        new BreakpointEvent(EVENT_REASONS.changed, {verified: true, id: bp.id} as DebugProtocol.Breakpoint)
       );
     });
     this._runtime.on(EVENT_TYPES.end, () => {
@@ -284,11 +284,11 @@ export class SolidityDebugSession extends LoggingDebugSession {
         args.context === EVALUATE_REQUEST_TYPES.hover ||
         args.context === undefined
       ) {
-        const { result, variablesReference } = await this._variablesHandler.evaluateExpression(args.expression);
-        response.body = { result, variablesReference };
+        const {result, variablesReference} = await this._variablesHandler.evaluateExpression(args.expression);
+        response.body = {result, variablesReference};
         this.sendResponse(response);
       } else {
-        response.body = { result: "", variablesReference: -1 };
+        response.body = {result: "", variablesReference: -1};
         this.sendResponse(response);
       }
     });
@@ -322,13 +322,13 @@ export class SolidityDebugSession extends LoggingDebugSession {
     try {
       await fn();
     } catch (e) {
-      this.sendErrorResponse(
-        response,
-        { id: ERROR_MESSAGE_ID, format: e && e.message ? e.message : e },
-        "",
-        null,
-        undefined
-      );
+      let msg: string;
+      if (e instanceof Error) {
+        msg = e.message;
+      } else {
+        msg = `{e}`;
+      }
+      this.sendErrorResponse(response, {id: ERROR_MESSAGE_ID, format: msg}, "", null, undefined);
     }
   }
 }

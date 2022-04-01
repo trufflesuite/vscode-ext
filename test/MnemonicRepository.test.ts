@@ -1,16 +1,16 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as fs from "fs-extra";
-import * as os from "os";
-import * as sinon from "sinon";
-import uuid = require("uuid");
-import { Memento } from "vscode";
-import { Constants } from "../src/Constants";
-import { MnemonicRepository } from "../src/services";
-import { FakeExtensionState } from "./FakeExtensionState";
-import { TestConstants } from "./TestConstants";
+import assert from "assert";
+import fs from "fs-extra";
+import os from "os";
+import {stub, restore} from "sinon";
+import uuid from "uuid";
+import {Memento} from "vscode";
+import {Constants} from "../src/Constants";
+import {MnemonicRepository} from "../src/services";
+import {FakeExtensionState} from "./FakeExtensionState";
+import {TestConstants} from "./TestConstants";
 
 describe("MnemonicRepository", () => {
   describe("Unit test", () => {
@@ -19,8 +19,8 @@ describe("MnemonicRepository", () => {
     let globalState: Memento;
 
     beforeEach(() => {
-      readFileSyncMock = sinon.stub(fs, "readFileSync");
-      existsSyncMock = sinon.stub(fs, "existsSync");
+      readFileSyncMock = stub(fs, "readFileSync");
+      existsSyncMock = stub(fs, "existsSync");
 
       // Clean state before run test
       globalState = new FakeExtensionState({});
@@ -28,7 +28,7 @@ describe("MnemonicRepository", () => {
     });
 
     afterEach(() => {
-      sinon.restore();
+      restore();
 
       // Clean state after run test
       globalState = new FakeExtensionState({});

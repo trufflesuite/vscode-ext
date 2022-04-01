@@ -1,20 +1,20 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as sinon from "sinon";
-import * as uuid from "uuid";
-import { QuickPickOptions } from "vscode";
+import assert from "assert";
+import sinon from "sinon";
+import uuid from "uuid";
+import {QuickPickOptions} from "vscode";
 import {
   IAzureConsortiumDto,
   IAzureConsortiumMemberDto,
   IAzureTransactionNodeDto,
   MemberResource,
 } from "../src/ARMBlockchain";
-import { TransactionNodeResource } from "../src/ARMBlockchain/Operations/TransactionNodeResource";
-import { Constants } from "../src/Constants";
+import {TransactionNodeResource} from "../src/ARMBlockchain/Operations/TransactionNodeResource";
+import {Constants} from "../src/Constants";
 import * as helpers from "../src/helpers";
-import { ConsortiumItem, ResourceGroupItem, SubscriptionItem } from "../src/Models/QuickPickItems";
+import {ConsortiumItem, ResourceGroupItem, SubscriptionItem} from "../src/Models/QuickPickItems";
 
 describe("Consortium Resource Explorer", () => {
   afterEach(() => {
@@ -113,7 +113,7 @@ describe("Consortium Resource Explorer", () => {
     const consortiumResourceExplorer = consortiumResourceExplorerRequire.ConsortiumResourceExplorer;
     sinon
       .stub(consortiumResourceExplorer.prototype, "getAzureClient")
-      .returns({ consortiumResource: { getConsortiaList: () => consortiaList } });
+      .returns({consortiumResource: {getConsortiaList: () => consortiaList}});
     const azureClientMock = consortiumResourceExplorer.prototype.getAzureClient();
 
     // Act
@@ -138,7 +138,7 @@ describe("Consortium Resource Explorer", () => {
     const consortiumResourceExplorer = consortiumResourceExplorerRequire.ConsortiumResourceExplorer;
     sinon
       .stub(consortiumResourceExplorer.prototype, "getAzureClient")
-      .returns({ memberResource: { getMemberList: async () => await getMemberList() } });
+      .returns({memberResource: {getMemberList: async () => await getMemberList()}});
     const azureClientMock = consortiumResourceExplorer.prototype.getAzureClient();
 
     // Act
@@ -160,7 +160,7 @@ describe("Consortium Resource Explorer", () => {
     const consortiumResourceExplorer = consortiumResourceExplorerRequire.ConsortiumResourceExplorer;
     sinon
       .stub(consortiumResourceExplorer.prototype, "getAzureClient")
-      .returns({ transactionNodeResource: { getTransactionNodeList: async () => await getTransactionNodeList() } });
+      .returns({transactionNodeResource: {getTransactionNodeList: async () => await getTransactionNodeList()}});
     const azureClientMock = consortiumResourceExplorer.prototype.getAzureClient();
 
     // Act
@@ -205,8 +205,8 @@ describe("Consortium Resource Explorer", () => {
     } as ResourceGroupItem;
 
     const azureClient = {
-      memberResource: { getMemberList: async () => await getMemberList() },
-      transactionNodeResource: { getTransactionNodeList: async () => await getTransactionNodeList() },
+      memberResource: {getMemberList: async () => await getMemberList()},
+      transactionNodeResource: {getTransactionNodeList: async () => await getTransactionNodeList()},
     };
 
     const consortiumResourceExplorerRequire = require("../src/resourceExplorers/ConsortiumResourceExplorer");

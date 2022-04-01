@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as sinon from "sinon";
-import * as uuid from "uuid";
-import { IEventGridDto } from "../src/ARMBlockchain";
-import { Constants } from "../src/Constants";
+import assert from "assert";
+import sinon from "sinon";
+import uuid from "uuid";
+import {IEventGridDto} from "../src/ARMBlockchain";
+import {Constants} from "../src/Constants";
 
 describe("Event Grid Resource Explorer", () => {
   afterEach(() => {
@@ -23,7 +23,7 @@ describe("Event Grid Resource Explorer", () => {
     const eventGridResourceExplorer = eventGridResourceExplorerRequire.EventGridResourceExplorer;
 
     const eventGridClient = {
-      eventGridResource: { getEventGridList: async () => await getEventGridList() },
+      eventGridResource: {getEventGridList: async () => await getEventGridList()},
     };
 
     // Act

@@ -1,12 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as fs from "fs-extra";
-import * as path from "path";
-import * as sinon from "sinon";
-import * as uuid from "uuid";
-import * as vscode from "vscode";
+import assert from "assert";
+import fs from "fs-extra";
+import path from "path";
+import sinon from "sinon";
+import uuid from "uuid";
+import vscode from "vscode";
 import {
   IAzureBlockchainDataManagerApplicationDto,
   IAzureBlockchainDataManagerDto,
@@ -16,11 +16,11 @@ import {
   IAzureTransactionNodeDto,
   IEventGridDto,
 } from "../src/ARMBlockchain";
-import { TruffleCommands } from "../src/commands/TruffleCommands";
-import { Constants } from "../src/Constants";
+import {TruffleCommands} from "../src/commands/TruffleCommands";
+import {Constants} from "../src/Constants";
 import * as helpers from "../src/helpers";
-import { CancellationEvent } from "../src/Models/CancellationEvent";
-import { ItemType } from "../src/Models/ItemType";
+import {CancellationEvent} from "../src/Models/CancellationEvent";
+import {ItemType} from "../src/Models/ItemType";
 import {
   BlockchainDataManagerInstanceItem,
   ConsortiumItem,
@@ -29,11 +29,11 @@ import {
   SubscriptionItem,
   TransactionNodeItem,
 } from "../src/Models/QuickPickItems";
-import { BlockchainDataManagerNetworkNode, BlockchainDataManagerProject } from "../src/Models/TreeItems";
-import { StorageAccountResourceExplorer } from "../src/resourceExplorers/StorageAccountResourceExplorer";
-import { ContractDB, ContractInstanceWithMetadata, ContractService, TreeManager } from "../src/services";
-import { Contract } from "../src/services/contract/Contract";
-import { AzureAccountHelper } from "./testHelpers/AzureAccountHelper";
+import {BlockchainDataManagerNetworkNode, BlockchainDataManagerProject} from "../src/Models/TreeItems";
+import {StorageAccountResourceExplorer} from "../src/resourceExplorers/StorageAccountResourceExplorer";
+import {ContractDB, ContractInstanceWithMetadata, ContractService, TreeManager} from "../src/services";
+import {Contract} from "../src/services/contract/Contract";
+import {AzureAccountHelper} from "./testHelpers/AzureAccountHelper";
 
 describe("Blockchain Data Manager Resource Explorer", () => {
   const blockchainDataManagerResourceExplorerRequire = require("../src/resourceExplorers/BlockchainDataManagerResourceExplorer");
@@ -141,7 +141,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
     it("deleteBDMApplication should executed all methods for delete BDM application", async () => {
       // Arrange
       const azureExplorer = {
-        bdmResource: { deleteBlockchainDataManagerApplication: async () => Promise.resolve() },
+        bdmResource: {deleteBlockchainDataManagerApplication: async () => Promise.resolve()},
       };
 
       const deleteBlobsStub = sinon
@@ -198,7 +198,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
       let createBDMApplicationStub: sinon.SinonStub<any[], any> | sinon.SinonStub<unknown[], unknown>;
 
       beforeEach(() => {
-        sinon.stub(fs, "statSync").returns({ isDirectory: () => false } as fs.Stats);
+        sinon.stub(fs, "statSync").returns({isDirectory: () => false} as fs.Stats);
         sinon.stub(vscode.window, "showInformationMessage");
         getSolidityContractsFolderPathStub = sinon
           .stub(ContractService, "getSolidityContractsFolderPath")
@@ -227,8 +227,8 @@ describe("Blockchain Data Manager Resource Explorer", () => {
         const testContractFilePath = path.join(__dirname, "testData", "enumTestContract.json");
         const fileData = fs.readFileSync(testContractFilePath, "utf-8");
         const contract = new Contract(JSON.parse(fileData));
-        contract.networks.testNetworkKey = { address: uuid.v4() };
-        const instanceTest = new ContractInstanceWithMetadata(contract, { id: "testNetworkKey" }, { host: uuid.v4() });
+        contract.networks.testNetworkKey = {address: uuid.v4()};
+        const instanceTest = new ContractInstanceWithMetadata(contract, {id: "testNetworkKey"}, {host: uuid.v4()});
 
         const expectedSolFiles = 2;
         let countSolFiles = 0;
@@ -282,7 +282,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
         } catch (error) {
           // Assert
           assert.strictEqual(
-            error.message,
+            (error as Error).message,
             Constants.errorMessageStrings.SolidityContractsNotFound,
             "error should be specific"
           );
@@ -330,7 +330,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
           );
         } catch (error) {
           // Assert
-          assert.strictEqual(error.name, CancellationEvent.name, "error should be specific");
+          assert.strictEqual((error as CancellationEvent).name, CancellationEvent.name, "error should be specific");
           assert.strictEqual(countSolFiles, expectedSolFiles, "showQuickPick should show only solidity files");
           assert.strictEqual(
             getSolidityContractsFolderPathStub.calledOnce,
@@ -377,7 +377,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
           );
         } catch (error) {
           // Assert
-          assert.strictEqual(error.name, CancellationEvent.name, "error should be specific");
+          assert.strictEqual((error as CancellationEvent).name, CancellationEvent.name, "error should be specific");
           assert.strictEqual(countSolFiles, expectedSolFiles, "showQuickPick should show only solidity files");
           assert.strictEqual(
             getSolidityContractsFolderPathStub.calledOnce,
@@ -404,8 +404,8 @@ describe("Blockchain Data Manager Resource Explorer", () => {
         const testContractFilePath = path.join(__dirname, "testData", "enumTestContract.json");
         const fileData = fs.readFileSync(testContractFilePath, "utf-8");
         const contract = new Contract(JSON.parse(fileData));
-        contract.networks.testNetworkKey = { address: uuid.v4() };
-        const instanceTest = new ContractInstanceWithMetadata(contract, { id: "testNetworkKey" }, null);
+        contract.networks.testNetworkKey = {address: uuid.v4()};
+        const instanceTest = new ContractInstanceWithMetadata(contract, {id: "testNetworkKey"}, null);
 
         const expectedSolFiles = 2;
         let countSolFiles = 0;
@@ -427,7 +427,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
         } catch (error) {
           // Assert
           assert.strictEqual(
-            error.message,
+            (error as Error).message,
             Constants.errorMessageStrings.NetworkIsNotAvailable,
             "error should be specific"
           );
@@ -456,7 +456,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
         const testContractFilePath = path.join(__dirname, "testData", "enumTestContract.json");
         const fileData = fs.readFileSync(testContractFilePath, "utf-8");
         const contract = new Contract(JSON.parse(fileData));
-        const instanceTest = new ContractInstanceWithMetadata(contract, { id: "testNetworkKey" }, { host: uuid.v4() });
+        const instanceTest = new ContractInstanceWithMetadata(contract, {id: "testNetworkKey"}, {host: uuid.v4()});
 
         const expectedSolFiles = 2;
         let countSolFiles = 0;
@@ -478,7 +478,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
         } catch (error) {
           // Assert
           assert.strictEqual(
-            error.message,
+            (error as Error).message,
             Constants.errorMessageStrings.NetworkIsNotAvailable,
             "error should be specific"
           );
@@ -501,7 +501,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
     });
 
     describe("createProject", () => {
-      const selectedMember = { label: uuid.v4() };
+      const selectedMember = {label: uuid.v4()};
       const selectedEventGrid = new EventGridItem(uuid.v4(), uuid.v4());
       const transactionName = uuid.v4();
       let getSelectedMemberStub: any;
@@ -526,7 +526,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
           blockchainDataManagerResourceExplorer.prototype,
           "createBlockchainDataManagerInstance"
         );
-        consortiumResourceExplorer = { createAzureConsortium: () => Promise.resolve() };
+        consortiumResourceExplorer = {createAzureConsortium: () => Promise.resolve()};
       });
 
       it("all method should be executed for create Blockchain Data Manager", async () => {
@@ -537,8 +537,8 @@ describe("Blockchain Data Manager Resource Explorer", () => {
         const selectedConsortium = new ConsortiumItem(uuid.v4(), uuid.v4(), uuid.v4(), memberName, location, uuid.v4());
         const bdmList = await getBlockchainDataManagerList();
         const azureExplorer = {
-          bdmResource: { getBlockchainDataManagerList: async () => bdmList },
-          consortiumResource: { getConsortiaList: async () => consortiaList },
+          bdmResource: {getBlockchainDataManagerList: async () => bdmList},
+          consortiumResource: {getConsortiaList: async () => consortiaList},
         };
 
         sinon
@@ -635,8 +635,8 @@ describe("Blockchain Data Manager Resource Explorer", () => {
         const consortiaList = await getConsortiaList();
         const bdmList = await getBlockchainDataManagerList();
         const azureExplorer = {
-          bdmResource: { getBlockchainDataManagerList: async () => bdmList },
-          consortiumResource: { getConsortiaList: async () => consortiaList },
+          bdmResource: {getBlockchainDataManagerList: async () => bdmList},
+          consortiumResource: {getConsortiaList: async () => consortiaList},
         };
 
         sinon
@@ -657,7 +657,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
             createConsortiumCallbackStub
           );
         } catch (error) {
-          assert.strictEqual(error.name, new CancellationEvent().name);
+          assert.strictEqual((error as Error).name, new CancellationEvent().name);
         } finally {
           // Assert
           assert.strictEqual(
@@ -705,7 +705,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
       // Arrange
       const bdmList = await getBlockchainDataManagerList();
       const azureExplorer = {
-        bdmResource: { getBlockchainDataManagerList: async () => bdmList },
+        bdmResource: {getBlockchainDataManagerList: async () => bdmList},
       };
       const getBlockchainDataManagerListSpy = sinon.spy(azureExplorer.bdmResource, "getBlockchainDataManagerList");
 
@@ -726,7 +726,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
 
     it("getBlockchainDataManagerInstance should return bdm instance", async () => {
       // Arrange
-      const { input, output } = Constants.treeItemData.group.bdm;
+      const {input, output} = Constants.treeItemData.group.bdm;
       const blockchainDataManagerInstanceItem = new BlockchainDataManagerInstanceItem(
         uuid.v4(),
         uuid.v4(),
@@ -1220,7 +1220,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
               (con) => !Constants.availableBlockchainDataManagerLocations.includes(con.location)
             ),
         };
-        const expectedItem = { label: "" };
+        const expectedItem = {label: ""};
         const loadConsortiumItemsSpy = sinon.spy(consortiumResourceExplorer, "loadConsortiumItems");
         sinon.stub(helpers, "showQuickPick").callsFake((...args: any[]) => {
           expectedItem.label = args[0][0].label;
@@ -1392,7 +1392,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
             location
           );
         } catch (error) {
-          assert.strictEqual(error.name, new CancellationEvent().name);
+          assert.strictEqual((error as Error).name, new CancellationEvent().name);
         } finally {
           // Assert
           assertResponse(numberQuickPickItems);
@@ -1460,7 +1460,7 @@ describe("Blockchain Data Manager Resource Explorer", () => {
           // Act
           await blockchainDataManagerResourceExplorer.prototype.getSelectedEventGrid(eventGridClient, uuid.v4());
         } catch (error) {
-          assert.strictEqual(error.name, new CancellationEvent().name);
+          assert.strictEqual((error as Error).name, new CancellationEvent().name);
         } finally {
           // Assert
           assert.strictEqual(getEventGridListSpy.calledOnce, true, "getEventGridList should be called");

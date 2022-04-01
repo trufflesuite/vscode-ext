@@ -1,7 +1,12 @@
 const webpack = require("webpack");
 const CopyPlugin = require("copy-webpack-plugin");
 const path = require("path");
-const config = {
+
+//@ts-check
+/** @typedef {import('webpack').Configuration} WebpackConfig **/
+
+/** @type WebpackConfig */
+module.exports = {
   target: "node",
   entry: {
     extension: "./src/extension.ts",
@@ -12,11 +17,10 @@ const config = {
     filename: "[name].js",
     libraryTarget: "commonjs2",
   },
-  devtool: false,
   optimization: {
     minimize: true,
   },
-  externals: function (context, request, callback) {
+  externals: function ({ context, request }, callback) {
     // don't pack any require/import that requests any file/module with
     // `"mscorlib"` in it
     if (/mscorlib/i.test(request)) {
@@ -48,12 +52,14 @@ const config = {
     ],
   },
   plugins: [
-    new CopyPlugin([
-      { from: "./src/Generators/mscorlib.js", to: "./" },
-      { from: "./src/Generators/Nethereum.Generators.DuoCode.js", to: "./" },
-      { from: "./src/debugAdapter/web3ProviderResolver.js", to: "./" },
-      { from: "./src/helpers/checkTruffleConfigTemplate.js", to: "./" },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        { from: "./src/Generators/mscorlib.js", to: "./" },
+        { from: "./src/Generators/Nethereum.Generators.DuoCode.js", to: "./" },
+        { from: "./src/debugAdapter/web3ProviderResolver.js", to: "./" },
+        { from: "./src/helpers/checkTruffleConfigTemplate.js", to: "./" },
+      ],
+    }),
     new webpack.DefinePlugin({
       IS_BUNDLE_TIME: true,
     }),
@@ -62,4 +68,3 @@ const config = {
     __dirname: false,
   },
 };
-module.exports = config;

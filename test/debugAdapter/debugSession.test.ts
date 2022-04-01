@@ -1,18 +1,18 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import { spawn } from "child_process";
-import { join as pathJoin } from "path";
-import * as sinon from "sinon";
-import { StoppedEvent } from "vscode-debugadapter";
-import { DebugProtocol } from "vscode-debugprotocol";
-import { GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS } from "../../src/debugAdapter/constants/debugSessionCommands";
-import { SolidityDebugSession } from "../../src/debugAdapter/debugSession";
-import { DebuggerTypes } from "../../src/debugAdapter/models/debuggerTypes";
-import { IInstruction } from "../../src/debugAdapter/models/IInstruction";
+import assert from "assert";
+import {spawn} from "child_process";
+import {join as pathJoin} from "path";
+import sinon from "sinon";
+import {StoppedEvent} from "vscode-debugadapter";
+import {DebugProtocol} from "vscode-debugprotocol";
+import {GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS} from "../../src/debugAdapter/constants/debugSessionCommands";
+import {SolidityDebugSession} from "../../src/debugAdapter/debugSession";
+import {DebuggerTypes} from "../../src/debugAdapter/models/debuggerTypes";
+import {IInstruction} from "../../src/debugAdapter/models/IInstruction";
 import RuntimeInterface from "../../src/debugAdapter/runtimeInterface";
-import { SolidityDebugSessionClient } from "./SolidityDebugSessionClient";
+import {SolidityDebugSessionClient} from "./SolidityDebugSessionClient";
 
 describe("DebugSession unit tests", () => {
   afterEach(() => {
@@ -137,8 +137,8 @@ describe("DebugSession unit tests", () => {
   });
 
   describe("customRequest", () => {
-    const currentInstructionMock = { pc: 0, op: "OpA" };
-    const instructionsMock = [currentInstructionMock, { pc: 1, op: "OpB" }];
+    const currentInstructionMock = {pc: 0, op: "OpA"};
+    const instructionsMock = [currentInstructionMock, {pc: 1, op: "OpB"}];
     let sendResponseStub: sinon.SinonStub<[DebugProtocol.Response], void>;
     let getAllInstructionsStub: sinon.SinonStub<[], IInstruction[]>;
     let getCurrentInstructionStub: sinon.SinonStub<[], IInstruction>;

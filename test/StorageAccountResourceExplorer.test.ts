@@ -1,14 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as fs from "fs-extra";
-import * as sinon from "sinon";
-import * as uuid from "uuid";
-import { Constants } from "../src/Constants";
+import assert from "assert";
+import fs from "fs-extra";
+import sinon from "sinon";
+import uuid from "uuid";
+import {Constants} from "../src/Constants";
 import * as helpers from "../src/helpers";
-import { userSettings } from "../src/helpers";
-import { BlobServiceClient } from "../src/services/storageAccountService/BlobServiceClient";
+import {userSettings} from "../src/helpers";
+import {BlobServiceClient} from "../src/services/storageAccountService/BlobServiceClient";
 
 describe("Storage Account Resource Explorer", () => {
   let getConfigurationAsyncStub: sinon.SinonStub<any>;
@@ -19,7 +19,7 @@ describe("Storage Account Resource Explorer", () => {
   beforeEach(() => {
     getConfigurationAsyncStub = sinon
       .stub(userSettings, "getConfigurationAsync")
-      .returns(Promise.resolve({ userValue: "", defaultValue: "" }));
+      .returns(Promise.resolve({userValue: "", defaultValue: ""}));
     updateConfigurationAsyncStub = sinon.stub(userSettings, "updateConfigurationAsync").resolves();
     storageAccountResourceExplorerRequire = require("../src/resourceExplorers/StorageAccountResourceExplorer");
     storageAccountResourceExplorer = storageAccountResourceExplorerRequire.StorageAccountResourceExplorer;
@@ -40,7 +40,7 @@ describe("Storage Account Resource Explorer", () => {
     const waitForLoginStub = sinon.stub(storageAccountResourceExplorer.prototype, "waitForLogin");
     const getStorageAccountClientStub = sinon
       .stub(storageAccountResourceExplorer.prototype, "getStorageAccountClient")
-      .returns(Promise.resolve({ location: uuid.v4() }));
+      .returns(Promise.resolve({location: uuid.v4()}));
     const getStorageAccountNameStub = sinon.stub(storageAccountResourceExplorer.prototype, "getStorageAccountName");
     const createStorageAccountIfDoesNotExistStub = sinon.stub(
       storageAccountResourceExplorer.prototype,
@@ -88,7 +88,7 @@ describe("Storage Account Resource Explorer", () => {
     // Arrange
     const storageAccountName = uuid.v4();
 
-    getConfigurationAsyncStub.returns(Promise.resolve({ userValue: storageAccountName, defaultValue: "" }));
+    getConfigurationAsyncStub.returns(Promise.resolve({userValue: storageAccountName, defaultValue: ""}));
 
     // Act
     await storageAccountResourceExplorer.prototype.getStorageAccountName();
@@ -100,7 +100,7 @@ describe("Storage Account Resource Explorer", () => {
 
   it("getStorageAccountName should set and return storage account name", async () => {
     // Arrange
-    getConfigurationAsyncStub.returns(Promise.resolve({ userValue: "", defaultValue: "" }));
+    getConfigurationAsyncStub.returns(Promise.resolve({userValue: "", defaultValue: ""}));
 
     // Act
     await storageAccountResourceExplorer.prototype.getStorageAccountName();
@@ -118,14 +118,14 @@ describe("Storage Account Resource Explorer", () => {
   it("createStorageAccountIfDoesNotExist should check existing storage account", async () => {
     // Arrange
     const client = {
-      storageResource: { getStorageAccount: () => Promise.resolve({}) },
+      storageResource: {getStorageAccount: () => Promise.resolve({})},
     };
     const location = uuid.v4();
     const storageAccountName = uuid.v4();
 
     const getStorageAccountStub = sinon
       .stub(client.storageResource, "getStorageAccount")
-      .returns(Promise.resolve({ properties: { provisioningState: Constants.provisioningState.succeeded } }));
+      .returns(Promise.resolve({properties: {provisioningState: Constants.provisioningState.succeeded}}));
     const createStorageAccountStub = sinon.stub(storageAccountResourceExplorer.prototype, "createStorageAccount");
 
     // Act
@@ -146,14 +146,14 @@ describe("Storage Account Resource Explorer", () => {
     async () => {
       // Arrange
       const client = {
-        storageResource: { getStorageAccount: () => Promise.resolve({}) },
+        storageResource: {getStorageAccount: () => Promise.resolve({})},
       };
       const location = uuid.v4();
       const storageAccountName = uuid.v4();
 
       const getStorageAccountStub = sinon
         .stub(client.storageResource, "getStorageAccount")
-        .returns(Promise.resolve({ properties: { provisioningState: Constants.provisioningState.creating } }));
+        .returns(Promise.resolve({properties: {provisioningState: Constants.provisioningState.creating}}));
       const createStorageAccountStub = sinon.stub(storageAccountResourceExplorer.prototype, "createStorageAccount");
 
       // Act
@@ -175,14 +175,14 @@ describe("Storage Account Resource Explorer", () => {
     async () => {
       // Arrange
       const client = {
-        storageResource: { getStorageAccount: () => Promise.resolve({}) },
+        storageResource: {getStorageAccount: () => Promise.resolve({})},
       };
       const location = uuid.v4();
       const storageAccountName = uuid.v4();
 
       const getStorageAccountStub = sinon
         .stub(client.storageResource, "getStorageAccount")
-        .returns(Promise.resolve({ properties: { provisioningState: Constants.provisioningState.resolvingDns } }));
+        .returns(Promise.resolve({properties: {provisioningState: Constants.provisioningState.resolvingDns}}));
       const createStorageAccountStub = sinon.stub(storageAccountResourceExplorer.prototype, "createStorageAccount");
 
       // Act
@@ -206,14 +206,14 @@ describe("Storage Account Resource Explorer", () => {
   it("createStorageAccountIfDoesNotExist throws ResourceNotFound error and create new storage account", async () => {
     // Arrange
     const client = {
-      storageResource: { getStorageAccount: () => Promise.resolve({}) },
+      storageResource: {getStorageAccount: () => Promise.resolve({})},
     };
     const location = uuid.v4();
     const storageAccountName = uuid.v4();
 
     const getStorageAccountStub = sinon
       .stub(client.storageResource, "getStorageAccount")
-      .throwsException({ message: "ResourceNotFound" });
+      .throwsException({message: "ResourceNotFound"});
     const createStorageAccountStub = sinon.stub(storageAccountResourceExplorer.prototype, "createStorageAccount");
 
     // Act
@@ -231,14 +231,14 @@ describe("Storage Account Resource Explorer", () => {
   it("createStorageAccountIfDoesNotExist throws not ResourceNotFound error", async () => {
     // Arrange
     const client = {
-      storageResource: { getStorageAccount: () => Promise.resolve({}) },
+      storageResource: {getStorageAccount: () => Promise.resolve({})},
     };
     const location = uuid.v4();
     const storageAccountName = uuid.v4();
 
     const getStorageAccountStub = sinon
       .stub(client.storageResource, "getStorageAccount")
-      .throwsException({ message: uuid.v4() });
+      .throwsException({message: uuid.v4()});
     const createStorageAccountStub = sinon.stub(storageAccountResourceExplorer.prototype, "createStorageAccount");
 
     try {
@@ -294,7 +294,7 @@ describe("Storage Account Resource Explorer", () => {
     const awaiterSpy = sinon.spy(helpers.outputCommandHelper, "awaiter");
     const getStorageAccountStub = sinon
       .stub(client.storageResource, "getStorageAccount")
-      .returns(Promise.resolve({ properties: { provisioningState: Constants.provisioningState.succeeded } }));
+      .returns(Promise.resolve({properties: {provisioningState: Constants.provisioningState.succeeded}}));
     const createStorageAccountStub = sinon.stub(client.storageResource, "createStorageAccount");
 
     // Act
@@ -320,7 +320,7 @@ describe("Storage Account Resource Explorer", () => {
     const awaiterSpy = sinon.spy(helpers.outputCommandHelper, "awaiter");
     const getStorageAccountStub = sinon
       .stub(client.storageResource, "getStorageAccount")
-      .returns(Promise.resolve({ properties: { provisioningState: Constants.provisioningState.succeeded } }));
+      .returns(Promise.resolve({properties: {provisioningState: Constants.provisioningState.succeeded}}));
     const createStorageAccountStub = sinon.stub(client.storageResource, "createStorageAccount");
 
     // Act
@@ -349,7 +349,7 @@ describe("Storage Account Resource Explorer", () => {
     // Arrange
     const getContainerStub = sinon
       .stub(BlobServiceClient, "getContainer")
-      .throwsException({ message: "ContainerNotFound" });
+      .throwsException({message: "ContainerNotFound"});
     const createContainerStub = sinon.stub(BlobServiceClient, "createContainer");
 
     // Act
@@ -362,7 +362,7 @@ describe("Storage Account Resource Explorer", () => {
 
   it("createContainerIfDoesNotExist throws not ContainerNotFound error", async () => {
     // Arrange
-    const getContainerStub = sinon.stub(BlobServiceClient, "getContainer").throwsException({ message: uuid.v4() });
+    const getContainerStub = sinon.stub(BlobServiceClient, "getContainer").throwsException({message: uuid.v4()});
     const createContainerStub = sinon.stub(BlobServiceClient, "createContainer");
 
     try {
@@ -407,7 +407,7 @@ describe("Storage Account Resource Explorer", () => {
     const storageAccountClient = require("../src/ARMBlockchain/StorageAccountClient");
     sinon.stub(storageAccountClient.__proto__, "constructor");
     const serviceClient = new storageAccountClient.StorageAccountClient(
-      { signRequest: () => undefined },
+      {signRequest: () => undefined},
       uuid.v4(),
       uuid.v4(),
       uuid.v4(),

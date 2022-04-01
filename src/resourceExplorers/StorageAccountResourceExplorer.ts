@@ -1,17 +1,17 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as fs from "fs-extra";
-import * as path from "path";
-import { ProgressLocation, window } from "vscode";
-import { IGetStorageAccountDto, IStorageAccountDto } from "../ARMBlockchain";
-import { ICreateStorageAccountDto } from "../ARMBlockchain/AzureDto/StorageAccount/CreateStorageAccountDto";
-import { StorageAccountClient } from "../ARMBlockchain/StorageAccountClient";
-import { Constants } from "../Constants";
-import { outputCommandHelper, userSettings } from "../helpers";
-import { ResourceGroupItem } from "../Models/QuickPickItems";
-import { BlobServiceClient } from "../services/storageAccountService/BlobServiceClient";
-import { AzureResourceExplorer } from "./AzureResourceExplorer";
+import fs from "fs-extra";
+import path from "path";
+import {ProgressLocation, window} from "vscode";
+import {IGetStorageAccountDto, IStorageAccountDto} from "../ARMBlockchain";
+import {ICreateStorageAccountDto} from "../ARMBlockchain/AzureDto/StorageAccount/CreateStorageAccountDto";
+import {StorageAccountClient} from "../ARMBlockchain/StorageAccountClient";
+import {Constants} from "../Constants";
+import {outputCommandHelper, userSettings} from "../helpers";
+import {ResourceGroupItem} from "../Models/QuickPickItems";
+import {BlobServiceClient} from "../services/storageAccountService/BlobServiceClient";
+import {AzureResourceExplorer} from "./AzureResourceExplorer";
 
 export class StorageAccountResourceExplorer extends AzureResourceExplorer {
   public async getFileBlobUrls(
@@ -28,13 +28,13 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
 
     await this.createStorageAccountIfDoesNotExist(client, client.location, storageAccountName);
 
-    const containerName = Constants.containerTruffleSuiteExtension;
+    const containerName = Constants.containerTruffleExtension;
     const sas = await this.getStorageAccountSas(client, storageAccountName);
 
     await this.createContainerIfDoesNotExist(storageAccountName, containerName, sas);
 
     return window.withProgress(
-      { location: ProgressLocation.Window, title: Constants.statusBarMessages.createBlobs },
+      {location: ProgressLocation.Window, title: Constants.statusBarMessages.createBlobs},
       async () =>
         await Promise.all(
           fileNameArray.map((name, index) =>
@@ -53,7 +53,7 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
     const client = await this.getStorageAccountClient(subscriptionId, resourceGroup);
 
     await window.withProgress(
-      { location: ProgressLocation.Window, title: Constants.statusBarMessages.deleteBlobs },
+      {location: ProgressLocation.Window, title: Constants.statusBarMessages.deleteBlobs},
       async () => {
         await Promise.all(fileUrls.map((url) => this.deleteBlob(new URL(url), client, localFilePaths)));
       }
@@ -61,7 +61,7 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
   }
 
   private async getStorageAccountName(): Promise<string> {
-    let { userValue } = await userSettings.getConfigurationAsync(Constants.userSettings.storageAccountUserSettingsKey);
+    let {userValue} = await userSettings.getConfigurationAsync(Constants.userSettings.storageAccountUserSettingsKey);
 
     if (!userValue) {
       userValue = `vscode${Date.parse(new Date().toString())}`;
@@ -122,7 +122,7 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
       storageAccount.properties.provisioningState === Constants.provisioningState.creating;
 
     return window.withProgress(
-      { location: ProgressLocation.Window, title: Constants.statusBarMessages.createStorageAccount },
+      {location: ProgressLocation.Window, title: Constants.statusBarMessages.createStorageAccount},
       async () =>
         await outputCommandHelper.awaiter<IStorageAccountDto>(
           action,
@@ -151,7 +151,7 @@ export class StorageAccountResourceExplorer extends AzureResourceExplorer {
     }
 
     await window.withProgress(
-      { location: ProgressLocation.Window, title: Constants.statusBarMessages.createContainer },
+      {location: ProgressLocation.Window, title: Constants.statusBarMessages.createContainer},
       async () => await BlobServiceClient.createContainer(storageAccountName, containerName, sas)
     );
   }

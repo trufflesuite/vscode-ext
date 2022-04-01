@@ -1,12 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as os from "os";
-import * as path from "path";
-import { ExtensionContext, extensions } from "vscode";
-import { IOZAsset } from "./services/openZeppelin/models";
+import os from "os";
+import path from "path";
+import {ExtensionContext, extensions} from "vscode";
 
-const extensionId = "trufflesuite-csi.trufflesuite-vscode";
+const extensionId = "trufflesuite-csi.truffle-vscode";
 const packageJSON = extensions.getExtension(extensionId)!.packageJSON;
 
 export enum RequiredApps {
@@ -33,13 +32,13 @@ export class Constants {
   public static extensionKey = packageJSON.aiKey;
 
   public static outputChannel = {
-    truffleSuiteForVSCode: "Trufflesuite for VSCode",
-    executeCommand: "Execute command",
-    ganacheCommands: "Ganache Server",
-    logicAppGenerator: "Logic App Generator",
-    requirements: "Requirements",
-    telemetryClient: "Telemetry Client",
-    treeManager: "Service Tree Manager",
+    truffleForVSCode: "Truffle for VSCode",
+    executeCommand: "Truffle: Execute command",
+    ganacheCommands: "Truffle: Ganache Server",
+    //logicAppGenerator: "Logic App Generator",
+    requirements: "Truffle: Requirements",
+    telemetryClient: "Truffle: Telemetry Client",
+    treeManager: "Truffle: Service Tree Manager",
   };
 
   public static truffleConfigRequireNames = {
@@ -54,10 +53,10 @@ export class Constants {
     migrations_directory: path.join("./", "migrations"),
   };
 
-  public static defaultTruffleBox = "Azure-Samples/Blockchain-Ethereum-Template";
+  public static defaultTruffleBox = "truffle-box/vscode-starter-box";
   public static defaultDebounceTimeout = 300;
   public static defaultInputNameInBdm = "transaction-node";
-  public static containerTruffleSuiteExtension = "container-trufflesuite-extension";
+  public static containerTruffleExtension = "container-truffle-extension";
 
   public static infuraHost = "infura.io";
   public static localhost = "127.0.0.1";
@@ -69,7 +68,7 @@ export class Constants {
   public static ganacheRetryTimeout = 2000; // milliseconds
   public static ganacheRetryAttempts = 5;
 
-  public static trufflesuiteResourceName = {
+  public static truffleResourceName = {
     eventGrid: "Event Grid",
     transactionNode: "Transaction Node",
   };
@@ -98,9 +97,9 @@ export class Constants {
   };
 
   // Values are quite brittle and don't map directly to the requirements.html screen.
-  public static requiredVersions: { [key: string]: string | { min: string; max: string } } = {
+  public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
     [RequiredApps.ganache]: {
-      max: "7.1.0",
+      max: "8.0.0",
       min: "6.0.0",
     },
     [RequiredApps.git]: "2.10.0",
@@ -114,7 +113,7 @@ export class Constants {
     },
     [RequiredApps.npm]: {
       max: "9.0.0",
-      min: "v6.14.15",
+      min: "6.14.15",
     },
     [RequiredApps.truffle]: {
       max: "6.0.0",
@@ -151,7 +150,7 @@ export class Constants {
       changelogPath: "",
       path: "",
       showOnStartup: "showOnStartupChangelog",
-      title: "Trufflesuite Development Kit for Ethereum Changelog",
+      title: "Truffle Development Kit for Ethereum Changelog",
       viewType: "changelog",
     },
     contractUI: {
@@ -163,13 +162,13 @@ export class Constants {
     requirements: {
       path: "",
       showOnStartup: "showOnStartupRequirementsPage",
-      title: "Trufflesuite Development Kit - Preview",
+      title: "Truffle Development Kit - Preview",
       viewType: "requirementsPage",
     },
     welcome: {
       path: "",
       showOnStartup: "showOnStartupWelcomePage",
-      title: "Welcome to Trufflesuite",
+      title: "Welcome to Truffle",
       viewType: "welcomePage",
     },
   };
@@ -248,18 +247,18 @@ export class Constants {
       azure: {
         member: {
           contextValue: "member",
-          iconPath: { dark: "", light: "" },
+          iconPath: {dark: "", light: ""},
         },
       },
       bdm: {
         input: {
           contextValue: "inputGroup",
-          iconPath: { dark: "", light: "" },
+          iconPath: {dark: "", light: ""},
           label: "Inputs",
         },
         output: {
           contextValue: "outputGroup",
-          iconPath: { dark: "", light: "" },
+          iconPath: {dark: "", light: ""},
           label: "Outputs",
         },
       },
@@ -267,85 +266,85 @@ export class Constants {
     network: {
       azure: {
         contextValue: "network",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       bdm: {
         application: {
           contextValue: "bdmApplication",
-          iconPath: { dark: "", light: "" },
+          iconPath: {dark: "", light: ""},
         },
         input: {
           contextValue: "input",
-          iconPath: { dark: "", light: "" },
+          iconPath: {dark: "", light: ""},
         },
         output: {
           contextValue: "output",
-          iconPath: { dark: "", light: "" },
+          iconPath: {dark: "", light: ""},
         },
       },
       default: {
         contextValue: "network",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       infura: {
         contextValue: "network",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       local: {
         contextValue: "localnetwork",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
     },
     project: {
       azure: {
         contextValue: "project",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       bdm: {
         contextValue: "bdmproject",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       default: {
         contextValue: "project",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       infura: {
         contextValue: "project",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
       local: {
         contextValue: "localproject",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
       },
     },
     service: {
       azure: {
         contextValue: "service",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
         label: "Azure Service",
         prefix: "abs",
       },
       bdm: {
         contextValue: "service",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
         label: "Blockchain Data Manager",
         prefix: "bdm",
       },
       default: {
         contextValue: "service",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
         label: "Default Service",
       },
       infura: {
         contextValue: "service",
-        iconPath: { dark: "", light: "" },
+        iconPath: {dark: "", light: ""},
         label: "Infura Service",
         prefix: "inf",
       },
       local: {
         contextValue: "service",
-        iconPath: { dark: "", light: "" },
-        label: "Local Service",
+        iconPath: {dark: "", light: ""},
+        label: "Ganache Service",
         prefix: "loc",
       },
     },
@@ -449,9 +448,8 @@ export class Constants {
     noUpperCaseLetter: "Password should have at least one uppercase letter from A to Z.",
     onlyLowerCaseAllowed: "Only lower case allowed.",
     onlyNumberAllowed: "Value after ':' should be a number.",
-    openZeppelinFilesAreInvalid: Constants.getMessageOpenZeppelinFilesAreInvalid,
     portAlreadyInUse: "This port is already in use. Choose another one.",
-    portNotInUseGanache: "No local service running on port. Please start service or select another port.",
+    portNotInUseGanache: "No local ganache service running on port. Please start service or select another port.",
     projectAlreadyExists: "Network already exists.",
     projectAlreadyExistsOnInfura: "Project already exist with the same name on Infura.",
     projectIdAlreadyExists: "Network with project ID already exists.",
@@ -504,7 +502,7 @@ export class Constants {
 
   // More information see here
   // https://ethereum.stackexchange.com/questions/17051/how-to-select-a-network-id-or-is-there-a-list-of-network-ids
-  public static infuraEndpointsIds: { [key: string]: number } = {
+  public static infuraEndpointsIds: {[key: string]: number} = {
     goerli: 5,
     kovan: 42,
     mainnet: 1,
@@ -657,7 +655,6 @@ export class Constants {
     memberNameValidating: "Member name validating...",
     networkIsNotReady: Constants.getNetworkIsNotReadyMessage,
     openButton: "Open",
-    ozFrameworkIsAvailableNow: "You can now use OpenZeppelin framework as well as Truffle",
     privateKeyWasCopiedToClipboard: "Private key was copied to clipboard",
     provisioningResource: (name: string) =>
       `${name} is provisioning. The provisioning status can be viewed in the Azure portal. ` +
@@ -712,9 +709,9 @@ export class Constants {
   };
 
   public static azureApps = {
-    AzureFunction: { label: "Azure Function", serviceType: 2, outputDir: "generatedAzureFunction" },
-    FlowApp: { label: "Flow App", serviceType: 0, outputDir: "generatedFlowApp" },
-    LogicApp: { label: "Logic App", serviceType: 1, outputDir: "generatedLogicApp" },
+    AzureFunction: {label: "Azure Function", serviceType: 2, outputDir: "generatedAzureFunction"},
+    FlowApp: {label: "Flow App", serviceType: 0, outputDir: "generatedFlowApp"},
+    LogicApp: {label: "Logic App", serviceType: 1, outputDir: "generatedLogicApp"},
   };
 
   public static azureApiVersions = {
@@ -759,15 +756,9 @@ export class Constants {
     string: "string",
     uint: "uint",
   };
-
-  // FIXME: revise the openzeppelin versions to work properly.
-  public static firstOZVersion = "2.3.0";
-  public static allOpenZeppelinVersions = ["2.3.0", "2.4.0", "2.5.0", "3.4.0", "4.4.0"];
-
   public static userSettings = {
-    coreSdkSettingsKey: "trufflesuite.coreSDK",
-    ozVersionUserSettingsKey: "trufflesuite.openZeppelin.version",
-    storageAccountUserSettingsKey: "trufflesuite.storageAccount.name",
+    coreSdkSettingsKey: "truffle-vscode.coreSDK",
+    storageAccountUserSettingsKey: "truffle-vscode.storageAccount.name",
   };
 
   public static bdmApplicationRequestParameters = {
@@ -776,85 +767,7 @@ export class Constants {
   };
 
   public static coreSdk = {
-    openZeppelin: "OpenZeppelin",
     truffle: "Truffle",
-  };
-
-  public static openZeppelin = {
-    cancelButtonTitle: "Cancel",
-    contractsUpgradeIsFailed: "Upgrade of OpenZeppelin contracts has failed",
-    contactParameterInformation(contractName: string, parameterName: string, parameterType: string) {
-      return `Contract: ${contractName}. Parameter: ${parameterName}: ${parameterType}`;
-    },
-    descriptionDownloadingFailed: "Description downloading failed",
-    downloadingContractsFromOpenZeppelin: "Downloading contracts from OpenZeppelin",
-    exploreDownloadedContractsInfo: "Explore more information about the contracts downloaded",
-    invalidVersionException: "Invalid version. All OpenZeppelin work will be stopped",
-    moreDetailsButtonTitle: "More details",
-    newVersionAvailable:
-      "There is a new version of your OpenZeppelin contracts available. Would you like to download the latest version?",
-    overwriteExistedContracts: "Overwrite existed contracts",
-    projectFileName: "project.json",
-    replaceButtonTitle: "Replace",
-    retryButtonTitle: "Retry",
-    retryDownloading: "Retry downloading",
-    saveSpecifiedParameters: "Not all contract parameters were defined. Do you want to save the progress?",
-    selectCategoryForDownloading: "Select category for downloading",
-    skipButtonTitle: "Skip files",
-    specifyContractParameters: "Some contracts have parameters required for deploy. Do you want to specify them?",
-    upgradeOpenZeppelin: "Upgrading OpenZeppelin",
-    hashCalculationFailed(errorMessage: string): string {
-      return `Error while calculating file hash. Message: ${errorMessage}`;
-    },
-    wereNotDownloaded(count: number): string {
-      return `OpenZeppelin: Some files (${count}) were not downloaded`;
-    },
-    wereDownloaded(count: number): string {
-      return `OpenZeppelin: (${count}) files were stored`;
-    },
-    alreadyExisted(existing: IOZAsset[]): string {
-      return (
-        `OpenZeppelin: (${existing.length}) files already exist on disk: ` +
-        existing
-          .slice(0, 3)
-          .map((contract) => contract.name)
-          .join(" ") +
-        (existing.length > 3 ? "..." : "")
-      );
-    },
-    invalidHashMessage(contractPath: string): string {
-      return `${contractPath} - invalid hash`;
-    },
-    validHashMessage(contractPath: string): string {
-      return `${contractPath} - valid hash`;
-    },
-    contractNotExistedOnDisk(contractPath: string): string {
-      return `${contractPath} - not existed on disk`;
-    },
-    categoryWillDownloaded(categoryName: string): string {
-      return `OpenZeppelin category will be downloaded: ${categoryName}`;
-    },
-    fileNow(count: number): string {
-      return `${count} file(s) on OpenZeppelin library now`;
-    },
-    invalidVersionDialog(version: string, location: string, lastVersion: string) {
-      return (
-        `There is invalid OpenZeppelin version (${version}) in ${location}. ` +
-        `Do you want to use the latest one (${lastVersion})?`
-      );
-    },
-  };
-
-  // TODO: add real extensions information when they will be released
-  public static externalExtensions: Record<string, any> = {
-    OpenZeppelin: {
-      commands: {
-        buildContracts: "oz.build.command",
-        deployContracts: "oz.deploy.command",
-      },
-      name: "openZeppelin.extension.name",
-      supportedVersion: "1.0.0",
-    },
   };
 
   public static initialize(context: ExtensionContext) {
@@ -1006,12 +919,6 @@ export class Constants {
   private static getMessageInputHasUnresolvedSymbols(unresolvedSymbols: string): string {
     return `Input value must not have '${unresolvedSymbols}'.`;
   }
-
-  private static getMessageOpenZeppelinFilesAreInvalid(invalidFilePaths: string[]): string {
-    return `OpenZeppelin files have been modified or removed:
-      ${invalidFilePaths.join("; ")}. Please revert changes or download them again.`;
-  }
-
   private static getNetworkIsNotReadyMessage(itemType: string) {
     switch (itemType) {
       case "AzureBlockchainNetworkNode":

@@ -1,12 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import rewire = require("rewire");
-import * as sinon from "sinon";
-import { LocalProject } from "../../../src/Models/TreeItems";
-import { GanacheService, TreeManager } from "../../../src/services";
-import { ProjectView } from "../../../src/ViewItems";
+import assert from "assert";
+import rewire from "rewire";
+import sinon from "sinon";
+import {LocalProject} from "../../../src/Models/TreeItems";
+import {GanacheService, TreeManager} from "../../../src/services";
+import {ProjectView} from "../../../src/ViewItems";
 
 describe("Disconnect Service", () => {
   afterEach(() => {
@@ -14,7 +14,7 @@ describe("Disconnect Service", () => {
   });
 
   describe("DisconnectProject_ShouldStopGanacheServer_LocalProject", () => {
-    const services = [{ localProjectInstance: new LocalProject("name", 8545), executed: true }];
+    const services = [{localProjectInstance: new LocalProject("name", 8545), executed: true}];
 
     services.forEach(async (service) => {
       it("GanacheService.stopGanacheServer() should be executed only for LocalProject.", async () => {

@@ -9,7 +9,7 @@ export * from "./IDeployDestination";
 import {
   AzureBlockchainNetworkNodeItemCreator,
   AzureBlockchainProjectItemCreator,
-  TrufflesuiteServiceItemCreator,
+  TruffleServiceItemCreator,
   BlockchainDataManagerInputAndOutputItemCreator,
   BlockchainDataManagerNetworkNodeItemCreator,
   BlockchainDataManagerProjectItemCreator,
@@ -24,13 +24,13 @@ import {
   MemberItemCreator,
   NullableItemCreator,
 } from "./ItemCreators";
-import { ItemFactory } from "./ItemFactory";
-import { ItemType } from "./ItemType";
+import {ItemFactory} from "./ItemFactory";
+import {ItemType} from "./ItemType";
 
 ItemFactory.register(ItemType.COMMAND, new CommandItemCreator());
 ItemFactory.register(ItemType.NULLABLE, new NullableItemCreator());
 
-ItemFactory.register(ItemType.AZURE_BLOCKCHAIN_SERVICE, new TrufflesuiteServiceItemCreator());
+ItemFactory.register(ItemType.AZURE_BLOCKCHAIN_SERVICE, new TruffleServiceItemCreator());
 ItemFactory.register(ItemType.LOCAL_SERVICE, new LocalServiceItemCreator());
 ItemFactory.register(ItemType.INFURA_SERVICE, new InfuraServiceItemCreator());
 ItemFactory.register(ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE, new BlockchainDataManagerServiceItemCreator());

@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as sinon from "sinon";
-import * as vscode from "vscode";
-import { Constants } from "../src/Constants";
+import assert from "assert";
+import sinon from "sinon";
+import vscode from "vscode";
+import {Constants} from "../src/Constants";
 import * as workspaceHelper from "../src/helpers/workspace";
 
 describe("Workspace", () => {

@@ -1,15 +1,15 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as truffleProvider from "@truffle/provider";
-import * as assert from "assert";
-import * as sinon from "sinon";
-import { ConfigurationReader } from "../../src/debugAdapter/configurationReader";
-import { Web3Wrapper } from "../../src/debugAdapter/web3Wrapper";
+import truffleProvider from "@truffle/provider";
+import assert from "assert";
+import {restore, stub} from "sinon";
+import {ConfigurationReader} from "../../src/debugAdapter/configurationReader";
+import {Web3Wrapper} from "../../src/debugAdapter/web3Wrapper";
 
 describe("Web3Wrapper unit tests", () => {
   afterEach(() => {
-    sinon.restore();
+    restore();
   });
 
   it("getProvider should call truffleProvider.create", () => {
@@ -19,7 +19,7 @@ describe("Web3Wrapper unit tests", () => {
       network_id: "*",
       port: 8545,
     };
-    const truffleProviderCreateStub = sinon.stub(truffleProvider, "create").returns({});
+    const truffleProviderCreateStub = stub(truffleProvider, "create").returns({});
 
     // Act
     const web3Wrapper = new Web3Wrapper(networkOptionsMock);

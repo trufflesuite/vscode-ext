@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { commands, ExtensionContext } from "vscode";
-import { Constants } from "../Constants";
-import { BasicWebView, IWebViewConfig } from "./BasicWebView";
+import {commands, ExtensionContext} from "vscode";
+import {Constants} from "../Constants";
+import {BasicWebView, IWebViewConfig} from "./BasicWebView";
 
 export class WelcomePage extends BasicWebView {
   protected readonly config: IWebViewConfig;
@@ -17,7 +17,7 @@ export class WelcomePage extends BasicWebView {
     return false;
   }
 
-  protected async receiveMessage(message: { [key: string]: any }): Promise<void> {
+  protected async receiveMessage(message: {[key: string]: any}): Promise<void> {
     await super.receiveMessage(message);
 
     if (!this.panel) {
@@ -26,11 +26,11 @@ export class WelcomePage extends BasicWebView {
 
     if (message.command === "executeCommand") {
       if (message.value === "createProject") {
-        await commands.executeCommand("trufflesuite.createProject");
+        await commands.executeCommand("truffle-vscode.createProject");
       }
 
       if (message.value === "connectProject") {
-        await commands.executeCommand("trufflesuite.connectProject");
+        await commands.executeCommand("truffle-vscode.connectProject");
       }
     }
   }

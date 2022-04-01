@@ -1,15 +1,15 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import * as assert from "assert";
-import * as fs from "fs-extra";
-import * as path from "path";
-import * as sinon from "sinon";
-import { Constants } from "../src/Constants";
-import { TruffleConfiguration } from "../src/helpers";
+import assert from "assert";
+import fs from "fs-extra";
+import path from "path";
+import sinon from "sinon";
+import {Constants} from "../src/Constants";
+import {TruffleConfiguration} from "../src/helpers";
 import * as helpers from "../src/helpers";
 import * as commands from "../src/helpers/command";
-import { ICommandResult } from "../src/helpers/command";
+import {ICommandResult} from "../src/helpers/command";
 import * as testData from "./testData/truffleConfigTestdata";
 
 describe("TruffleConfiguration helper", () => {
@@ -202,13 +202,13 @@ describe("getConfiguration() in class TruffleConfig", () => {
 
   it("getConfiguration returns configurations without directories and networks", async () => {
     // Arrange
-    const { contracts_directory, contracts_build_directory, migrations_directory } =
+    const {contracts_directory, contracts_build_directory, migrations_directory} =
       Constants.truffleConfigDefaultDirectory;
     const commandResult: ICommandResult = {
       cmdOutput: "",
       cmdOutputIncludingStderr: "",
       code: 0,
-      messages: [{ command: "truffleConfig", message: "{}" }],
+      messages: [{command: "truffleConfig", message: "{}"}],
     };
 
     sinon.stub(commands, "tryExecuteCommandInFork").returns(Promise.resolve(commandResult));
@@ -290,7 +290,7 @@ describe("getConfiguration() in class TruffleConfig", () => {
       cmdOutput: "",
       cmdOutputIncludingStderr: "",
       code: 0,
-      messages: [{ command: "truffleConfig", message: testNetwork }],
+      messages: [{command: "truffleConfig", message: testNetwork}],
     };
 
     sinon.stub(commands, "tryExecuteCommandInFork").returns(Promise.resolve(commandResult));
@@ -317,7 +317,7 @@ describe("getConfiguration() in class TruffleConfig", () => {
       cmdOutput: "",
       cmdOutputIncludingStderr: "",
       code: 0,
-      messages: [{ command: "truffleConfig", message: undefined }],
+      messages: [{command: "truffleConfig", message: undefined}],
     };
 
     sinon.stub(commands, "tryExecuteCommandInFork").returns(Promise.resolve(commandResult));
@@ -329,7 +329,7 @@ describe("getConfiguration() in class TruffleConfig", () => {
       await truffleConfig.getConfiguration();
     } catch (error) {
       assert.strictEqual(
-        error.message,
+        (error as Error).message,
         Constants.errorMessageStrings.TruffleConfigHasIncorrectFormat,
         "getConfiguration should throw error"
       );

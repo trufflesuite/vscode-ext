@@ -13,12 +13,15 @@
     // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
     // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
     // "noUnusedParameters": true,  /* Report errors on unused parameters. */
+    "esModuleInterop": true,
     "noUnusedLocals": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
     "strictNullChecks": true,
     "noUnusedParameters": true,
     "allowJs": true,
+    "checkJs": false,
+    "skipLibCheck": true,
     "typeRoots": ["./node_modules/@types", "./node_modules/@machinomy", "./src/debugger/types"]
   },
   "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.json", "test/**/*.js", "test/**/*.ts", "test/**/*.json"],
