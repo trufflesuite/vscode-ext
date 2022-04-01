@@ -78,18 +78,18 @@ jobs:
            echo "VSCE_FLAGS=--pre-release --yarn " >> $GITHUB_ENV
            echo "flags_set=true" >> $GITHUB_ENV
 
-      - name: compile and create vsix - MASTER Release
+      - name: compile and create vsix MASTER Release
         if: github.ref == 'refs/heads/master'
         run: |
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} ::"
-          yarn package ${{ env.VSCE_FLAGS }}
+          yarn package
           echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}.vsix" >> $GITHUB_ENV
 
-      - name: compile and create vsix - Develop Pre-Release
+      - name: compile and create vsix Develop PreRelease
         if: github.ref == 'refs/heads/develop'
         run: |
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} ::"
-          yarn package ${{ env.VSCE_FLAGS }}
+          yarn package --pre-release --yarn
           echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}.vsix" >> $GITHUB_ENV
 
       - name: print vsix path
