@@ -15,7 +15,6 @@ import {
   StringValueInfoValid,
   UintValue,
 } from "@truffle/codec/dist/lib/format/elementary";
-import type {Type} from "@truffle/codec/dist/lib/format/types";
 import {ArrayValue, Result} from "@truffle/codec/dist/lib/format/values";
 import * as Exception from "@truffle/codec/dist/lib/format/utils/exception";
 import {relative as pathRelative, sep as pathSep} from "path";
@@ -117,11 +116,7 @@ function translateContractValue(value: Format.Values.ContractValueInfo): string 
   }
 }
 
-function createResult(
-  variable: Format.Values.Result | undefined,
-  value: any,
-  typeName: string = "unknown"
-): TranslatedResult {
+function createResult(_: Format.Values.Result | undefined, value: any, typeName: string = "unknown"): TranslatedResult {
   return {
     value,
     typeName,
