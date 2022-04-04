@@ -84,7 +84,7 @@ jobs:
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} ::"
           yarn package
           echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "vsix_type='-RELEASE'" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "vsix_type=-RELEASE" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: compile and create vsix Develop PreRelease
         if: github.ref == 'refs/heads/develop'
