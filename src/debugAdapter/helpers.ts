@@ -15,9 +15,11 @@ import {
   StringValueInfoValid,
   UintValue,
 } from "@truffle/codec/dist/lib/format/elementary";
+import type {Type} from "@truffle/codec/dist/lib/format/types";
 import {ArrayValue, Result} from "@truffle/codec/dist/lib/format/values";
 import * as Exception from "@truffle/codec/dist/lib/format/utils/exception";
 import {relative as pathRelative, sep as pathSep} from "path";
+import _ from "lodash";
 
 export function sortFilePaths(filePaths: string[]): string[] {
   return filePaths.sort(comparePaths);
@@ -116,9 +118,9 @@ function translateContractValue(value: Format.Values.ContractValueInfo): string 
 }
 
 function createResult(
-  variable: Format.Values.Result,
+  variable: Format.Values.Result | undefined,
   value: any,
-  typeName: string = variable.type.typeClass
+  typeName: string = "unknown"
 ): TranslatedResult {
   return {
     value,
@@ -137,6 +139,10 @@ function createResult(
 export function translate(variable: Format.Values.Result, breaklength: number = 20): TranslatedResult {
   switch (variable.kind) {
     case "value":
+      if (!_.has(variable, "type.typeClass")) {
+        console.error("Debug Variable of unknown type received: ", {variable});
+        return createResult(variable, createResult(variable, `variable: ${variable}`, "unknown"));
+      }
       switch (variable.type.typeClass) {
         case "uint":
         case "int":
