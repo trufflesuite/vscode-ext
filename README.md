@@ -24,7 +24,7 @@ Developers that are familiar with Truffle CLI may use `e.g., truffle init` direc
 
 For developers who are not familiar with Truffle, or prefer to use the Command Palette, the extension can easily scaffold out a project directory using the following steps.
 
-1. From the [Command Palette](https://github.com/Microsoft/vscode-azure-blockchain-ethereum/wiki/Command-Palette), type `Truffle: New Solidity Project`
+1. From the Command Palette, type `Truffle: New Solidity Project`
 2. Select an empty directory to scaffold out your project.
 3. Choose a name for your project.
 4. Press Enter.
@@ -129,7 +129,7 @@ besu: {
   - Mac OSX
   - Linux 
 - VSCode 1.60.0 (or greater)
-- Node 15.00.x (or greater)
+- Node 14.17.3 (or greater)
 - NPM 7.18.1 (or greater)
 - Git 2.10.x (or greater)
 
