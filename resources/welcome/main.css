@@ -70,6 +70,21 @@ header p {
 
 /*#region main-content*/
 
+.callout {
+  text-align: left;
+  padding: 1rem;
+  margin: 1rem 0 0.4rem 0;
+  border-radius: 0.25rem;
+}
+
+.vscode-dark .callout {
+  background-color: #2b2b2b;
+}
+
+.vscode-light .callout {
+  background-color: #f7f7f7;
+}
+
 #content {
   display: flex;
   flex-direction: row;

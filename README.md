@@ -1,67 +1,56 @@
 # Truffle for VSCode
 
-The extension simplifies how you create, build and deploy smart contracts on Ethereum ledgers using the Truffle of tools.
+> :warning: **Installation or Setup Issues?** Checkout out our [comprehensive troubleshooting guide](https://trufflesuite.com/).
 
-- If you are doing open source blockchain development, the extension has built in integration for open source tools such as [Truffle/Ganache](https://trufflesuite.com/), [Infura](https://infura.io/).
-- If you are doing Azure development, an Azure subscription is required, log into your Azure subscription or create a [free account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F) before you begin. Enjoy the same integration of open source tools with Azure hosted blockchain networks such as [Hyperledger Besu](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/consensys.quorum-dev-quickstart) or the enterprise supported [Quorum Blockchain Service](https://azuremarketplace.microsoft.com/en-gb/marketplace/apps/consensys.qbs-contact-me)
+Truffle for VSCode simplifies how you create, build, debug and deploy smart contracts on [Ethereum](https://ethereum.org) and all EVM-compatibile blockchains and layer 2 solutions. The extension has built-in integration with a growing number of tools and services including [Truffle](https://trufflesuite.com/docs/truffle), [Ganache](https://trufflesuite.com/docs/ganache), and [Infura](https://infura.io/).
 
-# Open Source Ethereum development
+## Native IDE Debugging (preview)
 
-<details>
-  <summary style='font-size:15pt'>Get started with smart contracts</summary>
+Truffle for VSCode also offers comprehensive native IDE [Solidity](https://docs.soliditylang.org/) debugging support, taking advantage of VSCode's great debugging features such variables, watches, and breakpoints. No more jumping between differents tools or windows during your edit, compile, deploy, transact, debug loop.
 
-## Create a new smart contract project
+![in-ide debugging example](images/ide-debugging.png)
+
+## Getting Started
+
+### Installation
+
+To install add extension to VSCode, simply click the "Install" button above. Beyond this there are some local dependencies which you may have already installed. If not, the extension will prompt you accordingly. To help smooth out the dependency installation process, we've created a guide which you can find [here](https://trufflesuite.com/).
+
+### Create a New Project
 
 The Truffle for VSCode was built to work effectively for both new users to Ethereum, but not get in the way for those familiar with the process. One of the primary goals is to help users create a project structure for developing smart contracts, help in the compilation and building of these assets, deployment of these assets to blockchain endpoints as well as debugging of these contracts.
 
-Developers that are familiar with Truffle Suite may use the Truffle command line `e.g., truffle init` directly from the VS Code terminal, if they like.
+Developers that are familiar with Truffle CLI may use `e.g., truffle init` directly from the VSCode terminal, if they like.
 
 For developers who are not familiar with Truffle, or prefer to use the Command Palette, the extension can easily scaffold out a project directory using the following steps.
 
-1. From the [Command Palette](https://github.com/Microsoft/vscode-azure-blockchain-ethereum/wiki/Command-Palette), type `Blockchain: New Solidity Project`
-
+1. From the Command Palette, type `Truffle: New Solidity Project`
 2. Select an empty directory to scaffold out your project.
-
-3. Choose a name for your contract.
-
+3. Choose a name for your project.
 4. Press Enter.
-
-   ![Command Palette - New Solidity Project](https://github.com/Azure-Samples/blockchain-devkit/raw/master/media/extensionMedia/createNewProject.gif)
-
 ## Build your smart contracts
 
-Your newly scaffolded out directory includes a simple contract and all the necessary files to build and deploy a simple, working, contract to the blockchain endpoint. Use the following steps to build your contract
+Your newly scaffolded out directory includes a simple contract and all the necessary files to build and deploy a simple, working, contract to an RPC-endpoint. Use the following steps to build your contract:
 
-1. Select your contract Solidity (.sol) file, right click and choose `Build Contracts`
+1. Select your contract Solidity (.sol) file, right-click and choose `Build Contracts`
 
-   ![Right click shortcut - build contracts](https://github.com/Azure-Samples/blockchain-devkit/raw/master/media/extensionMedia/buildContractRightClick.gif)
+## Deploy to the RPC endpoint
 
-## Deploy to the Ethereum blockchain RPC endpoint
-
-Once compiled, you will have your contract, contract metadata (e.g., contract ABI, bytecode) available in the smart contract .json file which will be located in the`./build directory` The next steps is to deploy these contracts to a blockchain network.
+Once compiled, you will have your contract, contract metadata (e.g., contract ABI, bytecode) available in the smart contract .json file which will be located in the`./build directory` The next steps is to deploy these contracts to a network.
 
 For new users, this can be hard to understand, because there are multiple steps that need to occur for the deployment to be successful. To ease this burden the extension provide a simple model to deploy to various networks. By default, this will be a local network, using Ganache. The extension will start and run an instance of ganache for the user. The options to initiate this deployment are below.
 
 1. Select your contract Solidity (.sol) file, right click and choose `Deploy Contracts`
 
-   ![Right click smart contract - deploy contract](https://github.com/Azure-Samples/blockchain-devkit/raw/master/media/extensionMedia/deployContractRightClick.gif)
+## Deploy with Truffle Ganache locally
 
-</details>
-
-<br />
-
-<details>
-  <summary style='font-size:15pt'>Deploy with Truffle Ganache locally</summary>
-
-For rapid development of smart contracts, having the ability deploy contracts to a blockchain quickly to test and debug is a key principle. One of the most popular models to achive this is using Truffle Ganache, which acts as a local blockchain/blockchain emulator to allow this quick deployment and iteration that is ideal for developers.
+For rapid development of smart contracts, having the ability deploy contracts to a blockchain quickly to test and debug is a key principle. One of the most popular models to achive this is using [Ganache](https://trufflesuite.com/docs/ganache/), which acts as a local blockchain simulator to allow this quick deployment and iteration that is ideal for developers.
 
 The extension has integrated Ganache directly into the IDE to further lower the bar to entry, and allow even faster development iteration. By default, there is nothing to configure, and the following steps can be used.
 
 1. After selecting to deploy the contracts, either from the Command Pallette or by right clicking on the contract and selecting Deploy contracts, a dropdown will be presented with options for _where_ to deploy the contract. By default there will be a single entry on this list named development.
 
 2. After selecting development, the IDE will create a new instance of Truffle Ganache, which will use the default configuration for the project as the target. The IDE will then deploy the contracts to this instance.
-
-   ![Truffle default deployment](https://github.com/Azure-Samples/blockchain-devkit/raw/master/media/extensionMedia/truffleDefaultDeploy.gif)
 
 **OPTIONAL**: If there is a need to control this Ganache instance more or change the configuration, there are some other options that can be used that the IDE can help with as well.
 
@@ -77,13 +66,7 @@ The extension has integrated Ganache directly into the IDE to further lower the 
 
    e. Enter the port number to use for this local network.
 
-
-</details>
-
-<br />
-
-<details>
-   <summary style='font-size:15pt'>Deploy with Infura to Ethereum mainnet and testnets</summary>
+## Deploy with Infura to Ethereum mainnet and testnets
 
 If you are a developer that would like to target public testnet and mainnet for Ethereum, the ability to leverage Infura from inside the IDE is provided via this extension.
 
@@ -113,14 +96,7 @@ To use Infura, the first step is to either create or connect to an existing Infu
 
 11. Simply select the desired target network endpoint and the extension will deploy the contracts to this location.
 
-![Infura deploy](https://github.com/Azure-Samples/blockchain-devkit/raw/master/media/extensionMedia/infuraDeploy.gif)
-
-</details>
-
-<br />
-
-<details>
-   <summary style='font-size:15pt'>Deploy with Hyperledger Besu</summary>
+## Deploy with Hyperledger Besu
 
 Hyperledger Besu is a popular Ethereum client that is unique in that it offers a client that can be used in either public networks, such as Ethereum mainnet or private, consortium based networks. It can be deployed a variety of [ways](https://besu.hyperledger.org/en/stable/HowTo/Get-Started/Install-Binaries/), and recently a preview has been made available in [Azure](https://azuremarketplace.microsoft.com/en-us/marketplace/apps/consensys.hyperledger-besu-quickstart?tab=Overview).
 
@@ -146,23 +122,18 @@ besu: {
  },
 ```
 
-![Besu deploy](https://github.com/Azure-Samples/blockchain-devkit/raw/master/media/extensionMedia/hyperledgerBesuDeploy.gif)
-
-</details>
-
-<br />
-
 ## System Requirements
 
 - Supported Operating Systems
-- Windows 10
-- Mac OSX
-- VS Code 1.60.0 (or Greater)
-- Node 15.00.x (or Greater)
-- NPM 7.18.1 (or Greater)
-- Git 2.10.x (or Greater)
+  - Windows 10
+  - Mac OSX
+  - Linux
+- VSCode 1.60.0 (or greater)
+- Node 14.17.3 (or greater)
+- NPM 7.18.1 (or greater)
+- Git 2.10.x (or greater)
 
-**Our [Wiki page](https://github.com/trufflesuite/vscode-ext/wiki) includes a comprehensive getting started guide with detailed usage instructions for this plugin**
+**Our [Docs page](https://trufflesuite.com/docs/) includes a comprehensive getting started guide with detailed usage instructions for this plugin**
 
 ## Development
 
@@ -185,4 +156,4 @@ MIT
 
 ## Telemetry
 
-VS Code collects usage data and sends it to ConsenSys to help improve their products and services. Read their [privacy statement](https://consensys.net/privacy-policy/) to learn more. If you don’t wish to send usage data to ConsenSys, you can set the `telemetry.enableTelemetry` setting to `false`. Learn more at their [FAQ](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting).
+VSCode collects usage data and sends it to ConsenSys Software Incorporated to help improve its products and services. Read our [privacy statement](https://consensys.net/privacy-policy/) to learn more. If you don’t wish to send usage data, you can set the `telemetry.enableTelemetry` setting to `false`. Learn more at the [FAQ](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting).

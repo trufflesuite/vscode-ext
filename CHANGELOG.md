@@ -1,6 +1,10 @@
 # Change Log
 
-All notable changes to the "Truffle" extension will be documented in this file.
+All notable changes to the "Truffle for VSCode" extension will be documented in this file.
+
+## 2.1.3
+
+- Debugger timeout increase
 
 ## 2.0.0
 
