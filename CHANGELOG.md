@@ -2,6 +2,10 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
+## 2.1.4
+
+- Cleaning up doc links.
+
 ## 2.1.3
 
 - Debugger timeout increase
