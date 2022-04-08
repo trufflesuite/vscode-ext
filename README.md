@@ -127,13 +127,13 @@ besu: {
 - Supported Operating Systems
   - Windows 10
   - Mac OSX
-  - Linux 
+  - Linux
 - VSCode 1.60.0 (or greater)
 - Node 14.17.3 (or greater)
 - NPM 7.18.1 (or greater)
 - Git 2.10.x (or greater)
 
-**Our [Wiki page](https://github.com/trufflesuite/vscode-ext/wiki) includes a comprehensive getting started guide with detailed usage instructions for this plugin**
+**Our [Docs page](https://trufflesuite.com/docs/) includes a comprehensive getting started guide with detailed usage instructions for this plugin**
 
 ## Development
 
