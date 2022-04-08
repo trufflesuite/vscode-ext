@@ -1,10 +1,12 @@
 # Truffle for VSCode
 
-> :warning: **Installation or Setup Issues?** Checkout out our [comprehensive troubleshooting guide](https://trufflesuite.com/).
+> **Installation or Setup Issues?** Checkout out our [comprehensive troubleshooting guide](https://trufflesuite.com/).
 
-Truffle for VSCode simplifies how you create, build, debug and deploy smart contracts on [Ethereum](https://ethereum.org) and all EVM-compatibile blockchains and layer 2 solutions. The extension has built-in integration with a growing number of tools and services including [Truffle](https://trufflesuite.com/docs/truffle), [Ganache](https://trufflesuite.com/docs/ganache), and [Infura](https://infura.io/).
+Truffle for VSCode simplifies how you create, build, debug and deploy smart contracts on [Ethereum](https://ethereum.org) and all EVM-compatibile blockchains and layer 2 scaling solutions. The extension has built-in integration with a growing number of tools and services including [Truffle](https://trufflesuite.com/docs/truffle), [Ganache](https://trufflesuite.com/docs/ganache), and [Infura](https://infura.io/).
 
-## Native IDE Debugging (preview)
+## Native IDE Debugging
+
+*Please note that this is a beta release of the IDE debugger and there are some known (and possibly unknown) issues that we are actively resolving. Feel free to review status and / or open any new issues or feature requests [here](https://github.com/trufflesuite/vscode-ext/issues).*
 
 Truffle for VSCode also offers comprehensive native IDE [Solidity](https://docs.soliditylang.org/) debugging support, taking advantage of VSCode's great debugging features such variables, watches, and breakpoints. No more jumping between differents tools or windows during your edit, compile, deploy, transact, debug loop.
 
