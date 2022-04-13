@@ -2,6 +2,10 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
+## 2.1.5
+
+- Readme fixes/copy changes.
+
 ## 2.1.4
 
 - Cleaning up doc links.
