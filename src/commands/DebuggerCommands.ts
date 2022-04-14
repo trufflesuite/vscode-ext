@@ -92,7 +92,7 @@ function generateDebugAdapterConfig(txHash: string, workingDirectory: string, pr
     txHash,
     type: DEBUG_TYPE,
     workingDirectory,
-    timeout: 20000,
+    timeout: 30000,
   } as DebugConfiguration;
 }
 
