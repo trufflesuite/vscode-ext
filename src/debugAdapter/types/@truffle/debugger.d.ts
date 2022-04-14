@@ -21,7 +21,7 @@ declare module "@truffle/debugger" {
     removeAllBreakpoints: () => Promise<void>;
     view: (selectors: any) => any;
     addBreakpoint: (breakPoint: any) => {};
-    variables: () => Promise<any>;
+    variables: ({indicateUnknown: boolean}?) => Promise<any>;
     continueUntilBreakpoint: () => Promise<void>;
     stepNext: () => Promise<void>;
     stepInto: () => Promise<void>;

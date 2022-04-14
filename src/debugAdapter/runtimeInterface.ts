@@ -114,7 +114,7 @@ export default class RuntimeInterface extends EventEmitter {
     Record<string, TranslatedResult> | any
   > {
     if (this._session) {
-      const variables = await this._session.variables();
+      const variables = await this._session.variables({indicateUnknown: true});
       return translateTruffleVariables(variables);
     } else {
       return Promise.resolve({});
