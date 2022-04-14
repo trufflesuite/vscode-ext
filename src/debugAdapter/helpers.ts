@@ -116,7 +116,11 @@ function translateContractValue(value: Format.Values.ContractValueInfo): string 
   }
 }
 
-function createResult(_: Format.Values.Result | undefined, value: any, typeName: string = "unknown"): TranslatedResult {
+function createResult(
+  variable: Format.Values.Result | undefined,
+  value: any,
+  typeName: string = variable!.type.typeClass
+): TranslatedResult {
   return {
     value,
     typeName,
@@ -394,6 +398,8 @@ function getErrorResult(variable: Result, breaklength: number): any {
       return `Array or string is too long (length ${errorResult.error.lengthAsBN.toString()}); decoding is not supported`;
     case "OverlargePointersNotImplementedError":
       return `Pointer is too large (value ${errorResult.error.pointerAsBN.toString()}); decoding is not supported`;
+    case "StorageNotSuppliedError":
+      return `Value unavailable until reached by debugger`;
     case "UserDefinedTypeNotFoundError":
     case "UnsupportedConstantError":
     case "UnusedImmutableError":
