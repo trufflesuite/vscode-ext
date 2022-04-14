@@ -11,6 +11,10 @@ All notable changes to the "Truffle for VSCode" extension will be documented in 
 - Improved handling of unknown storage variables
 - Increased debugger timeout to 30 seconds
 
+## 2.1.5
+
+- Readme fixes/copy changes.
+
 ## 2.1.4
 
 - Cleaning up doc links.
