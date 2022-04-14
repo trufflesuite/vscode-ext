@@ -150,7 +150,7 @@ export class Constants {
       changelogPath: "",
       path: "",
       showOnStartup: "showOnStartupChangelog",
-      title: "Truffle Development Kit for Ethereum Changelog",
+      title: "Truffle for VSCode Changelog",
       viewType: "changelog",
     },
     contractUI: {
@@ -162,7 +162,7 @@ export class Constants {
     requirements: {
       path: "",
       showOnStartup: "showOnStartupRequirementsPage",
-      title: "Truffle Development Kit - Preview",
+      title: "Truffle for VSCode Requirements",
       viewType: "requirementsPage",
     },
     welcome: {
