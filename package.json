@@ -1,7 +1,7 @@
 {
   "name": "truffle-vscode",
-  "displayName": "Truffle for VSCode",
-  "description": "Develop and deploy on the Ethereum Ecosystem with VSCode.",
+  "displayName": "Truffle for VS Code",
+  "description": "Build, debug and deploy smart contracts on Ethereum and EVM-compatible blockchains.",
   "publisher": "trufflesuite-csi",
   "preview": true,
   "icon": "images/TruffleLogo.png",
@@ -19,7 +19,15 @@
     "vscode": "^1.63.0"
   },
   "keywords": [
-    "truffle"
+    "blockchain",
+    "solidity",
+    "truffle",
+    "ethereum",
+    "evm",
+    "debugger",
+    "compiler",
+    "ganache",
+    "infura"
   ],
   "categories": [
     "Extension Packs",
