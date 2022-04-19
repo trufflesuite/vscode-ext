@@ -1,14 +1,14 @@
-# Truffle for VSCode
+# Truffle for VS Code
 
 > **Installation or Setup Issues?** Checkout out our [comprehensive troubleshooting guide](https://trufflesuite.com/docs/vscode-ext/installation-guide/).
 
-Truffle for VSCode simplifies how you create, build, debug and deploy smart contracts on [Ethereum](https://ethereum.org) and all EVM-compatibile blockchains and layer 2 scaling solutions. The extension has built-in integration with a growing number of tools and services including [Truffle](https://trufflesuite.com/docs/truffle), [Ganache](https://trufflesuite.com/docs/ganache), and [Infura](https://infura.io/).
+Truffle for VS Code simplifies how you create, build, debug and deploy smart contracts on [Ethereum](https://ethereum.org) and all EVM-compatible blockchains and layer 2 scaling solutions. The extension has built-in integration with a growing number of tools and services including [Truffle](https://trufflesuite.com/docs/truffle), [Ganache](https://trufflesuite.com/docs/ganache), and [Infura](https://infura.io/).
 
 ## Native IDE Debugging
 
 *Please note that this is a beta release of the IDE debugger and there are some known (and possibly unknown) issues that we are actively resolving. Feel free to review status and / or open any new issues or feature requests [here](https://github.com/trufflesuite/vscode-ext/issues).*
 
-Truffle for VSCode also offers comprehensive native IDE [Solidity](https://docs.soliditylang.org/) debugging support, taking advantage of VSCode's great debugging features such variables, watches, and breakpoints. No more jumping between differents tools or windows during your edit, compile, deploy, transact, debug loop.
+Truffle for VS Code also offers comprehensive native IDE [Solidity](https://docs.soliditylang.org/) debugging support, taking advantage of VS Code's great debugging features such variables, watches, and breakpoints. No more jumping between differents tools or windows during your edit, compile, deploy, transact, debug loop.
 
 ![in-ide debugging example](images/ide-debugging.png)
 
@@ -16,13 +16,13 @@ Truffle for VSCode also offers comprehensive native IDE [Solidity](https://docs.
 
 ### Installation
 
-To install add extension to VSCode, simply click the "Install" button above. Beyond this there are some local dependencies which you may have already installed. If not, the extension will prompt you accordingly. To help smooth out the dependency installation process, we've created a guide which you can find [here](https://trufflesuite.com/).
+To install add extension to VS Code, simply click the "Install" button above. Beyond this there are some local dependencies which you may have already installed. If not, the extension will prompt you accordingly. To help smooth out the dependency installation process, we've created a guide which you can find [here](https://trufflesuite.com/).
 
 ### Create a New Project
 
-The Truffle for VSCode was built to work effectively for both new users to Ethereum, but not get in the way for those familiar with the process. One of the primary goals is to help users create a project structure for developing smart contracts, help in the compilation and building of these assets, deployment of these assets to blockchain endpoints as well as debugging of these contracts.
+The Truffle for VS Code was built to work effectively for both new users to Ethereum, but not get in the way for those familiar with the process. One of the primary goals is to help users create a project structure for developing smart contracts, help in the compilation and building of these assets, deployment of these assets to blockchain endpoints as well as debugging of these contracts.
 
-Developers that are familiar with Truffle CLI may use `e.g., truffle init` directly from the VSCode terminal, if they like.
+Developers that are familiar with Truffle CLI may use `e.g., truffle init` directly from the VS Code terminal, if they like.
 
 For developers who are not familiar with Truffle, or prefer to use the Command Palette, the extension can easily scaffold out a project directory using the following steps.
 
@@ -130,7 +130,7 @@ besu: {
   - Windows 10
   - Mac OSX
   - Linux
-- VSCode 1.60.0 (or greater)
+- VS Code 1.60.0 (or greater)
 - Node 14.17.3 (or greater)
 - NPM 7.18.1 (or greater)
 - Git 2.10.x (or greater)
@@ -150,7 +150,7 @@ yarn install
 yarn test
 ```
 
-There are more docs online at the VSCode website on how to develop plugins at the [VSCode Docs - Extension API](https://code.visualstudio.com/api).
+There are more docs online at the VS Code website on how to develop plugins at the [VS Code Docs - Extension API](https://code.visualstudio.com/api).
 
 ## License
 
@@ -158,4 +158,4 @@ MIT
 
 ## Telemetry
 
-VSCode collects usage data and sends it to ConsenSys Software Incorporated to help improve its products and services. Read our [privacy statement](https://consensys.net/privacy-policy/) to learn more. If you don’t wish to send usage data, you can set the `telemetry.enableTelemetry` setting to `false`. Learn more at the [FAQ](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting).
+VS Code collects usage data and sends it to ConsenSys Software Incorporated to help improve its products and services. Read our [privacy statement](https://consensys.net/privacy-policy/) to learn more. If you don’t wish to send usage data, you can set the `telemetry.enableTelemetry` setting to `false`. Learn more at the [FAQ](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting).
