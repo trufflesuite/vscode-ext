@@ -1,5 +1,7 @@
 # Truffle for VS Code
 
+[![CI](https://github.com/trufflesuite/vscode-ext/actions/workflows/main.yml/badge.svg)](https://github.com/trufflesuite/vscode-ext/actions/workflows/main.yml)
+
 > **Installation or Setup Issues?** Checkout out our [comprehensive troubleshooting guide](https://trufflesuite.com/docs/vscode-ext/installation-guide/).
 
 Truffle for VS Code simplifies how you create, build, debug and deploy smart contracts on [Ethereum](https://ethereum.org) and all EVM-compatible blockchains and layer 2 scaling solutions. The extension has built-in integration with a growing number of tools and services including [Truffle](https://trufflesuite.com/docs/truffle), [Ganache](https://trufflesuite.com/docs/ganache), and [Infura](https://infura.io/).
