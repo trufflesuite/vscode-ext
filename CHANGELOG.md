@@ -5,6 +5,7 @@ All notable changes to the "Truffle for VSCode" extension will be documented in 
 ## 2.2.3
 
 - Massive required apps validation has been removed
+- Ganache commands have been added to extension initialization
 
 ## 2.2.1
 
