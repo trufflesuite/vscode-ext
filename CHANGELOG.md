@@ -2,6 +2,11 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
+## 2.2.3
+
+- Required apps double calling validation has fixed.
+- Ganache commands, has added to extension initialization.
+
 ## 2.2.1
 
 - Had to bump a version due to semver. Some copy fixes added in here.
