@@ -65,17 +65,17 @@ export async function tryExecuteCommand(
   commands: string,
   ...args: string[]
 ): Promise<ICommandResult> {
-  const {result} = tryExecuteCommandAsync(workingDirectory, true, commands, ...args);
+  const {result} = await tryExecuteCommandAsync(workingDirectory, true, commands, ...args);
 
   return result;
 }
 
-export function tryExecuteCommandAsync(
+export async function tryExecuteCommandAsync(
   workingDirectory: string | undefined,
   writeToOutputChannel: boolean,
   commands: string,
   ...args: string[]
-): ICommandExecute {
+): Promise<ICommandExecute> {
   let cmdOutput: string = "";
   let cmdOutputIncludingStderr: string = "";
 
