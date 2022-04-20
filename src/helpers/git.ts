@@ -4,13 +4,9 @@
 import {RequiredApps} from "../Constants";
 import {Telemetry} from "../TelemetryClient";
 import {executeCommand} from "./command";
-import {required} from "./required";
+// import {required} from "./required";
 
 export async function gitInit(workingDirectory: string): Promise<void> {
-  if (!(await required.checkRequiredApps())) {
-    return;
-  }
-
   if (!(await isRepoExists(workingDirectory))) {
     await executeCommand(workingDirectory, RequiredApps.git, "init");
   }

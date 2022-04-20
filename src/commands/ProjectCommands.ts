@@ -7,7 +7,6 @@ import {Constants, RequiredApps} from "../Constants";
 import {
   gitHelper,
   outputCommandHelper,
-  required,
   showIgnorableNotification,
   showInputBox,
   showOpenFolderDialog,
@@ -25,9 +24,6 @@ interface IProjectDestination {
 export namespace ProjectCommands {
   export async function newSolidityProject(): Promise<void> {
     Telemetry.sendEvent("ProjectCommands.newSolidityProject.started");
-    if (!(await required.checkRequiredApps())) {
-      return;
-    }
 
     const typeOfSolidityProjectDestination: IProjectDestination[] = [
       {

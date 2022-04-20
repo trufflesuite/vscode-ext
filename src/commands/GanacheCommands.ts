@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {commands, QuickPickItem, window} from "vscode";
-import {Constants, RequiredApps} from "../Constants";
-import {required, showQuickPick} from "../helpers";
+import {QuickPickItem, window} from "vscode";
+import {Constants} from "../Constants";
+import {showQuickPick} from "../helpers";
 import {ItemType} from "../Models";
 import {LocalProject} from "../Models/TreeItems";
 import {GanacheService, TreeManager} from "../services";
@@ -15,11 +15,6 @@ export namespace GanacheCommands {
   export async function startGanacheCmd(projectView?: ProjectView): Promise<void> {
     Telemetry.sendEvent("GanacheCommands.startGanacheCmd.commandStarted");
 
-    if (!(await required.checkApps(RequiredApps.node))) {
-      Telemetry.sendEvent("GanacheCommands.startGanacheCmd.nodeIsNotInstalled");
-      commands.executeCommand("truffle-vscode.showRequirementsPage");
-      return;
-    }
     const port = await getGanachePort(projectView);
     const ganacheProcess = await GanacheService.startGanacheServer(port);
 
