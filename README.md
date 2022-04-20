@@ -18,7 +18,7 @@ Truffle for VS Code also offers comprehensive native IDE [Solidity](https://docs
 
 ### Installation
 
-To install this extension to VS Code, simply click the "Install" button above. Beyond this, there are some local dependencies you may have already installed. If not, the extension will prompt you accordingly. To help smooth out the dependency installation process, we've created a guide which you can find [here](https://trufflesuite.com/).
+To install this extension to VS Code, simply click the "Install" button above. Beyond this, there are some local dependencies you may have already installed. If not, the extension will prompt you accordingly. To help smooth out the dependency installation process, we've created a guide which you can find [here](https://trufflesuite.com/docs/vscode-ext/installation-guide/).
 
 ### Create a New Project
 
