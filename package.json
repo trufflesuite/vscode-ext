@@ -54,6 +54,8 @@
     "onCommand:truffle-vscode.signInToInfuraAccount",
     "onCommand:truffle-vscode.signOutOfInfuraAccount",
     "onCommand:truffle-vscode.openAtAzurePortal",
+    "onCommand:truffle-vscode.startGanacheServer",
+    "onCommand:truffle-vscode.stopGanacheServer",
     "onDebug"
   ],
   "contributes": {
