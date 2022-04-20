@@ -57,28 +57,6 @@ export namespace required {
     return valid;
   }
 
-  /**
-   * Function check only required apps: Node.js, npm, git
-   * Show Requirements Page
-   */
-  export async function checkRequiredApps(): Promise<boolean> {
-    return checkApps(...requiredApps);
-  }
-
-  export async function checkApps(...apps: RequiredApps[]): Promise<boolean> {
-    const valid = await checkAppsSilent(...apps);
-
-    if (!valid) {
-      Telemetry.sendEvent(Constants.telemetryEvents.failedToCheckRequiredApps);
-      const message = Constants.errorMessageStrings.RequiredAppsAreNotInstalled;
-      const details = Constants.informationMessage.seeDetailsRequirementsPage;
-      window.showErrorMessage(`${message}. ${details}`);
-      commands.executeCommand("truffle-vscode.showRequirementsPage");
-    }
-
-    return valid;
-  }
-
   export async function checkAppsSilent(...apps: RequiredApps[]): Promise<boolean> {
     const versions = await getExactlyVersions(...apps);
     const invalid = versions

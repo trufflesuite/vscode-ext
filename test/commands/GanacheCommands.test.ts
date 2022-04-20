@@ -47,7 +47,7 @@ describe("Unit tests GanacheCommands", () => {
 
   it("startGanacheCmd executes truffle-vscode.showRequirementsPage cmd when not all app are installed", async () => {
     // Arrange
-    checkAppsStub = sinon.stub(required, "checkApps").returns(Promise.resolve(false));
+    checkAppsStub = sinon.stub(required, "checkAllApps").returns(Promise.resolve(false));
     const executeCommandStub = sinon.stub(commands, "executeCommand");
     sinon.replace(GanacheCommands, "getGanachePort", async () => 99);
 
@@ -62,7 +62,7 @@ describe("Unit tests GanacheCommands", () => {
 
   it("startGanacheCmd shows information message when server already running", async () => {
     // Arrange
-    checkAppsStub = sinon.stub(required, "checkApps").returns(Promise.resolve(true));
+    checkAppsStub = sinon.stub(required, "checkAllApps").returns(Promise.resolve(true));
     const startGanacheServerStub = sinon
       .stub(GanacheService, "startGanacheServer")
       .returns(Promise.resolve({pid: 1234, port: testPort}));
@@ -88,7 +88,7 @@ describe("Unit tests GanacheCommands", () => {
 
   it("startGanacheCmd should start server and show message", async () => {
     // Arrange
-    checkAppsStub = sinon.stub(required, "checkApps").returns(Promise.resolve(true));
+    checkAppsStub = sinon.stub(required, "checkAllApps").returns(Promise.resolve(true));
     const ganacheProcess = {
       output: {
         name: "channel name",
