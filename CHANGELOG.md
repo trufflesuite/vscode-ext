@@ -2,6 +2,10 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
+## 2.2.1
+
+- Had to bump a version due to semver. Some copy fixes added in here.
+
 ## 2.1.9
 
 - Including troubleshooting guide link in README
