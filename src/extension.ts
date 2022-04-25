@@ -241,7 +241,7 @@ export async function activate(context: ExtensionContext) {
   ];
   context.subscriptions.push(...subscriptions);
 
-  required.checkAllApps();
+  await required.checkAllApps();
 
   Telemetry.sendEvent(Constants.telemetryEvents.extensionActivated);
 }

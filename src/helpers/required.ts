@@ -154,19 +154,19 @@ export namespace required {
   }
 
   export async function getNodeVersion(): Promise<string> {
-    return getVersion(RequiredApps.node, "--version", /v(\d+.\d+.\d+)/);
+    return await getVersion(RequiredApps.node, "--version", /v(\d+.\d+.\d+)/);
   }
 
   export async function getNpmVersion(): Promise<string> {
-    return getVersion(RequiredApps.npm, "--version", /(\d+.\d+.\d+)/);
+    return await getVersion(RequiredApps.npm, "--version", /(\d+.\d+.\d+)/);
   }
 
   export async function getGitVersion(): Promise<string> {
-    return getVersion(RequiredApps.git, "--version", / (\d+.\d+.\d+)/);
+    return await getVersion(RequiredApps.git, "--version", / (\d+.\d+.\d+)/);
   }
 
   export async function getPythonVersion(): Promise<string> {
-    return getVersion(RequiredApps.python, "--version", / (\d+.\d+.\d+)/);
+    return await getVersion(RequiredApps.python, "--version", / (\d+.\d+.\d+)/);
   }
 
   export async function getTruffleVersion(): Promise<string> {
@@ -179,7 +179,8 @@ export namespace required {
     ).cmdOutput.match(/truffle@(\d+.\d+.\d+)/);
 
     return (
-      (localVersion && localVersion[1]) || getVersion(RequiredApps.truffle, "version", /(?<=Truffle v)(\d+.\d+.\d+)/)
+      (localVersion && localVersion[1]) ||
+      (await getVersion(RequiredApps.truffle, "version", /(?<=Truffle v)(\d+.\d+.\d+)/))
     );
   }
 
@@ -192,7 +193,7 @@ export namespace required {
       await tryExecuteCommand(getWorkspaceRoot(true), `npm list --depth 0 ganache-cli@${majorVersion}`)
     ).cmdOutput.match(/ganache-cli@(\d+.\d+.\d+)/);
 
-    return (localVersion && localVersion[1]) || getVersion(RequiredApps.ganache, "--version", /v(\d+.\d+.\d+)/);
+    return (localVersion && localVersion[1]) || (await getVersion(RequiredApps.ganache, "--version", /v(\d+.\d+.\d+)/));
   }
 
   export async function installNpm(): Promise<void> {
