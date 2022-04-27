@@ -20,8 +20,11 @@ export namespace GanacheCommands {
       commands.executeCommand("truffle-vscode.showRequirementsPage");
       return;
     }
+
     const port = await getGanachePort(projectView);
-    const ganacheProcess = await GanacheService.startGanacheServer(port);
+    const forked = getGanacheTypeOfNetwork(projectView);
+
+    const ganacheProcess = await GanacheService.startGanacheServer(port, forked);
 
     if (!ganacheProcess.process) {
       Telemetry.sendEvent("GanacheCommands.startGanacheCmd.serverAlreadyRunning");
@@ -73,5 +76,12 @@ export namespace GanacheCommands {
       ignoreFocusOut: true,
     });
     return (pick as LocalProject).port;
+  }
+
+  export function getGanacheTypeOfNetwork(projectView?: ProjectView): boolean {
+    const project: LocalProject = projectView?.extensionItem as LocalProject;
+    const forked: boolean = project.forked ? project.forked : false;
+
+    return forked;
   }
 }

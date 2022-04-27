@@ -42,7 +42,7 @@ export namespace ServiceCommands {
     Telemetry.sendEvent("ServiceCommands.createProject.commandStarted");
     const serviceDestinations: IServiceDestination[] = [
       {
-        cmd: createLocalProject,
+        cmd: chooseTypeOfNetwork,
         itemType: ItemType.LOCAL_SERVICE,
         label: Constants.treeItemData.service.local.label,
       },
@@ -63,7 +63,7 @@ export namespace ServiceCommands {
       // },
     ];
 
-    const project = await execute(serviceDestinations);
+    const project = await execute(serviceDestinations, true);
 
     Telemetry.sendEvent("ServiceCommands.createProject.commandFinished", {
       itemType: telemetryHelper.mapItemType(project.itemType),
@@ -97,9 +97,33 @@ export namespace ServiceCommands {
       // },
     ];
 
-    const project = await execute(serviceDestinations);
+    const project = await execute(serviceDestinations, true);
 
     Telemetry.sendEvent("ServiceCommands.connectProject.commandFinished", {
+      itemType: telemetryHelper.mapItemType(project.itemType),
+    });
+
+    return project;
+  }
+
+  export async function chooseTypeOfNetwork(): Promise<Project> {
+    Telemetry.sendEvent("ServiceCommands.chooseTypeOfNetwork.commandStarted");
+    const serviceDestinations: IServiceDestination[] = [
+      {
+        cmd: assignDefaultNetwork,
+        itemType: ItemType.LOCAL_SERVICE,
+        label: Constants.treeItemData.service.local.type.default.label,
+      },
+      {
+        cmd: assignForkedNetwork,
+        itemType: ItemType.LOCAL_SERVICE,
+        label: Constants.treeItemData.service.local.type.forked.label,
+      },
+    ];
+
+    const project = await execute(serviceDestinations, false);
+
+    Telemetry.sendEvent("ServiceCommands.chooseTypeOfNetwork.commandFinished", {
       itemType: telemetryHelper.mapItemType(project.itemType),
     });
 
@@ -160,12 +184,13 @@ export namespace ServiceCommands {
   // }
 }
 
-async function execute(serviceDestinations: IServiceDestination[]): Promise<Project> {
+async function execute(serviceDestinations: IServiceDestination[], saveChild: boolean): Promise<Project> {
   const destination = await selectDestination(serviceDestinations);
+
   const service = await TreeManager.getItem(destination.itemType);
   const child = await destination.cmd(service);
 
-  await addChild(service, child);
+  if (saveChild) await addChild(service, child);
 
   return child;
 }
@@ -215,9 +240,17 @@ async function getExistingProjectIds(service: InfuraService): Promise<string[]> 
 }
 
 // ------------ LOCAL ------------ //
-async function createLocalProject(service: LocalService): Promise<LocalProject> {
+async function createLocalProject(service: LocalService, forked: boolean): Promise<LocalProject> {
   const localResourceExplorer = new LocalResourceExplorer();
-  return localResourceExplorer.createProject(await getExistingNames(service), await getExistingPorts(service));
+  return localResourceExplorer.createProject(await getExistingNames(service), await getExistingPorts(service), forked);
+}
+
+async function assignDefaultNetwork(service: LocalService): Promise<LocalProject> {
+  return createLocalProject(service, false);
+}
+
+async function assignForkedNetwork(service: LocalService): Promise<LocalProject> {
+  return createLocalProject(service, true);
 }
 
 async function connectLocalProject(service: LocalService): Promise<LocalProject> {

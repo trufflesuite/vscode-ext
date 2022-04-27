@@ -41,7 +41,7 @@ export namespace GanacheService {
     return PortStatus.FREE;
   }
 
-  export async function startGanacheServer(port: number | string): Promise<IGanacheProcess> {
+  export async function startGanacheServer(port: number | string, forked?: boolean): Promise<IGanacheProcess> {
     Telemetry.sendEvent("GanacheService.startGanacheServer");
     if (UrlValidator.validatePort(port)) {
       Telemetry.sendException(new Error(Constants.ganacheCommandStrings.invalidGanachePort));
@@ -60,7 +60,7 @@ export namespace GanacheService {
     }
 
     if (portStatus === PortStatus.FREE) {
-      ganacheProcesses[port] = await spawnGanacheServer(port);
+      ganacheProcesses[port] = await spawnGanacheServer(port, forked);
     }
 
     Telemetry.sendEvent("GanacheServiceClient.waitGanacheStarted.serverStarted");
@@ -83,8 +83,11 @@ export namespace GanacheService {
     return Promise.all(shouldBeFree).then(() => undefined);
   }
 
-  async function spawnGanacheServer(port: number | string): Promise<IGanacheProcess> {
-    const process = spawnProcess(undefined, "npx", [RequiredApps.ganache, `-p ${port}`]);
+  async function spawnGanacheServer(port: number | string, forked?: boolean): Promise<IGanacheProcess> {
+    const args: string[] = [RequiredApps.ganache, `-p ${port}`];
+    if (forked) args.push("--fork");
+
+    const process = spawnProcess(undefined, "npx", args);
     const output = window.createOutputChannel(`${Constants.outputChannel.ganacheCommands}:${port}`);
     const ganacheProcess = {port, process, output} as IGanacheProcess;
 

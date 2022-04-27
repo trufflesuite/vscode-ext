@@ -346,6 +346,16 @@ export class Constants {
         iconPath: {dark: "", light: ""},
         label: "Ganache Service",
         prefix: "loc",
+        type: {
+          default: {
+            label: "Default",
+            prefix: "dfl",
+          },
+          forked: {
+            label: "Forked",
+            prefix: "frk",
+          },
+        },
       },
     },
   };
