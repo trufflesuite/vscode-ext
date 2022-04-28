@@ -29,6 +29,7 @@ import {Telemetry} from "./TelemetryClient";
 import {NetworkNodeView, ProjectView} from "./ViewItems";
 
 import {DebuggerConfiguration} from "./debugAdapter/configuration/debuggerConfiguration";
+import {Dependency, ExplorerViewProvider} from "./views/ExplorerViewProvider";
 
 export async function activate(context: ExtensionContext) {
   if (process.env.CODE_TEST) {
@@ -207,6 +208,29 @@ export async function activate(context: ExtensionContext) {
     }
   });
   //#endregion
+
+  // #region TreeDataProvider registrations
+  const rootPath =
+    workspace.workspaceFolders && workspace.workspaceFolders.length > 0
+      ? workspace.workspaceFolders[0].uri.fsPath
+      : undefined;
+  const explorerViewProvider = new ExplorerViewProvider(rootPath);
+  window.registerTreeDataProvider("truffle-vscode.explorer-view", explorerViewProvider);
+  commands.registerCommand("nodeDependencies.refreshEntry", () => explorerViewProvider.refresh());
+  commands.registerCommand("extension.openPackageOnNpm", (moduleName) =>
+    commands.executeCommand("vscode.open", Uri.parse(`https://www.npmjs.com/package/${moduleName}`))
+  );
+  commands.registerCommand("nodeDependencies.addEntry", () =>
+    window.showInformationMessage(`Successfully called add entry.`)
+  );
+  commands.registerCommand("nodeDependencies.editEntry", (node: Dependency) =>
+    window.showInformationMessage(`Successfully called edit entry on ${node.label}.`)
+  );
+  commands.registerCommand("nodeDependencies.deleteEntry", (node: Dependency) =>
+    window.showInformationMessage(`Successfully called delete entry on ${node.label}.`)
+  );
+
+  // #endregion
 
   const subscriptions = [
     showWelcomePage,

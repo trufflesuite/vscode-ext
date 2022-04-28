@@ -55,7 +55,7 @@
     "onCommand:truffle-vscode.signOutOfInfuraAccount",
     "onCommand:truffle-vscode.openAtAzurePortal",
     "onCommand:truffle-vscode.startGanacheServer",
-    "onCommand:truffle-vscode.stopGanacheServer",    
+    "onCommand:truffle-vscode.stopGanacheServer",
     "onDebug"
   ],
   "contributes": {
@@ -289,6 +289,30 @@
         "command": "truffle-vscode.openAtAzurePortal",
         "title": "Open at Azure Portal",
         "category": "Truffle"
+      },
+      {
+        "command": "nodeDependencies.refreshEntry",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "nodeDependencies.addEntry",
+        "title": "Add"
+      },
+      {
+        "command": "nodeDependencies.editEntry",
+        "title": "Edit",
+        "icon": {
+          "light": "resources/light/edit.svg",
+          "dark": "resources/dark/edit.svg"
+        }
+      },
+      {
+        "command": "nodeDependencies.deleteEntry",
+        "title": "Delete"
       }
     ],
     "breakpoints": [
@@ -355,7 +379,16 @@
           "command": "truffle-vscode.refresh",
           "when": "view == truffle-vscode.truffle",
           "group": "navigation"
-        }
+        },
+        {
+					"command": "nodeDependencies.refreshEntry",
+					"when": "view == nodeDependencies",
+					"group": "navigation"
+				},
+				{
+					"command": "nodeDependencies.addEntry",
+					"when": "view == nodeDependencies"
+				}
       ],
       "view/item/context": [
         {
@@ -407,7 +440,16 @@
           "command": "truffle-vscode.openAtAzurePortal",
           "when": "view == truffle-vscode.truffle && viewItem == output",
           "group": "truffle-0@0"
-        }
+        },
+        {
+					"command": "nodeDependencies.editEntry",
+					"when": "view == nodeDependencies && viewItem == dependency",
+					"group": "inline"
+				},
+				{
+					"command": "nodeDependencies.deleteEntry",
+					"when": "view == nodeDependencies && viewItem == dependency"
+				}
       ],
       "explorer/context": [
         {
@@ -443,10 +485,28 @@
       ]
     },
     "views": {
-      "explorer": [
+      "truffle-activitybar-container": [
+        {
+          "id": "truffle-vscode.explorer-view",
+          "name": "Explorer"
+        },
         {
           "id": "truffle-vscode.truffle",
-          "name": "Truffle - Networks"
+          "name": "Networks",
+          "contextualTitle": "List of all known Networks"
+        },
+        {
+          "id": "truffle-vscode.deployments-view",
+          "name": "Deployments"
+        },
+        {
+          "id": "truffle-vscode.libraries-view",
+          "name": "Libraries"
+        },
+        {
+          "id": "truffle-vscode.help-view",
+          "name": "Help & Feedback",
+          "contextualTitle": "Help & Feedback section"
         }
       ],
       "debug": [
@@ -529,7 +589,16 @@
         ],
         "variables": {}
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "truffle-activitybar-container",
+          "title": "Truffle",
+          "icon": "images/truffle.svg"
+        }
+      ]
+    }
   },
   "scripts": {
     "package": "npx vsce package",
