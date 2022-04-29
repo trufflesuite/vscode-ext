@@ -350,10 +350,20 @@ export class Constants {
           default: {
             label: "Default",
             prefix: "dfl",
+            description: "Default",
+            isForked: false,
           },
           forked: {
             label: "Forked",
             prefix: "frk",
+            description: "Forked",
+            isForked: true,
+          },
+          linked: {
+            label: "Linked",
+            prefix: "lnk",
+            description: "Linked",
+            isForked: false,
           },
         },
       },

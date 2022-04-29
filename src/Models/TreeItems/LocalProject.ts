@@ -11,8 +11,8 @@ export class LocalProject extends Project {
   public readonly port: number;
   public readonly forked?: boolean;
 
-  constructor(label: string, port: number, forked?: boolean) {
-    super(ItemType.LOCAL_PROJECT, label, Constants.treeItemData.project.local);
+  constructor(label: string, port: number, forked?: boolean, description?: string) {
+    super(ItemType.LOCAL_PROJECT, label, Constants.treeItemData.project.local, description);
 
     this.port = port;
     this.forked = forked;
@@ -22,6 +22,7 @@ export class LocalProject extends Project {
     const obj = super.toJSON();
 
     obj.port = this.port;
+    obj.forked = this.forked;
 
     return obj;
   }

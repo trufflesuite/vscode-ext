@@ -40,9 +40,10 @@ interface IServiceDestination {
 export namespace ServiceCommands {
   export async function createProject(): Promise<Project> {
     Telemetry.sendEvent("ServiceCommands.createProject.commandStarted");
+
     const serviceDestinations: IServiceDestination[] = [
       {
-        cmd: chooseTypeOfNetwork,
+        cmd: setNetworkType,
         itemType: ItemType.LOCAL_SERVICE,
         label: Constants.treeItemData.service.local.label,
       },
@@ -106,8 +107,9 @@ export namespace ServiceCommands {
     return project;
   }
 
-  export async function chooseTypeOfNetwork(): Promise<Project> {
+  export async function setNetworkType(): Promise<Project> {
     Telemetry.sendEvent("ServiceCommands.chooseTypeOfNetwork.commandStarted");
+
     const serviceDestinations: IServiceDestination[] = [
       {
         cmd: assignDefaultNetwork,
@@ -240,22 +242,45 @@ async function getExistingProjectIds(service: InfuraService): Promise<string[]> 
 }
 
 // ------------ LOCAL ------------ //
-async function createLocalProject(service: LocalService, forked: boolean): Promise<LocalProject> {
-  const localResourceExplorer = new LocalResourceExplorer();
-  return localResourceExplorer.createProject(await getExistingNames(service), await getExistingPorts(service), forked);
-}
-
 async function assignDefaultNetwork(service: LocalService): Promise<LocalProject> {
-  return createLocalProject(service, false);
+  const forked: boolean = Constants.treeItemData.service.local.type.default.isForked;
+  const description: string = Constants.treeItemData.service.local.type.default.description;
+
+  return createLocalProject(service, forked, description);
 }
 
 async function assignForkedNetwork(service: LocalService): Promise<LocalProject> {
-  return createLocalProject(service, true);
+  const forked: boolean = Constants.treeItemData.service.local.type.forked.isForked;
+  const description: string = Constants.treeItemData.service.local.type.forked.description;
+
+  return createLocalProject(service, forked, description);
+}
+
+async function createLocalProject(
+  service: LocalService,
+  forked?: boolean,
+  description?: string
+): Promise<LocalProject> {
+  const localResourceExplorer = new LocalResourceExplorer();
+  return localResourceExplorer.createProject(
+    await getExistingNames(service),
+    await getExistingPorts(service),
+    forked,
+    description
+  );
 }
 
 async function connectLocalProject(service: LocalService): Promise<LocalProject> {
+  const forked: boolean = Constants.treeItemData.service.local.type.linked.isForked;
+  const description: string = Constants.treeItemData.service.local.type.linked.description;
+
   const localResourceExplorer = new LocalResourceExplorer();
-  return localResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
+  return localResourceExplorer.selectProject(
+    await getExistingNames(service),
+    await getExistingPorts(service),
+    forked,
+    description
+  );
 }
 
 async function getExistingNames(service: LocalService): Promise<string[]> {

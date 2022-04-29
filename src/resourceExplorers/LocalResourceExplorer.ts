@@ -13,7 +13,8 @@ export class LocalResourceExplorer {
   public async createProject(
     existingProjects: string[] = [],
     existingPorts: number[] = [],
-    forked: boolean
+    forked?: boolean,
+    description?: string
   ): Promise<LocalProject> {
     Telemetry.sendEvent("LocalResourceExplorer.createProject");
     return this.getOrCreateLocalProject(
@@ -21,17 +22,25 @@ export class LocalResourceExplorer {
       existingPorts,
       GanacheService.PortStatus.FREE,
       Constants.validationMessages.portAlreadyInUse,
-      forked
+      forked,
+      description
     );
   }
 
-  public async selectProject(existingProjects: string[] = [], existingPorts: number[] = []): Promise<LocalProject> {
+  public async selectProject(
+    existingProjects: string[] = [],
+    existingPorts: number[] = [],
+    forked?: boolean,
+    description?: string
+  ): Promise<LocalProject> {
     Telemetry.sendEvent("LocalResourceExplorer.selectProject");
     const localProject = await this.getOrCreateLocalProject(
       existingProjects,
       existingPorts,
       GanacheService.PortStatus.GANACHE,
-      Constants.validationMessages.portNotInUseGanache
+      Constants.validationMessages.portNotInUseGanache,
+      forked,
+      description
     );
 
     await GanacheService.startGanacheServer(localProject.port);
@@ -44,12 +53,13 @@ export class LocalResourceExplorer {
     existingPorts: number[],
     portStatus: GanacheService.PortStatus,
     validateMessage: string,
-    forked?: boolean
+    forked?: boolean,
+    description?: string
   ): Promise<LocalProject> {
     const localProjectName = await this.getLocalProjectName(existingProjects);
     const localProjectPort = await this.getLocalProjectPort(existingPorts, portStatus, validateMessage);
 
-    return this.getLocalProject(localProjectName, localProjectPort, forked);
+    return this.getLocalProject(localProjectName, localProjectPort, forked, description);
   }
 
   private async getLocalProjectName(existingProjects: string[]): Promise<string> {
@@ -102,8 +112,15 @@ export class LocalResourceExplorer {
     return parseInt(port, 10);
   }
 
-  private async getLocalProject(projectName: string, port: number, forked?: boolean): Promise<LocalProject> {
-    const localProject = new LocalProject(projectName, port, forked);
+  private async getLocalProject(
+    projectName: string,
+    port: number,
+    forked?: boolean,
+    description?: string
+  ): Promise<LocalProject> {
+    const formattedDescription: string = `(${port}) ${description}`;
+
+    const localProject = new LocalProject(projectName, port, forked, formattedDescription);
     const url = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
     const networkNode = new LocalNetworkNode(projectName, url, "*");
 
