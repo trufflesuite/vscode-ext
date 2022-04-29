@@ -85,7 +85,7 @@ export namespace GanacheService {
 
   async function spawnGanacheServer(port: number | string, forked?: boolean): Promise<IGanacheProcess> {
     const args: string[] = [RequiredApps.ganache, `-p ${port}`];
-    if (forked) args.push("--fork");
+    if (forked) args.push("-f");
 
     const process = spawnProcess(undefined, "npx", args);
     const output = window.createOutputChannel(`${Constants.outputChannel.ganacheCommands}:${port}`);
