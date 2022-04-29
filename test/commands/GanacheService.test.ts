@@ -113,6 +113,24 @@ describe("Unit tests GanacheService", () => {
     assert.deepStrictEqual(spawnStub.getCall(0).args[2], ["ganache", `-p ${defaultPort}`]);
   });
 
+  it("startGanacheServer should execute npx cmd with fork option", async () => {
+    // Arrange
+    const urlValidatorSpy = sinon.spy(UrlValidator, "validatePort");
+    const spawnStub = sinon.stub(outputCommandHelper, "spawnProcess").returns(processMock as cp.ChildProcess);
+    sinon.stub(shell, "findPid").returns(Promise.resolve(Number.NaN));
+    sinon.stub(window, "createOutputChannel").returns(channel as OutputChannel);
+    sinon.stub(GanacheServiceClient, "waitGanacheStarted");
+
+    // Act
+    await GanacheService.startGanacheServer(defaultPort, true);
+
+    // Assert
+    assert.strictEqual(urlValidatorSpy.called, true);
+    assert.strictEqual(spawnStub.called, true);
+    assert.strictEqual(spawnStub.getCall(0).args[1], "npx");
+    assert.deepStrictEqual(spawnStub.getCall(0).args[2], ["ganache", `-p ${defaultPort}`, "-f"]);
+  });
+
   it("startGanacheServer if server was not started should throw exception and dispose all", async () => {
     // Arrange
     const channelDisposeSpy = sinon.spy(channel, "dispose");
