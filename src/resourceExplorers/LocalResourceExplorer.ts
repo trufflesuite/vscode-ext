@@ -118,7 +118,7 @@ export class LocalResourceExplorer {
     forked?: boolean,
     description?: string
   ): Promise<LocalProject> {
-    const formattedDescription: string = `(${port}) ${description}`;
+    const formattedDescription: string = `:${port} (${description})`;
 
     const localProject = new LocalProject(projectName, port, forked, formattedDescription);
     const url = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
