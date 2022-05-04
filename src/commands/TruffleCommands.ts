@@ -100,6 +100,20 @@ export namespace TruffleCommands {
     Telemetry.sendEvent("TruffleCommands.deployContracts.commandFinished");
   }
 
+  export async function execScript(uri: Uri): Promise<void> {
+    Telemetry.sendEvent("TruffleCommands.execScript.commandStarted");
+
+    await showIgnorableNotification(Constants.statusBarMessages.executingScript, async () => {
+      if (!(await required.checkAppsSilent(RequiredApps.truffle))) {
+        Telemetry.sendEvent("TruffleCommands.execScript.truffleInstallation");
+        await required.installTruffle(required.Scope.locally);
+      }
+      await outputCommandHelper.executeCommand(getWorkspaceRoot(), "npx", RequiredApps.truffle, "exec", uri.fsPath);
+    });
+
+    Telemetry.sendEvent("TruffleCommands.execScript.commandFinished");
+  }
+
   export async function writeAbiToBuffer(uri: Uri): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.writeAbiToBuffer.commandStarted");
     const contract = await readCompiledContract(uri);

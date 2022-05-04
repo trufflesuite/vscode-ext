@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Memento, window} from "vscode";
+import {Memento, window, Uri} from "vscode";
 import {Constants} from "../Constants";
 import {
   // getWorkspaceRoot,
@@ -36,6 +36,10 @@ class SdkCoreCommands {
 
   public async deploy(): Promise<void> {
     return this.extensionAdapter.deploy();
+  }
+
+  public async execScript(uri: Uri): Promise<void> {
+    return this.extensionAdapter.execScript(uri);
   }
 
   private async getCoreSdk() {

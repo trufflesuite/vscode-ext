@@ -33,4 +33,6 @@ export class TestConstants {
   };
 
   public static truffleCommandTestDataFolder: string = "testData";
+
+  public static truffleExecScriptExample: string = "script.js";
 }
