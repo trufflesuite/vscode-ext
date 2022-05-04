@@ -3,7 +3,8 @@
 
 import {commands, QuickPickItem, window} from "vscode";
 import {Constants, RequiredApps} from "../Constants";
-import {required, showQuickPick} from "../helpers";
+import {required} from "../helpers/required";
+import {showQuickPick} from "../helpers/userInteraction";
 import {ItemType} from "../Models";
 import {LocalProject} from "../Models/TreeItems";
 import {GanacheService, TreeManager} from "../services";

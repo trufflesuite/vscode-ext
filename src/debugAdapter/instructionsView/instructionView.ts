@@ -21,14 +21,19 @@ export default class InstructionView {
     });
   }
 
-  public update(newInstructions: IInstruction[]) {
-    this.dataProvider.refresh(newInstructions);
+  public update(element: InstructionTreeNode, newInstructions: IInstruction[]) {
+    this.dataProvider.refresh(element, newInstructions);
   }
 
-  public revealInstruction(instruction: IInstruction) {
+  public revealInstruction(instruction: IInstruction): InstructionTreeNode {
+    const treeNode = new InstructionTreeNode(undefined, undefined, instruction);
     if (this.view.visible) {
-      const treeNode = new InstructionTreeNode(undefined, undefined, instruction);
       this.view.reveal(treeNode, {focus: true, select: true, expand: true});
     }
+    return treeNode;
+  }
+
+  getRootElement(): InstructionTreeNode {
+    return this.view.selection[0];
   }
 }

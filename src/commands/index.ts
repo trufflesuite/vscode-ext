@@ -5,7 +5,6 @@ export * from "./ContractCommands";
 export * from "./DebuggerCommands";
 export * from "./GanacheCommands";
 export * from "./InfuraCommands";
-export * from "./LogicAppCommands";
 export * from "./ProjectCommands";
 export * from "./ServiceCommands";
 export * from "./TruffleCommands";

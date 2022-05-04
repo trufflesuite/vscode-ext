@@ -8,8 +8,8 @@ export class ExplorerViewProvider implements vscode.TreeDataProvider<Dependency>
 
   constructor(private workspaceRoot: string | undefined) {}
 
-  refresh(): void {
-    this._onDidChangeTreeData.fire();
+  refresh(dependency: Dependency): void {
+    this._onDidChangeTreeData.fire(dependency);
   }
 
   getTreeItem(element: Dependency): vscode.TreeItem {

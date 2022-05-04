@@ -47,23 +47,27 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
   public addChild(child: IExtensionItem): void {
     if (this.children.some((_child) => _child.label === child.label)) {
       Telemetry.sendException(
-        new Error(Constants.errorMessageStrings.GetMessageChildAlreadyConnected(Telemetry.obfuscate(child.label || "")))
+        new Error(
+          Constants.errorMessageStrings.GetMessageChildAlreadyConnected(
+            Telemetry.obfuscate(child.label?.toString() || "")
+          )
+        )
       );
-      throw new Error(Constants.errorMessageStrings.GetMessageChildAlreadyConnected(child.label || ""));
+      throw new Error(Constants.errorMessageStrings.GetMessageChildAlreadyConnected(child.label?.toString() || ""));
     }
 
     child.addParent(this);
     this.children.push(child);
 
     this.collapse();
-    return this.refreshTree();
+    this.refreshTree();
   }
 
   public removeChild(child: IExtensionItem): void {
     this.children = this.children.filter((_child) => _child !== child);
 
     this.collapse();
-    return this.refreshTree();
+    this.refreshTree();
   }
 
   public setChildren(children: IExtensionItem[]): void {
@@ -71,7 +75,7 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
     this.children.forEach((child) => child.addParent(this));
 
     this.collapse();
-    return this.refreshTree();
+    this.refreshTree();
   }
 
   public toJSON(): {[key: string]: any} {
@@ -83,7 +87,7 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
     };
   }
 
-  private collapse() {
+  private collapse(): void {
     if (this.children.length > 0) {
       Telemetry.sendEvent("ExtensionItem.collapse.childrenLengthGreaterThanZero");
       this.collapsibleState = TreeItemCollapsibleState.Collapsed;

@@ -8,6 +8,7 @@ import {CancellationToken, Progress, ProgressOptions, window} from "vscode";
 import {TruffleCommands} from "../../src/commands/TruffleCommands";
 import * as helpers from "../../src/helpers";
 import * as commands from "../../src/helpers/command";
+import {required} from "../../src/helpers/required";
 import {TestConstants} from "../TestConstants";
 
 describe("BuildContracts Command", () => {
@@ -21,7 +22,7 @@ describe("BuildContracts Command", () => {
     let withProgressStub: SinonStub<[ProgressOptions, (progress: Progress<any>, token: CancellationToken) => any], any>;
 
     beforeEach(() => {
-      requiredMock = mock(helpers.required);
+      requiredMock = mock(required);
 
       getWorkspaceRootMock = stub(helpers, "getWorkspaceRoot");
       getWorkspaceRootMock.returns(uuid.v4());

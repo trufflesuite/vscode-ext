@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {DebugProtocol} from "vscode-debugprotocol";
+import {DebugProtocol} from "@vscode/debugprotocol";
 import {EVENT_TYPES} from "../constants/debugAdapter";
 
 export namespace DebuggerTypes {

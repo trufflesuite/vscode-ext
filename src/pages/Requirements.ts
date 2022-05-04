@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { ExtensionContext } from "vscode";
-import { Constants } from "../Constants";
-import { required } from "../helpers";
-import { BasicWebView, IWebViewConfig } from "./BasicWebView";
+import {ExtensionContext} from "vscode";
+import {Constants} from "../Constants";
+import {required} from "../helpers/required";
+import {BasicWebView, IWebViewConfig} from "./BasicWebView";
 
 export class RequirementsPage extends BasicWebView {
   protected readonly config: IWebViewConfig;
@@ -18,7 +18,7 @@ export class RequirementsPage extends BasicWebView {
     return true;
   }
 
-  protected async receiveMessage(message: { [key: string]: any }): Promise<void> {
+  protected async receiveMessage(message: {[key: string]: any}): Promise<void> {
     await super.receiveMessage(message);
 
     if (!this.panel) {

@@ -48,7 +48,7 @@ class InfuraClient {
 
       await this.updateCredentials(user, token);
     } catch (error) {
-      this.eventEmitter.fire();
+      this.eventEmitter.fire("sign-in");
       throw error;
     }
   }
@@ -190,14 +190,14 @@ class InfuraClient {
     if (tokens && !user.email) {
       this.eventEmitter.fire(Constants.infuraSigningIn);
     } else {
-      this.eventEmitter.fire();
+      this.eventEmitter.fire("update-credentials");
     }
   }
 
   private async cleanCredentials(): Promise<void> {
     await this.updateInfuraCache();
     await this.setExcludedProjects([], []);
-    this.eventEmitter.fire();
+    this.eventEmitter.fire("clean-credentials");
   }
 
   private async signInSilently(): Promise<boolean> {

@@ -7,14 +7,9 @@ import sinon from "sinon";
 import uuid from "uuid";
 import {QuickPickOptions} from "vscode";
 import {Constants} from "../../../src/Constants";
-import * as helpers from "../../../src/helpers";
+import * as userInteraction from "../../../src/helpers/userInteraction";
 import {ItemType} from "../../../src/Models";
-import {
-  AzureBlockchainProject,
-  AzureBlockchainService,
-  BlockchainDataManagerProject,
-  BlockchainDataManagerService,
-} from "../../../src/Models/TreeItems";
+import {LocalProject, LocalService} from "../../../src/Models/TreeItems";
 import {TreeManager} from "../../../src/services";
 
 describe("Create Service", () => {
@@ -27,13 +22,13 @@ describe("Create Service", () => {
     const serviceCommandsRewire = rewire("../../../src/commands/ServiceCommands");
     const showQuickPickStub = sinon.stub();
     showQuickPickStub.returns({
-      cmd: sinon.mock().returns(new AzureBlockchainProject(uuid.v4(), uuid.v4(), uuid.v4(), [uuid.v4()])),
-      itemType: ItemType.AZURE_BLOCKCHAIN_SERVICE,
-      label: Constants.treeItemData.service.azure.label,
+      cmd: sinon.mock().returns(new LocalProject(uuid.v4(), 1234)),
+      itemType: ItemType.LOCAL_PROJECT,
+      label: Constants.treeItemData.service.local.label,
     });
 
-    sinon.stub(TreeManager, "getItem").returns(new AzureBlockchainService());
-    sinon.replace(helpers, "showQuickPick", showQuickPickStub);
+    sinon.stub(TreeManager, "getItem").returns(new LocalService());
+    sinon.replace(userInteraction, "showQuickPick", showQuickPickStub);
 
     // Act
     await serviceCommandsRewire.ServiceCommands.createProject();
@@ -45,32 +40,4 @@ describe("Create Service", () => {
       "showQuickPick should be called with given arguments"
     );
   });
-
-  it(
-    "showQuickPick should be executed with Constants.placeholders.selectDestination " +
-      "placeholder and select Blockchain Data Manager",
-    async () => {
-      // Arrange
-      const serviceCommandsRewire = rewire("../../../src/commands/ServiceCommands");
-      const showQuickPickStub = sinon.stub();
-      showQuickPickStub.returns({
-        cmd: sinon.mock().returns(new BlockchainDataManagerProject(uuid.v4(), uuid.v4(), uuid.v4())),
-        itemType: ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE,
-        label: Constants.treeItemData.service.bdm.label,
-      });
-
-      sinon.stub(TreeManager, "getItem").returns(new BlockchainDataManagerService());
-      sinon.replace(helpers, "showQuickPick", showQuickPickStub);
-
-      // Act
-      await serviceCommandsRewire.ServiceCommands.createProject();
-
-      // Assert
-      assert.strictEqual(
-        (showQuickPickStub.args[0][1] as QuickPickOptions).placeHolder,
-        `${Constants.placeholders.selectDestination}.`,
-        "showQuickPick should be called with given arguments"
-      );
-    }
-  );
 });

@@ -12,7 +12,7 @@ import {
   TruffleCommands,
 } from "./commands";
 import {Constants} from "./Constants";
-import {CommandContext, isWorkspaceOpen, required, setCommandContext} from "./helpers";
+import {CommandContext, isWorkspaceOpen, setCommandContext} from "./helpers";
 import {CancellationEvent} from "./Models";
 import {Output} from "./Output";
 import {ChangelogPage, RequirementsPage, WelcomePage} from "./pages";
@@ -29,7 +29,8 @@ import {Telemetry} from "./TelemetryClient";
 import {NetworkNodeView, ProjectView} from "./ViewItems";
 
 import {DebuggerConfiguration} from "./debugAdapter/configuration/debuggerConfiguration";
-import {Dependency, ExplorerViewProvider} from "./views/ExplorerViewProvider";
+import {FileExplorer} from "./views/fileExplorer";
+import {required} from "./helpers/required";
 
 export async function activate(context: ExtensionContext) {
   if (process.env.CODE_TEST) {
@@ -159,42 +160,6 @@ export async function activate(context: ExtensionContext) {
   );
   //#endregion
 
-  //#region contract commands
-  // const createNewBDMApplication = commands.registerCommand(
-  //   "truffle-vscode.createNewBDMApplication",
-  //   async (viewItem: ProjectView) => {
-  //     await tryExecute(() => ServiceCommands.createNewBDMApplication(viewItem));
-  //   }
-  // );
-  // const deleteBDMApplication = commands.registerCommand(
-  //   "truffle-vscode.deleteBDMApplication",
-  //   async (viewItem: NetworkNodeView) => await tryExecute(() => ServiceCommands.deleteBDMApplication(viewItem))
-  // );
-  //#endregion
-
-  //#region logic app commands
-  // const generateMicroservicesWorkflows = commands.registerCommand(
-  //   'truffle-vscode.generateMicroservicesWorkflows',
-  //   async (filePath: Uri | undefined) => {
-  //     await tryExecute(async () => await LogicAppCommands.generateMicroservicesWorkflows(filePath));
-  //   });
-  // const generateDataPublishingWorkflows = commands.registerCommand(
-  //   'truffle-vscode.generateDataPublishingWorkflows',
-  //   async (filePath: Uri | undefined) => {
-  //     await tryExecute(async () => await LogicAppCommands.generateDataPublishingWorkflows(filePath));
-  //   });
-  // const generateEventPublishingWorkflows = commands.registerCommand(
-  //   'truffle-vscode.generateEventPublishingWorkflows',
-  //   async (filePath: Uri | undefined) => {
-  //     await tryExecute(async () => await LogicAppCommands.generateEventPublishingWorkflows(filePath));
-  //   });
-  // const generateReportPublishingWorkflows = commands.registerCommand(
-  //   'truffle-vscode.generateReportPublishingWorkflows',
-  //   async (filePath: Uri | undefined) => {
-  //     await tryExecute(async () => await LogicAppCommands.generateReportPublishingWorkflows(filePath));
-  //   });
-  //#endregion
-
   //#region debugger commands
   const startDebugger = commands.registerCommand("truffle-vscode.debugTransaction", async () => {
     await tryExecute(() => DebuggerCommands.startSolidityDebugger());
@@ -210,25 +175,27 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   // #region TreeDataProvider registrations
-  const rootPath =
-    workspace.workspaceFolders && workspace.workspaceFolders.length > 0
-      ? workspace.workspaceFolders[0].uri.fsPath
-      : undefined;
-  const explorerViewProvider = new ExplorerViewProvider(rootPath);
-  window.registerTreeDataProvider("truffle-vscode.explorer-view", explorerViewProvider);
-  commands.registerCommand("nodeDependencies.refreshEntry", () => explorerViewProvider.refresh());
-  commands.registerCommand("extension.openPackageOnNpm", (moduleName) =>
-    commands.executeCommand("vscode.open", Uri.parse(`https://www.npmjs.com/package/${moduleName}`))
-  );
-  commands.registerCommand("nodeDependencies.addEntry", () =>
-    window.showInformationMessage(`Successfully called add entry.`)
-  );
-  commands.registerCommand("nodeDependencies.editEntry", (node: Dependency) =>
-    window.showInformationMessage(`Successfully called edit entry on ${node.label}.`)
-  );
-  commands.registerCommand("nodeDependencies.deleteEntry", (node: Dependency) =>
-    window.showInformationMessage(`Successfully called delete entry on ${node.label}.`)
-  );
+  // const rootPath =
+  //   workspace.workspaceFolders && workspace.workspaceFolders.length > 0
+  //     ? workspace.workspaceFolders[0].uri.fsPath
+  //     : undefined;
+  // // const explorerViewProvider = new ExplorerViewProvider(rootPath);
+  // window.registerTreeDataProvider("truffle-vscode.explorer-view", explorerViewProvider);
+  // commands.registerCommand("nodeDependencies.refreshEntry", () => explorerViewProvider.refresh());
+  // commands.registerCommand("extension.openPackageOnNpm", (moduleName) =>
+  //   commands.executeCommand("vscode.open", Uri.parse(`https://www.npmjs.com/package/${moduleName}`))
+  // );
+  // commands.registerCommand("nodeDependencies.addEntry", () =>
+  //   window.showInformationMessage(`Successfully called add entry.`)
+  // );
+  // commands.registerCommand("nodeDependencies.editEntry", (node: Dependency) =>
+  //   window.showInformationMessage(`Successfully called edit entry on ${node.label}.`)
+  // );
+  // commands.registerCommand("nodeDependencies.deleteEntry", (node: Dependency) =>
+  //   window.showInformationMessage(`Successfully called delete entry on ${node.label}.`)
+  // );
+
+  new FileExplorer(context, "truffle-vscode", "explorer-view");
 
   // #endregion
 
@@ -239,10 +206,8 @@ export async function activate(context: ExtensionContext) {
     newSolidityProject,
     buildContracts,
     deployContracts,
-    // createNewBDMApplication,
     createProject,
     connectProject,
-    // deleteBDMApplication,
     disconnectProject,
     copyByteCode,
     copyDeployedByteCode,
@@ -252,10 +217,6 @@ export async function activate(context: ExtensionContext) {
     startGanacheServer,
     stopGanacheServer,
     resartGanacheServer,
-    // generateMicroservicesWorkflows,
-    // generateDataPublishingWorkflows,
-    // generateEventPublishingWorkflows,
-    // generateReportPublishingWorkflows,
     getPrivateKeyFromMnemonic,
     signInToInfuraAccount,
     signOutOfInfuraAccount,

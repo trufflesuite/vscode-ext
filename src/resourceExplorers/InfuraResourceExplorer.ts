@@ -1,14 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { QuickPickItem, window } from "vscode";
-import { Constants } from "../Constants";
-import { showInputBox, showQuickPick } from "../helpers";
-import { InfuraProjectItem } from "../Models/QuickPickItems";
-import { InfuraNetworkNode, InfuraProject } from "../Models/TreeItems";
-import { IInfuraEndpointDto, IInfuraProjectDto, IInfuraProjectQuickPick } from "../services/infuraService/InfuraDto";
-import { InfuraServiceClient } from "../services/infuraService/InfuraServiceClient";
-import { Telemetry } from "../TelemetryClient";
+import {QuickPickItem, window} from "vscode";
+import {Constants} from "../Constants";
+import {showInputBox, showQuickPick} from "../helpers/userInteraction";
+import {InfuraProjectItem} from "../Models/QuickPickItems";
+import {InfuraNetworkNode, InfuraProject} from "../Models/TreeItems";
+import {IInfuraEndpointDto, IInfuraProjectDto, IInfuraProjectQuickPick} from "../services/infuraService/InfuraDto";
+import {InfuraServiceClient} from "../services/infuraService/InfuraServiceClient";
+import {Telemetry} from "../TelemetryClient";
 
 export class InfuraResourceExplorer {
   public async createProject(existingProjects: string[] = []): Promise<InfuraProject> {
@@ -57,7 +57,7 @@ export class InfuraResourceExplorer {
   }
 
   private async getProjectDestinations(existingProjectIds: string[]): Promise<QuickPickItem[]> {
-    const createInfuraProjectItem: QuickPickItem = { label: Constants.uiCommandStrings.createInfuraProject };
+    const createInfuraProjectItem: QuickPickItem = {label: Constants.uiCommandStrings.createInfuraProject};
     const infuraProjectItems = await this.loadInfuraProjectItems(existingProjectIds);
 
     return [createInfuraProjectItem, ...infuraProjectItems];
@@ -116,7 +116,7 @@ export class InfuraResourceExplorer {
 
   private async getProjectAvailability(): Promise<boolean> {
     const answer = await showQuickPick(
-      [{ label: Constants.projectAvailability.public }, { label: Constants.projectAvailability.private }],
+      [{label: Constants.projectAvailability.public}, {label: Constants.projectAvailability.private}],
       {
         ignoreFocusOut: true,
         placeHolder: `${Constants.placeholders.selectInfuraProjectAvailability}.`,

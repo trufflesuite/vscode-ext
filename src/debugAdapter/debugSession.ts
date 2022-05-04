@@ -11,8 +11,8 @@ import {
   StoppedEvent,
   TerminatedEvent,
   Thread,
-} from "vscode-debugadapter";
-import {DebugProtocol} from "vscode-debugprotocol";
+} from "@vscode/debugadapter";
+import {DebugProtocol} from "@vscode/debugprotocol";
 import {
   ERROR_MESSAGE_ID,
   EVALUATE_REQUEST_TYPES,
@@ -103,7 +103,7 @@ export class SolidityDebugSession extends LoggingDebugSession {
     await this.sendErrorIfFailed(response, async () => {
       // make sure to 'Stop' the buffered logging if 'trace' is not set
       // logger.setup enable logs in client
-      logger.setup(args.trace ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
+      logger.setup(args.noDebug ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
 
       // start the program in the runtime
       await this._runtime.attach(args.txHash, args.workingDirectory);

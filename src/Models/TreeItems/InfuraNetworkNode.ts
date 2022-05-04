@@ -1,11 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { URL } from "url";
-import { Constants } from "../../Constants";
-import { showInputBox, TruffleConfiguration } from "../../helpers";
-import { ItemType } from "../ItemType";
-import { MnemonicNetworkNode } from "./MnemonicNetworkNode";
+import {URL} from "url";
+import {Constants} from "../../Constants";
+import {TruffleConfiguration} from "../../helpers";
+import {showInputBox} from "../../helpers/userInteraction";
+import {ItemType} from "../ItemType";
+import {MnemonicNetworkNode} from "./MnemonicNetworkNode";
 
 export class InfuraNetworkNode extends MnemonicNetworkNode {
   constructor(label: string, url: URL | string, networkId: number | string) {

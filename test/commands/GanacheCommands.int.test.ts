@@ -10,7 +10,7 @@ import vscode from "vscode";
 import {GanacheCommands} from "../../src/commands";
 import * as commands from "../../src/helpers/command";
 import * as shell from "../../src/helpers/shell";
-import {AzureBlockchainService, IExtensionItem, LocalProject, LocalService, Service} from "../../src/Models/TreeItems";
+import {IExtensionItem, LocalProject, LocalService, Service} from "../../src/Models/TreeItems";
 import {TreeManager} from "../../src/services";
 import {ProjectView} from "../../src/ViewItems";
 
@@ -86,8 +86,6 @@ describe("Integration tests GanacheCommands", () => {
 });
 
 async function createTestServiceItems(): Promise<Service[]> {
-  const trufflesuite = new AzureBlockchainService();
   const localService = new LocalService();
-
-  return [trufflesuite, localService];
+  return [localService];
 }

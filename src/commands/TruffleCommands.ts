@@ -11,18 +11,18 @@ import {Constants, RequiredApps} from "../Constants";
 import {
   getWorkspaceRoot,
   outputCommandHelper,
-  required,
-  showConfirmPaidOperationDialog,
-  showIgnorableNotification,
-  showQuickPick,
   telemetryHelper,
   TruffleConfig,
   TruffleConfiguration,
   vscodeEnvironment,
 } from "../helpers";
+import {required} from "../helpers/required";
+
+import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from "../helpers/userInteraction";
+
 import {IDeployDestination, ItemType} from "../Models";
 import {NetworkForContractItem} from "../Models/QuickPickItems/NetworkForContractItem";
-import {AzureBlockchainProject, InfuraProject, LocalProject, LocalService} from "../Models/TreeItems";
+import {InfuraProject, LocalProject, LocalService} from "../Models/TreeItems";
 import {Project} from "../Models/TreeItems";
 import {Output} from "../Output";
 import {
@@ -94,7 +94,7 @@ export namespace TruffleCommands {
     Telemetry.sendEvent("TruffleCommands.deployContracts.selectedDestination", {
       url: Telemetry.obfuscate(command.description || ""),
     });
-
+    console.log("Calling cmd:", {command, cmd: command.cmd});
     await command.cmd();
 
     Telemetry.sendEvent("TruffleCommands.deployContracts.commandFinished");
@@ -306,8 +306,7 @@ async function getProjectDeployDestinationItems(
   const destinations: IDeployDestination[] = [];
 
   const filteredProjects = projects.filter(
-    (project) =>
-      project instanceof AzureBlockchainProject || project instanceof InfuraProject || project instanceof LocalProject
+    (project) => project instanceof InfuraProject || project instanceof LocalProject
   );
 
   for (const project of filteredProjects) {

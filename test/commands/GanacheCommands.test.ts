@@ -7,17 +7,10 @@ import sinon from "sinon";
 import {commands, OutputChannel, QuickPickItem, window} from "vscode";
 import {GanacheCommands} from "../../src/commands";
 import {Constants, RequiredApps} from "../../src/Constants";
-import * as helpers from "../../src/helpers";
-import {required} from "../../src/helpers";
+import * as userInteraction from "../../src/helpers/userInteraction";
+import {required} from "../../src/helpers/required";
 import * as shell from "../../src/helpers/shell";
-import {
-  AzureBlockchainProject,
-  AzureBlockchainService,
-  IExtensionItem,
-  LocalProject,
-  LocalService,
-  Service,
-} from "../../src/Models/TreeItems";
+import {IExtensionItem, LocalProject, LocalService, Service} from "../../src/Models/TreeItems";
 import {GanacheService, TreeManager} from "../../src/services";
 import * as GanacheServiceClient from "../../src/services/ganache/GanacheServiceClient";
 import {ProjectView} from "../../src/ViewItems";
@@ -173,8 +166,7 @@ describe("Unit tests GanacheCommands", () => {
   it("getGanachePort tree manager contains LOCAL_SERVICE item with children", async () => {
     // Arrange
     sinon.stub(TreeManager, "getItem").returns(new LocalService());
-    sinon.stub(helpers, "showQuickPick").returns(Promise.resolve(localProject as QuickPickItem));
-
+    sinon.stub(userInteraction, "showQuickPick").returns(Promise.resolve(localProject as QuickPickItem));
     // Act
     const result = await GanacheCommands.getGanachePort();
 
@@ -184,25 +176,14 @@ describe("Unit tests GanacheCommands", () => {
 });
 
 const testPort = 8544;
-const localProject = new LocalProject(TestConstants.consortiumTestNames.local, testPort);
+const localProject = new LocalProject(TestConstants.servicesNames.localProject, testPort);
 
 async function createTestServiceItems(): Promise<Service[]> {
   const services: Service[] = [];
 
-  const trufflesuite = new AzureBlockchainService();
   const localService = new LocalService();
-
-  const azureBlockchainProject = new AzureBlockchainProject(
-    TestConstants.servicesNames.testConsortium,
-    "subscriptionId",
-    "resourceGroup",
-    ["memberName"]
-  );
-
-  trufflesuite.addChild(azureBlockchainProject);
   localService.addChild(localProject);
-
-  services.push(trufflesuite, localService);
+  services.push(localService);
 
   return services;
 }

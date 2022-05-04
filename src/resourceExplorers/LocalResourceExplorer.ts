@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from "../Constants";
-import { showInputBox } from "../helpers";
-import { LocalNetworkNode, LocalProject } from "../Models/TreeItems";
-import { GanacheService } from "../services";
-import { Telemetry } from "../TelemetryClient";
-import { DialogResultValidator } from "../validators/DialogResultValidator";
-import { UrlValidator } from "../validators/UrlValidator";
+import {Constants} from "../Constants";
+import {showInputBox} from "../helpers/userInteraction";
+import {LocalNetworkNode, LocalProject} from "../Models/TreeItems";
+import {GanacheService} from "../services";
+import {Telemetry} from "../TelemetryClient";
+import {DialogResultValidator} from "../validators/DialogResultValidator";
+import {UrlValidator} from "../validators/UrlValidator";
 
 export class LocalResourceExplorer {
   public async createProject(existingProjects: string[] = [], existingPorts: number[] = []): Promise<LocalProject> {
