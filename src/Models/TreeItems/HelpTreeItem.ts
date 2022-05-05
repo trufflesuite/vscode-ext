@@ -1,4 +1,4 @@
-import {AzExtParentTreeItem, AzExtTreeItem, GenericTreeItem, IActionContext} from "@microsoft/vscode-azext-utils";
+import {AzExtParentTreeItem, AzExtTreeItem, IActionContext} from "@microsoft/vscode-azext-utils";
 import {ThemeIcon} from "vscode";
 import {OpenUrlTreeItem} from "./OpenUrlTreeItem";
 
