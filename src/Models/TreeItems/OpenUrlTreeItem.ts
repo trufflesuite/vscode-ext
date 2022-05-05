@@ -4,8 +4,9 @@ import {AzExtParentTreeItem, GenericTreeItem} from "@microsoft/vscode-azext-util
 export class OpenUrlTreeItem extends GenericTreeItem {
   private _url: string;
 
-  public constructor(parent: AzExtParentTreeItem, label: string, url: string, iconPath?: vscode.ThemeIcon) {
+  public constructor(parent: AzExtParentTreeItem, id: string, label: string, url: string, iconPath?: vscode.ThemeIcon) {
     super(parent, {
+      id,
       commandId: "truffle-vscode.openUrl",
       contextValue: "openUrl",
       iconPath: iconPath ?? new vscode.ThemeIcon("globe"),
