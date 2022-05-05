@@ -680,7 +680,7 @@
     "truffle": "^5.4.22",
     "ts-loader": "7.0.2",
     "tsc-watch": "^4.5.0",
-    "typescript": "3.8.3",
+    "typescript": "4.6.4",
     "@vscode/debugadapter": "^1.55.1",
     "@vscode/debugprotocol": "^1.55.1",
     "@vscode/test-electron": "^2.1.3",
