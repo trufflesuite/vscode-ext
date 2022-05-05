@@ -1,6 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {IAzExtOutputChannel} from "@microsoft/vscode-azext-utils";
 import os from "os";
 import path from "path";
 import {ExtensionContext, extensions} from "vscode";
@@ -25,7 +26,6 @@ export enum NotificationOptions {
 }
 
 export class Constants {
-  public static extensionContext: ExtensionContext;
   public static temporaryDirectory = "";
   public static extensionName = packageJSON.name;
   public static extensionVersion = packageJSON.version;
@@ -62,9 +62,6 @@ export class Constants {
   public static localhost = "127.0.0.1";
   public static localhostName = "development";
   public static defaultLocalhostPort = 8545;
-  public static defaultABSPort = 3200;
-  public static defaultABSHost = "blockchain.azure.com";
-
   public static ganacheRetryTimeout = 2000; // milliseconds
   public static ganacheRetryAttempts = 5;
 
@@ -584,8 +581,7 @@ export class Constants {
   };
 
   public static initialize(context: ExtensionContext) {
-    this.extensionContext = context;
-    this.temporaryDirectory = context.storagePath ? context.storagePath : os.tmpdir();
+    this.temporaryDirectory = context.storageUri ? context.storageUri.fsPath : os.tmpdir();
     this.webViewPages.contractUI.path = context.asAbsolutePath(path.join("resources", "drizzle", "index.html"));
     this.webViewPages.welcome.path = context.asAbsolutePath(path.join("resources", "welcome", "index.html"));
     this.webViewPages.requirements.path = context.asAbsolutePath(path.join("resources", "welcome", "prereqs.html"));
@@ -682,4 +678,13 @@ export class Constants {
         return "Blockchain item is unavailable.";
     }
   }
+}
+
+/**
+ * Namespace for common variables used throughout the extension. They must be initialized in the activate() method of extension.ts
+ */
+export namespace ext {
+  export const prefix: string = "truffle-vscode";
+  export let context: ExtensionContext;
+  export let outputChannel: IAzExtOutputChannel;
 }

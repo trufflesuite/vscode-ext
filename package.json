@@ -505,7 +505,7 @@
     "views": {
       "truffle-activitybar-container": [
         {
-					"id": "truffle-vscode.explorer-view",
+					"id": "truffle-vscode.views.explorer",
 					"name": "Explorer"
 				},
         {
@@ -514,15 +514,15 @@
           "contextualTitle": "List of all known Networks"
         },
         {
-          "id": "truffle-vscode.deployments-view",
+          "id": "truffle-vscode.views.deployments",
           "name": "Deployments"
         },
         {
-          "id": "truffle-vscode.libraries-view",
+          "id": "truffle-vscode.views.libraries",
           "name": "Libraries"
         },
         {
-          "id": "truffle-vscode.help-view",
+          "id": "truffle-vscode.views.help",
           "name": "Help & Feedback",
           "contextualTitle": "Help & Feedback section"
         }

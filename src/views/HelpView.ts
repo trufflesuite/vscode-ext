@@ -1,29 +1,18 @@
-import {AzExtParentTreeItem, AzExtTreeItem, GenericTreeItem, IActionContext} from "@microsoft/vscode-azext-utils";
-import {OpenUrlTreeItem} from "./OpenUrlTreeItem";
-import {ThemeIcon} from "vscode";
+import {AzExtTreeDataProvider, AzExtTreeItem, IActionContext, registerCommand} from "@microsoft/vscode-azext-utils";
+import {HelpTreeItem} from "../Models/TreeItems/HelpTreeItem";
+import * as vscode from "vscode";
+import {OpenUrlTreeItem} from "../Models/TreeItems/OpenUrlTreeItem";
 
-export class HelpTreeItem extends AzExtParentTreeItem {
-  public label: string = "help";
-  public contextValue: string = "help";
-
-  private declare values: GenericTreeItem[];
-
-  public async loadMoreChildrenImpl(_clear: boolean, _ctx: IActionContext): Promise<AzExtTreeItem[]> {
-    return this.values ?? (this.values = [this.readDocumentationTreeItem]);
-  }
-  public hasMoreChildrenImpl(): boolean {
-    return false;
-  }
-
-  private get readDocumentationTreeItem(): AzExtTreeItem {
-    const node = new OpenUrlTreeItem(
-      this,
-      "Read Extension Documentation",
-      "https://aka.ms/helppanel_docs",
-      new ThemeIcon("book")
-    );
-    node.id = "0";
-
-    return node;
-  }
+/**
+ * Function to register our help view for us.
+ *
+ * @param viewId the id of the view, defaults
+ * @returns The tree view for use/subscribing in the main extension code.
+ */
+export function registerHelpView(viewId: string = "truffle-vscode.views.help"): vscode.TreeView<AzExtTreeItem> {
+  const helpRoot = new HelpTreeItem(undefined);
+  const helpTreeDataProvider = new AzExtTreeDataProvider(helpRoot, "truffle-vscode.help.loadMore");
+  // register the opening command.
+  registerCommand("truffle-vscode.openUrl", async (_: IActionContext, node: OpenUrlTreeItem) => node.openUrl());
+  return vscode.window.createTreeView(viewId, {treeDataProvider: helpTreeDataProvider, canSelectMany: false});
 }

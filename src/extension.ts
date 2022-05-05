@@ -11,7 +11,7 @@ import {
   ServiceCommands,
   TruffleCommands,
 } from "./commands";
-import {Constants} from "./Constants";
+import {Constants, ext} from "./Constants";
 import {CommandContext, isWorkspaceOpen, setCommandContext} from "./helpers";
 import {CancellationEvent} from "./Models";
 import {Output} from "./Output";
@@ -31,13 +31,28 @@ import {NetworkNodeView, ProjectView} from "./ViewItems";
 import {DebuggerConfiguration} from "./debugAdapter/configuration/debuggerConfiguration";
 import {FileExplorer} from "./views/fileExplorer";
 import {required} from "./helpers/required";
+import {registerHelpView} from "./views/HelpView";
+import {registerUIExtensionVariables} from "@microsoft/vscode-azext-utils";
+
+/**
+ * This function registers variables similar to docker plugin, going forward this seems a better method of doing things.
+ *
+ * @param ctx the context we want to work on.
+ */
+function initializeExtensionVariables(ctx: ExtensionContext): void {
+  ext.context = ctx;
+  ext.outputChannel = Output.subscribe();
+  registerUIExtensionVariables(ext);
+}
 
 export async function activate(context: ExtensionContext) {
   if (process.env.CODE_TEST) {
     return;
   }
 
-  Constants.initialize(context);
+  Constants.initialize(context); // still do this first.
+  initializeExtensionVariables(context);
+
   DebuggerConfiguration.initialize(context);
   await ContractDB.initialize(AdapterType.IN_MEMORY);
   await InfuraServiceClient.initialize(context.globalState);
@@ -195,7 +210,8 @@ export async function activate(context: ExtensionContext) {
   //   window.showInformationMessage(`Successfully called delete entry on ${node.label}.`)
   // );
 
-  new FileExplorer(context, "truffle-vscode", "explorer-view");
+  new FileExplorer(context, "truffle-vscode", "views.explorer");
+  const helpView = registerHelpView();
 
   // #endregion
 
@@ -223,6 +239,7 @@ export async function activate(context: ExtensionContext) {
     showProjectsFromInfuraAccount,
     openAtAzurePortal,
     changeCoreSdkConfigurationListener,
+    helpView,
   ];
   context.subscriptions.push(...subscriptions);
 

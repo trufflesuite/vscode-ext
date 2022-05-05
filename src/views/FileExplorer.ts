@@ -331,10 +331,11 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
 }
 
 export class FileExplorer {
-  constructor(context: vscode.ExtensionContext, commandPrefix = "truffle-vscode", viewName = "fileExplorer") {
+  constructor(context: vscode.ExtensionContext, commandPrefix = "truffle-vscode", viewName = "views.fileExplorer") {
     const openFileCommand = `${commandPrefix}.openFile`;
     // const refreshFileCommand = `${commandPrefix}.refreshFile`;
     const treeDataProvider = new FileSystemProvider(openFileCommand);
+    // FIXME: not sure if I like this or not... we have a mix of subscription push calls/locations.
     context.subscriptions.push(vscode.window.createTreeView(`${commandPrefix}.${viewName}`, {treeDataProvider}));
     vscode.commands.registerCommand(openFileCommand, (resource) => this.openResource(resource));
     // vscode.commands.registerCommand(refreshFileCommand, (resource) => treeDataProvider.refresh(resource));
