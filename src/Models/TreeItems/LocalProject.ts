@@ -7,22 +7,23 @@ import {ItemType} from "../ItemType";
 import {LocalNetworkNode} from "./LocalNetworkNode";
 import {Project} from "./Project";
 
+export type TLocalProjectOptions = {
+  isForked: boolean;
+  forkedNetwork?: string;
+  url?: string;
+  blockNumber?: number;
+};
+
 export class LocalProject extends Project {
-  public readonly port: number;
-  public readonly forked?: boolean;
-
-  constructor(label: string, port: number, forked?: boolean, description?: string) {
+  constructor(label: string, readonly port: number, readonly options?: TLocalProjectOptions, description?: string) {
     super(ItemType.LOCAL_PROJECT, label, Constants.treeItemData.project.local, description);
-
-    this.port = port;
-    this.forked = forked;
   }
 
   public toJSON(): {[p: string]: any} {
     const obj = super.toJSON();
 
     obj.port = this.port;
-    obj.forked = this.forked;
+    obj.options = this.options;
 
     return obj;
   }

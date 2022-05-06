@@ -226,6 +226,7 @@ export class Constants {
     enterInfuraProjectName: "Enter project name",
     enterLocalProjectName: "Enter local project name",
     enterLocalProjectPort: "Enter local port number",
+    enterBlockNumber: "Enter a block number",
     enterMemberName: "Enter member name",
     enterMemberPassword: "Enter member password",
     enterTransactionNodeName: "Enter transaction node name",
@@ -348,22 +349,31 @@ export class Constants {
         prefix: "loc",
         type: {
           default: {
-            label: "Default",
+            label: "Regular",
             prefix: "dfl",
-            description: "Default",
+            description: "Regular",
             isForked: false,
+            networks: {},
           },
           forked: {
             label: "Forked",
             prefix: "frk",
             description: "Forked",
             isForked: true,
+            networks: {
+              mainnet: "mainnet",
+              ropsten: "ropsten",
+              kovan: "kovan",
+              rinkeby: "rinkeby",
+              goerli: "goerli",
+            },
           },
           linked: {
             label: "Linked",
             prefix: "lnk",
             description: "Linked",
             isForked: false,
+            networks: {},
           },
         },
       },
@@ -509,6 +519,7 @@ export class Constants {
     selectMember: "Select member",
     selectMnemonicExtractKey: "Select mnemonic to extract key",
     selectMnemonicStorage: "Select mnemonic storage",
+    selectType: "Select type",
     selectNetwork: "Select network",
     selectNewProjectPath: "Select new project path",
     selectProjects: "Select Projects",
@@ -518,6 +529,7 @@ export class Constants {
     selectTransactionNode: "Select transaction node",
     selectTypeOfSolidityProject: "Select type of solidity project",
     setupMnemonic: "Setup mnemonic",
+    enterBlockNumber: "No number gets the last mined block",
   };
 
   // More information see here

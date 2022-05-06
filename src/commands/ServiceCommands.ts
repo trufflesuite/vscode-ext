@@ -2,8 +2,9 @@
 // Licensed under the MIT license.
 
 import open from "open";
+import {QuickPickItem} from "vscode";
 import {Constants} from "../Constants";
-import {showQuickPick, telemetryHelper} from "../helpers";
+import {showInputBox, showQuickPick, telemetryHelper} from "../helpers";
 import {ItemType} from "../Models";
 import {
   // AzureBlockchainProject,
@@ -18,6 +19,7 @@ import {
   Project,
   Service,
   ServiceTypes,
+  TLocalProjectOptions,
 } from "../Models/TreeItems";
 import {
   // BlockchainDataManagerResourceExplorer,
@@ -37,13 +39,24 @@ interface IServiceDestination {
   picked?: boolean;
 }
 
+type TNetwork = {
+  label: string;
+};
+
+type TServiceType = {
+  label: string;
+  isForked: boolean;
+  description: string;
+  networks: TNetwork[];
+};
+
 export namespace ServiceCommands {
   export async function createProject(): Promise<Project> {
     Telemetry.sendEvent("ServiceCommands.createProject.commandStarted");
 
     const serviceDestinations: IServiceDestination[] = [
       {
-        cmd: setNetworkType,
+        cmd: createLocalProject,
         itemType: ItemType.LOCAL_SERVICE,
         label: Constants.treeItemData.service.local.label,
       },
@@ -64,7 +77,7 @@ export namespace ServiceCommands {
       // },
     ];
 
-    const project = await execute(serviceDestinations, true);
+    const project = await execute(serviceDestinations);
 
     Telemetry.sendEvent("ServiceCommands.createProject.commandFinished", {
       itemType: telemetryHelper.mapItemType(project.itemType),
@@ -98,34 +111,9 @@ export namespace ServiceCommands {
       // },
     ];
 
-    const project = await execute(serviceDestinations, true);
+    const project = await execute(serviceDestinations);
 
     Telemetry.sendEvent("ServiceCommands.connectProject.commandFinished", {
-      itemType: telemetryHelper.mapItemType(project.itemType),
-    });
-
-    return project;
-  }
-
-  export async function setNetworkType(): Promise<Project> {
-    Telemetry.sendEvent("ServiceCommands.chooseTypeOfNetwork.commandStarted");
-
-    const serviceDestinations: IServiceDestination[] = [
-      {
-        cmd: assignDefaultNetwork,
-        itemType: ItemType.LOCAL_SERVICE,
-        label: Constants.treeItemData.service.local.type.default.label,
-      },
-      {
-        cmd: assignForkedNetwork,
-        itemType: ItemType.LOCAL_SERVICE,
-        label: Constants.treeItemData.service.local.type.forked.label,
-      },
-    ];
-
-    const project = await execute(serviceDestinations, false);
-
-    Telemetry.sendEvent("ServiceCommands.chooseTypeOfNetwork.commandFinished", {
       itemType: telemetryHelper.mapItemType(project.itemType),
     });
 
@@ -144,7 +132,7 @@ export namespace ServiceCommands {
       }
     }
 
-    await TreeManager.removeItem(viewItem.extensionItem);
+    TreeManager.removeItem(viewItem.extensionItem);
     Telemetry.sendEvent("ServiceCommands.disconnectProject.commandFinished");
   }
 
@@ -186,13 +174,13 @@ export namespace ServiceCommands {
   // }
 }
 
-async function execute(serviceDestinations: IServiceDestination[], saveChild: boolean): Promise<Project> {
+async function execute(serviceDestinations: IServiceDestination[]): Promise<Project> {
   const destination = await selectDestination(serviceDestinations);
 
-  const service = await TreeManager.getItem(destination.itemType);
+  const service = TreeManager.getItem(destination.itemType);
   const child = await destination.cmd(service);
 
-  if (saveChild) await addChild(service, child);
+  await addChild(service, child);
 
   return child;
 }
@@ -242,43 +230,54 @@ async function getExistingProjectIds(service: InfuraService): Promise<string[]> 
 }
 
 // ------------ LOCAL ------------ //
-async function assignDefaultNetwork(service: LocalService): Promise<LocalProject> {
-  const forked: boolean = Constants.treeItemData.service.local.type.default.isForked;
-  const description: string = Constants.treeItemData.service.local.type.default.description;
+// async function assignDefaultNetwork(service: LocalService): Promise<LocalProject> {
+//   const forked: boolean = Constants.treeItemData.service.local.type.default.isForked;
+//   const description: string = Constants.treeItemData.service.local.type.default.description;
 
-  return createLocalProject(service, forked, description);
-}
+//   return createLocalProject(service, forked, description);
+// }
 
-async function assignForkedNetwork(service: LocalService): Promise<LocalProject> {
-  const forked: boolean = Constants.treeItemData.service.local.type.forked.isForked;
-  const description: string = Constants.treeItemData.service.local.type.forked.description;
+// async function assignForkedNetwork(service: LocalService): Promise<LocalProject> {
+//   const forked: boolean = Constants.treeItemData.service.local.type.forked.isForked;
+//   const description: string = Constants.treeItemData.service.local.type.forked.description;
 
-  return createLocalProject(service, forked, description);
-}
+//   return createLocalProject(service, forked, description);
+// }
 
-async function createLocalProject(
-  service: LocalService,
-  forked?: boolean,
-  description?: string
-): Promise<LocalProject> {
+async function createLocalProject(service: LocalService): Promise<LocalProject> {
+  const serviceTypes: TServiceType[] = await loadServiceType();
+  const serviceType: TServiceType = await getServiceTypes(serviceTypes);
+
+  const description: string = serviceType.description;
+  const options: TLocalProjectOptions = {
+    isForked: serviceType.isForked,
+  };
+
+  if (serviceType.isForked) {
+    options.forkedNetwork = (await getNetworks(serviceType.networks)).label;
+    options.blockNumber = await getBlockNumber();
+  }
+
   const localResourceExplorer = new LocalResourceExplorer();
   return localResourceExplorer.createProject(
     await getExistingNames(service),
     await getExistingPorts(service),
-    forked,
+    options,
     description
   );
 }
 
 async function connectLocalProject(service: LocalService): Promise<LocalProject> {
-  const forked: boolean = Constants.treeItemData.service.local.type.linked.isForked;
   const description: string = Constants.treeItemData.service.local.type.linked.description;
+  const options: TLocalProjectOptions = {
+    isForked: false,
+  };
 
   const localResourceExplorer = new LocalResourceExplorer();
   return localResourceExplorer.selectProject(
     await getExistingNames(service),
     await getExistingPorts(service),
-    forked,
+    options,
     description
   );
 }
@@ -293,6 +292,81 @@ async function getExistingPorts(service: LocalService): Promise<number[]> {
   return localProjects.map((item) => item.port);
 }
 
+async function getServiceTypes(serviceTypes: TServiceType[]): Promise<TServiceType> {
+  const items: QuickPickItem[] = [];
+
+  serviceTypes.forEach(async (element) => {
+    items.push({
+      label: element.label,
+    });
+  });
+
+  const result: QuickPickItem = await showQuickPick(items, {
+    ignoreFocusOut: true,
+    placeHolder: `${Constants.placeholders.selectType}.`,
+  });
+
+  return serviceTypes.find((item) => item.label.Equals(result.label))!;
+}
+
+async function getNetworks(networks: TNetwork[]): Promise<TNetwork> {
+  const items: QuickPickItem[] = [];
+
+  networks.forEach(async (element) => {
+    items.push({
+      label: element.label,
+    });
+  });
+
+  const result: QuickPickItem = await showQuickPick(items, {
+    ignoreFocusOut: true,
+    placeHolder: `${Constants.placeholders.selectNetwork}.`,
+  });
+
+  return networks.find((item) => item.label.Equals(result.label))!;
+}
+
+async function getBlockNumber(): Promise<number> {
+  const blockNumber: string = await showInputBox({
+    ignoreFocusOut: true,
+    prompt: Constants.paletteLabels.enterBlockNumber,
+    placeHolder: Constants.placeholders.enterBlockNumber,
+    validateInput: async (value: string) => {
+      if (value.length.Equals(0)) return null;
+
+      if (!value.match(Constants.validationRegexps.onlyNumber)) return Constants.validationMessages.valueShouldBeNumber;
+
+      return null;
+    },
+  });
+
+  return Number(blockNumber);
+}
+
+async function loadServiceType(): Promise<TServiceType[]> {
+  const networks: TServiceType[] = [
+    {
+      label: Constants.treeItemData.service.local.type.default.label,
+      isForked: Constants.treeItemData.service.local.type.default.isForked,
+      description: Constants.treeItemData.service.local.type.default.description,
+      networks: [],
+    },
+    {
+      label: Constants.treeItemData.service.local.type.forked.label,
+      isForked: Constants.treeItemData.service.local.type.forked.isForked,
+      description: Constants.treeItemData.service.local.type.forked.description,
+      networks: [
+        {label: Constants.treeItemData.service.local.type.forked.networks.mainnet},
+        {label: Constants.treeItemData.service.local.type.forked.networks.ropsten},
+        {label: Constants.treeItemData.service.local.type.forked.networks.kovan},
+        {label: Constants.treeItemData.service.local.type.forked.networks.rinkeby},
+        {label: Constants.treeItemData.service.local.type.forked.networks.goerli},
+      ],
+    },
+  ];
+
+  return networks;
+}
 // ------------ BLOCKCHAIN DATA MANAGER ------------ //
 
 // async function connectBlockchainDataManagerProject(
@@ -322,7 +396,7 @@ async function getExistingPorts(service: LocalService): Promise<number[]> {
 // }
 
 async function addChild(service: Service, child: Project): Promise<void> {
-  await service.addChild(child);
+  service.addChild(child);
 
   Telemetry.sendEvent("ServiceCommands.execute.newServiceItem", {
     ruri: Telemetry.obfuscate((child.resourceUri || "").toString()),

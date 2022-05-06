@@ -6,6 +6,7 @@ import {OutputChannel, window} from "vscode";
 import {Constants, RequiredApps} from "../../Constants";
 import {shell, spawnProcess} from "../../helpers";
 import {findPid, killPid} from "../../helpers/shell";
+import {TLocalProjectOptions} from "../../Models/TreeItems";
 import {Telemetry} from "../../TelemetryClient";
 import {UrlValidator} from "../../validators/UrlValidator";
 import {isGanacheServer, waitGanacheStarted} from "./GanacheServiceClient";
@@ -41,7 +42,10 @@ export namespace GanacheService {
     return PortStatus.FREE;
   }
 
-  export async function startGanacheServer(port: number | string, forked?: boolean): Promise<IGanacheProcess> {
+  export async function startGanacheServer(
+    port: number | string,
+    options?: TLocalProjectOptions
+  ): Promise<IGanacheProcess> {
     Telemetry.sendEvent("GanacheService.startGanacheServer");
     if (UrlValidator.validatePort(port)) {
       Telemetry.sendException(new Error(Constants.ganacheCommandStrings.invalidGanachePort));
@@ -60,7 +64,7 @@ export namespace GanacheService {
     }
 
     if (portStatus === PortStatus.FREE) {
-      ganacheProcesses[port] = await spawnGanacheServer(port, forked);
+      ganacheProcesses[port] = await spawnGanacheServer(port, options);
     }
 
     Telemetry.sendEvent("GanacheServiceClient.waitGanacheStarted.serverStarted");
@@ -83,9 +87,14 @@ export namespace GanacheService {
     return Promise.all(shouldBeFree).then(() => undefined);
   }
 
-  async function spawnGanacheServer(port: number | string, forked?: boolean): Promise<IGanacheProcess> {
-    const args: string[] = [RequiredApps.ganache, `-p ${port}`];
-    if (forked) args.push("-f");
+  async function spawnGanacheServer(port: number | string, options?: TLocalProjectOptions): Promise<IGanacheProcess> {
+    const args: string[] = [RequiredApps.ganache, `--port ${port}`];
+
+    if (options?.isForked) {
+      args.push(`--fork.network ${options.forkedNetwork}`);
+
+      if (options.blockNumber! > 0) args.push(`--fork.blockNumber ${options.blockNumber}`);
+    }
 
     const process = spawnProcess(undefined, "npx", args);
     const output = window.createOutputChannel(`${Constants.outputChannel.ganacheCommands}:${port}`);

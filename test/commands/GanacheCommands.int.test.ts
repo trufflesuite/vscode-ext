@@ -79,7 +79,7 @@ describe("Integration tests GanacheCommands", () => {
     assert.strictEqual(spawnStub.getCall(0).args[0], "npx", "should execute npx command");
     assert.deepStrictEqual(
       spawnStub.getCall(0).args[1],
-      ["ganache", `-p ${defaultPort}`],
+      ["ganache", `--port ${defaultPort}`],
       "should execute npx command with specific parameters"
     );
   });

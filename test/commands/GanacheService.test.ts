@@ -9,6 +9,7 @@ import {OutputChannel, window} from "vscode";
 import {Constants} from "../../src/Constants";
 import * as outputCommandHelper from "../../src/helpers";
 import * as shell from "../../src/helpers/shell";
+import {TLocalProjectOptions} from "../../src/Models/TreeItems";
 import {GanacheService} from "../../src/services";
 import * as GanacheServiceClient from "../../src/services/ganache/GanacheServiceClient";
 import {UrlValidator} from "../../src/validators/UrlValidator";
@@ -110,25 +111,36 @@ describe("Unit tests GanacheService", () => {
     assert.strictEqual(urlValidatorSpy.called, true);
     assert.strictEqual(spawnStub.called, true);
     assert.strictEqual(spawnStub.getCall(0).args[1], "npx");
-    assert.deepStrictEqual(spawnStub.getCall(0).args[2], ["ganache", `-p ${defaultPort}`]);
+    assert.deepStrictEqual(spawnStub.getCall(0).args[2], ["ganache", `--port ${defaultPort}`]);
   });
 
-  it("startGanacheServer should execute npx cmd with fork option", async () => {
+  it("startGanacheServer should execute npx cmd with options", async () => {
     // Arrange
     const urlValidatorSpy = sinon.spy(UrlValidator, "validatePort");
     const spawnStub = sinon.stub(outputCommandHelper, "spawnProcess").returns(processMock as cp.ChildProcess);
+    const options: TLocalProjectOptions = {
+      isForked: true,
+      forkedNetwork: "rinkeby",
+      blockNumber: 1000,
+    };
+
     sinon.stub(shell, "findPid").returns(Promise.resolve(Number.NaN));
     sinon.stub(window, "createOutputChannel").returns(channel as OutputChannel);
     sinon.stub(GanacheServiceClient, "waitGanacheStarted");
 
     // Act
-    await GanacheService.startGanacheServer(defaultPort, true);
+    await GanacheService.startGanacheServer(defaultPort, options);
 
     // Assert
     assert.strictEqual(urlValidatorSpy.called, true);
     assert.strictEqual(spawnStub.called, true);
     assert.strictEqual(spawnStub.getCall(0).args[1], "npx");
-    assert.deepStrictEqual(spawnStub.getCall(0).args[2], ["ganache", `-p ${defaultPort}`, "-f"]);
+    assert.deepStrictEqual(spawnStub.getCall(0).args[2], [
+      "ganache",
+      `--port ${defaultPort}`,
+      `--fork.network ${options.forkedNetwork}`,
+      `--fork.blockNumber ${options.blockNumber}`,
+    ]);
   });
 
   it("startGanacheServer if server was not started should throw exception and dispose all", async () => {
