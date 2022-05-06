@@ -230,20 +230,6 @@ async function getExistingProjectIds(service: InfuraService): Promise<string[]> 
 }
 
 // ------------ LOCAL ------------ //
-// async function assignDefaultNetwork(service: LocalService): Promise<LocalProject> {
-//   const forked: boolean = Constants.treeItemData.service.local.type.default.isForked;
-//   const description: string = Constants.treeItemData.service.local.type.default.description;
-
-//   return createLocalProject(service, forked, description);
-// }
-
-// async function assignForkedNetwork(service: LocalService): Promise<LocalProject> {
-//   const forked: boolean = Constants.treeItemData.service.local.type.forked.isForked;
-//   const description: string = Constants.treeItemData.service.local.type.forked.description;
-
-//   return createLocalProject(service, forked, description);
-// }
-
 async function createLocalProject(service: LocalService): Promise<LocalProject> {
   const serviceTypes: TServiceType[] = await loadServiceType();
   const serviceType: TServiceType = await getServiceTypes(serviceTypes);
