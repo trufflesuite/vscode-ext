@@ -91,9 +91,16 @@ export namespace GanacheService {
     const args: string[] = [RequiredApps.ganache, `--port ${port}`];
 
     if (options?.isForked) {
-      args.push(`--fork.network ${options.forkedNetwork}`);
+      if (options.url !== undefined) args.push(`--fork.url ${options.url}`);
 
-      if (options.blockNumber! > 0) args.push(`--fork.blockNumber ${options.blockNumber}`);
+      if (
+        options.forkedNetwork !== undefined &&
+        options.forkedNetwork != Constants.treeItemData.service.local.type.forked.networks.other
+      )
+        args.push(`--fork.network ${options.forkedNetwork.toLowerCase()}`);
+
+      if (options.blockNumber !== undefined && options.blockNumber > 0)
+        args.push(`--fork.blockNumber ${options.blockNumber}`);
     }
 
     const process = spawnProcess(undefined, "npx", args);

@@ -62,6 +62,7 @@ export class Constants {
   public static localhost = "127.0.0.1";
   public static localhostName = "development";
   public static defaultLocalhostPort = 8545;
+  public static defaultLastBlockDescription = "last one";
   public static defaultABSPort = 3200;
   public static defaultABSHost = "blockchain.azure.com";
 
@@ -227,6 +228,7 @@ export class Constants {
     enterLocalProjectName: "Enter local project name",
     enterLocalProjectPort: "Enter local port number",
     enterBlockNumber: "Enter a block number",
+    enterNetworkUrl: "Enter a valid host address with no port",
     enterMemberName: "Enter member name",
     enterMemberPassword: "Enter member password",
     enterTransactionNodeName: "Enter transaction node name",
@@ -361,11 +363,12 @@ export class Constants {
             description: "Forked",
             isForked: true,
             networks: {
-              mainnet: "mainnet",
-              ropsten: "ropsten",
-              kovan: "kovan",
-              rinkeby: "rinkeby",
-              goerli: "goerli",
+              mainnet: "Mainnet",
+              ropsten: "Ropsten",
+              kovan: "Kovan",
+              rinkeby: "Rinkeby",
+              goerli: "Goerli",
+              other: "Other...",
             },
           },
           linked: {
@@ -530,6 +533,7 @@ export class Constants {
     selectTypeOfSolidityProject: "Select type of solidity project",
     setupMnemonic: "Setup mnemonic",
     enterBlockNumber: "No number gets the last mined block",
+    enterNetworkUrl: "Enter a valid url",
   };
 
   // More information see here

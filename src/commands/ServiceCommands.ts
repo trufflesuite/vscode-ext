@@ -241,6 +241,10 @@ async function createLocalProject(service: LocalService): Promise<LocalProject> 
 
   if (serviceType.isForked) {
     options.forkedNetwork = (await getNetworks(serviceType.networks)).label;
+
+    if (options.forkedNetwork.Equals(Constants.treeItemData.service.local.type.forked.networks.other))
+      options.url = await getHostAddress();
+
     options.blockNumber = await getBlockNumber();
   }
 
@@ -329,6 +333,22 @@ async function getBlockNumber(): Promise<number> {
   return Number(blockNumber);
 }
 
+async function getHostAddress(): Promise<string> {
+  const url: string = await showInputBox({
+    ignoreFocusOut: true,
+    prompt: Constants.paletteLabels.enterNetworkUrl,
+    placeHolder: Constants.placeholders.enterNetworkUrl,
+    validateInput: async (value: string) => {
+      if (value.length.Equals(0)) return Constants.validationMessages.invalidHostAddress;
+      if (!value.match(Constants.validationRegexps.isUrl)) return Constants.validationMessages.invalidHostAddress;
+
+      return null;
+    },
+  });
+
+  return url;
+}
+
 async function loadServiceType(): Promise<TServiceType[]> {
   const networks: TServiceType[] = [
     {
@@ -347,6 +367,7 @@ async function loadServiceType(): Promise<TServiceType[]> {
         {label: Constants.treeItemData.service.local.type.forked.networks.kovan},
         {label: Constants.treeItemData.service.local.type.forked.networks.rinkeby},
         {label: Constants.treeItemData.service.local.type.forked.networks.goerli},
+        {label: Constants.treeItemData.service.local.type.forked.networks.other},
       ],
     },
   ];

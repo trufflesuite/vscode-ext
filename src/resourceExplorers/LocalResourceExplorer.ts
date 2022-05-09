@@ -58,15 +58,9 @@ export class LocalResourceExplorer {
     options?: TLocalProjectOptions,
     description?: string
   ): Promise<LocalProject> {
-    const label = await this.getLocalProjectName(existingProjects);
-    const port = await this.getLocalProjectPort(existingPorts, portStatus, validateMessage);
-    let formattedDescription: string;
-
-    if (options?.isForked)
-      formattedDescription = `(${description}) - port: ${port} | ${options.forkedNetwork} - block number: ${
-        options.blockNumber?.Equals(0) ? "last one" : `${options.blockNumber}`
-      }`;
-    else formattedDescription = `(${description}) - port:${port}`;
+    const port: number = await this.getLocalProjectPort(existingPorts, portStatus, validateMessage);
+    const label: string = await this.getLocalProjectName(existingProjects);
+    const formattedDescription: string = await this.getDescription(port, options, description);
 
     return this.getLocalProject(label, port, options, formattedDescription);
   }
@@ -134,5 +128,20 @@ export class LocalResourceExplorer {
     });
 
     return parseInt(port, 10);
+  }
+
+  private async getDescription(port: number, options?: TLocalProjectOptions, description?: string) {
+    const blockNumber: string | undefined = options?.blockNumber?.Equals(0)
+      ? Constants.defaultLastBlockDescription
+      : options?.blockNumber?.ToString();
+    const forkedNetwork: string | undefined = options?.url === undefined ? options?.forkedNetwork : options?.url;
+
+    let formattedDescription: string;
+
+    if (options?.isForked)
+      formattedDescription = `(${description}) - port: ${port} | ${forkedNetwork} - block number: ${blockNumber}`;
+    else formattedDescription = `(${description}) - port: ${port}`;
+
+    return formattedDescription;
   }
 }
