@@ -18,6 +18,8 @@ import {
   Project,
   Service,
   ServiceTypes,
+  QuorumProject,
+  QuorumService,
 } from "../Models/TreeItems";
 import {
   // BlockchainDataManagerResourceExplorer,
@@ -25,6 +27,7 @@ import {
   InfuraResourceExplorer,
   LocalResourceExplorer,
   // StorageAccountResourceExplorer,
+  QuorumResourceExplorer,
 } from "../resourceExplorers";
 import {GanacheService, TreeManager} from "../services";
 import {Telemetry} from "../TelemetryClient";
@@ -95,6 +98,11 @@ export namespace ServiceCommands {
       //   itemType: ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE,
       //   label: Constants.treeItemData.service.bdm.label,
       // },
+      {
+        cmd: connectQuorumProject,
+        itemType: ItemType.QUORUM_SERVICE,
+        label: Constants.treeItemData.service.quorum.label,
+      },
     ];
 
     const project = await execute(serviceDestinations);
@@ -233,6 +241,12 @@ async function getExistingNames(service: LocalService): Promise<string[]> {
 async function getExistingPorts(service: LocalService): Promise<number[]> {
   const localProjects = service.getChildren() as LocalProject[];
   return localProjects.map((item) => item.port);
+}
+
+// ------------ QUORUM ------------ //
+async function connectQuorumProject(service: QuorumService): Promise<QuorumProject> {
+  const quorumResourceExplorer = new QuorumResourceExplorer();
+  return quorumResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
 }
 
 // ------------ BLOCKCHAIN DATA MANAGER ------------ //

@@ -294,6 +294,10 @@ export class Constants {
         contextValue: "localnetwork",
         iconPath: {dark: "", light: ""},
       },
+      quorum: {
+        contextValue: "quorumproject",
+        iconPath: {dark: "", light: ""},
+      },
     },
     project: {
       azure: {
@@ -314,6 +318,10 @@ export class Constants {
       },
       local: {
         contextValue: "localproject",
+        iconPath: {dark: "", light: ""},
+      },
+      quorum: {
+        contextValue: "quorumproject",
         iconPath: {dark: "", light: ""},
       },
     },
@@ -345,6 +353,12 @@ export class Constants {
         contextValue: "service",
         iconPath: {dark: "", light: ""},
         label: "Ganache Service",
+        prefix: "loc",
+      },
+      quorum: {
+        contextValue: "service",
+        iconPath: {dark: "", light: ""},
+        label: "Quorum Service",
         prefix: "loc",
       },
     },
@@ -450,6 +464,7 @@ export class Constants {
     onlyNumberAllowed: "Value after ':' should be a number.",
     portAlreadyInUse: "This port is already in use. Choose another one.",
     portNotInUseGanache: "No local ganache service running on port. Please start service or select another port.",
+    portNotInUseQuorum: "No local quorum service running on port. Please start service or select another port.",
     projectAlreadyExists: "Network already exists.",
     projectAlreadyExistsOnInfura: "Project already exist with the same name on Infura.",
     projectIdAlreadyExists: "Network with project ID already exists.",
@@ -831,6 +846,11 @@ export class Constants {
       light: context.asAbsolutePath(path.join("resources/light", "LocalNetwork.svg")),
     };
 
+    this.treeItemData.network.quorum.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "LocalNetwork.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "LocalNetwork.svg")),
+    };
+
     // @deprecated
     this.treeItemData.project.azure.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "ABS-consortium.svg")),
@@ -849,6 +869,11 @@ export class Constants {
     };
 
     this.treeItemData.project.local.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "LocalProject.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "LocalProject.svg")),
+    };
+
+    this.treeItemData.project.quorum.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "LocalProject.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "LocalProject.svg")),
     };
@@ -873,6 +898,11 @@ export class Constants {
     this.treeItemData.service.local.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "LocalService.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "LocalService.svg")),
+    };
+
+    this.treeItemData.service.quorum.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "QuorumService.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "QuorumService.svg")),
     };
   }
 
