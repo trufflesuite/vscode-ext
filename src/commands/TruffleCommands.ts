@@ -58,20 +58,21 @@ export namespace TruffleCommands {
    * Call the truffle command line compiler
    * @param args a list of optional compile command args to append in certain circumstances
    */
-  export async function buildContracts(...args: Array<string>): Promise<void> {
+  export async function buildContracts(uri?: Uri): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.buildContracts.commandStarted");
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
       if (!(await required.checkAppsSilent(RequiredApps.truffle))) {
         Telemetry.sendEvent("TruffleCommands.buildContracts.truffleInstallation");
         await required.installTruffle(required.Scope.locally);
       }
-      await outputCommandHelper.executeCommand(getWorkspaceRoot(), "npx", RequiredApps.truffle, "compile", ...args);
+      const filePath = uri ? path.dirname(uri.fsPath) : getWorkspaceRoot();
+      await outputCommandHelper.executeCommand(filePath, "npx", RequiredApps.truffle, "compile");
     });
 
     Telemetry.sendEvent("TruffleCommands.buildContracts.commandFinished");
   }
 
-  export async function deployContracts(): Promise<void> {
+  export async function deployContracts(uri?: Uri): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.deployContracts.commandStarted");
 
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();

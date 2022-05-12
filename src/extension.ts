@@ -98,11 +98,11 @@ export async function activate(context: ExtensionContext) {
   const newSolidityProject = commands.registerCommand("truffle-vscode.newSolidityProject", async () => {
     await tryExecute(() => ProjectCommands.newSolidityProject());
   });
-  const buildContracts = commands.registerCommand("truffle-vscode.buildContracts", async () => {
-    await tryExecute(() => sdkCoreCommands.build());
+  const buildContracts = commands.registerCommand("truffle-vscode.buildContracts", async (uri: Uri) => {
+    await tryExecute(() => sdkCoreCommands.build(uri));
   });
-  const deployContracts = commands.registerCommand("truffle-vscode.deployContracts", async () => {
-    await tryExecute(() => sdkCoreCommands.deploy());
+  const deployContracts = commands.registerCommand("truffle-vscode.deployContracts", async (uri: Uri) => {
+    await tryExecute(() => sdkCoreCommands.deploy(uri));
   });
   const copyByteCode = commands.registerCommand("truffle-contract.copyByteCode", async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeBytecodeToBuffer(uri));

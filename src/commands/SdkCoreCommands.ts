@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Memento, window} from "vscode";
+import {Memento, window, Uri} from "vscode";
 import {Constants} from "../Constants";
 import {
   // getWorkspaceRoot,
@@ -30,12 +30,12 @@ class SdkCoreCommands {
    *  call build on an extension
    * @param args an array of compile/build time args you want to pass to the task (optional)
    */
-  public async build(...args: Array<string>): Promise<void> {
-    return this.extensionAdapter.build(...args);
+  public async build(uri: Uri): Promise<void> {
+    return this.extensionAdapter.build(uri);
   }
 
-  public async deploy(): Promise<void> {
-    return this.extensionAdapter.deploy();
+  public async deploy(uri: Uri): Promise<void> {
+    return this.extensionAdapter.deploy(uri);
   }
 
   private async getCoreSdk() {
