@@ -3,50 +3,40 @@
 
 import {Constants} from "../Constants";
 import {showInputBox} from "../helpers";
-import {QuorumNetworkNode, QuorumProject} from "../Models/TreeItems";
-import {GanacheService} from "../services";
+import {GenericNetworkNode, GenericProject} from "../Models/TreeItems";
+import {GenericService} from "../services";
 import {Telemetry} from "../TelemetryClient";
 import {DialogResultValidator} from "../validators/DialogResultValidator";
 import {UrlValidator} from "../validators/UrlValidator";
 
-export class QuorumResourceExplorer {
-  public async createProject(existingProjects: string[] = [], existingPorts: number[] = []): Promise<QuorumProject> {
-    Telemetry.sendEvent("QuorumResourceExplorer.createProject");
-    return this.getOrCreateQuorumProject(
+export class GenericResourceExplorer {
+  public async selectProject(existingProjects: string[] = [], existingPorts: number[] = []): Promise<GenericProject> {
+    Telemetry.sendEvent("GenericResourceExplorer.selectProject");
+    const genericProject = await this.getOrCreateGenericProject(
       existingProjects,
       existingPorts,
-      GanacheService.PortStatus.FREE,
-      Constants.validationMessages.portAlreadyInUse
-    );
-  }
-
-  public async selectProject(existingProjects: string[] = [], existingPorts: number[] = []): Promise<QuorumProject> {
-    Telemetry.sendEvent("QuorumResourceExplorer.selectProject");
-    const quorumProject = await this.getOrCreateQuorumProject(
-      existingProjects,
-      existingPorts,
-      GanacheService.PortStatus.GANACHE,
-      Constants.validationMessages.portNotInUseQuorum
+      GenericService.PortStatus.RUNNING,
+      Constants.validationMessages.portNotInUseGeneric
     );
 
     // await GanacheService.startGanacheServer(localProject.port);
 
-    return quorumProject;
+    return genericProject;
   }
 
-  private async getOrCreateQuorumProject(
+  private async getOrCreateGenericProject(
     existingProjects: string[],
     existingPorts: number[],
-    portStatus: GanacheService.PortStatus,
+    portStatus: GenericService.PortStatus,
     validateMessage: string
-  ): Promise<QuorumProject> {
-    const localProjectName = await this.getQuorumProjectName(existingProjects);
-    const localProjectPort = await this.getQuorumProjectPort(existingPorts, portStatus, validateMessage);
+  ): Promise<GenericProject> {
+    const localProjectName = await this.getGenericProjectName(existingProjects);
+    const localProjectPort = await this.getGenericProjectPort(existingPorts, portStatus, validateMessage);
 
-    return this.getQuorumProject(localProjectName, localProjectPort);
+    return this.getGenericProject(localProjectName, localProjectPort);
   }
 
-  private async getQuorumProjectName(existingProjects: string[]): Promise<string> {
+  private async getGenericProjectName(existingProjects: string[]): Promise<string> {
     return showInputBox({
       ignoreFocusOut: true,
       prompt: Constants.paletteLabels.enterLocalProjectName,
@@ -66,9 +56,9 @@ export class QuorumResourceExplorer {
     });
   }
 
-  private async getQuorumProjectPort(
+  private async getGenericProjectPort(
     existingPorts: number[],
-    portStatus: GanacheService.PortStatus,
+    portStatus: GenericService.PortStatus,
     validateMessage: string
   ): Promise<number> {
     const port = await showInputBox({
@@ -84,7 +74,7 @@ export class QuorumResourceExplorer {
           return Constants.validationMessages.projectAlreadyExists;
         }
 
-        if ((await GanacheService.getPortStatus(value)) !== portStatus) {
+        if ((await GenericService.getPortStatus(value)) !== portStatus) {
           return validateMessage;
         }
 
@@ -96,13 +86,13 @@ export class QuorumResourceExplorer {
     return parseInt(port, 10);
   }
 
-  private async getQuorumProject(projectName: string, port: number): Promise<QuorumProject> {
-    const quorumProject = new QuorumProject(projectName, port);
+  private async getGenericProject(projectName: string, port: number): Promise<GenericProject> {
+    const genericProject = new GenericProject(projectName, port);
     const url = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
-    const networkNode = new QuorumNetworkNode(projectName, url, "*");
+    const networkNode = new GenericNetworkNode(projectName, url, "*");
 
-    quorumProject.addChild(networkNode);
+    genericProject.addChild(networkNode);
 
-    return quorumProject;
+    return genericProject;
   }
 }

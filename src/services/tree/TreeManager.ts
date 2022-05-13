@@ -11,7 +11,7 @@ import {
   IExtensionItem,
   InfuraService,
   LocalService,
-  QuorumService,
+  GenericService,
   Service,
   ServiceTypes,
 } from "../../Models/TreeItems";
@@ -109,12 +109,12 @@ class ExtensionTreeManager {
       bdmService = new BlockchainDataManagerService();
     }
 
-    let quorumService = items.find((item) => item instanceof QuorumService);
-    if (!quorumService) {
-      quorumService = new QuorumService();
+    let genericService = items.find((item) => item instanceof GenericService);
+    if (!genericService) {
+      genericService = new GenericService();
     }
 
-    return [trufflesuite, infuraService, localService, bdmService, quorumService];
+    return [trufflesuite, infuraService, localService, bdmService, genericService];
   }
 }
 

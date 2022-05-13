@@ -7,11 +7,11 @@ import {TruffleConfiguration} from "../../helpers";
 import {ItemType} from "../ItemType";
 import {NetworkNode} from "./NetworkNode";
 
-export class QuorumNetworkNode extends NetworkNode {
+export class GenericNetworkNode extends NetworkNode {
   public readonly port: number;
 
   constructor(label: string, url: URL | string, networkId: number | string) {
-    super(ItemType.QUORUM_NETWORK_NODE, label, Constants.treeItemData.network.quorum, url, networkId);
+    super(ItemType.GENERIC_NETWORK_NODE, label, Constants.treeItemData.network.generic, url, networkId);
 
     this.port = parseInt(this.url.port, 10) || Constants.defaultLocalhostPort;
   }

@@ -18,8 +18,8 @@ import {
   Project,
   Service,
   ServiceTypes,
-  QuorumProject,
-  QuorumService,
+  GenericProject,
+  GenericService,
 } from "../Models/TreeItems";
 import {
   // BlockchainDataManagerResourceExplorer,
@@ -27,7 +27,7 @@ import {
   InfuraResourceExplorer,
   LocalResourceExplorer,
   // StorageAccountResourceExplorer,
-  QuorumResourceExplorer,
+  GenericResourceExplorer,
 } from "../resourceExplorers";
 import {GanacheService, TreeManager} from "../services";
 import {Telemetry} from "../TelemetryClient";
@@ -99,9 +99,9 @@ export namespace ServiceCommands {
       //   label: Constants.treeItemData.service.bdm.label,
       // },
       {
-        cmd: connectQuorumProject,
-        itemType: ItemType.QUORUM_SERVICE,
-        label: Constants.treeItemData.service.quorum.label,
+        cmd: connectGenericProject,
+        itemType: ItemType.GENERIC_SERVICE,
+        label: Constants.treeItemData.service.generic.label,
       },
     ];
 
@@ -126,7 +126,7 @@ export namespace ServiceCommands {
       }
     }
 
-    await TreeManager.removeItem(viewItem.extensionItem);
+    TreeManager.removeItem(viewItem.extensionItem);
     Telemetry.sendEvent("ServiceCommands.disconnectProject.commandFinished");
   }
 
@@ -243,10 +243,10 @@ async function getExistingPorts(service: LocalService): Promise<number[]> {
   return localProjects.map((item) => item.port);
 }
 
-// ------------ QUORUM ------------ //
-async function connectQuorumProject(service: QuorumService): Promise<QuorumProject> {
-  const quorumResourceExplorer = new QuorumResourceExplorer();
-  return quorumResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
+// ------------ GENERIC ------------ //
+async function connectGenericProject(service: GenericService): Promise<GenericProject> {
+  const genericResourceExplorer = new GenericResourceExplorer();
+  return genericResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
 }
 
 // ------------ BLOCKCHAIN DATA MANAGER ------------ //

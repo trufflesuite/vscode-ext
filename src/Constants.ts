@@ -35,6 +35,7 @@ export class Constants {
     truffleForVSCode: "Truffle for VSCode",
     executeCommand: "Truffle: Execute command",
     ganacheCommands: "Truffle: Ganache Server",
+    genericCommands: "Truffle: Generic Server",
     //logicAppGenerator: "Logic App Generator",
     requirements: "Truffle: Requirements",
     telemetryClient: "Truffle: Telemetry Client",
@@ -294,8 +295,8 @@ export class Constants {
         contextValue: "localnetwork",
         iconPath: {dark: "", light: ""},
       },
-      quorum: {
-        contextValue: "quorumproject",
+      generic: {
+        contextValue: "network",
         iconPath: {dark: "", light: ""},
       },
     },
@@ -320,8 +321,8 @@ export class Constants {
         contextValue: "localproject",
         iconPath: {dark: "", light: ""},
       },
-      quorum: {
-        contextValue: "quorumproject",
+      generic: {
+        contextValue: "genericproject",
         iconPath: {dark: "", light: ""},
       },
     },
@@ -355,11 +356,11 @@ export class Constants {
         label: "Ganache Service",
         prefix: "loc",
       },
-      quorum: {
+      generic: {
         contextValue: "service",
         iconPath: {dark: "", light: ""},
-        label: "Quorum Service",
-        prefix: "loc",
+        label: "Other Service",
+        prefix: "gnr",
       },
     },
   };
@@ -464,7 +465,7 @@ export class Constants {
     onlyNumberAllowed: "Value after ':' should be a number.",
     portAlreadyInUse: "This port is already in use. Choose another one.",
     portNotInUseGanache: "No local ganache service running on port. Please start service or select another port.",
-    portNotInUseQuorum: "No local quorum service running on port. Please start service or select another port.",
+    portNotInUseGeneric: "No local service running on port. Please start service or select another port.",
     projectAlreadyExists: "Network already exists.",
     projectAlreadyExistsOnInfura: "Project already exist with the same name on Infura.",
     projectIdAlreadyExists: "Network with project ID already exists.",
@@ -575,6 +576,7 @@ export class Constants {
     getCode: "eth_getCode",
     netListening: "net_listening",
     netVersion: "net_version",
+    web3_clientVersion: "web3_clientVersion",
   };
 
   public static ganacheCommandStrings = {
@@ -588,6 +590,14 @@ export class Constants {
     serverNoGanacheInstance: "No Ganache instance running",
     serverSuccessfullyStarted: "Ganache server successfully started",
     serverSuccessfullyStopped: "Ganache server successfully stopped",
+  };
+
+  public static genericCommandStrings = {
+    invalidPort: "Cannot check for connection. Invalid port",
+    portIsBusy: "Cannot start ganache server, port is busy",
+    serverNoAvailable: "No network settings available",
+    serverRunning: "Server is running",
+    serverNotFound: "Not found",
   };
 
   public static uiCommandStrings = {
@@ -846,7 +856,7 @@ export class Constants {
       light: context.asAbsolutePath(path.join("resources/light", "LocalNetwork.svg")),
     };
 
-    this.treeItemData.network.quorum.iconPath = {
+    this.treeItemData.network.generic.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "LocalNetwork.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "LocalNetwork.svg")),
     };
@@ -873,7 +883,7 @@ export class Constants {
       light: context.asAbsolutePath(path.join("resources/light", "LocalProject.svg")),
     };
 
-    this.treeItemData.project.quorum.iconPath = {
+    this.treeItemData.project.generic.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "LocalProject.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "LocalProject.svg")),
     };
@@ -900,9 +910,9 @@ export class Constants {
       light: context.asAbsolutePath(path.join("resources/light", "LocalService.svg")),
     };
 
-    this.treeItemData.service.quorum.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "QuorumService.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "QuorumService.svg")),
+    this.treeItemData.service.generic.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "GenericService.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "GenericService.svg")),
     };
   }
 

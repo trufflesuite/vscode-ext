@@ -5,8 +5,12 @@ import {Constants} from "../../Constants";
 import {ItemType} from "../ItemType";
 import {Service} from "./Service";
 
-export class QuorumService extends Service {
+export class GenericService extends Service {
   constructor() {
-    super(ItemType.QUORUM_SERVICE, Constants.treeItemData.service.quorum.label, Constants.treeItemData.service.quorum);
+    super(
+      ItemType.GENERIC_SERVICE,
+      Constants.treeItemData.service.generic.label,
+      Constants.treeItemData.service.generic
+    );
   }
 }

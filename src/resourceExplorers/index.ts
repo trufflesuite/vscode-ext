@@ -7,5 +7,5 @@ export * from "./ConsortiumResourceExplorer";
 export * from "./EventGridResourceExplorer";
 export * from "./InfuraResourceExplorer";
 export * from "./LocalResourceExplorer";
-export * from "./QuorumResourceExplorer";
+export * from "./GenericResourceExplorer";
 export * from "./StorageAccountResourceExplorer";

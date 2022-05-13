@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {QuorumProject} from "../TreeItems";
+import {GenericProject} from "../TreeItems";
 import {ItemCreator} from "./ItemCreator";
 
-export class QuorumProjectItemCreator extends ItemCreator {
+export class GenericProjectItemCreator extends ItemCreator {
   protected getRequiredFields(): Array<{fieldName: string; type: string}> {
     const requiredFields = super.getRequiredFields();
     requiredFields.push(
@@ -21,7 +21,7 @@ export class QuorumProjectItemCreator extends ItemCreator {
     return [obj.label, obj.port];
   }
 
-  protected createFromObject(label: string, port: number): QuorumProject {
-    return new QuorumProject(label, port);
+  protected createFromObject(label: string, port: number): GenericProject {
+    return new GenericProject(label, port);
   }
 }

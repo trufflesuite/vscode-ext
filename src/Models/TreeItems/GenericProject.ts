@@ -4,14 +4,14 @@
 import {Constants} from "../../Constants";
 import {IDeployDestination} from "../IDeployDestination";
 import {ItemType} from "../ItemType";
-import {QuorumNetworkNode} from "./QuorumNetworkNode";
+import {GenericNetworkNode} from "./GenericNetworkNode";
 import {Project} from "./Project";
 
-export class QuorumProject extends Project {
+export class GenericProject extends Project {
   public readonly port: number;
 
   constructor(label: string, port: number) {
-    super(ItemType.QUORUM_PROJECT, label, Constants.treeItemData.project.quorum);
+    super(ItemType.GENERIC_PROJECT, label, Constants.treeItemData.project.generic);
 
     this.port = port;
   }
@@ -25,15 +25,15 @@ export class QuorumProject extends Project {
   }
 
   public async getDeployDestinations(): Promise<IDeployDestination[]> {
-    const {quorum} = Constants.treeItemData.service;
+    const {generic} = Constants.treeItemData.service;
 
-    const getDeployName = (labelNode: string) => [quorum.prefix, this.label, labelNode].join("_");
+    const getDeployName = (labelNode: string) => [generic.prefix, this.label, labelNode].join("_");
 
     return Promise.all(
-      (this.getChildren() as QuorumNetworkNode[]).map(async (node) => {
+      (this.getChildren() as GenericNetworkNode[]).map(async (node) => {
         return {
           description: await node.getRPCAddress(),
-          detail: quorum.label,
+          detail: generic.label,
           getTruffleNetwork: async () => {
             const truffleNetwork = await node.getTruffleNetwork();
             truffleNetwork.name = getDeployName(node.label);
