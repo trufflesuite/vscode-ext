@@ -1,662 +1,668 @@
 {
-  "name": "truffle-vscode",
-  "displayName": "Truffle for VS Code",
-  "description": "Build, debug and deploy smart contracts on Ethereum and EVM-compatible blockchains.",
-  "publisher": "trufflesuite-csi",
-  "preview": true,
-  "icon": "images/TruffleLogo.png",
-  "version": "2.2.3",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/trufflesuite/vscode-ext"
-  },
-  "bugs": {
-    "url": "https://github.com/trufflesuite/vscode-ext/issues"
-  },
-  "homepage": "https://github.com/trufflesuite/vscode-ext/blob/master/README.md",
-  "license": "MIT",
-  "engines": {
-    "vscode": "^1.63.0"
-  },
-  "keywords": [
-    "blockchain",
-    "solidity",
-    "truffle",
-    "ethereum",
-    "evm",
-    "debugger",
-    "compiler",
-    "ganache",
-    "infura"
-  ],
-  "categories": [
-    "Extension Packs",
-    "Programming Languages"
-  ],
-  "aiKey": "INSERTAIKEY",
-  "main": "./out/src/extension.js",
-  "activationEvents": [
-    "onView:truffle-vscode.truffle",
-    "onCommand:truffle-vscode.showWelcomePage",
-    "onCommand:truffle-vscode.refresh",
-    "onCommand:truffle-contract.copyByteCode",
-    "onCommand:truffle-contract.copyDeployedByteCode",
-    "onCommand:truffle-contract.copyABI",
-    "onCommand:truffle-vscode.createLocalUI",
-    "onCommand:truffle-vscode.newSolidityProject",
-    "onCommand:truffle-vscode.buildContracts",
-    "onCommand:truffle-vscode.deployContracts",
-    "onCommand:truffle-vscode.connectProject",
-    "onCommand:truffle-vscode.copyRPCEndpointAddress",
-    "onCommand:truffle-vscode.createProject",
-    "onCommand:truffle-vscode.disconnectProject",
-    "onCommand:truffle-vscode.debugTransaction",
-    "onCommand:truffle-vscode.signInToInfuraAccount",
-    "onCommand:truffle-vscode.signOutOfInfuraAccount",
-    "onCommand:truffle-vscode.openAtAzurePortal",
-    "onCommand:truffle-vscode.startGanacheServer",
-    "onCommand:truffle-vscode.stopGanacheServer",    
-    "onDebug"
-  ],
-  "contributes": {
-    "configuration": {
-      "title": "Truffle for VSCode",
-      "properties": {
-        "truffle-vscode.ignoreLongRunningTaskNotification": {
-          "type": "boolean",
-          "default": false,
-          "description": "Disable notification on long running tasks."
-        },
-        "truffle-vscode.storageAccount.name": {
-          "type": "string",
-          "scope": "Storage Account name"
-        },
-        "truffle-vscode.coreSDK": {
-          "type": "string",
-          "scope": "Core SDK for extensions backend",
-          "default": "Truffle",
-          "enum": [
-            "Truffle"
-          ]
-        }
-      }
-    },
-    "commands": [
-      {
-        "command": "truffle-vscode.showWelcomePage",
-        "title": "Show Welcome Page",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.refresh",
-        "title": "Refresh",
-        "category": "Blockchain",
-        "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
-        }
-      },
-      {
-        "command": "truffle-contract.copyByteCode",
-        "title": "Copy Constructor Bytecode",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-contract.copyDeployedByteCode",
-        "title": "Copy Transaction Bytecode",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-contract.copyABI",
-        "title": "Copy Contract ABI",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.newSolidityProject",
-        "title": "New Solidity Project",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.buildContracts",
-        "title": "Build Contracts",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.deployContracts",
-        "title": "Deploy Contracts",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.connectProject",
-        "title": "Connect to network",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.copyRPCEndpointAddress",
-        "title": "Copy RPC Endpoint Address",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.createProject",
-        "title": "Create a new network",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.disconnectProject",
-        "title": "Disconnect",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.startGanacheServer",
-        "title": "Start Ganache",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.stopGanacheServer",
-        "title": "Stop Ganache",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.restartGanacheServer",
-        "title": "Restart Ganache",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.signInToInfuraAccount",
-        "title": "Sign in to Infura account",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.signOutOfInfuraAccount",
-        "title": "Sign out of Infura account",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.debugTransaction",
-        "title": "Debug Transaction",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.getPrivateKey",
-        "title": "Retrieve private key",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.openAtAzurePortal",
-        "title": "Open at Azure Portal",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.checkForConnection",
-        "title": "Check network connection",
-        "category": "Blockchain"
-      },      
-      {
-        "command": "truffle-vscode.showWelcomePage",
-        "title": "Show Welcome Page",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.refresh",
-        "title": "Refresh",
-        "category": "Truffle",
-        "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
-        }
-      },
-      {
-        "command": "truffle-contract.copyByteCode",
-        "title": "Copy Constructor Bytecode",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-contract.copyDeployedByteCode",
-        "title": "Copy Transaction Bytecode",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-contract.copyABI",
-        "title": "Copy Contract ABI",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.newSolidityProject",
-        "title": "New Solidity Project",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.buildContracts",
-        "title": "Build Contracts",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.deployContracts",
-        "title": "Deploy Contracts",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.connectProject",
-        "title": "Connect to network",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.copyRPCEndpointAddress",
-        "title": "Copy RPC Endpoint Address",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.createProject",
-        "title": "Create a new network",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.disconnectProject",
-        "title": "Disconnect",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.startGanacheServer",
-        "title": "Start Ganache",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.stopGanacheServer",
-        "title": "Stop Ganache",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.restartGanacheServer",
-        "title": "Restart Ganache",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.signInToInfuraAccount",
-        "title": "Sign in to Infura account",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.signOutOfInfuraAccount",
-        "title": "Sign out of Infura account",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.debugTransaction",
-        "title": "Debug Transaction",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.getPrivateKey",
-        "title": "Retrieve private key",
-        "category": "Truffle"
-      },
-      {
-        "command": "truffle-vscode.openAtAzurePortal",
-        "title": "Open at Azure Portal",
-        "category": "Truffle"
-      }
-    ],
-    "breakpoints": [
-      {
-        "language": "solidity"
-      },
-      {
-        "language": "sol"
-      }
-    ],
-    "menus": {
-      "commandPalette": [
-        {
-          "when": "false",
-          "command": "truffle-vscode.refresh"
-        },
-        {
-          "when": "false",
-          "command": "truffle-vscode.copyRPCEndpointAddress"
-        },
-        {
-          "when": "false",
-          "command": "truffle-vscode.disconnectProject"
-        },
-        {
-          "when": "false",
-          "command": "truffle-contract.copyByteCode"
-        },
-        {
-          "when": "false",
-          "command": "truffle-contract.copyDeployedByteCode"
-        },
-        {
-          "when": "false",
-          "command": "truffle-contract.copyABI"
-        },
-        {
-          "when": "truffle-vscode:isWorkspaceOpen",
-          "command": "truffle-vscode.buildContracts"
-        },
-        {
-          "when": "truffle-vscode:isWorkspaceOpen",
-          "command": "truffle-vscode.deployContracts"
-        },
-        {
-          "when": "false",
-          "command": "truffle-vscode.openAtAzurePortal"
-        }
-      ],
-      "view/title": [
-        {
-          "command": "truffle-vscode.showWelcomePage",
-          "when": "view == truffle-vscode.truffle"
-        },
-        {
-          "command": "truffle-vscode.createProject",
-          "when": "view == truffle-vscode.truffle"
-        },
-        {
-          "command": "truffle-vscode.connectProject",
-          "when": "view == truffle-vscode.truffle"
-        },
-        {
-          "command": "truffle-vscode.refresh",
-          "when": "view == truffle-vscode.truffle",
-          "group": "navigation"
-        }
-      ],
-      "view/item/context": [
-        {
-          "command": "truffle-vscode.disconnectProject",
-          "when": "view == truffle-vscode.truffle && viewItem == project",
-          "group": "truffle-0@0"
-        },
-        {
-          "command": "truffle-vscode.startGanacheServer",
-          "when": "view == truffle-vscode.truffle && viewItem == localproject",
-          "group": "truffle-1@0"
-        },
-        {
-          "command": "truffle-vscode.stopGanacheServer",
-          "when": "view == truffle-vscode.truffle && viewItem == localproject",
-          "group": "truffle-1@1"
-        },
-        {
-          "command": "truffle-vscode.restartGanacheServer",
-          "when": "view == truffle-vscode.truffle && viewItem == localproject",
-          "group": "truffle-1@2"
-        },
-        {
-          "command": "truffle-vscode.disconnectProject",
-          "when": "view == truffle-vscode.truffle && viewItem == localproject",
-          "group": "truffle-0@0"
-        },
-        {
-          "command": "truffle-vscode.disconnectProject",
-          "when": "view == truffle-vscode.truffle && viewItem == bdmproject",
-          "group": "truffle-0@0"
-        },       
-        {
-          "command": "truffle-vscode.copyRPCEndpointAddress",
-          "when": "view == truffle-vscode.truffle && viewItem == network",
-          "group": "truffle-0@0"
-        },
-        {
-          "command": "truffle-vscode.copyRPCEndpointAddress",
-          "when": "view == truffle-vscode.truffle && viewItem == localnetwork",
-          "group": "truffle-0@0"
-        },
-        {
-          "command": "truffle-vscode.openAtAzurePortal",
-          "when": "view == truffle-vscode.truffle && viewItem == input",
-          "group": "truffle-0@0"
-        },
-        {
-          "command": "truffle-vscode.openAtAzurePortal",
-          "when": "view == truffle-vscode.truffle && viewItem == output",
-          "group": "truffle-0@0"
-        },
-        {
-          "command": "truffle-vscode.disconnectProject",
-          "when": "view == truffle-vscode.truffle && viewItem == genericproject",
-          "group": "truffle-0@0"
-        },    
-        {
-          "command": "truffle-vscode.checkForConnection",
-          "when": "view == truffle-vscode.truffle && viewItem == genericproject",
-          "group": "truffle-1@0"
-        }
-      ],
-      "explorer/context": [
-        {
-          "when": "resourceLangId == solidity",
-          "command": "truffle-vscode.buildContracts",
-          "group": "8_buildContractGroup"
-        },
-        {
-          "when": "resourceLangId == json",
-          "command": "truffle-vscode.deployContracts",
-          "group": "8_buildContractGroup"
-        },
-        {
-          "when": "resourceLangId == solidity",
-          "command": "truffle-vscode.deployContracts",
-          "group": "8_buildContractGroup"
-        },
-        {
-          "when": "resourceLangId == json",
-          "command": "truffle-contract.copyByteCode",
-          "group": "9_copyFromContractGroup"
-        },
-        {
-          "when": "resourceLangId == json",
-          "command": "truffle-contract.copyDeployedByteCode",
-          "group": "9_copyFromContractGroup"
-        },
-        {
-          "when": "resourceLangId == json",
-          "command": "truffle-contract.copyABI",
-          "group": "9_copyFromContractGroup"
-        }
-      ]
-    },
-    "views": {
-      "explorer": [
-        {
-          "id": "truffle-vscode.truffle",
-          "name": "Truffle - Networks"
-        }
-      ],
-      "debug": [
-        {
-          "id": "truffle-vscode.InstructionView",
-          "name": "Truffle - Instructions"
-        }
-      ]
-    },
-    "debuggers": [
-      {
-        "type": "truffle",
-        "label": "Truffle - Debugger",
-        "program": "./out/src/debugger.js",
-        "runtime": "node",
-        "configurationAttributes": {
-          "launch": {
-            "required": [],
-            "properties": {
-              "stopOnEntry": {
-                "type": "boolean",
-                "description": "Automatically stop after launch.",
-                "default": true
-              },
-              "trace": {
-                "type": "boolean",
-                "description": "Enable logging of the Debug Adapter Protocol.",
-                "default": true
-              },
-              "txHash": {
-                "type": "string",
-                "description": "Transaction hash to debug",
-                "default": "0x"
-              },
-              "files": {
-                "type": "string[]",
-                "description": "Array of file paths of solidity files to debug",
-                "default": []
-              },
-              "workingDirectory": {
-                "type": "string",
-                "description": "Directory of truffle project",
-                "default": "${workspaceFolder}"
-              },
-              "providerUrl": {
-                "type": "string",
-                "description": "URL of provider",
-                "default": "http://127.0.0.1:8545"
-              }
-            }
-          }
-        },
-        "initialConfigurations": [
-          {
-            "type": "truffle",
-            "request": "launch",
-            "name": "Truffle - Debug Transaction",
-            "stopOnEntry": false,
-            "txHash": "0x",
-            "files": [],
-            "workingDirectory": "${workspaceFolder}",
-            "providerUrl": "http://127.0.0.1:8545"
-          }
-        ],
-        "configurationSnippets": [
-          {
-            "label": "Truffle - Debugger Launch",
-            "description": "Runs the Truffle debugger (truffle) and attaches to a TestRPC instance",
-            "body": {
-              "type": "truffle",
-              "request": "launch",
-              "name": "Debug Transaction with Truffle",
-              "stopOnEntry": false,
-              "txHash": "0x",
-              "files": [],
-              "workingDirectory": "^\"\\${workspaceFolder}/",
-              "providerUrl": "http://127.0.0.1:8545"
-            }
-          }
-        ],
-        "variables": {}
-      }
-    ]
-  },
-  "scripts": {
-    "package": "npx vsce package",
-    "publish": "npx vsce publish",
-    "vscode:prepublish": "npm i && npm run webpack:prod",
-    "compile": "npm run clean && tsc -p ./",
-    "compile:webpack": "npm run clean && tsc -p ./ && npm run webpack:dev",
-    "webpack:dev": "webpack --config webpack.dev.js",
-    "webpack:prod": "webpack --config webpack.prod.js",
-    "watch:webpack": "webpack --watch --config webpack.dev.js",
-    "copyFiles": "copyfiles -V -f ./src/debugAdapter/web3ProviderResolver.js ./src/helpers/checkTruffleConfigTemplate.js ./out/src/ ",
-    "watch:tsc": "tsc-watch --onCompilationComplete \"npm run copyFiles\" ",
-    "watch": "npm run watch:tsc",
-    "prettier:fix": "prettier --write .",
-    "eslint": "eslint -c .eslintrc.js --ext .ts src/**/*.ts test/**/*.ts",
-    "version": "tsc -v",
-    "test": "npm run compile && node ./out/test/runTest",
-    "clean": "npx rimraf -- ./out/*"
-  },
-  "devDependencies": {
-    "@types/big.js": "^6.1.2",
-    "@types/copy-webpack-plugin": "^8.0.1",
-    "@types/download": "^6.2.4",
-    "@types/estree": "^0.0.39",
-    "@types/fs-extra": "^7.0.0",
-    "@types/glob": "^7.1.1",
-    "@types/hdkey": "^0.7.0",
-    "@types/istanbul": "^0.4.30",
-    "@types/lodash": "4.14.178",
-    "@types/mocha": "^5.2.7",
-    "@types/request": "^2.48.1",
-    "@types/request-promise": "^4.1.44",
-    "@types/rewire": "^2.5.28",
-    "@types/semver": "^6.0.0",
-    "@types/sinon": "^7.0.11",
-    "@types/source-map": "^0.5.2",
-    "@types/uuid": "^3.4.4",
-    "@types/vscode": "1.39.0",
-    "@typescript-eslint/eslint-plugin": "^5.3.1",
-    "@typescript-eslint/parser": "^5.3.1",
-    "copyfiles": "^2.4.1",
-    "copy-webpack-plugin": "^10.0.0",
-    "decache": "^4.5.1",
-    "eslint": "^8.2.0",
-    "eslint-config-prettier": "8.3.0",
-    "eslint-plugin-import": "^2.25.3",
-    "eslint-plugin-jsdoc": "^37.0.3",
-    "eslint-plugin-prefer-arrow": "^1.2.3",
-    "eslint-plugin-prettier": "^4.0.0",
-    "glob": "^7.1.4",
-    "husky": "^2.4.0",
-    "istanbul": "^0.4.5",
-    "lint-staged": "^8.2.0",
-    "mocha": "^6.2.0",
-    "prettier": "2.4.1",
-    "remap-istanbul": "^0.13.0",
-    "rewire": "^4.0.1",
-    "sinon": "^7.3.2",
-    "truffle": "^5.4.22",
-    "ts-loader": "7.0.2",
-    "tsc-watch": "^4.5.0",
-    "typescript": "3.8.3",
-    "vscode-debugadapter": "^1.33.0",
-    "vscode-debugprotocol": "^1.33.0",
-    "vscode-test": "^1.2.0",
-    "webpack": "5.64.4",
-    "webpack-cli": "4.9.1",
-    "webpack-merge": "^5.8.0"
-  },
-  "dependencies": {
-    "abi-decoder": "^2.4.0",
-    "acorn": "^6.1.1",
-    "acorn-walk": "^6.1.1",
-    "astring": "^1.7.5",
-    "azure-arm-resource": "^7.3.0",
-    "bip39": "^3.0.1",
-    "download": "^7.1.0",
-    "fs-extra": "^7.0.1",
-    "hdkey": "^1.1.1",
-    "lodash": "4.17.21",
-    "ms-rest": "^2.5.0",
-    "ms-rest-azure": "^2.6.0",
-    "open": "^6.4.0",
-    "request": "^2.88.0",
-    "request-promise": "^4.2.4",
-    "semver": "^6.0.0",
-    "solidity-parser-antlr": "^0.4.11",
-    "@truffle/codec": "^0.12.8",
-    "@truffle/compile-solidity": "^6.0.8",
-    "@truffle/debug-utils": "^6.0.4",
-    "@truffle/debugger": "^10.0.5",
-    "@truffle/resolver": "^8.0.2",
-    "ts-node": "^10.4.0",
-    "uuid": "^3.3.2",
-    "vscode-azureextensionui": "^0.29.12",
-    "vscode-extension-telemetry": "^0.1.1",
-    "web3": "1.5.3"
-  },
-  "extensionDependencies": [
-    "JuanBlanco.solidity",
-    "ms-vscode.azure-account"
-  ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged && npm run compile"
-    }
-  },
-  "lint-staged": {
-    "*.ts": [
-      "eslint -c .eslintrc.js --ext .ts src/**/*.ts test/**/*.ts",
-      "prettier --write",
-      "git add"
-    ]
-  }
+	"name": "truffle-vscode",
+	"displayName": "Truffle for VS Code",
+	"description": "Build, debug and deploy smart contracts on Ethereum and EVM-compatible blockchains.",
+	"publisher": "trufflesuite-csi",
+	"preview": true,
+	"icon": "images/TruffleLogo.png",
+	"version": "2.2.3",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/trufflesuite/vscode-ext"
+	},
+	"bugs": {
+		"url": "https://github.com/trufflesuite/vscode-ext/issues"
+	},
+	"homepage": "https://github.com/trufflesuite/vscode-ext/blob/master/README.md",
+	"license": "MIT",
+	"engines": {
+		"vscode": "^1.63.0"
+	},
+	"keywords": [
+		"blockchain",
+		"solidity",
+		"truffle",
+		"ethereum",
+		"evm",
+		"debugger",
+		"compiler",
+		"ganache",
+		"infura"
+	],
+	"categories": [
+		"Extension Packs",
+		"Programming Languages"
+	],
+	"aiKey": "INSERTAIKEY",
+	"main": "./out/src/extension.js",
+	"activationEvents": [
+		"onView:truffle-vscode.truffle",
+		"onCommand:truffle-vscode.showWelcomePage",
+		"onCommand:truffle-vscode.refresh",
+		"onCommand:truffle-contract.copyByteCode",
+		"onCommand:truffle-contract.copyDeployedByteCode",
+		"onCommand:truffle-contract.copyABI",
+		"onCommand:truffle-vscode.createLocalUI",
+		"onCommand:truffle-vscode.newSolidityProject",
+		"onCommand:truffle-vscode.buildContracts",
+		"onCommand:truffle-vscode.deployContracts",
+		"onCommand:truffle-vscode.connectProject",
+		"onCommand:truffle-vscode.copyRPCEndpointAddress",
+		"onCommand:truffle-vscode.createProject",
+		"onCommand:truffle-vscode.disconnectProject",
+		"onCommand:truffle-vscode.debugTransaction",
+		"onCommand:truffle-vscode.signInToInfuraAccount",
+		"onCommand:truffle-vscode.signOutOfInfuraAccount",
+		"onCommand:truffle-vscode.openAtAzurePortal",
+		"onCommand:truffle-vscode.startGanacheServer",
+		"onCommand:truffle-vscode.stopGanacheServer",
+		"onDebug"
+	],
+	"contributes": {
+		"configuration": {
+			"title": "Truffle for VSCode",
+			"properties": {
+				"truffle-vscode.ignoreLongRunningTaskNotification": {
+					"type": "boolean",
+					"default": false,
+					"description": "Disable notification on long running tasks."
+				},
+				"truffle-vscode.storageAccount.name": {
+					"type": "string",
+					"scope": "Storage Account name"
+				},
+				"truffle-vscode.coreSDK": {
+					"type": "string",
+					"scope": "Core SDK for extensions backend",
+					"default": "Truffle",
+					"enum": [
+						"Truffle"
+					]
+				}
+			}
+		},
+		"commands": [
+			{
+				"command": "truffle-vscode.showWelcomePage",
+				"title": "Show Welcome Page",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.refresh",
+				"title": "Refresh",
+				"category": "Blockchain",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "truffle-contract.copyByteCode",
+				"title": "Copy Constructor Bytecode",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-contract.copyDeployedByteCode",
+				"title": "Copy Transaction Bytecode",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-contract.copyABI",
+				"title": "Copy Contract ABI",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.newSolidityProject",
+				"title": "New Solidity Project",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.buildContracts",
+				"title": "Build Contracts",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.deployContracts",
+				"title": "Deploy Contracts",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.connectProject",
+				"title": "Connect to network",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.copyRPCEndpointAddress",
+				"title": "Copy RPC Endpoint Address",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.createProject",
+				"title": "Create a new network",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.disconnectProject",
+				"title": "Disconnect",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.startGanacheServer",
+				"title": "Start Ganache",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.stopGanacheServer",
+				"title": "Stop Ganache",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.restartGanacheServer",
+				"title": "Restart Ganache",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.signInToInfuraAccount",
+				"title": "Sign in to Infura account",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.signOutOfInfuraAccount",
+				"title": "Sign out of Infura account",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.debugTransaction",
+				"title": "Debug Transaction",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.getPrivateKey",
+				"title": "Retrieve private key",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.openAtAzurePortal",
+				"title": "Open at Azure Portal",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.checkForConnection",
+				"title": "Check network connection",
+				"category": "Blockchain"
+			},
+			{
+				"command": "truffle-vscode.showWelcomePage",
+				"title": "Show Welcome Page",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.refresh",
+				"title": "Refresh",
+				"category": "Truffle",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh.svg"
+				}
+			},
+			{
+				"command": "truffle-contract.copyByteCode",
+				"title": "Copy Constructor Bytecode",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-contract.copyDeployedByteCode",
+				"title": "Copy Transaction Bytecode",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-contract.copyABI",
+				"title": "Copy Contract ABI",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.newSolidityProject",
+				"title": "New Solidity Project",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.buildContracts",
+				"title": "Build Contracts",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.deployContracts",
+				"title": "Deploy Contracts",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.connectProject",
+				"title": "Connect to network",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.copyRPCEndpointAddress",
+				"title": "Copy RPC Endpoint Address",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.createProject",
+				"title": "Create a new network",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.disconnectProject",
+				"title": "Disconnect",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.startGanacheServer",
+				"title": "Start Ganache",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.stopGanacheServer",
+				"title": "Stop Ganache",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.restartGanacheServer",
+				"title": "Restart Ganache",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.signInToInfuraAccount",
+				"title": "Sign in to Infura account",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.signOutOfInfuraAccount",
+				"title": "Sign out of Infura account",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.debugTransaction",
+				"title": "Debug Transaction",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.getPrivateKey",
+				"title": "Retrieve private key",
+				"category": "Truffle"
+			},
+			{
+				"command": "truffle-vscode.openAtAzurePortal",
+				"title": "Open at Azure Portal",
+				"category": "Truffle"
+			}
+		],
+		"breakpoints": [
+			{
+				"language": "solidity"
+			},
+			{
+				"language": "sol"
+			}
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"when": "false",
+					"command": "truffle-vscode.refresh"
+				},
+				{
+					"when": "false",
+					"command": "truffle-vscode.copyRPCEndpointAddress"
+				},
+				{
+					"when": "false",
+					"command": "truffle-vscode.disconnectProject"
+				},
+				{
+					"when": "false",
+					"command": "truffle-contract.copyByteCode"
+				},
+				{
+					"when": "false",
+					"command": "truffle-contract.copyDeployedByteCode"
+				},
+				{
+					"when": "false",
+					"command": "truffle-contract.copyABI"
+				},
+				{
+					"when": "truffle-vscode:isWorkspaceOpen",
+					"command": "truffle-vscode.buildContracts"
+				},
+				{
+					"when": "truffle-vscode:isWorkspaceOpen",
+					"command": "truffle-vscode.deployContracts"
+				},
+				{
+					"when": "false",
+					"command": "truffle-vscode.openAtAzurePortal"
+				}
+			],
+			"view/title": [
+				{
+					"command": "truffle-vscode.showWelcomePage",
+					"when": "view == truffle-vscode.truffle"
+				},
+				{
+					"command": "truffle-vscode.createProject",
+					"when": "view == truffle-vscode.truffle"
+				},
+				{
+					"command": "truffle-vscode.connectProject",
+					"when": "view == truffle-vscode.truffle"
+				},
+				{
+					"command": "truffle-vscode.refresh",
+					"when": "view == truffle-vscode.truffle",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "truffle-vscode.disconnectProject",
+					"when": "view == truffle-vscode.truffle && viewItem == project",
+					"group": "truffle-0@0"
+				},
+				{
+					"command": "truffle-vscode.startGanacheServer",
+					"when": "view == truffle-vscode.truffle && viewItem == localproject",
+					"group": "truffle-1@0"
+				},
+				{
+					"command": "truffle-vscode.stopGanacheServer",
+					"when": "view == truffle-vscode.truffle && viewItem == localproject",
+					"group": "truffle-1@1"
+				},
+				{
+					"command": "truffle-vscode.restartGanacheServer",
+					"when": "view == truffle-vscode.truffle && viewItem == localproject",
+					"group": "truffle-1@2"
+				},
+				{
+					"command": "truffle-vscode.disconnectProject",
+					"when": "view == truffle-vscode.truffle && viewItem == localproject",
+					"group": "truffle-0@0"
+				},
+				{
+					"command": "truffle-vscode.disconnectProject",
+					"when": "view == truffle-vscode.truffle && viewItem == bdmproject",
+					"group": "truffle-0@0"
+				},
+				{
+					"command": "truffle-vscode.copyRPCEndpointAddress",
+					"when": "view == truffle-vscode.truffle && viewItem == network",
+					"group": "truffle-0@0"
+				},
+				{
+					"command": "truffle-vscode.copyRPCEndpointAddress",
+					"when": "view == truffle-vscode.truffle && viewItem == localnetwork",
+					"group": "truffle-0@0"
+				},
+				{
+					"command": "truffle-vscode.openAtAzurePortal",
+					"when": "view == truffle-vscode.truffle && viewItem == input",
+					"group": "truffle-0@0"
+				},
+				{
+					"command": "truffle-vscode.openAtAzurePortal",
+					"when": "view == truffle-vscode.truffle && viewItem == output",
+					"group": "truffle-0@0"
+				},
+				{
+					"command": "truffle-vscode.disconnectProject",
+					"when": "view == truffle-vscode.truffle && viewItem == genericproject",
+					"group": "truffle-0@0"
+				},
+				{
+					"command": "truffle-vscode.checkForConnection",
+					"when": "view == truffle-vscode.truffle && viewItem == genericproject",
+					"group": "truffle-1@0"
+				}
+			],
+			"explorer/context": [
+				{
+					"when": "resourceLangId == solidity",
+					"command": "truffle-vscode.buildContracts",
+					"group": "8_buildContractGroup"
+				},
+				{
+					"when": "resourceLangId == json",
+					"command": "truffle-vscode.deployContracts",
+					"group": "8_buildContractGroup"
+				},
+				{
+					"when": "resourceLangId == solidity",
+					"command": "truffle-vscode.deployContracts",
+					"group": "8_buildContractGroup"
+				},
+				{
+					"when": "resourceLangId == json",
+					"command": "truffle-contract.copyByteCode",
+					"group": "9_copyFromContractGroup"
+				},
+				{
+					"when": "resourceLangId == json",
+					"command": "truffle-contract.copyDeployedByteCode",
+					"group": "9_copyFromContractGroup"
+				},
+				{
+					"when": "resourceLangId == json",
+					"command": "truffle-contract.copyABI",
+					"group": "9_copyFromContractGroup"
+				}
+			]
+		},
+		"views": {
+			"explorer": [
+				{
+					"id": "truffle-vscode.truffle",
+					"name": "Truffle - Networks"
+				}
+			],
+			"debug": [
+				{
+					"id": "truffle-vscode.InstructionView",
+					"name": "Truffle - Instructions"
+				}
+			]
+		},
+		"debuggers": [
+			{
+				"type": "truffle",
+				"label": "Truffle - Debugger",
+				"program": "./out/src/debugger.js",
+				"runtime": "node",
+				"configurationAttributes": {
+					"launch": {
+						"required": [],
+						"properties": {
+							"stopOnEntry": {
+								"type": "boolean",
+								"description": "Automatically stop after launch.",
+								"default": true
+							},
+							"trace": {
+								"type": "boolean",
+								"description": "Enable logging of the Debug Adapter Protocol.",
+								"default": true
+							},
+							"txHash": {
+								"type": "string",
+								"description": "Transaction hash to debug",
+								"default": "0x"
+							},
+							"files": {
+								"type": "string[]",
+								"description": "Array of file paths of solidity files to debug",
+								"default": []
+							},
+							"workingDirectory": {
+								"type": "string",
+								"description": "Directory of truffle project",
+								"default": "${workspaceFolder}"
+							},
+							"providerUrl": {
+								"type": "string",
+								"description": "URL of provider",
+								"default": "http://127.0.0.1:8545"
+							}
+						}
+					}
+				},
+				"initialConfigurations": [
+					{
+						"type": "truffle",
+						"request": "launch",
+						"name": "Truffle - Debug Transaction",
+						"stopOnEntry": false,
+						"txHash": "0x",
+						"files": [],
+						"workingDirectory": "${workspaceFolder}",
+						"providerUrl": "http://127.0.0.1:8545"
+					}
+				],
+				"configurationSnippets": [
+					{
+						"label": "Truffle - Debugger Launch",
+						"description": "Runs the Truffle debugger (truffle) and attaches to a TestRPC instance",
+						"body": {
+							"type": "truffle",
+							"request": "launch",
+							"name": "Debug Transaction with Truffle",
+							"stopOnEntry": false,
+							"txHash": "0x",
+							"files": [],
+							"workingDirectory": "^\"\\${workspaceFolder}/",
+							"providerUrl": "http://127.0.0.1:8545"
+						}
+					}
+				],
+				"variables": {}
+			}
+		]
+	},
+	"scripts": {
+		"package": "npx vsce package",
+		"publish": "npx vsce publish",
+		"vscode:prepublish": "npm i && npm run webpack:prod",
+		"compile": "npm run clean && tsc -p ./",
+		"compile:webpack": "npm run clean && tsc -p ./ && npm run webpack:dev",
+		"webpack:dev": "webpack --config webpack.dev.js",
+		"webpack:prod": "webpack --config webpack.prod.js",
+		"watch:webpack": "webpack --watch --config webpack.dev.js",
+		"copyFiles": "copyfiles -V -f ./src/debugAdapter/web3ProviderResolver.js ./src/helpers/checkTruffleConfigTemplate.js ./out/src/ ",
+		"watch:tsc": "tsc-watch --onCompilationComplete \"npm run copyFiles\" ",
+		"watch": "npm run watch:tsc",
+		"prettier:fix": "prettier --write .",
+		"eslint": "eslint -c .eslintrc.js --ext .ts src/**/*.ts test/**/*.ts",
+		"version": "tsc -v",
+		"test": "npm run compile && node ./out/test/runTest",
+		"clean": "npx rimraf -- ./out/*"
+	},
+	"devDependencies": {
+		"@types/big.js": "^6.1.2",
+		"@types/copy-webpack-plugin": "^8.0.1",
+		"@types/download": "^6.2.4",
+		"@types/estree": "^0.0.39",
+		"@types/fs-extra": "^7.0.0",
+		"@types/glob": "^7.1.1",
+		"@types/hdkey": "^0.7.0",
+		"@types/istanbul": "^0.4.30",
+		"@types/lodash": "4.14.178",
+		"@types/mocha": "^5.2.7",
+		"@types/request": "^2.48.1",
+		"@types/request-promise": "^4.1.44",
+		"@types/rewire": "^2.5.28",
+		"@types/semver": "^6.0.0",
+		"@types/sinon": "^7.0.11",
+		"@types/source-map": "^0.5.2",
+		"@types/uuid": "^3.4.4",
+		"@types/vscode": "1.39.0",
+		"@typescript-eslint/eslint-plugin": "^5.3.1",
+		"@typescript-eslint/parser": "^5.3.1",
+		"copyfiles": "^2.4.1",
+		"copy-webpack-plugin": "^10.0.0",
+		"decache": "^4.5.1",
+		"eslint": "^8.2.0",
+		"eslint-config-prettier": "8.3.0",
+		"eslint-plugin-import": "^2.25.3",
+		"eslint-plugin-jsdoc": "^37.0.3",
+		"eslint-plugin-prefer-arrow": "^1.2.3",
+		"eslint-plugin-prettier": "^4.0.0",
+		"glob": "^7.1.4",
+		"husky": "^2.4.0",
+		"istanbul": "^0.4.5",
+		"lint-staged": "^8.2.0",
+		"mocha": "^6.2.0",
+		"prettier": "2.4.1",
+		"remap-istanbul": "^0.13.0",
+		"rewire": "^4.0.1",
+		"sinon": "^7.3.2",
+		"truffle": "^5.4.22",
+		"ts-loader": "7.0.2",
+		"tsc-watch": "^4.5.0",
+		"typescript": "3.8.3",
+		"vscode-debugadapter": "^1.33.0",
+		"vscode-debugprotocol": "^1.33.0",
+		"vscode-test": "^1.2.0",
+		"webpack": "5.64.4",
+		"webpack-cli": "4.9.1",
+		"webpack-merge": "^5.8.0"
+	},
+	"dependencies": {
+		"abi-decoder": "^2.4.0",
+		"acorn": "^6.1.1",
+		"acorn-walk": "^6.1.1",
+		"astring": "^1.7.5",
+		"azure-arm-resource": "^7.3.0",
+		"bip39": "^3.0.1",
+		"download": "^7.1.0",
+		"fs-extra": "^7.0.1",
+		"hdkey": "^1.1.1",
+		"lodash": "4.17.21",
+		"ms-rest": "^2.5.0",
+		"ms-rest-azure": "^2.6.0",
+		"open": "^6.4.0",
+		"request": "^2.88.0",
+		"request-promise": "^4.2.4",
+		"semver": "^6.0.0",
+		"solidity-parser-antlr": "^0.4.11",
+		"@truffle/codec": "^0.12.8",
+		"@truffle/compile-solidity": "^6.0.8",
+		"@truffle/debug-utils": "^6.0.4",
+		"@truffle/debugger": "^10.0.5",
+		"@truffle/resolver": "^8.0.2",
+		"ts-node": "^10.4.0",
+		"uuid": "^3.3.2",
+		"vscode-azureextensionui": "^0.29.12",
+		"vscode-extension-telemetry": "^0.1.1",
+		"web3": "1.5.3"
+	},
+	"extensionDependencies": [
+		"JuanBlanco.solidity",
+		"ms-vscode.azure-account"
+	],
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged && npm run compile"
+		}
+	},
+	"lint-staged": {
+		"*.ts": [
+			"eslint -c .eslintrc.js --ext .ts src/**/*.ts test/**/*.ts",
+			"prettier --write",
+			"git add"
+		]
+	},
+	"__metadata": {
+		"id": "6b46df02-0a05-4fe7-a214-48530cdace4e",
+		"publisherDisplayName": "ConsenSys Software Inc.",
+		"publisherId": "0e0a6137-fd21-4312-b0f5-ff30c8d7a457",
+		"isPreReleaseVersion": false
+	}
 }
