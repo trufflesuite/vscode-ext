@@ -21,15 +21,9 @@ export namespace GenericCommands {
     }
 
     const project: GenericProject = projectView?.extensionItem as GenericProject;
-    const clientVersion: string = await GenericService.getClientVersion(project.port);
+    project.description = await GenericService.getClientVersion(project.port);
 
-    if (clientVersion.length === 0) {
-      project.description = Constants.genericCommandStrings.serverNotFound;
-      window.showErrorMessage(Constants.genericCommandStrings.serverNoAvailable);
-    } else {
-      project.description = clientVersion;
-      window.showInformationMessage(Constants.genericCommandStrings.serverRunning);
-    }
+    window.showInformationMessage(Constants.genericCommandStrings.serverRunning);
 
     TreeManager.saveState();
     await commands.executeCommand("truffle-vscode.refresh");

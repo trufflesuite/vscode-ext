@@ -18,10 +18,10 @@ export class GenericProjectItemCreator extends ItemCreator {
   }
 
   protected getAdditionalConstructorArguments(obj: {[key: string]: any}): any[] {
-    return [obj.label, obj.port];
+    return [obj.label, obj.port, obj.description];
   }
 
-  protected createFromObject(label: string, port: number): GenericProject {
-    return new GenericProject(label, port);
+  protected createFromObject(label: string, port: number, description?: string): GenericProject {
+    return new GenericProject(label, port, description);
   }
 }

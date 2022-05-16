@@ -10,8 +10,8 @@ import {Project} from "./Project";
 export class GenericProject extends Project {
   public readonly port: number;
 
-  constructor(label: string, port: number) {
-    super(ItemType.GENERIC_PROJECT, label, Constants.treeItemData.project.generic);
+  constructor(label: string, port: number, description?: string) {
+    super(ItemType.GENERIC_PROJECT, label, Constants.treeItemData.project.generic, description);
 
     this.port = port;
   }

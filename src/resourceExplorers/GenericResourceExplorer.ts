@@ -19,7 +19,7 @@ export class GenericResourceExplorer {
       Constants.validationMessages.portNotInUseGeneric
     );
 
-    // await GanacheService.startGanacheServer(localProject.port);
+    genericProject.description = await GenericService.getClientVersion(genericProject.port);
 
     return genericProject;
   }

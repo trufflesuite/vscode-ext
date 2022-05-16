@@ -593,7 +593,7 @@ export class Constants {
   };
 
   public static genericCommandStrings = {
-    invalidPort: "Cannot check for connection. Invalid port",
+    invalidPort: "Unable to verify connection. Invalid port",
     portIsBusy: "Cannot start ganache server, port is busy",
     serverNoAvailable: "No network settings available",
     serverRunning: "Server is running",
