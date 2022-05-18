@@ -161,7 +161,7 @@ class InfuraClient {
   }
 
   private async receiveProjects(): Promise<IProjectsResultDto> {
-    const url = new URL(Constants.infuraMockAPIUrls.projects, Constants.infuraMockAPIUrls.rootURL).toString();
+    const url = new URL(Constants.infuraAPIUrls.projects, Constants.infuraAPIUrls.rootURL).toString();
     const params = {
       method: "GET",
       url,
