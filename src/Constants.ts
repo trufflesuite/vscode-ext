@@ -295,6 +295,20 @@ export class Constants {
         iconPath: {dark: "", light: ""},
       },
     },
+    layer: {
+      infura: {
+        contextValue: "layer",
+        iconPath: {dark: "", light: ""},
+        layerOne: {
+          label: "Layer One",
+          value: 1,
+        },
+        layerTwo: {
+          label: "Layer Two",
+          value: 2,
+        },
+      },
+    },
     project: {
       azure: {
         contextValue: "project",
@@ -508,6 +522,16 @@ export class Constants {
     mainnet: 1,
     rinkeby: 4,
     ropsten: 3,
+    "arbitrum-mainnet": 42161,
+    "arbitrum-rinkeby": 421611,
+    "aurora-mainnet": 1313161554,
+    "aurora-testnet": 1313161555,
+    "near-mainnet": 0,
+    "near-testnet": 0,
+    "optimism-kovan": 69,
+    "optimism-mainnet": 10,
+    "polygon-mainnet": 137,
+    "polygon-mumbai": 80001,
   };
 
   public static projectAvailability = {
@@ -694,6 +718,12 @@ export class Constants {
     userMe: "user/me",
   };
 
+  public static infuraMockAPIUrls = {
+    projects: "xhulz/json-server/db",
+    rootURL: "https://my-json-server.typicode.com/",
+    userMe: "user/me",
+  };
+
   public static infuraSigningIn = "Signing in";
 
   public static infuraRequestGrantType = {
@@ -873,6 +903,11 @@ export class Constants {
     this.treeItemData.service.local.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "LocalService.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "LocalService.svg")),
+    };
+
+    this.treeItemData.layer.infura.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "InfuraLayer.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "InfuraLayer.svg")),
     };
   }
 

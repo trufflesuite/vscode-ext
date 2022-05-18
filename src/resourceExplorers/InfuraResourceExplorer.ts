@@ -1,14 +1,15 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { QuickPickItem, window } from "vscode";
-import { Constants } from "../Constants";
-import { showInputBox, showQuickPick } from "../helpers";
-import { InfuraProjectItem } from "../Models/QuickPickItems";
-import { InfuraNetworkNode, InfuraProject } from "../Models/TreeItems";
-import { IInfuraEndpointDto, IInfuraProjectDto, IInfuraProjectQuickPick } from "../services/infuraService/InfuraDto";
-import { InfuraServiceClient } from "../services/infuraService/InfuraServiceClient";
-import { Telemetry } from "../TelemetryClient";
+import {QuickPickItem, window} from "vscode";
+import {Constants} from "../Constants";
+import {showInputBox, showQuickPick} from "../helpers";
+import {InfuraProjectItem} from "../Models/QuickPickItems";
+import {InfuraNetworkNode, InfuraProject} from "../Models/TreeItems";
+import {InfuraLayer} from "../Models/TreeItems/InfuraLayer";
+import {IInfuraEndpointDto, IInfuraProjectDto, IInfuraProjectQuickPick} from "../services/infuraService/InfuraDto";
+import {InfuraServiceClient} from "../services/infuraService/InfuraServiceClient";
+import {Telemetry} from "../TelemetryClient";
 
 export class InfuraResourceExplorer {
   public async createProject(existingProjects: string[] = []): Promise<InfuraProject> {
@@ -57,7 +58,7 @@ export class InfuraResourceExplorer {
   }
 
   private async getProjectDestinations(existingProjectIds: string[]): Promise<QuickPickItem[]> {
-    const createInfuraProjectItem: QuickPickItem = { label: Constants.uiCommandStrings.createInfuraProject };
+    const createInfuraProjectItem: QuickPickItem = {label: Constants.uiCommandStrings.createInfuraProject};
     const infuraProjectItems = await this.loadInfuraProjectItems(existingProjectIds);
 
     return [createInfuraProjectItem, ...infuraProjectItems];
@@ -116,7 +117,7 @@ export class InfuraResourceExplorer {
 
   private async getProjectAvailability(): Promise<boolean> {
     const answer = await showQuickPick(
-      [{ label: Constants.projectAvailability.public }, { label: Constants.projectAvailability.private }],
+      [{label: Constants.projectAvailability.public}, {label: Constants.projectAvailability.private}],
       {
         ignoreFocusOut: true,
         placeHolder: `${Constants.placeholders.selectInfuraProjectAvailability}.`,
@@ -131,16 +132,38 @@ export class InfuraResourceExplorer {
     projectId: string,
     endpoints: IInfuraEndpointDto
   ): Promise<InfuraProject> {
-    const infuraNetworkNodes: InfuraNetworkNode[] = [];
+    const infuraProject = new InfuraProject(projectName, projectId);
+    const infuraNetworkNodesLayerOne: InfuraNetworkNode[] = [];
+    const infuraNetworkNodesLayerTwo: InfuraNetworkNode[] = [];
+    const layers = {
+      [Constants.treeItemData.layer.infura.layerOne.value]: (
+        label: string,
+        url: string | URL,
+        networkId: string | number
+      ) => infuraNetworkNodesLayerOne.push(new InfuraNetworkNode(label, url, networkId)),
+      [Constants.treeItemData.layer.infura.layerTwo.value]: (
+        label: string,
+        url: string | URL,
+        networkId: string | number
+      ) => infuraNetworkNodesLayerTwo.push(new InfuraNetworkNode(label, url, networkId)),
+    };
+
+    let layer: number = Constants.treeItemData.layer.infura.layerOne.value;
 
     for (const [key, value] of Object.entries(endpoints)) {
-      infuraNetworkNodes.push(new InfuraNetworkNode(key, value.https, Constants.infuraEndpointsIds[key]));
+      layer = value.layer ? value.layer : layer;
+      layers[layer](key, value.https, Constants.infuraEndpointsIds[key]);
     }
 
-    const infuraProject = new InfuraProject(projectName, projectId);
-    infuraProject.setChildren(
-      infuraNetworkNodes.sort((first, second) => (first.networkId as number) - (second.networkId as number))
-    );
+    const InfuraLayerOne = new InfuraLayer(Constants.treeItemData.layer.infura.layerOne.label);
+    infuraProject.addChild(InfuraLayerOne);
+    InfuraLayerOne.setChildren(infuraNetworkNodesLayerOne);
+
+    if (infuraNetworkNodesLayerTwo.length > 0) {
+      const InfuraLayerTwo = new InfuraLayer(Constants.treeItemData.layer.infura.layerTwo.label);
+      infuraProject.addChild(InfuraLayerTwo);
+      InfuraLayerTwo.setChildren(infuraNetworkNodesLayerTwo);
+    }
 
     return infuraProject;
   }

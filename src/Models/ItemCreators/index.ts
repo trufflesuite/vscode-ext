@@ -17,3 +17,4 @@ export * from "./LocalProjectItemCreator";
 export * from "./LocalServiceItemCreator";
 export * from "./MemberItemCreator";
 export * from "./NullableItemCreator";
+export * from "./InfuraLayerItemCreator";
