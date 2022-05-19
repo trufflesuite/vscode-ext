@@ -54,7 +54,6 @@
     "onCommand:truffle-vscode.debugTransaction",
     "onCommand:truffle-vscode.signInToInfuraAccount",
     "onCommand:truffle-vscode.signOutOfInfuraAccount",
-    "onCommand:truffle-vscode.openAtAzurePortal",
     "onCommand:truffle-vscode.startGanacheServer",
     "onCommand:truffle-vscode.stopGanacheServer",
     "onDebug"
@@ -183,11 +182,6 @@
         "category": "Blockchain"
       },
       {
-        "command": "truffle-vscode.openAtAzurePortal",
-        "title": "Open at Azure Portal",
-        "category": "Blockchain"
-      },
-      {
         "command": "truffle-vscode.showWelcomePage",
         "title": "Show Welcome Page",
         "category": "Truffle"
@@ -287,46 +281,17 @@
         "category": "Truffle"
       },
       {
-        "command": "truffle-vscode.openAtAzurePortal",
-        "title": "Open at Azure Portal",
-        "category": "Truffle"
-      },
-      {
-        "command": "nodeDependencies.refreshEntry",
-        "title": "Refresh",
+        "command": "truffle-vscode.views.explorer.refreshExplorer",
+        "title": "Refresh Explorer",
         "icon": {
           "light": "resources/light/refresh.svg",
           "dark": "resources/dark/refresh.svg"
         }
       },
       {
-        "command": "nodeDependencies.addEntry",
-        "title": "Add"
-      },
-      {
-        "command": "nodeDependencies.editEntry",
-        "title": "Edit",
-        "icon": {
-          "light": "resources/light/edit.svg",
-          "dark": "resources/dark/edit.svg"
-        }
-      },
-      {
-        "command": "nodeDependencies.deleteEntry",
-        "title": "Delete"
-      },
-      {
-				"command": "truffle-vscode.explorer-view.refreshFile",
-				"title": "Refresh",
-				"icon": {
-					"light": "resources/light/refresh.svg",
-					"dark": "resources/dark/refresh.svg"
-				}
-			},
-      {
-				"command": "truffle-vscode.explorer-view.openFile",
-				"title": "Open File"
-			}
+        "command": "truffle-vscode.views.explorer.openFile",
+        "title": "Open File"
+      }
     ],
     "breakpoints": [
       {
@@ -369,10 +334,6 @@
         {
           "when": "truffle-vscode:isWorkspaceOpen",
           "command": "truffle-vscode.deployContracts"
-        },
-        {
-          "when": "false",
-          "command": "truffle-vscode.openAtAzurePortal"
         }
       ],
       "view/title": [
@@ -394,13 +355,9 @@
           "group": "navigation"
         },
         {
-          "command": "nodeDependencies.refreshEntry",
-          "when": "view == nodeDependencies",
+          "command": "truffle-vscode.views.explorer.refreshExplorer",
+          "when": "view == truffle-vscode.views.explorer",
           "group": "navigation"
-        },
-        {
-          "command": "nodeDependencies.addEntry",
-          "when": "view == nodeDependencies"
         }
       ],
       "view/item/context": [
@@ -443,31 +400,7 @@
           "command": "truffle-vscode.copyRPCEndpointAddress",
           "when": "view == truffle-vscode.truffle && viewItem == localnetwork",
           "group": "truffle-0@0"
-        },
-        {
-          "command": "truffle-vscode.openAtAzurePortal",
-          "when": "view == truffle-vscode.truffle && viewItem == input",
-          "group": "truffle-0@0"
-        },
-        {
-          "command": "truffle-vscode.openAtAzurePortal",
-          "when": "view == truffle-vscode.truffle && viewItem == output",
-          "group": "truffle-0@0"
-        },
-        {
-          "command": "nodeDependencies.editEntry",
-          "when": "view == nodeDependencies && viewItem == dependency",
-          "group": "inline"
-        },
-        {
-          "command": "nodeDependencies.deleteEntry",
-          "when": "view == nodeDependencies && viewItem == dependency"
-        },
-        {
-					"command": "truffle-vscode.explorer-view.refreshFile",
-					"when": "view == truffle-vscode.explorer-view && viewItem == file",
-					"group": "inline"
-				}
+        }
       ],
       "explorer/context": [
         {
@@ -502,12 +435,22 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "truffle-vscode.views.explorer",
+        "contents": "In order to use truffle features, you can open a folder containing a truffle project with a `contracts` folder present.\n[Open Folder](command:vscode.openFolder)\n[Clone Repository](command:git.clone)\nTo learn more about how to create a Truffle project [read our docs](https://trufflesuite.com/docs/vscode-ext/quickstart/#create-a-new-solidity-contract)."
+      },
+      {
+        "view": "truffle-vscode.views.deployments",
+        "contents": "Deployed contracts will appear here."
+      }
+    ],
     "views": {
       "truffle-activitybar-container": [
         {
-					"id": "truffle-vscode.views.explorer",
-					"name": "Explorer"
-				},
+          "id": "truffle-vscode.views.explorer",
+          "name": "Explorer - Truffle"
+        },
         {
           "id": "truffle-vscode.truffle",
           "name": "Networks",
@@ -518,15 +461,12 @@
           "name": "Deployments"
         },
         {
-          "id": "truffle-vscode.views.libraries",
-          "name": "Libraries"
-        },
-        {
           "id": "truffle-vscode.views.help",
           "name": "Help & Feedback",
           "contextualTitle": "Help & Feedback section"
         }
       ],
+
       "debug": [
         {
           "id": "truffle-vscode.InstructionView",
@@ -699,16 +639,12 @@
     "acorn": "^6.1.1",
     "acorn-walk": "^6.1.1",
     "astring": "^1.7.5",
-    "@azure/arm-resources": "^5.0.1",
-    "@azure/arm-resources-subscriptions": "^2.0.1",
     "bip39": "^3.0.1",
     "download": "^7.1.0",
     "fs-extra": "^7.0.1",
     "hdkey": "^1.1.1",
     "lodash": "4.17.21",
     "mkdirp": "^1.0.4",
-    "ms-rest": "^2.5.0",
-    "ms-rest-azure": "^2.6.0",
     "open": "^6.4.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
@@ -721,8 +657,7 @@
     "web3": "1.7.3"
   },
   "extensionDependencies": [
-    "JuanBlanco.solidity",
-    "ms-vscode.azure-account"
+    "JuanBlanco.solidity"
   ],
   "husky": {
     "hooks": {

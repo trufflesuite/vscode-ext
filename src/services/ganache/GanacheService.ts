@@ -62,7 +62,8 @@ export namespace GanacheService {
     if (portStatus === PortStatus.FREE) {
       ganacheProcesses[port] = await spawnGanacheServer(port);
     }
-
+    // open the channel to show the output.
+    ganacheProcesses[port]?.output?.show(false);
     Telemetry.sendEvent("GanacheServiceClient.waitGanacheStarted.serverStarted");
     return ganacheProcesses[port];
   }

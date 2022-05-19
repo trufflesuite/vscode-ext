@@ -65,34 +65,6 @@ export class Constants {
   public static ganacheRetryTimeout = 2000; // milliseconds
   public static ganacheRetryAttempts = 5;
 
-  public static truffleResourceName = {
-    eventGrid: "Event Grid",
-    transactionNode: "Transaction Node",
-  };
-
-  public static lengthParam = {
-    azureBlockchainResourceName: {
-      max: 20,
-      min: 2,
-    },
-    bdmName: {
-      max: 20,
-      min: 1,
-    },
-    eventGridName: {
-      max: 50,
-      min: 3,
-    },
-    password: {
-      max: 72,
-      min: 12,
-    },
-    resourceGroup: {
-      max: 90,
-      min: 1,
-    },
-  };
-
   // Values are quite brittle and don't map directly to the requirements.html screen.
   public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
     [RequiredApps.ganache]: {
@@ -129,7 +101,7 @@ export class Constants {
   };
 
   public static globalStateKeys = {
-    azureBlockchainExtensionVersion: "azureBlockchainExtensionVersion",
+    truffleExtensionVersion: "truffleExtensionVersion",
     infuraCredentialsCacheKey: "InfuraCache",
     infuraExcludedProjectsListKey: "InfuraExcludedProjects",
     isNotifiedAboutOZSdk: "isNotifiedAboutOZSdk",
@@ -339,10 +311,6 @@ export class Constants {
     forbiddenSymbols: "Provided name has forbidden symbols.",
     infuraProjectInvalidName:
       'Project name must be at least 3 characters and should have alphanumeric, space, and the symbols "-", "_", ":".',
-    invalidAzureName:
-      "Invalid name. Name can contain only lowercase letters and numbers. " +
-      `The first character must be a letter. Length must be between ${Constants.lengthParam.azureBlockchainResourceName.min} ` +
-      `and ${Constants.lengthParam.azureBlockchainResourceName.max} characters.`,
     invalidConfirmationResult: "'yes' or 'no'",
     invalidHostAddress: "Invalid host address",
     invalidPort: "Invalid port.",

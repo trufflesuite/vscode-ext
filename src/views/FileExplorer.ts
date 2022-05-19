@@ -3,6 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import * as mkdirp from "mkdirp";
 import * as rimraf from "rimraf";
+import {ext} from "../Constants";
 
 //#region Utilities
 
@@ -160,15 +161,42 @@ interface Entry {
 
 //#endregion
 
+// TODO: move to AzExtTreeDataProvider
 export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscode.FileSystemProvider {
   private _onDidChangeFile: vscode.EventEmitter<vscode.FileChangeEvent[]>;
+  private _onDidChangeTree: vscode.EventEmitter<Entry[] | void | null>;
 
-  constructor(private _openFileCommand: string) {
+  /**
+   * @param _openFileCommand The command name for opening files
+   * @param _baseFolder optionally the root folder inside the workspace we start in.
+   */
+  constructor(private _openFileCommand: string, private _baseFolder?: string) {
     this._onDidChangeFile = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
+    this._onDidChangeTree = new vscode.EventEmitter<Entry[]>();
+  }
+
+  // Refresh full view
+  public refresh(): void {
+    this._onDidChangeTree.fire();
+  }
+
+  getBaseUri(): vscode.Uri {
+    if (this.getWorkspaceFolder()) {
+      if (this._baseFolder) {
+        return vscode.Uri.file(path.join(this.getWorkspaceFolder()!.uri.fsPath, this._baseFolder));
+      } else {
+        return this.getWorkspaceFolder()!.uri;
+      }
+    }
+    // fallback
+    return vscode.Uri.file(".");
   }
 
   get onDidChangeFile(): vscode.Event<vscode.FileChangeEvent[]> {
     return this._onDidChangeFile.event;
+  }
+  get onDidChangeTreeData(): vscode.Event<Entry[] | void | null> {
+    return this._onDidChangeTree.event;
   }
 
   watch(uri: vscode.Uri, options: {recursive: boolean; excludes: string[]}): vscode.Disposable {
@@ -290,29 +318,56 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
   }
 
   // tree data provider
-
   async getChildren(element?: Entry): Promise<Entry[]> {
+    ext.outputChannel.appendLog(`Getting Children of: ${element}`);
+
     if (element) {
       const children = await this.readDirectory(element.uri);
       return children.map(([name, type]) => ({uri: vscode.Uri.file(path.join(element.uri.fsPath, name)), type}));
     }
 
-    const workspaceFolder = vscode.workspace.workspaceFolders?.filter((folder) => folder.uri.scheme === "file")[0];
+    const workspaceFolder = this.getWorkspaceFolder();
     if (workspaceFolder) {
-      const children = await this.readDirectory(workspaceFolder.uri);
-      children.sort((a, b) => {
-        if (a[1] === b[1]) {
-          return a[0].localeCompare(b[0]);
+      let children = await this.getSortedChildren(workspaceFolder.uri);
+
+      if (this._baseFolder) {
+        // we need to filter for this folder
+        const baseFolderUri = children?.filter((cVal) => {
+          return cVal[1] == vscode.FileType.Directory && cVal[0] === this._baseFolder;
+        });
+        // if we find it we change our children to be its.
+        if (baseFolderUri && baseFolderUri.length > 0) {
+          // just set this to our baseFolder.
+          children = children.filter((v) => this._baseFolder?.localeCompare(v[0]) == 0);
+          ext.outputChannel.appendLog(`Setting Base Folder to: ${this._baseFolder}`);
+        } else {
+          ext.outputChannel.appendLog(`no baseFolder: ${this._baseFolder} found in children of workspace: ${children}`);
+          vscode.window.showInformationMessage(`No folder "${this._baseFolder}" found in workspace.`);
+          return [];
         }
-        return a[1] === vscode.FileType.Directory ? -1 : 1;
-      });
+      }
+      // return the mapped entries.
       return children.map(([name, type]) => ({
         uri: vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, name)),
         type,
       }));
     }
-
     return [];
+  }
+
+  private getWorkspaceFolder(): vscode.WorkspaceFolder | undefined {
+    return vscode.workspace.workspaceFolders?.filter((folder) => folder.uri.scheme === "file")[0];
+  }
+
+  async getSortedChildren(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
+    const children = await this.readDirectory(uri);
+    children.sort((a, b) => {
+      if (a[1] === b[1]) {
+        return a[0].localeCompare(b[0]);
+      }
+      return a[1] === vscode.FileType.Directory ? -1 : 1;
+    });
+    return children;
   }
 
   getTreeItem(element: Entry): vscode.TreeItem {
@@ -331,14 +386,15 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
 }
 
 export class FileExplorer {
-  constructor(context: vscode.ExtensionContext, commandPrefix = "truffle-vscode", viewName = "views.fileExplorer") {
+  constructor(context: vscode.ExtensionContext, commandPrefix = "truffle-vscode", viewName = "views.explorer") {
     const openFileCommand = `${commandPrefix}.openFile`;
-    // const refreshFileCommand = `${commandPrefix}.refreshFile`;
-    const treeDataProvider = new FileSystemProvider(openFileCommand);
+    const refreshExplorerCommand = `${commandPrefix}.${viewName}.refreshExplorer`;
+    const treeDataProvider = new FileSystemProvider(openFileCommand, "contracts");
+
     // FIXME: not sure if I like this or not... we have a mix of subscription push calls/locations.
     context.subscriptions.push(vscode.window.createTreeView(`${commandPrefix}.${viewName}`, {treeDataProvider}));
     vscode.commands.registerCommand(openFileCommand, (resource) => this.openResource(resource));
-    // vscode.commands.registerCommand(refreshFileCommand, (resource) => treeDataProvider.refresh(resource));
+    vscode.commands.registerCommand(refreshExplorerCommand, (_) => treeDataProvider.refresh());
   }
 
   private openResource(resource: vscode.Uri): void {

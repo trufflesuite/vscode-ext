@@ -91,10 +91,6 @@ export namespace ServiceCommands {
     await TreeManager.removeItem(viewItem.extensionItem);
     Telemetry.sendEvent("ServiceCommands.disconnectProject.commandFinished");
   }
-
-  export function openAtAzurePortal(viewItem: NetworkNodeView): void {
-    open(viewItem.extensionItem.url.href);
-  }
 }
 
 async function execute(serviceDestinations: IServiceDestination[]): Promise<Project> {
