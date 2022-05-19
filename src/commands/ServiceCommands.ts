@@ -1,7 +1,6 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import open from "open";
 import {Constants} from "../Constants";
 import {telemetryHelper} from "../helpers";
 import {showQuickPick} from "../helpers/userInteraction";
@@ -18,7 +17,7 @@ import {
 import {InfuraResourceExplorer, LocalResourceExplorer} from "../resourceExplorers";
 import {GanacheService, TreeManager} from "../services";
 import {Telemetry} from "../TelemetryClient";
-import {NetworkNodeView, ProjectView} from "../ViewItems";
+import {ProjectView} from "../ViewItems";
 
 interface IServiceDestination {
   cmd: (service: Service) => Promise<Project>;
