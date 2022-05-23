@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { workspace } from "vscode";
-import { Constants } from "../Constants";
-import { Telemetry } from "../TelemetryClient";
+import {Uri, workspace, WorkspaceFolder} from "vscode";
+import {Constants} from "../Constants";
+import {Telemetry} from "../TelemetryClient";
 
 export function getWorkspaceRoot(ignoreException: boolean = false): string | undefined {
   const workspaceRoot = workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
@@ -15,6 +15,30 @@ export function getWorkspaceRoot(ignoreException: boolean = false): string | und
   }
 
   return workspaceRoot;
+}
+
+export function getWorkspaces(): WorkspaceFolder[] | undefined {
+  const workspaces = workspace.workspaceFolders;
+
+  if (workspaces === undefined) {
+    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined("Workspace root"));
+    Telemetry.sendException(error);
+    throw error;
+  }
+
+  return workspaces;
+}
+
+export function getWorkspaceByUri(uri: Uri): string | undefined {
+  const workspaceFolder = workspace.getWorkspaceFolder(uri)?.uri.fsPath;
+
+  if (workspaceFolder === undefined) {
+    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined("Workspace root"));
+    Telemetry.sendException(error);
+    throw error;
+  }
+
+  return workspaceFolder;
 }
 
 export function isWorkspaceOpen(): boolean {

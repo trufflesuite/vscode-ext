@@ -10,8 +10,9 @@ import crypto from "crypto";
 import ESTree from "estree";
 import fs from "fs-extra";
 import path from "path";
+import {Uri} from "vscode";
 import {Constants} from "../Constants";
-import {getWorkspaceRoot} from "../helpers";
+import {getWorkspaceRoot, getWorkspaceByUri} from "../helpers";
 import {MnemonicRepository} from "../services";
 import {Telemetry} from "../TelemetryClient";
 import {tryExecuteCommandInFork} from "./command";
@@ -116,8 +117,11 @@ export namespace TruffleConfiguration {
     };
   }
 
+  export let truffleConfigUri: Uri;
+
   export function getTruffleConfigUri(): string {
-    const configFilePath = path.join(getWorkspaceRoot()!, "truffle-config.js");
+    const workspacRoot = truffleConfigUri ? getWorkspaceByUri(truffleConfigUri) : getWorkspaceRoot()!;
+    const configFilePath = path.join(workspacRoot!, "truffle-config.js");
 
     if (!fs.pathExistsSync(configFilePath)) {
       const error = new Error(Constants.errorMessageStrings.TruffleConfigIsNotExist);
