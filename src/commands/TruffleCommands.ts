@@ -78,6 +78,7 @@ export namespace TruffleCommands {
   export async function deployContracts(uri?: Uri): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.deployContracts.commandStarted");
 
+    uri = uri ? Uri.parse(path.normalize(path.join(uri!.fsPath, ".."))) : undefined;
     TruffleConfiguration.truffleConfigUri = await getWorkspace(uri);
 
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
@@ -487,16 +488,16 @@ function ensureFileIsContractJson(filePath: string) {
 async function getWorkspace(uri?: Uri): Promise<Uri> {
   if (uri) return Uri.parse(path.dirname(uri.fsPath));
 
-  const workspaces = getWorkspaces();
+  const workspaces = await getWorkspaces();
 
-  if (workspaces?.length.Equals(1)) return workspaces[0].uri;
+  if (workspaces?.length.Equals(1)) return workspaces[0].workspace;
 
   const folders: QuickPickItem[] = [];
 
   workspaces?.forEach((element) => {
     folders.push({
-      label: element.name,
-      detail: element.uri.fsPath,
+      label: element.dirName,
+      detail: element.workspace.fsPath,
     });
   });
 

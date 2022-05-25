@@ -1,9 +1,17 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Uri, workspace, WorkspaceFolder} from "vscode";
+import {Uri, workspace} from "vscode";
 import {Constants} from "../Constants";
 import {Telemetry} from "../TelemetryClient";
+import * as fs from "fs";
+import * as path from "path";
+
+export interface TruffleWorkspace {
+  dirName: string;
+  workspace: Uri;
+  truffleConfig: Uri;
+}
 
 export function getWorkspaceRoot(ignoreException: boolean = false): string | undefined {
   const workspaceRoot = workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
@@ -17,8 +25,14 @@ export function getWorkspaceRoot(ignoreException: boolean = false): string | und
   return workspaceRoot;
 }
 
-export function getWorkspaces(): WorkspaceFolder[] | undefined {
-  const workspaces = workspace.workspaceFolders;
+export async function getWorkspaces(): Promise<TruffleWorkspace[]> {
+  const workspaces: TruffleWorkspace[] = [];
+
+  await Promise.all(
+    workspace.workspaceFolders!.map(async (ws) => {
+      workspaces.push(...(await getWorkspaceFiles(ws.uri.fsPath)));
+    })
+  );
 
   if (workspaces === undefined) {
     const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined("Workspace root"));
@@ -29,18 +43,31 @@ export function getWorkspaces(): WorkspaceFolder[] | undefined {
   return workspaces;
 }
 
-export function getWorkspaceByUri(uri: Uri): string | undefined {
-  const workspaceFolder = workspace.getWorkspaceFolder(uri)?.uri.fsPath;
-
-  if (workspaceFolder === undefined) {
-    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined("Workspace root"));
-    Telemetry.sendException(error);
-    throw error;
-  }
-
-  return workspaceFolder;
-}
-
 export function isWorkspaceOpen(): boolean {
   return !!(workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath);
+}
+
+async function getWorkspaceFiles(dirPath: string, arrayOfFiles?: TruffleWorkspace[]): Promise<TruffleWorkspace[]> {
+  const files = fs.readdirSync(dirPath);
+
+  arrayOfFiles = arrayOfFiles || [];
+
+  await Promise.all(
+    files.map(async (file) => {
+      if (file.Contains("node_modules")) return;
+
+      if (fs.statSync(`${dirPath}/${file}`).isDirectory()) {
+        arrayOfFiles = await getWorkspaceFiles(`${dirPath}/${file}`, arrayOfFiles);
+      } else {
+        if (file.Equals(Constants.defaultTruffleConfigFileName))
+          arrayOfFiles!.push({
+            dirName: path.dirname(`${dirPath}/${file}`).split(path.sep).pop()!.ToString(),
+            workspace: Uri.parse(dirPath),
+            truffleConfig: Uri.parse(`${dirPath}/${file}`),
+          });
+      }
+    })
+  );
+
+  return arrayOfFiles;
 }
