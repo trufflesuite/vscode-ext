@@ -47,20 +47,20 @@ export function isWorkspaceOpen(): boolean {
   return !!(workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath);
 }
 
-async function getWorkspaceFiles(dirPath: string, arrayOfFiles?: TruffleWorkspace[]): Promise<TruffleWorkspace[]> {
+async function getWorkspaceFiles(dirPath: string, truffleWorkSpaces?: TruffleWorkspace[]): Promise<TruffleWorkspace[]> {
   const files = fs.readdirSync(dirPath);
 
-  arrayOfFiles = arrayOfFiles || [];
+  truffleWorkSpaces = truffleWorkSpaces || [];
 
   await Promise.all(
     files.map(async (file) => {
       if (file.Contains("node_modules")) return;
 
       if (fs.statSync(`${dirPath}/${file}`).isDirectory()) {
-        arrayOfFiles = await getWorkspaceFiles(`${dirPath}/${file}`, arrayOfFiles);
+        truffleWorkSpaces = await getWorkspaceFiles(`${dirPath}/${file}`, truffleWorkSpaces);
       } else {
         if (file.Equals(Constants.defaultTruffleConfigFileName))
-          arrayOfFiles!.push({
+          truffleWorkSpaces!.push({
             dirName: path.dirname(`${dirPath}/${file}`).split(path.sep).pop()!.ToString(),
             workspace: Uri.parse(dirPath),
             truffleConfig: Uri.parse(`${dirPath}/${file}`),
@@ -69,5 +69,5 @@ async function getWorkspaceFiles(dirPath: string, arrayOfFiles?: TruffleWorkspac
     })
   );
 
-  return arrayOfFiles;
+  return truffleWorkSpaces;
 }
