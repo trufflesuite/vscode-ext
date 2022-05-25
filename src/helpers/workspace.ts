@@ -54,14 +54,14 @@ async function getWorkspaceFiles(dirPath: string, truffleWorkSpaces?: TruffleWor
 
   await Promise.all(
     files.map(async (file) => {
-      if (file.Contains("node_modules")) return;
+      if (file.includes("node_modules")) return;
 
       if (fs.statSync(`${dirPath}/${file}`).isDirectory()) {
         truffleWorkSpaces = await getWorkspaceFiles(`${dirPath}/${file}`, truffleWorkSpaces);
       } else {
-        if (file.Equals(Constants.defaultTruffleConfigFileName))
+        if (file === Constants.defaultTruffleConfigFileName)
           truffleWorkSpaces!.push({
-            dirName: path.dirname(`${dirPath}/${file}`).split(path.sep).pop()!.ToString(),
+            dirName: path.dirname(`${dirPath}/${file}`).split(path.sep).pop()!.toString(),
             workspace: Uri.parse(dirPath),
             truffleConfig: Uri.parse(`${dirPath}/${file}`),
           });

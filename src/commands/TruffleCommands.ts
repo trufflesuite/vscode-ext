@@ -490,11 +490,11 @@ async function getWorkspace(uri?: Uri): Promise<Uri> {
 
   const workspaces = await getWorkspaces();
 
-  if (workspaces?.length.Equals(1)) return workspaces[0].workspace;
+  if (workspaces.length === 1) return workspaces[0].workspace;
 
   const folders: QuickPickItem[] = [];
 
-  workspaces?.forEach((element) => {
+  Array.from(workspaces).forEach((element) => {
     folders.push({
       label: element.dirName,
       detail: element.workspace.fsPath,
