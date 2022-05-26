@@ -11,7 +11,7 @@ import {OpenUrlTreeItem} from "../Models/TreeItems/OpenUrlTreeItem";
  */
 export function registerHelpView(viewId: string = "truffle-vscode.views.help"): vscode.TreeView<AzExtTreeItem> {
   const helpRoot = new HelpTreeItem(undefined);
-  const helpTreeDataProvider = new AzExtTreeDataProvider(helpRoot, "truffle-vscode.help.loadMore");
+  const helpTreeDataProvider = new AzExtTreeDataProvider(helpRoot, "truffle-vscode.views.help.loadMore");
   // register the opening command.
   registerCommand("truffle-vscode.openUrl", async (_: IActionContext, node: OpenUrlTreeItem) => node.openUrl());
   return vscode.window.createTreeView(viewId, {treeDataProvider: helpTreeDataProvider, canSelectMany: false});

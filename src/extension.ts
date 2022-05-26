@@ -29,10 +29,11 @@ import {Telemetry} from "./TelemetryClient";
 import {NetworkNodeView, ProjectView} from "./ViewItems";
 
 import {DebuggerConfiguration} from "./debugAdapter/configuration/debuggerConfiguration";
-import {FileExplorer} from "./views/fileExplorer";
+import {registerFileExplorerView} from "./views/fileExplorer";
 import {required} from "./helpers/required";
 import {registerHelpView} from "./views/HelpView";
 import {registerUIExtensionVariables} from "@microsoft/vscode-azext-utils";
+import {registerDeploymentView} from "./views/DeploymentsView";
 
 /**
  * This function registers variables similar to docker plugin, going forward this seems a better method of doing things.
@@ -187,8 +188,10 @@ export async function activate(context: ExtensionContext) {
 
   // #region truffle views
 
-  new FileExplorer(context, "truffle-vscode", "views.explorer");
+  const fileExplorerView = registerFileExplorerView("truffle-vscode", "views.explorer");
   const helpView = registerHelpView();
+
+  const deploymentView = registerDeploymentView();
 
   // #endregion
 
@@ -215,7 +218,10 @@ export async function activate(context: ExtensionContext) {
     signOutOfInfuraAccount,
     showProjectsFromInfuraAccount,
     changeCoreSdkConfigurationListener,
+    // new view - main views
+    fileExplorerView,
     helpView,
+    deploymentView,
   ];
   context.subscriptions.push(...subscriptions);
 

@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as mkdirp from "mkdirp";
 import * as rimraf from "rimraf";
 import {ext} from "../Constants";
+import {getWorkspaceFolder} from "./Utils";
 
 //#region Utilities
 
@@ -161,7 +162,6 @@ interface Entry {
 
 //#endregion
 
-// TODO: move to AzExtTreeDataProvider
 export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscode.FileSystemProvider {
   private _onDidChangeFile: vscode.EventEmitter<vscode.FileChangeEvent[]>;
   private _onDidChangeTree: vscode.EventEmitter<Entry[] | void | null>;
@@ -181,11 +181,12 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
   }
 
   getBaseUri(): vscode.Uri {
-    if (this.getWorkspaceFolder()) {
+    const workspaceFolder = getWorkspaceFolder();
+    if (workspaceFolder) {
       if (this._baseFolder) {
-        return vscode.Uri.file(path.join(this.getWorkspaceFolder()!.uri.fsPath, this._baseFolder));
+        return vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, this._baseFolder));
       } else {
-        return this.getWorkspaceFolder()!.uri;
+        return workspaceFolder.uri;
       }
     }
     // fallback
@@ -326,7 +327,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
       return children.map(([name, type]) => ({uri: vscode.Uri.file(path.join(element.uri.fsPath, name)), type}));
     }
 
-    const workspaceFolder = this.getWorkspaceFolder();
+    const workspaceFolder = getWorkspaceFolder();
     if (workspaceFolder) {
       let children = await this.getSortedChildren(workspaceFolder.uri);
 
@@ -355,10 +356,6 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
     return [];
   }
 
-  private getWorkspaceFolder(): vscode.WorkspaceFolder | undefined {
-    return vscode.workspace.workspaceFolders?.filter((folder) => folder.uri.scheme === "file")[0];
-  }
-
   async getSortedChildren(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
     const children = await this.readDirectory(uri);
     children.sort((a, b) => {
@@ -385,19 +382,18 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
   }
 }
 
-export class FileExplorer {
-  constructor(context: vscode.ExtensionContext, commandPrefix = "truffle-vscode", viewName = "views.explorer") {
-    const openFileCommand = `${commandPrefix}.openFile`;
-    const refreshExplorerCommand = `${commandPrefix}.${viewName}.refreshExplorer`;
-    const treeDataProvider = new FileSystemProvider(openFileCommand, "contracts");
+const openResource = (resource: vscode.Uri): void => {
+  vscode.window.showTextDocument(resource);
+};
 
-    // FIXME: not sure if I like this or not... we have a mix of subscription push calls/locations.
-    context.subscriptions.push(vscode.window.createTreeView(`${commandPrefix}.${viewName}`, {treeDataProvider}));
-    vscode.commands.registerCommand(openFileCommand, (resource) => this.openResource(resource));
-    vscode.commands.registerCommand(refreshExplorerCommand, (_) => treeDataProvider.refresh());
-  }
-
-  private openResource(resource: vscode.Uri): void {
-    vscode.window.showTextDocument(resource);
-  }
+export function registerFileExplorerView(
+  commandPrefix = "truffle-vscode",
+  viewName = "views.explorer"
+): vscode.TreeView<Entry> {
+  const openFileCommand = `${commandPrefix}.openFile`;
+  const refreshExplorerCommand = `${commandPrefix}.${viewName}.refreshExplorer`;
+  const treeDataProvider = new FileSystemProvider(openFileCommand, "contracts");
+  vscode.commands.registerCommand(openFileCommand, (resource) => openResource(resource));
+  vscode.commands.registerCommand(refreshExplorerCommand, (_) => treeDataProvider.refresh());
+  return vscode.window.createTreeView(`${commandPrefix}.${viewName}`, {treeDataProvider});
 }
