@@ -2,9 +2,13 @@ import * as vscode from "vscode";
 import {AzExtParentTreeItem, GenericTreeItem} from "@microsoft/vscode-azext-utils";
 
 export class OpenUrlTreeItem extends GenericTreeItem {
-  private _url: string;
-
-  public constructor(parent: AzExtParentTreeItem, id: string, label: string, url: string, iconPath?: vscode.ThemeIcon) {
+  public constructor(
+    parent: AzExtParentTreeItem,
+    id: string,
+    label: string,
+    private readonly url: string | undefined,
+    iconPath?: vscode.ThemeIcon
+  ) {
     super(parent, {
       id,
       commandId: "truffle-vscode.openUrl",
@@ -13,10 +17,13 @@ export class OpenUrlTreeItem extends GenericTreeItem {
       includeInTreeItemPicker: true,
       label,
     });
-    this._url = url;
   }
 
   public async openUrl(): Promise<void> {
-    await vscode.env.openExternal(vscode.Uri.parse(this._url));
+    if (this.url) {
+      await vscode.env.openExternal(vscode.Uri.parse(this.url));
+    } else {
+      vscode.window.showWarningMessage(`URL was blank for item: ${this.label}`);
+    }
   }
 }

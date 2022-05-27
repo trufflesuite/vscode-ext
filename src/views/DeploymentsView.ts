@@ -8,12 +8,14 @@ import {
 import fs from "fs";
 import paths from "path";
 import vscode, {ThemeIcon} from "vscode";
+import {getChain, getExplorerLink} from "../functions/explorer";
+import {OpenUrlTreeItem} from "../Models/TreeItems/OpenUrlTreeItem";
 import {getWorkspaceFolder, pathExists} from "./Utils";
 
 const JSON_FILE_SUFFIX = ".json";
 
 interface NetworkDeployment {
-  networkId: string;
+  networkId: number;
   events: Record<any, any>;
   links: Record<any, any>;
   address: string;
@@ -107,7 +109,7 @@ export class ContractDeploymentViewTreeItem extends DeploymentsViewTreeItemBase 
   private static getNetworkObjects(contract: ContractBuildFile): NetworkDeployment[] {
     return Object.entries(contract.networks).map<NetworkDeployment>((value) => ({
       ...value[1],
-      networkId: value[0],
+      networkId: Number(value[0]),
     }));
   }
 
@@ -145,7 +147,7 @@ export class NetworkDeploymentsTreeItem extends AzExtParentTreeItem {
       this.deployments,
       "invalidDeployments",
       (source) => new NetworkDeploymentTreeItem(this, source),
-      (source) => source?.networkId
+      (source) => "" + source?.networkId
     );
   }
 }
@@ -158,7 +160,7 @@ export class NetworkDeploymentTreeItem extends AzExtParentTreeItem {
   }
 
   public get label(): string {
-    return this.deployment.networkId + " [network name TBC]";
+    return `${this.deployment.networkId} [${getChain(this.deployment.networkId).name}]`;
   }
 
   public get contextValue(): string {
@@ -170,28 +172,33 @@ export class NetworkDeploymentTreeItem extends AzExtParentTreeItem {
   }
 
   async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-    // TODO: make these items perhaps specific in some cases...
+    const chainId: number = this.deployment.networkId;
     return [
-      new GenericTreeItem(this, {
-        label: `Address: ${this.deployment.address}`,
-        contextValue: "address",
-        iconPath: new ThemeIcon("output"),
-      }),
-      new GenericTreeItem(this, {
-        label: `txHash: ${this.deployment.transactionHash}`,
-        contextValue: "transactionHash",
-        iconPath: new ThemeIcon("broadcast"),
-      }),
-      new GenericTreeItem(this, {
-        label: `Events: ${JSON.stringify(this.deployment.events)}`,
-        contextValue: "events",
-        iconPath: new ThemeIcon("files"),
-      }),
-      new GenericTreeItem(this, {
-        label: `Links: ${JSON.stringify(this.deployment.links)}`,
-        contextValue: "links",
-        iconPath: new ThemeIcon("references"),
-      }),
+      new OpenUrlTreeItem(
+        this,
+        this.deployment.address,
+        `Address: ${this.deployment.address}`,
+        getExplorerLink(chainId, this.deployment.address, "address"),
+        new ThemeIcon("output")
+      ),
+      new OpenUrlTreeItem(
+        this,
+        this.deployment.transactionHash,
+        `txHash: ${this.deployment.transactionHash}`,
+        getExplorerLink(chainId, this.deployment.transactionHash, "transaction"),
+        new ThemeIcon("broadcast")
+      ),
+      // these need to be something else eventually
+      // new GenericTreeItem(this, {
+      //   label: `Events: ${JSON.stringify(this.deployment.events)}`,
+      //   contextValue: "events",
+      //   iconPath: new ThemeIcon("files"),
+      // }),
+      // new GenericTreeItem(this, {
+      //   label: `Links: ${JSON.stringify(this.deployment.links)}`,
+      //   contextValue: "links",
+      //   iconPath: new ThemeIcon("references"),
+      // }),
     ];
   }
 }
