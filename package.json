@@ -233,7 +233,7 @@
       },
       {
         "command": "truffle-vscode.execScript",
-        "title": "Execute Script",
+        "title": "Truffle: Execute Script",
         "category": "Truffle"
       },
       {
