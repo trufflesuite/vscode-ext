@@ -13,8 +13,7 @@ export class LocalResourceExplorer {
   public async createProject(
     existingProjects: string[] = [],
     existingPorts: number[] = [],
-    options?: TLocalProjectOptions,
-    description?: string
+    options?: TLocalProjectOptions
   ): Promise<LocalProject> {
     Telemetry.sendEvent("LocalResourceExplorer.createProject");
 
@@ -23,16 +22,14 @@ export class LocalResourceExplorer {
       existingPorts,
       GanacheService.PortStatus.FREE,
       Constants.validationMessages.portAlreadyInUse,
-      options,
-      description
+      options
     );
   }
 
   public async selectProject(
     existingProjects: string[] = [],
     existingPorts: number[] = [],
-    options?: TLocalProjectOptions,
-    description?: string
+    options?: TLocalProjectOptions
   ): Promise<LocalProject> {
     Telemetry.sendEvent("LocalResourceExplorer.selectProject");
 
@@ -41,8 +38,7 @@ export class LocalResourceExplorer {
       existingPorts,
       GanacheService.PortStatus.GANACHE,
       Constants.validationMessages.portNotInUseGanache,
-      options,
-      description
+      options
     );
 
     await GanacheService.startGanacheServer(localProject.port);
@@ -55,14 +51,13 @@ export class LocalResourceExplorer {
     existingPorts: number[],
     portStatus: GanacheService.PortStatus,
     validateMessage: string,
-    options?: TLocalProjectOptions,
-    description?: string
+    options?: TLocalProjectOptions
   ): Promise<LocalProject> {
     const port: number = await this.getLocalProjectPort(existingPorts, portStatus, validateMessage);
     const label: string = await this.getLocalProjectName(existingProjects);
-    const formattedDescription: string = await this.getDescription(port, options, description);
+    const description: string = await this.getDescription(port, options);
 
-    return this.getLocalProject(label, port, options, formattedDescription);
+    return this.getLocalProject(label, port, options, description);
   }
 
   private async getLocalProject(
@@ -130,17 +125,19 @@ export class LocalResourceExplorer {
     return parseInt(port, 10);
   }
 
-  private async getDescription(port: number, options?: TLocalProjectOptions, description?: string) {
+  private async getDescription(port: number, options?: TLocalProjectOptions) {
     const blockNumber: string | undefined = options?.blockNumber?.Equals(0)
-      ? Constants.defaultLastBlockDescription
+      ? Constants.latestBlock
       : options?.blockNumber?.ToString();
     const forkedNetwork: string | undefined = options?.url === undefined ? options?.forkedNetwork : options?.url;
 
     let formattedDescription: string;
 
     if (options?.isForked)
-      formattedDescription = `(${description}) - port: ${port} | ${forkedNetwork} - block number: ${blockNumber}`;
-    else formattedDescription = `(${description}) - port: ${port}`;
+      formattedDescription = `${forkedNetwork?.toLowerCase()} - ${Constants.networkProtocols.http}${
+        Constants.localhost
+      }:${port} forking ${forkedNetwork?.toLowerCase()}@${blockNumber}`;
+    else formattedDescription = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
 
     return formattedDescription;
   }

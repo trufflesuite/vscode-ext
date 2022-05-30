@@ -234,7 +234,6 @@ async function createLocalProject(service: LocalService): Promise<LocalProject> 
   const serviceTypes: TServiceType[] = await loadServiceType();
   const serviceType: TServiceType = await getServiceTypes(serviceTypes);
 
-  const description: string = serviceType.description;
   const options: TLocalProjectOptions = {
     isForked: serviceType.isForked,
   };
@@ -249,27 +248,16 @@ async function createLocalProject(service: LocalService): Promise<LocalProject> 
   }
 
   const localResourceExplorer = new LocalResourceExplorer();
-  return localResourceExplorer.createProject(
-    await getExistingNames(service),
-    await getExistingPorts(service),
-    options,
-    description
-  );
+  return localResourceExplorer.createProject(await getExistingNames(service), await getExistingPorts(service), options);
 }
 
 async function connectLocalProject(service: LocalService): Promise<LocalProject> {
-  const description: string = Constants.treeItemData.service.local.type.linked.description;
   const options: TLocalProjectOptions = {
     isForked: false,
   };
 
   const localResourceExplorer = new LocalResourceExplorer();
-  return localResourceExplorer.selectProject(
-    await getExistingNames(service),
-    await getExistingPorts(service),
-    options,
-    description
-  );
+  return localResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service), options);
 }
 
 async function getExistingNames(service: LocalService): Promise<string[]> {

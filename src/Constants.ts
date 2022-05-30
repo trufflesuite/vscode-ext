@@ -62,12 +62,12 @@ export class Constants {
   public static localhost = "127.0.0.1";
   public static localhostName = "development";
   public static defaultLocalhostPort = 8545;
-  public static defaultLastBlockDescription = "latest";
   public static defaultABSPort = 3200;
   public static defaultABSHost = "blockchain.azure.com";
 
   public static ganacheRetryTimeout = 2000; // milliseconds
   public static ganacheRetryAttempts = 5;
+  public static latestBlock = "latest";
 
   public static truffleResourceName = {
     eventGrid: "Event Grid",
@@ -351,9 +351,9 @@ export class Constants {
         prefix: "loc",
         type: {
           default: {
-            label: "Regular",
+            label: "Local",
             prefix: "dfl",
-            description: "Regular",
+            description: "Local",
             isForked: false,
             networks: {},
           },
@@ -522,8 +522,8 @@ export class Constants {
     selectMember: "Select member",
     selectMnemonicExtractKey: "Select mnemonic to extract key",
     selectMnemonicStorage: "Select mnemonic storage",
-    selectType: "Select type",
-    selectNetwork: "Select network",
+    selectType: "Select a type",
+    selectNetwork: "Select a network to fork",
     selectNewProjectPath: "Select new project path",
     selectProjects: "Select Projects",
     selectResourceGroup: "Select a resource group",
