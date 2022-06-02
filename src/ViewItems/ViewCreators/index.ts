@@ -7,3 +7,4 @@ export * from "./NullableViewCreator";
 export * from "./ProjectViewCreator";
 export * from "./ServiceViewCreator";
 export * from "./ViewCreator";
+export * from "./LayerViewCreator";
