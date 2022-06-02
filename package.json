@@ -119,7 +119,8 @@
       {
         "command": "truffle-vscode.buildContracts",
         "title": "Build Contracts",
-        "category": "Blockchain"
+        "category": "Blockchain",
+        "icon": "$(run-all)"
       },
       {
         "command": "truffle-vscode.deployContracts",
@@ -218,12 +219,14 @@
       {
         "command": "truffle-vscode.buildContracts",
         "title": "Build Contracts",
-        "category": "Truffle"
+        "category": "Truffle",
+        "icon": "$(run-all)"
       },
       {
         "command": "truffle-vscode.deployContracts",
         "title": "Deploy Contracts",
-        "category": "Truffle"
+        "category": "Truffle",
+        "icon": "$(radio-tower)"
       },
       {
         "command": "truffle-vscode.connectProject",
@@ -283,6 +286,7 @@
       {
         "command": "truffle-vscode.views.explorer.refreshExplorer",
         "title": "Refresh Explorer",
+        "category": "Truffle",
         "icon": {
           "light": "resources/light/refresh.svg",
           "dark": "resources/dark/refresh.svg"
@@ -356,6 +360,16 @@
         },
         {
           "command": "truffle-vscode.views.explorer.refreshExplorer",
+          "when": "view == truffle-vscode.views.explorer",
+          "group": "navigation"
+        },
+        {
+          "command": "truffle-vscode.buildContracts",
+          "when": "view == truffle-vscode.views.explorer",
+          "group": "navigation"
+        },
+        {
+          "command": "truffle-vscode.deployContracts",
           "when": "view == truffle-vscode.views.explorer",
           "group": "navigation"
         }
@@ -466,7 +480,6 @@
           "contextualTitle": "Help & Feedback section"
         }
       ],
-
       "debug": [
         {
           "id": "truffle-vscode.InstructionView",

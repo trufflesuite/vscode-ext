@@ -22,7 +22,7 @@ interface Chains {
 }
 
 const UnknownChain: ChainObject = {
-  name: "UnknownChain",
+  name: "Unknown/Truffle",
   link: "",
   builder: (_) => "",
 };
