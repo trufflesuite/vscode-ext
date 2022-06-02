@@ -29,12 +29,21 @@ import {
   LocalService,
   Member,
   Service,
+  TLocalProjectOptions,
 } from "../../src/Models/TreeItems";
 import {ConsortiumResourceExplorer} from "../../src/resourceExplorers";
 import {GanacheService, MnemonicRepository, TreeManager} from "../../src/services";
 import {TestConstants} from "../TestConstants";
 import {AzureAccountHelper} from "../testHelpers/AzureAccountHelper";
 const {service} = Constants.treeItemData;
+const description: string = String.Empty;
+
+const options: TLocalProjectOptions = {
+  isForked: false,
+  forkedNetwork: String.Empty,
+  blockNumber: 0,
+  url: String.Empty,
+};
 
 describe("TruffleCommands", () => {
   describe("Integration test", async () => {
@@ -603,7 +612,7 @@ async function createTestServicesItems(): Promise<Service[]> {
 
   const defaultPort = 8545;
   const defaultLabel = TestConstants.consortiumTestNames.local;
-  const localProject = new LocalProject(defaultLabel, defaultPort);
+  const localProject = new LocalProject(defaultLabel, defaultPort, options, description);
   const defaultUrl = `${Constants.networkProtocols.http}${Constants.localhost}:${defaultPort}`;
   const localNetworkNode = new LocalNetworkNode(defaultLabel, defaultUrl, "*");
   localProject.addChild(localNetworkNode);

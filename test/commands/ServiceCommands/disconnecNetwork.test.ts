@@ -4,9 +4,18 @@
 import assert from "assert";
 import rewire from "rewire";
 import sinon from "sinon";
-import {LocalProject} from "../../../src/Models/TreeItems";
+import {LocalProject, TLocalProjectOptions} from "../../../src/Models/TreeItems";
 import {GanacheService, TreeManager} from "../../../src/services";
 import {ProjectView} from "../../../src/ViewItems";
+
+const description: string = String.Empty;
+
+const options: TLocalProjectOptions = {
+  isForked: false,
+  forkedNetwork: String.Empty,
+  blockNumber: 0,
+  url: String.Empty,
+};
 
 describe("Disconnect Service", () => {
   afterEach(() => {
@@ -14,7 +23,7 @@ describe("Disconnect Service", () => {
   });
 
   describe("DisconnectProject_ShouldStopGanacheServer_LocalProject", () => {
-    const services = [{localProjectInstance: new LocalProject("name", 8545), executed: true}];
+    const services = [{localProjectInstance: new LocalProject("name", 8545, options, description), executed: true}];
 
     services.forEach(async (service) => {
       it("GanacheService.stopGanacheServer() should be executed only for LocalProject.", async () => {
@@ -40,7 +49,7 @@ describe("Disconnect Service", () => {
     it("treeManager.removeItem() should be executed for LocalProject.", async () => {
       // Arrange
       const serviceCommandsRewire = rewire("../../../src/commands/ServiceCommands");
-      const projectView = new ProjectView(new LocalProject("name", 8545));
+      const projectView = new ProjectView(new LocalProject("name", 8545, options, description));
       const removeItemMock = sinon.stub(TreeManager, "removeItem").returns(undefined);
 
       // Act

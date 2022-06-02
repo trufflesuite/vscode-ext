@@ -24,8 +24,8 @@ export class LocalProjectItemCreator extends ItemCreator {
   protected createFromObject(
     label: string,
     port: number,
-    options?: TLocalProjectOptions,
-    description?: string
+    options: TLocalProjectOptions,
+    description: string
   ): LocalProject {
     return new LocalProject(label, port, options, description);
   }

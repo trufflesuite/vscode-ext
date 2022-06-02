@@ -236,6 +236,9 @@ async function createLocalProject(service: LocalService): Promise<LocalProject> 
 
   const options: TLocalProjectOptions = {
     isForked: serviceType.isForked,
+    forkedNetwork: String.Empty,
+    url: String.Empty,
+    blockNumber: 0,
   };
 
   if (serviceType.isForked) {
@@ -254,6 +257,9 @@ async function createLocalProject(service: LocalService): Promise<LocalProject> 
 async function connectLocalProject(service: LocalService): Promise<LocalProject> {
   const options: TLocalProjectOptions = {
     isForked: false,
+    blockNumber: 0,
+    forkedNetwork: String.Empty,
+    url: String.Empty,
   };
 
   const localResourceExplorer = new LocalResourceExplorer();

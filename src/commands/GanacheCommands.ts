@@ -79,7 +79,13 @@ export namespace GanacheCommands {
   }
 
   export async function getGanacheProjectOptions(projectView?: ProjectView): Promise<TLocalProjectOptions> {
+    if (!projectView) {
+      const error = new Error(Constants.ganacheCommandStrings.cannotStartServer);
+      Telemetry.sendException(error);
+      throw error;
+    }
+
     const project: LocalProject = projectView?.extensionItem as LocalProject;
-    return project.options!;
+    return project.options;
   }
 }

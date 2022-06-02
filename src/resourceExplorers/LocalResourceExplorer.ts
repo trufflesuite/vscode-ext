@@ -13,7 +13,7 @@ export class LocalResourceExplorer {
   public async createProject(
     existingProjects: string[] = [],
     existingPorts: number[] = [],
-    options?: TLocalProjectOptions
+    options: TLocalProjectOptions
   ): Promise<LocalProject> {
     Telemetry.sendEvent("LocalResourceExplorer.createProject");
 
@@ -29,7 +29,7 @@ export class LocalResourceExplorer {
   public async selectProject(
     existingProjects: string[] = [],
     existingPorts: number[] = [],
-    options?: TLocalProjectOptions
+    options: TLocalProjectOptions
   ): Promise<LocalProject> {
     Telemetry.sendEvent("LocalResourceExplorer.selectProject");
 
@@ -51,7 +51,7 @@ export class LocalResourceExplorer {
     existingPorts: number[],
     portStatus: GanacheService.PortStatus,
     validateMessage: string,
-    options?: TLocalProjectOptions
+    options: TLocalProjectOptions
   ): Promise<LocalProject> {
     const port: number = await this.getLocalProjectPort(existingPorts, portStatus, validateMessage);
     const label: string = await this.getLocalProjectName(existingProjects);
@@ -63,8 +63,8 @@ export class LocalResourceExplorer {
   private async getLocalProject(
     label: string,
     port: number,
-    options?: TLocalProjectOptions,
-    description?: string
+    options: TLocalProjectOptions,
+    description: string
   ): Promise<LocalProject> {
     const localProject = new LocalProject(label, port, options, description);
     const url = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
@@ -125,15 +125,13 @@ export class LocalResourceExplorer {
     return parseInt(port, 10);
   }
 
-  private async getDescription(port: number, options?: TLocalProjectOptions) {
-    const blockNumber: string | undefined = options?.blockNumber?.Equals(0)
-      ? Constants.latestBlock
-      : options?.blockNumber?.ToString();
-    const forkedNetwork: string | undefined = options?.url === undefined ? options?.forkedNetwork : options?.url;
+  private async getDescription(port: number, options: TLocalProjectOptions) {
+    const blockNumber: string = options.blockNumber === 0 ? Constants.latestBlock : options.blockNumber.toString();
+    const forkedNetwork: string = options.url === String.Empty ? options.forkedNetwork : options.url;
 
     let formattedDescription: string;
 
-    if (options?.isForked)
+    if (options.isForked)
       formattedDescription = `${forkedNetwork?.toLowerCase()} - ${Constants.networkProtocols.http}${
         Constants.localhost
       }:${port} forking ${forkedNetwork?.toLowerCase()}@${blockNumber}`;

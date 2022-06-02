@@ -122,6 +122,7 @@ describe("Unit tests GanacheService", () => {
       isForked: true,
       forkedNetwork: "rinkeby",
       blockNumber: 1000,
+      url: String.Empty,
     };
 
     sinon.stub(shell, "findPid").returns(Promise.resolve(Number.NaN));

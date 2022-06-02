@@ -9,13 +9,13 @@ import {Project} from "./Project";
 
 export type TLocalProjectOptions = {
   isForked: boolean;
-  forkedNetwork?: string;
-  url?: string;
-  blockNumber?: number;
+  forkedNetwork: string;
+  url: string;
+  blockNumber: number;
 };
 
 export class LocalProject extends Project {
-  constructor(label: string, readonly port: number, readonly options?: TLocalProjectOptions, description?: string) {
+  constructor(label: string, readonly port: number, readonly options: TLocalProjectOptions, description: string) {
     super(ItemType.LOCAL_PROJECT, label, Constants.treeItemData.project.local, description);
   }
 
