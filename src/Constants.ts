@@ -937,4 +937,15 @@ export class Constants {
         return "Blockchain item is unavailable.";
     }
   }
+
+  public static workspaceIgnoredFolders: string[] = [
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/ElectronClient/lib/**",
+    "**/CliClient/build/lib/**",
+    "**/CliClient/tests-build/lib/**",
+    "**/ElectronClient/dist/**",
+    "**/Modules/TinyMCE/JoplinLists/**",
+    "**/Modules/TinyMCE/IconPack/**",
+  ];
 }

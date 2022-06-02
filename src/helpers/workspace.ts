@@ -4,8 +4,8 @@
 import {Uri, workspace} from "vscode";
 import {Constants} from "../Constants";
 import {Telemetry} from "../TelemetryClient";
-import * as fs from "fs";
 import * as path from "path";
+import glob from "glob";
 
 export interface TruffleWorkspace {
   dirName: string;
@@ -34,7 +34,7 @@ export async function getWorkspaces(): Promise<TruffleWorkspace[]> {
     })
   );
 
-  if (workspaces === undefined) {
+  if (workspaces.length === 0) {
     const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined("Workspace root"));
     Telemetry.sendException(error);
     throw error;
@@ -47,27 +47,20 @@ export function isWorkspaceOpen(): boolean {
   return !!(workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath);
 }
 
-async function getWorkspaceFiles(dirPath: string, truffleWorkSpaces?: TruffleWorkspace[]): Promise<TruffleWorkspace[]> {
-  const files = fs.readdirSync(dirPath);
+async function getWorkspaceFiles(dirPath: string): Promise<TruffleWorkspace[]> {
+  const truffleWorkSpaces: TruffleWorkspace[] = [];
 
-  truffleWorkSpaces = truffleWorkSpaces || [];
+  const files = glob.sync(`${dirPath}/**/${Constants.defaultTruffleConfigFileName}`, {
+    ignore: Constants.workspaceIgnoredFolders,
+  });
 
-  await Promise.all(
-    files.map(async (file) => {
-      if (file.includes("node_modules")) return;
-
-      if (fs.statSync(`${dirPath}/${file}`).isDirectory()) {
-        truffleWorkSpaces = await getWorkspaceFiles(`${dirPath}/${file}`, truffleWorkSpaces);
-      } else {
-        if (file === Constants.defaultTruffleConfigFileName)
-          truffleWorkSpaces!.push({
-            dirName: path.dirname(`${dirPath}/${file}`).split(path.sep).pop()!.toString(),
-            workspace: Uri.parse(dirPath),
-            truffleConfig: Uri.parse(`${dirPath}/${file}`),
-          });
-      }
-    })
-  );
+  files.forEach((file) => {
+    truffleWorkSpaces.push({
+      dirName: path.dirname(file).split(path.sep).pop()!.toString(),
+      workspace: Uri.parse(path.dirname(file)),
+      truffleConfig: Uri.parse(file),
+    });
+  });
 
   return truffleWorkSpaces;
 }

@@ -120,8 +120,8 @@ export namespace TruffleConfiguration {
   export let truffleConfigUri: Uri;
 
   export function getTruffleConfigUri(): string {
-    const workspacRoot = truffleConfigUri ? truffleConfigUri.fsPath : getWorkspaceRoot()!;
-    const configFilePath = path.join(workspacRoot, Constants.defaultTruffleConfigFileName);
+    const workspaceRoot = truffleConfigUri ? truffleConfigUri.fsPath : getWorkspaceRoot()!;
+    const configFilePath = path.join(workspaceRoot, Constants.defaultTruffleConfigFileName);
 
     if (!fs.pathExistsSync(configFilePath)) {
       const error = new Error(Constants.errorMessageStrings.TruffleConfigIsNotExist);

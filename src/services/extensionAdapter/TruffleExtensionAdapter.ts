@@ -6,14 +6,15 @@ import {TruffleCommands} from "../../commands/TruffleCommands";
 import {IExtensionAdapter} from "./IExtensionAdapter";
 
 export class TruffleExtensionAdapter implements IExtensionAdapter {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public async validateExtension(): Promise<void> {}
+  public validateExtension = async (): Promise<void> => {
+    throw new Error("Method not implemented.");
+  };
 
-  public async build(uri?: Uri): Promise<void> {
+  public build = async (uri?: Uri): Promise<void> => {
     return TruffleCommands.buildContracts(uri);
-  }
+  };
 
-  public async deploy(uri?: Uri) {
+  public deploy = async (uri?: Uri): Promise<void> => {
     return TruffleCommands.deployContracts(uri);
-  }
+  };
 }
