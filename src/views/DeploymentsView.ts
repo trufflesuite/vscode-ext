@@ -7,7 +7,7 @@ import {
 } from "@microsoft/vscode-azext-utils";
 import fs from "fs";
 import paths from "path";
-import vscode, {ThemeIcon} from "vscode";
+import vscode, {commands, ThemeIcon} from "vscode";
 import {getChain, getExplorerLink} from "../functions/explorer";
 import {OpenUrlTreeItem} from "../Models/TreeItems/OpenUrlTreeItem";
 import {getWorkspaceFolder, pathExists} from "./Utils";
@@ -188,7 +188,7 @@ export class NetworkDeploymentTreeItem extends AzExtParentTreeItem {
         getExplorerLink(chainId, this.deployment.transactionHash, "transaction"),
         new ThemeIcon("broadcast")
       ),
-      // these need to be something else eventually
+      // TODO: these need to be something else eventually
       // new GenericTreeItem(this, {
       //   label: `Events: ${JSON.stringify(this.deployment.events)}`,
       //   contextValue: "events",
@@ -275,5 +275,8 @@ export function registerDeploymentView(
 ): vscode.TreeView<AzExtTreeItem> {
   const root = new DeploymentsView(baseFolder, undefined);
   const treeDataProvider = new AzExtTreeDataProvider(root, `${viewId}.loadMore`);
+  commands.registerCommand(`${viewId}.refresh`, async (context: IActionContext, node?: AzExtTreeItem) => {
+    await treeDataProvider.refresh(context, node);
+  });
   return vscode.window.createTreeView(viewId, {treeDataProvider, canSelectMany: true});
 }

@@ -1,6 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {registerUIExtensionVariables} from "@microsoft/vscode-azext-utils";
 import {commands, ExtensionContext, Uri, window, workspace} from "vscode";
 import {
   DebuggerCommands,
@@ -12,7 +13,10 @@ import {
   TruffleCommands,
 } from "./commands";
 import {Constants, ext} from "./Constants";
+
+import {DebuggerConfiguration} from "./debugAdapter/configuration/debuggerConfiguration";
 import {CommandContext, isWorkspaceOpen, setCommandContext} from "./helpers";
+import {required} from "./helpers/required";
 import {CancellationEvent} from "./Models";
 import {Output} from "./Output";
 import {ChangelogPage, RequirementsPage, WelcomePage} from "./pages";
@@ -27,13 +31,9 @@ import {
 } from "./services";
 import {Telemetry} from "./TelemetryClient";
 import {NetworkNodeView, ProjectView} from "./ViewItems";
-
-import {DebuggerConfiguration} from "./debugAdapter/configuration/debuggerConfiguration";
-import {registerFileExplorerView} from "./views/fileExplorer";
-import {required} from "./helpers/required";
-import {registerHelpView} from "./views/HelpView";
-import {registerUIExtensionVariables} from "@microsoft/vscode-azext-utils";
 import {registerDeploymentView} from "./views/DeploymentsView";
+import {registerFileExplorerView} from "./views/fileExplorer";
+import {registerHelpView} from "./views/HelpView";
 
 /**
  * This function registers variables similar to docker plugin, going forward this seems a better method of doing things.

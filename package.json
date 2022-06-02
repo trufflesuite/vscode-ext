@@ -56,6 +56,8 @@
     "onCommand:truffle-vscode.signOutOfInfuraAccount",
     "onCommand:truffle-vscode.startGanacheServer",
     "onCommand:truffle-vscode.stopGanacheServer",
+    "onCommand:truffle-vscode.views.explorer.refreshExplorer",
+    "onCommand:truffle-vscode.views.deployments.refresh",
     "onDebug"
   ],
   "contributes": {
@@ -91,10 +93,7 @@
         "command": "truffle-vscode.refresh",
         "title": "Refresh",
         "category": "Blockchain",
-        "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
-        }
+        "icon": "$(refresh)"
       },
       {
         "command": "truffle-contract.copyByteCode",
@@ -191,10 +190,7 @@
         "command": "truffle-vscode.refresh",
         "title": "Refresh",
         "category": "Truffle",
-        "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
-        }
+        "icon": "$(refresh)"
       },
       {
         "command": "truffle-contract.copyByteCode",
@@ -287,14 +283,17 @@
         "command": "truffle-vscode.views.explorer.refreshExplorer",
         "title": "Refresh Explorer",
         "category": "Truffle",
-        "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
-        }
+        "icon": "$(refresh)"
       },
       {
         "command": "truffle-vscode.views.explorer.openFile",
         "title": "Open File"
+      },
+      {
+        "command": "truffle-vscode.views.deployments.refresh",
+        "title": "Refresh Deployments",
+        "category": "Truffle",
+        "icon": "$(refresh)"
       }
     ],
     "breakpoints": [
@@ -371,6 +370,11 @@
         {
           "command": "truffle-vscode.deployContracts",
           "when": "view == truffle-vscode.views.explorer",
+          "group": "navigation"
+        },
+        {
+          "command": "truffle-vscode.views.deployments.refresh",
+          "when": "view == truffle-vscode.views.deployments",
           "group": "navigation"
         }
       ],
