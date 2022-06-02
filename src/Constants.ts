@@ -718,12 +718,6 @@ export class Constants {
     userMe: "user/me",
   };
 
-  public static infuraMockAPIUrls = {
-    projects: "xhulz/json-server/db",
-    rootURL: "https://my-json-server.typicode.com/",
-    userMe: "user/me",
-  };
-
   public static infuraSigningIn = "Signing in";
 
   public static infuraRequestGrantType = {
