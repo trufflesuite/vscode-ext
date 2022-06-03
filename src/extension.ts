@@ -10,6 +10,7 @@ import {
   sdkCoreCommands,
   ServiceCommands,
   TruffleCommands,
+  GenericCommands,
 } from "./commands";
 import {Constants} from "./Constants";
 import {CommandContext, isWorkspaceOpen, required, setCommandContext} from "./helpers";
@@ -37,6 +38,9 @@ export async function activate(context: ExtensionContext) {
 
   Constants.initialize(context);
   DebuggerConfiguration.initialize(context);
+
+  await required.checkAllApps();
+
   await ContractDB.initialize(AdapterType.IN_MEMORY);
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
@@ -90,6 +94,15 @@ export async function activate(context: ExtensionContext) {
       await tryExecute(() => GanacheCommands.stopGanacheCmd(viewItem)).then(() =>
         tryExecute(() => GanacheCommands.startGanacheCmd(viewItem))
       );
+    }
+  );
+  //#endregion
+
+  //#region Generic extension commands
+  const checkForConnection = commands.registerCommand(
+    "truffle-vscode.checkForConnection",
+    async (viewItem?: ProjectView) => {
+      await tryExecute(() => GenericCommands.checkForConnection(viewItem));
     }
   );
   //#endregion
@@ -238,10 +251,9 @@ export async function activate(context: ExtensionContext) {
     showProjectsFromInfuraAccount,
     openAtAzurePortal,
     changeCoreSdkConfigurationListener,
+    checkForConnection,
   ];
   context.subscriptions.push(...subscriptions);
-
-  await required.checkAllApps();
 
   Telemetry.sendEvent(Constants.telemetryEvents.extensionActivated);
 }

@@ -48,18 +48,16 @@ export function isWorkspaceOpen(): boolean {
 }
 
 async function getWorkspaceFiles(dirPath: string): Promise<TruffleWorkspace[]> {
-  const truffleWorkSpaces: TruffleWorkspace[] = [];
-
   const files = glob.sync(`${dirPath}/**/${Constants.defaultTruffleConfigFileName}`, {
     ignore: Constants.workspaceIgnoredFolders,
   });
 
-  files.forEach((file) => {
-    truffleWorkSpaces.push({
+  const truffleWorkSpaces: TruffleWorkspace[] = files.map((file) => {
+    return {
       dirName: path.dirname(file).split(path.sep).pop()!.toString(),
       workspace: Uri.parse(path.dirname(file)),
       truffleConfig: Uri.parse(file),
-    });
+    };
   });
 
   return truffleWorkSpaces;

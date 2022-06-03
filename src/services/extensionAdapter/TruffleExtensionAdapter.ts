@@ -7,7 +7,7 @@ import {IExtensionAdapter} from "./IExtensionAdapter";
 
 export class TruffleExtensionAdapter implements IExtensionAdapter {
   public validateExtension = async (): Promise<void> => {
-    throw new Error("Method not implemented.");
+    // throw new Error("Method not implemented.");
   };
 
   public build = async (uri?: Uri): Promise<void> => {

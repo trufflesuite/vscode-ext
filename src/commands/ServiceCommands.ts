@@ -18,6 +18,8 @@ import {
   Project,
   Service,
   ServiceTypes,
+  GenericProject,
+  GenericService,
 } from "../Models/TreeItems";
 import {
   // BlockchainDataManagerResourceExplorer,
@@ -25,6 +27,7 @@ import {
   InfuraResourceExplorer,
   LocalResourceExplorer,
   // StorageAccountResourceExplorer,
+  GenericResourceExplorer,
 } from "../resourceExplorers";
 import {GanacheService, TreeManager} from "../services";
 import {Telemetry} from "../TelemetryClient";
@@ -95,6 +98,11 @@ export namespace ServiceCommands {
       //   itemType: ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE,
       //   label: Constants.treeItemData.service.bdm.label,
       // },
+      {
+        cmd: connectGenericProject,
+        itemType: ItemType.GENERIC_SERVICE,
+        label: Constants.treeItemData.service.generic.label,
+      },
     ];
 
     const project = await execute(serviceDestinations);
@@ -118,7 +126,7 @@ export namespace ServiceCommands {
       }
     }
 
-    await TreeManager.removeItem(viewItem.extensionItem);
+    TreeManager.removeItem(viewItem.extensionItem);
     Telemetry.sendEvent("ServiceCommands.disconnectProject.commandFinished");
   }
 
@@ -233,6 +241,12 @@ async function getExistingNames(service: LocalService): Promise<string[]> {
 async function getExistingPorts(service: LocalService): Promise<number[]> {
   const localProjects = service.getChildren() as LocalProject[];
   return localProjects.map((item) => item.port);
+}
+
+// ------------ GENERIC ------------ //
+async function connectGenericProject(service: GenericService): Promise<GenericProject> {
+  const genericResourceExplorer = new GenericResourceExplorer();
+  return genericResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
 }
 
 // ------------ BLOCKCHAIN DATA MANAGER ------------ //

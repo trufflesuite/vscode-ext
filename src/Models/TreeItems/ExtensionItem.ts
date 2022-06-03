@@ -21,12 +21,14 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
   protected constructor(
     public readonly itemType: ItemType,
     public readonly label: string,
-    public readonly data: ExtensionItemData
+    public readonly data: ExtensionItemData,
+    public description?: string
   ) {
     super(label);
 
     this.contextValue = data.contextValue;
     this.iconPath = data.iconPath;
+    this.description = description;
 
     this.children = [];
     this.parent = null;

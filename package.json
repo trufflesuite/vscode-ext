@@ -187,6 +187,11 @@
 				"category": "Blockchain"
 			},
 			{
+				"command": "truffle-vscode.checkForConnection",
+				"title": "Check network connection",
+				"category": "Blockchain"
+			},
+			{
 				"command": "truffle-vscode.showWelcomePage",
 				"title": "Show Welcome Page",
 				"category": "Truffle"
@@ -407,6 +412,16 @@
 					"command": "truffle-vscode.openAtAzurePortal",
 					"when": "view == truffle-vscode.truffle && viewItem == output",
 					"group": "truffle-0@0"
+				},
+				{
+					"command": "truffle-vscode.disconnectProject",
+					"when": "view == truffle-vscode.truffle && viewItem == genericproject",
+					"group": "truffle-0@0"
+				},
+				{
+					"command": "truffle-vscode.checkForConnection",
+					"when": "view == truffle-vscode.truffle && viewItem == genericproject",
+					"group": "truffle-1@0"
 				}
 			],
 			"explorer/context": [
