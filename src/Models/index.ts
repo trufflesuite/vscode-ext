@@ -15,6 +15,7 @@ import {
   LocalProjectItemCreator,
   LocalServiceItemCreator,
   NullableItemCreator,
+  InfuraLayerItemCreator,
 } from "./ItemCreators";
 import {ItemFactory} from "./ItemFactory";
 import {ItemType} from "./ItemType";
@@ -30,3 +31,5 @@ ItemFactory.register(ItemType.INFURA_PROJECT, new InfuraProjectItemCreator());
 
 ItemFactory.register(ItemType.LOCAL_NETWORK_NODE, new LocalNetworkNodeItemCreator());
 ItemFactory.register(ItemType.INFURA_NETWORK_NODE, new InfuraNetworkNodeItemCreator());
+
+ItemFactory.register(ItemType.INFURA_LAYER, new InfuraLayerItemCreator());

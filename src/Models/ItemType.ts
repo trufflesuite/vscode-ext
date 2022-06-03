@@ -20,4 +20,5 @@ export enum ItemType {
   INFURA_SERVICE = 40,
   INFURA_PROJECT = 41,
   INFURA_NETWORK_NODE = 42,
+  INFURA_LAYER = 43,
 }

@@ -9,8 +9,8 @@ import {ItemType} from "../ItemType";
 import {MnemonicNetworkNode} from "./MnemonicNetworkNode";
 
 export class InfuraNetworkNode extends MnemonicNetworkNode {
-  constructor(label: string, url: URL | string, networkId: number | string) {
-    super(ItemType.INFURA_NETWORK_NODE, label, Constants.treeItemData.network.infura, url, networkId);
+  constructor(label: string, url: URL | string, networkId: number | string, description?: string) {
+    super(ItemType.INFURA_NETWORK_NODE, label, Constants.treeItemData.network.infura, url, networkId, description);
   }
 
   public async getTruffleNetwork(): Promise<TruffleConfiguration.INetwork> {

@@ -16,3 +16,5 @@ export * from "./NetworkNode";
 export * from "./Nullable";
 export * from "./Project";
 export * from "./Service";
+export * from "./InfuraLayer";
+export * from "./Layer";

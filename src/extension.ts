@@ -55,6 +55,9 @@ export async function activate(context: ExtensionContext) {
   initializeExtensionVariables(context);
 
   DebuggerConfiguration.initialize(context);
+
+  await required.checkAllApps();
+
   await ContractDB.initialize(AdapterType.IN_MEMORY);
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
@@ -224,8 +227,6 @@ export async function activate(context: ExtensionContext) {
     deploymentView,
   ];
   context.subscriptions.push(...subscriptions);
-
-  await required.checkAllApps();
 
   Telemetry.sendEvent(Constants.telemetryEvents.extensionActivated);
 }

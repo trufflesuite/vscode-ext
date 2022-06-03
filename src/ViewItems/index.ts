@@ -17,6 +17,7 @@ import {
   NullableViewCreator,
   ProjectViewCreator,
   ServiceViewCreator,
+  LayerViewCreator,
 } from "./ViewCreators";
 import {ViewItemFactory} from "./ViewItemFactory";
 
@@ -33,3 +34,5 @@ ViewItemFactory.register(ItemType.LOCAL_NETWORK_NODE, new NetworkNodeViewCreator
 ViewItemFactory.register(ItemType.INFURA_NETWORK_NODE, new NetworkNodeViewCreator());
 
 ViewItemFactory.register(ItemType.MEMBER, new GroupViewCreator());
+
+ViewItemFactory.register(ItemType.INFURA_LAYER, new LayerViewCreator());

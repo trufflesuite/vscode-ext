@@ -30,11 +30,12 @@ export abstract class NetworkNode extends ExtensionItem {
     label: string,
     data: ExtensionItemData,
     url: URL | string,
-    networkId: number | string
+    networkId: number | string,
+    description?: string
   ) {
     networkId = networkId === "*" ? networkId : parseInt(networkId + "", 10);
 
-    super(itemType, label, data);
+    super(itemType, label, data, description);
 
     this.url = this.prepareUrl(url);
     this.networkId = networkId;
