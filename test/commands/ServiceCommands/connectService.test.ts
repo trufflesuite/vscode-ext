@@ -90,8 +90,8 @@ describe("Service Commands", () => {
         showQuickPickMock.onCall(0).callsFake((items: any) => {
           return items.find((item: any) => item.label === service.local.label);
         });
-        showInputBoxMock.onCall(0).returns(name);
-        showInputBoxMock.onCall(1).returns(port);
+        showInputBoxMock.onCall(0).returns(port);
+        showInputBoxMock.onCall(1).returns(name);
         getPortStatusMock.returns(GanacheService.PortStatus.FREE);
 
         // Act

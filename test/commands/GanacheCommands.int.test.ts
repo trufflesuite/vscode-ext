@@ -10,7 +10,14 @@ import vscode from "vscode";
 import {GanacheCommands} from "../../src/commands";
 import * as commands from "../../src/helpers/command";
 import * as shell from "../../src/helpers/shell";
-import {AzureBlockchainService, IExtensionItem, LocalProject, LocalService, Service} from "../../src/Models/TreeItems";
+import {
+  AzureBlockchainService,
+  IExtensionItem,
+  LocalProject,
+  LocalService,
+  Service,
+  TLocalProjectOptions,
+} from "../../src/Models/TreeItems";
 import {TreeManager} from "../../src/services";
 import {ProjectView} from "../../src/ViewItems";
 
@@ -20,6 +27,15 @@ describe("Integration tests GanacheCommands", () => {
   let serviceItems: Service[];
   let loadStateMock: sinon.SinonStub<[], IExtensionItem[]>;
   let projectView: ProjectView;
+
+  const description: string = String.Empty;
+
+  const options: TLocalProjectOptions = {
+    isForked: false,
+    forkedNetwork: String.Empty,
+    blockNumber: 0,
+    url: String.Empty,
+  };
 
   const streamMock = {
     on(_event: "data", _listener: (chunk: any) => void): any {
@@ -49,7 +65,7 @@ describe("Integration tests GanacheCommands", () => {
     loadStateMock = sinon.stub(TreeManager, "loadState");
     loadStateMock.returns(serviceItems);
 
-    projectView = new ProjectView(new LocalProject("test consortium", defaultPort));
+    projectView = new ProjectView(new LocalProject("test consortium", defaultPort, options, description));
 
     sinon.mock(vscode.window);
     sinon.stub(vscode.window, "showInformationMessage");
@@ -79,7 +95,7 @@ describe("Integration tests GanacheCommands", () => {
     assert.strictEqual(spawnStub.getCall(0).args[0], "npx", "should execute npx command");
     assert.deepStrictEqual(
       spawnStub.getCall(0).args[1],
-      ["ganache", `-p ${defaultPort}`],
+      ["ganache", `--port ${defaultPort}`],
       "should execute npx command with specific parameters"
     );
   });

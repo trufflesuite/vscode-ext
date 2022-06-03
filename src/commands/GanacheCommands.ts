@@ -5,7 +5,7 @@ import {commands, QuickPickItem, window} from "vscode";
 import {Constants, RequiredApps} from "../Constants";
 import {required, showQuickPick} from "../helpers";
 import {ItemType} from "../Models";
-import {LocalProject} from "../Models/TreeItems";
+import {LocalProject, TLocalProjectOptions} from "../Models/TreeItems";
 import {GanacheService, TreeManager} from "../services";
 import {Telemetry} from "../TelemetryClient";
 import {ProjectView} from "../ViewItems";
@@ -20,8 +20,11 @@ export namespace GanacheCommands {
       commands.executeCommand("truffle-vscode.showRequirementsPage");
       return;
     }
+
     const port = await getGanachePort(projectView);
-    const ganacheProcess = await GanacheService.startGanacheServer(port);
+    const options = await getGanacheProjectOptions(projectView);
+
+    const ganacheProcess = await GanacheService.startGanacheServer(port, options);
 
     if (!ganacheProcess.process) {
       Telemetry.sendEvent("GanacheCommands.startGanacheCmd.serverAlreadyRunning");
@@ -73,5 +76,16 @@ export namespace GanacheCommands {
       ignoreFocusOut: true,
     });
     return (pick as LocalProject).port;
+  }
+
+  export async function getGanacheProjectOptions(projectView?: ProjectView): Promise<TLocalProjectOptions> {
+    if (!projectView) {
+      const error = new Error(Constants.ganacheCommandStrings.cannotStartServer);
+      Telemetry.sendException(error);
+      throw error;
+    }
+
+    const project: LocalProject = projectView?.extensionItem as LocalProject;
+    return project.options;
   }
 }

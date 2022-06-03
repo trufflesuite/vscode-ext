@@ -69,6 +69,7 @@ export class Constants {
 
   public static ganacheRetryTimeout = 2000; // milliseconds
   public static ganacheRetryAttempts = 5;
+  public static latestBlock = "latest";
 
   public static truffleResourceName = {
     eventGrid: "Event Grid",
@@ -228,6 +229,8 @@ export class Constants {
     enterInfuraProjectName: "Enter project name",
     enterLocalProjectName: "Enter local project name",
     enterLocalProjectPort: "Enter local port number",
+    enterBlockNumber: "Enter a block number",
+    enterNetworkUrl: "Enter a valid host address with no port",
     enterMemberName: "Enter member name",
     enterMemberPassword: "Enter member password",
     enterTransactionNodeName: "Enter transaction node name",
@@ -370,6 +373,36 @@ export class Constants {
         iconPath: {dark: "", light: ""},
         label: "Ganache Service",
         prefix: "loc",
+        type: {
+          default: {
+            label: "Local",
+            prefix: "dfl",
+            description: "Local",
+            isForked: false,
+            networks: {},
+          },
+          forked: {
+            label: "Fork",
+            prefix: "frk",
+            description: "Fork",
+            isForked: true,
+            networks: {
+              mainnet: "Mainnet",
+              ropsten: "Ropsten",
+              kovan: "Kovan",
+              rinkeby: "Rinkeby",
+              goerli: "Goerli",
+              other: "Other...",
+            },
+          },
+          linked: {
+            label: "Linked",
+            prefix: "lnk",
+            description: "Linked",
+            isForked: false,
+            networks: {},
+          },
+        },
       },
       generic: {
         contextValue: "service",
@@ -520,7 +553,8 @@ export class Constants {
     selectMember: "Select member",
     selectMnemonicExtractKey: "Select mnemonic to extract key",
     selectMnemonicStorage: "Select mnemonic storage",
-    selectNetwork: "Select network",
+    selectType: "Select a type",
+    selectNetwork: "Select a network to fork",
     selectNewProjectPath: "Select new project path",
     selectProjects: "Select Projects",
     selectResourceGroup: "Select a resource group",
@@ -529,6 +563,8 @@ export class Constants {
     selectTransactionNode: "Select transaction node",
     selectTypeOfSolidityProject: "Select type of solidity project",
     setupMnemonic: "Setup mnemonic",
+    enterBlockNumber: "Leave blank for latest block",
+    enterNetworkUrl: "Enter a valid url",
   };
 
   // More information see here
