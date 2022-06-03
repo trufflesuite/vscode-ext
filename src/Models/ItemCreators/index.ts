@@ -8,5 +8,8 @@ export * from "./InfuraServiceItemCreator";
 export * from "./LocalNetworkNodeItemCreator";
 export * from "./LocalProjectItemCreator";
 export * from "./LocalServiceItemCreator";
+export * from "./GenericNetworkNodeItemCreator";
+export * from "./GenericProjectItemCreator";
+export * from "./GenericServiceItemCreator";
 export * from "./NullableItemCreator";
 export * from "./InfuraLayerItemCreator";

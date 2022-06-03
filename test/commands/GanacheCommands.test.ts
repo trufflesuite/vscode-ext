@@ -10,11 +10,20 @@ import {Constants, RequiredApps} from "../../src/Constants";
 import * as userInteraction from "../../src/helpers/userInteraction";
 import {required} from "../../src/helpers/required";
 import * as shell from "../../src/helpers/shell";
-import {IExtensionItem, LocalProject, LocalService, Service} from "../../src/Models/TreeItems";
+import {IExtensionItem, LocalProject, LocalService, Service, TLocalProjectOptions} from "../../src/Models/TreeItems";
 import {GanacheService, TreeManager} from "../../src/services";
 import * as GanacheServiceClient from "../../src/services/ganache/GanacheServiceClient";
 import {ProjectView} from "../../src/ViewItems";
 import {TestConstants} from "../TestConstants";
+
+const description: string = "";
+
+const options: TLocalProjectOptions = {
+  isForked: false,
+  forkedNetwork: "",
+  blockNumber: 0,
+  url: "",
+};
 
 describe("Unit tests GanacheCommands", () => {
   let checkAppsStub: sinon.SinonStub<RequiredApps[], Promise<boolean>>;
@@ -31,7 +40,7 @@ describe("Unit tests GanacheCommands", () => {
     loadStateMock = sinon.stub(TreeManager, "loadState");
     loadStateMock.returns(testServiceItems);
 
-    projectView = new ProjectView(new LocalProject("test consortium", testPort));
+    projectView = new ProjectView(new LocalProject("test consortium", testPort, options, description));
   });
 
   afterEach(() => {
@@ -176,7 +185,7 @@ describe("Unit tests GanacheCommands", () => {
 });
 
 const testPort = 8544;
-const localProject = new LocalProject(TestConstants.servicesNames.localProject, testPort);
+const localProject = new LocalProject(TestConstants.servicesNames.localProject, testPort, options, description);
 
 async function createTestServiceItems(): Promise<Service[]> {
   const services: Service[] = [];

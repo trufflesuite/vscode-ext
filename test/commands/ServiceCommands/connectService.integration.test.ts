@@ -115,13 +115,13 @@ describe("Service Commands", () => {
 
         showInputBoxMock.twice();
         showInputBoxMock.onCall(0).callsFake(async (..._args: any[]) => {
-          validationMessage = await _args[0].validateInput(defaultName);
-          return defaultName;
+          validationMessage = await _args[0].validateInput(defaultPort);
+          return defaultPort;
         });
 
         showInputBoxMock.onCall(1).callsFake(async (..._args: any[]) => {
-          validationMessage = await _args[0].validateInput(defaultPort);
-          return defaultPort;
+          validationMessage = await _args[0].validateInput(defaultName);
+          return defaultName;
         });
 
         // Act

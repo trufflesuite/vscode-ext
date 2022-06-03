@@ -4,40 +4,36 @@
 import {Constants} from "../../Constants";
 import {IDeployDestination} from "../IDeployDestination";
 import {ItemType} from "../ItemType";
-import {LocalNetworkNode} from "./LocalNetworkNode";
+import {GenericNetworkNode} from "./GenericNetworkNode";
 import {Project} from "./Project";
 
-export type TLocalProjectOptions = {
-  isForked: boolean;
-  forkedNetwork: string;
-  url: string;
-  blockNumber: number;
-};
+export class GenericProject extends Project {
+  public readonly port: number;
 
-export class LocalProject extends Project {
-  constructor(label: string, readonly port: number, readonly options: TLocalProjectOptions, description: string) {
-    super(ItemType.LOCAL_PROJECT, label, Constants.treeItemData.project.local, description);
+  constructor(label: string, port: number, description?: string) {
+    super(ItemType.GENERIC_PROJECT, label, Constants.treeItemData.project.generic, description);
+
+    this.port = port;
   }
 
   public toJSON(): {[p: string]: any} {
     const obj = super.toJSON();
 
     obj.port = this.port;
-    obj.options = this.options;
 
     return obj;
   }
 
   public async getDeployDestinations(): Promise<IDeployDestination[]> {
-    const {local} = Constants.treeItemData.service;
+    const {generic} = Constants.treeItemData.service;
 
-    const getDeployName = (labelNode: string) => [local.prefix, this.label, labelNode].join("_");
+    const getDeployName = (labelNode: string) => [generic.prefix, this.label, labelNode].join("_");
 
     return Promise.all(
-      (this.getChildren() as LocalNetworkNode[]).map(async (node) => {
+      (this.getChildren() as GenericNetworkNode[]).map(async (node) => {
         return {
           description: await node.getRPCAddress(),
-          detail: local.label,
+          detail: generic.label,
           getTruffleNetwork: async () => {
             const truffleNetwork = await node.getTruffleNetwork();
             truffleNetwork.name = getDeployName(node.label);

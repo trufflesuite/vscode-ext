@@ -9,8 +9,17 @@ import {QuickPickOptions} from "vscode";
 import {Constants} from "../../../src/Constants";
 import * as userInteraction from "../../../src/helpers/userInteraction";
 import {ItemType} from "../../../src/Models";
-import {LocalProject, LocalService} from "../../../src/Models/TreeItems";
+import {LocalProject, LocalService, TLocalProjectOptions} from "../../../src/Models/TreeItems";
 import {TreeManager} from "../../../src/services";
+
+const description: string = "";
+
+const options: TLocalProjectOptions = {
+  isForked: false,
+  forkedNetwork: "",
+  blockNumber: 0,
+  url: "",
+};
 
 describe("Create Service", () => {
   afterEach(() => {
@@ -22,7 +31,7 @@ describe("Create Service", () => {
     const serviceCommandsRewire = rewire("../../../src/commands/ServiceCommands");
     const showQuickPickStub = sinon.stub();
     showQuickPickStub.returns({
-      cmd: sinon.mock().returns(new LocalProject(uuid.v4(), 1234)),
+      cmd: sinon.mock().returns(new LocalProject(uuid.v4(), 1234, options, description)),
       itemType: ItemType.LOCAL_PROJECT,
       label: Constants.treeItemData.service.local.label,
     });

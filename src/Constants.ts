@@ -35,6 +35,7 @@ export class Constants {
     truffleForVSCode: "Truffle for VSCode",
     executeCommand: "Truffle: Execute command",
     ganacheCommands: "Truffle: Ganache Server",
+    genericCommands: "Truffle: Generic Server",
     //logicAppGenerator: "Logic App Generator",
     requirements: "Truffle: Requirements",
     telemetryClient: "Truffle: Telemetry Client",
@@ -62,8 +63,11 @@ export class Constants {
   public static localhost = "127.0.0.1";
   public static localhostName = "development";
   public static defaultLocalhostPort = 8545;
+  public static defaultTruffleConfigFileName = "truffle-config.js";
+
   public static ganacheRetryTimeout = 2000; // milliseconds
   public static ganacheRetryAttempts = 5;
+  public static latestBlock = "latest";
 
   // Values are quite brittle and don't map directly to the requirements.html screen.
   public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
@@ -195,6 +199,8 @@ export class Constants {
     enterInfuraProjectName: "Enter project name",
     enterLocalProjectName: "Enter local project name",
     enterLocalProjectPort: "Enter local port number",
+    enterBlockNumber: "Enter a block number",
+    enterNetworkUrl: "Enter a valid host address with no port",
     enterMemberName: "Enter member name",
     enterMemberPassword: "Enter member password",
     enterTransactionNodeName: "Enter transaction node name",
@@ -225,6 +231,10 @@ export class Constants {
         contextValue: "localnetwork",
         iconPath: {dark: "", light: ""},
       },
+      generic: {
+        contextValue: "network",
+        iconPath: {dark: "", light: ""},
+      },
     },
     layer: {
       infura: {
@@ -253,6 +263,10 @@ export class Constants {
         contextValue: "localproject",
         iconPath: {dark: "", light: ""},
       },
+      generic: {
+        contextValue: "genericproject",
+        iconPath: {dark: "", light: ""},
+      },
     },
     service: {
       default: {
@@ -271,6 +285,42 @@ export class Constants {
         iconPath: {dark: "", light: ""},
         label: "Ganache Service",
         prefix: "loc",
+        type: {
+          default: {
+            label: "Local",
+            prefix: "dfl",
+            description: "Local",
+            isForked: false,
+            networks: {},
+          },
+          forked: {
+            label: "Fork",
+            prefix: "frk",
+            description: "Fork",
+            isForked: true,
+            networks: {
+              mainnet: "Mainnet",
+              ropsten: "Ropsten",
+              kovan: "Kovan",
+              rinkeby: "Rinkeby",
+              goerli: "Goerli",
+              other: "Other...",
+            },
+          },
+          linked: {
+            label: "Linked",
+            prefix: "lnk",
+            description: "Linked",
+            isForked: false,
+            networks: {},
+          },
+        },
+      },
+      generic: {
+        contextValue: "service",
+        iconPath: {dark: "", light: ""},
+        label: "Other Service",
+        prefix: "gnr",
       },
     },
   };
@@ -338,6 +388,7 @@ export class Constants {
     onlyNumberAllowed: "Value after ':' should be a number.",
     portAlreadyInUse: "This port is already in use. Choose another one.",
     portNotInUseGanache: "No local ganache service running on port. Please start service or select another port.",
+    portNotInUseGeneric: "No local service running on port. Please start service or select another port.",
     projectAlreadyExists: "Network already exists.",
     projectAlreadyExistsOnInfura: "Project already exist with the same name on Infura.",
     projectIdAlreadyExists: "Network with project ID already exists.",
@@ -372,12 +423,15 @@ export class Constants {
     selectMember: "Select member",
     selectMnemonicExtractKey: "Select mnemonic to extract key",
     selectMnemonicStorage: "Select mnemonic storage",
-    selectNetwork: "Select network",
+    selectType: "Select a type",
+    selectNetwork: "Select a network to fork",
     selectNewProjectPath: "Select new project path",
     selectProjects: "Select Projects",
     selectTransactionNode: "Select transaction node",
     selectTypeOfSolidityProject: "Select type of solidity project",
     setupMnemonic: "Setup mnemonic",
+    enterBlockNumber: "Leave blank for latest block",
+    enterNetworkUrl: "Enter a valid url",
   };
 
   // More information see here
@@ -437,6 +491,7 @@ export class Constants {
     getCode: "eth_getCode",
     netListening: "net_listening",
     netVersion: "net_version",
+    web3_clientVersion: "web3_clientVersion",
   };
 
   public static ganacheCommandStrings = {
@@ -450,6 +505,14 @@ export class Constants {
     serverNoGanacheInstance: "No Ganache instance running",
     serverSuccessfullyStarted: "Ganache server successfully started",
     serverSuccessfullyStopped: "Ganache server successfully stopped",
+  };
+
+  public static genericCommandStrings = {
+    invalidPort: "Unable to verify connection. Invalid port",
+    portIsBusy: "Cannot start ganache server, port is busy",
+    serverNoAvailable: "No network settings available",
+    serverRunning: "Server is running",
+    serverNotFound: "Not found",
   };
 
   public static uiCommandStrings = {
@@ -597,12 +660,22 @@ export class Constants {
       light: context.asAbsolutePath(path.join("resources/light", "LocalNetwork.svg")),
     };
 
+    this.treeItemData.network.generic.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "LocalNetwork.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "LocalNetwork.svg")),
+    };
+
     this.treeItemData.project.infura.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "InfuraProject.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "InfuraProject.svg")),
     };
 
     this.treeItemData.project.local.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "LocalProject.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "LocalProject.svg")),
+    };
+
+    this.treeItemData.project.generic.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "LocalProject.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "LocalProject.svg")),
     };
@@ -620,6 +693,11 @@ export class Constants {
     this.treeItemData.layer.infura.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "InfuraLayer.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "InfuraLayer.svg")),
+    };
+
+    this.treeItemData.service.generic.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "GenericService.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "GenericService.svg")),
     };
   }
 
@@ -675,6 +753,17 @@ export class Constants {
         return "Blockchain item is unavailable.";
     }
   }
+
+  public static workspaceIgnoredFolders: string[] = [
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/ElectronClient/lib/**",
+    "**/CliClient/build/lib/**",
+    "**/CliClient/tests-build/lib/**",
+    "**/ElectronClient/dist/**",
+    "**/Modules/TinyMCE/JoplinLists/**",
+    "**/Modules/TinyMCE/IconPack/**",
+  ];
 }
 
 /**

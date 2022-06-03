@@ -13,3 +13,5 @@ export * from "./MnemonicRepository";
 export * from "./tree/TreeManager";
 export * from "./tree/TreeService";
 export * from "./infuraService/InfuraServiceClient";
+export * from "./generic/GenericService";
+export * from "./generic/GenericServiceClient";

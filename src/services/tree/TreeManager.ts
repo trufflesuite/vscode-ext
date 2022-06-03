@@ -4,7 +4,15 @@
 import {Memento} from "vscode";
 import {Constants} from "../../Constants";
 import {ItemFactory} from "../../Models";
-import {Command, IExtensionItem, InfuraService, LocalService, Service, ServiceTypes} from "../../Models/TreeItems";
+import {
+  Command,
+  IExtensionItem,
+  InfuraService,
+  LocalService,
+  GenericService,
+  Service,
+  ServiceTypes,
+} from "../../Models/TreeItems";
 import {Output} from "../../Output";
 import {Telemetry} from "../../TelemetryClient";
 
@@ -88,7 +96,13 @@ class ExtensionTreeManager {
     if (!infuraService) {
       infuraService = new InfuraService();
     }
-    return [infuraService, localService];
+
+    let genericService = items.find((item) => item instanceof GenericService);
+    if (!genericService) {
+      genericService = new GenericService();
+    }
+
+    return [infuraService, localService, genericService];
   }
 }
 

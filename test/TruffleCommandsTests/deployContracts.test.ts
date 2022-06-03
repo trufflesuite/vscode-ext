@@ -3,9 +3,9 @@
 
 import assert from "assert";
 import path from "path";
-import sinon from "sinon";
+import sinon, {stub} from "sinon";
 import uuid from "uuid";
-import vscode from "vscode";
+import vscode, {Uri} from "vscode";
 import {TruffleCommands} from "../../src/commands/TruffleCommands";
 import {Constants} from "../../src/Constants";
 import * as helpers from "../../src/helpers";
@@ -22,10 +22,29 @@ import {
   LocalProject,
   LocalService,
   Service,
+  TLocalProjectOptions,
 } from "../../src/Models/TreeItems";
 import {GanacheService, TreeManager} from "../../src/services";
 import {TestConstants} from "../TestConstants";
+import {TruffleWorkspace} from "../../src/helpers/workspace";
 const {service} = Constants.treeItemData;
+const description: string = "";
+
+const options: TLocalProjectOptions = {
+  isForked: false,
+  forkedNetwork: "",
+  blockNumber: 0,
+  url: "",
+};
+
+const root: Uri = Uri.parse(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
+const truffleWorkspace: TruffleWorkspace[] = [
+  {
+    dirName: "xpto",
+    workspace: root,
+    truffleConfig: Uri.parse(`${root.fsPath}/truffle-config.js`),
+  },
+];
 
 describe("TruffleCommands", () => {
   describe("Integration test", async () => {
@@ -37,7 +56,7 @@ describe("TruffleCommands", () => {
       let checkHdWalletProviderVersionMock: sinon.SinonExpectation;
       let installTruffleHdWalletProviderMock: sinon.SinonExpectation;
 
-      let getWorkspaceRootMock: any;
+      let getWorkspacesMock: any;
 
       let showQuickPickMock: sinon.SinonStub;
       let showInputBoxMock: sinon.SinonStub;
@@ -58,7 +77,8 @@ describe("TruffleCommands", () => {
       let executeCommandMock: sinon.SinonExpectation;
 
       beforeEach(async () => {
-        getWorkspaceRootMock = sinon.stub(helpers, "getWorkspaceRoot");
+        getWorkspacesMock = stub(helpers, "getWorkspaces");
+        getWorkspacesMock.returns(truffleWorkspace);
 
         requiredMock = sinon.mock(requiredHelpers.required);
         checkAppsSilentMock = requiredMock.expects("checkAppsSilent");
@@ -99,7 +119,7 @@ describe("TruffleCommands", () => {
 
       it("should throw exception when config file not found", async () => {
         // Arrange
-        getWorkspaceRootMock.returns(__dirname);
+        getWorkspacesMock.returns(__dirname);
         executeCommandMock.returns(uuid.v4());
 
         // Act and assert
@@ -112,7 +132,6 @@ describe("TruffleCommands", () => {
 
       it("should throw cancellationEvent when showQuickPick return undefined", async () => {
         // Arrange
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
         showQuickPickMock.returns(undefined);
 
@@ -123,7 +142,6 @@ describe("TruffleCommands", () => {
       it("should install TruffleHdWalletProvider when it required", async () => {
         // Arrange
         checkAppsSilentMock.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         isHdWalletProviderRequiredMock.returns(true);
         checkHdWalletProviderVersionMock.returns(false);
         executeCommandMock.returns(uuid.v4());
@@ -141,7 +159,7 @@ describe("TruffleCommands", () => {
         assert.strictEqual(showInputBoxMock.called, false, "showInputBox should not be called");
         assert.strictEqual(checkAppsSilentMock.calledOnce, true, "checkAppsSilent should be called once");
         assert.strictEqual(installTruffleMock.called, false, "installTruffle should not be called");
-        assert.strictEqual(getWorkspaceRootMock.called, true, "getWorkspaceRoot should be called");
+        assert.strictEqual(getWorkspacesMock.called, true, "getWorkspacesMock should be called");
         assert.strictEqual(executeCommandMock.called, true, "executeCommand should be called");
         assert.strictEqual(startGanacheServerMock.called, true, "startGanacheServer should be called");
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, "truffleConfig.setNetwork should not be called");
@@ -165,7 +183,6 @@ describe("TruffleCommands", () => {
       it("should not install TruffleHdWalletProvider when it version correct", async () => {
         // Arrange
         checkAppsSilentMock.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         isHdWalletProviderRequiredMock.returns(true);
         checkHdWalletProviderVersionMock.returns(true);
         executeCommandMock.returns(uuid.v4());
@@ -182,7 +199,7 @@ describe("TruffleCommands", () => {
         assert.strictEqual(showInputBoxMock.called, false, "showInputBox should not be called");
         assert.strictEqual(checkAppsSilentMock.calledOnce, true, "checkAppsSilent should be called once");
         assert.strictEqual(installTruffleMock.called, false, "installTruffle should not be called");
-        assert.strictEqual(getWorkspaceRootMock.called, true, "getWorkspaceRoot should be called");
+        assert.strictEqual(getWorkspacesMock.called, true, "getWorkspacesMock should be called");
         assert.strictEqual(executeCommandMock.called, true, "executeCommand should be called");
         assert.strictEqual(startGanacheServerMock.called, true, "startGanacheServer should be called");
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, "truffleConfig.setNetwork should not be called");
@@ -206,7 +223,6 @@ describe("TruffleCommands", () => {
       it("to development should throw exception when there is an error on command execution", async () => {
         // Arrange
         checkAppsSilentMock.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.throws(TestConstants.testError);
 
         showQuickPickMock.callsFake((items: any) => {
@@ -220,7 +236,7 @@ describe("TruffleCommands", () => {
         assert.strictEqual(showInputBoxMock.called, false, "showInputBox should not be called");
         assert.strictEqual(checkAppsSilentMock.calledOnce, true, "checkAppsSilent should be called once");
         assert.strictEqual(installTruffleMock.called, false, "installTruffle should not be called");
-        assert.strictEqual(getWorkspaceRootMock.called, true, "getWorkspaceRoot should be called");
+        assert.strictEqual(getWorkspacesMock.called, true, "getWorkspacesMock should be called");
         assert.strictEqual(executeCommandMock.called, true, "executeCommand should be called");
         assert.strictEqual(startGanacheServerMock.called, true, "startGanacheServer should be called");
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, "truffleConfig.setNetwork should not be called");
@@ -244,7 +260,6 @@ describe("TruffleCommands", () => {
       it("to network should complete successfully", async () => {
         // Arrange
         checkAppsSilentMock.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
@@ -259,7 +274,7 @@ describe("TruffleCommands", () => {
         assert.strictEqual(showInputBoxMock.called, false, "showInputBox should not be called");
         assert.strictEqual(checkAppsSilentMock.calledOnce, true, "checkAppsSilent should be called once");
         assert.strictEqual(installTruffleMock.called, false, "installTruffle should not be called");
-        assert.strictEqual(getWorkspaceRootMock.called, true, "getWorkspaceRoot should be called");
+        assert.strictEqual(getWorkspacesMock.called, true, "getWorkspacesMock should be called");
         assert.strictEqual(executeCommandMock.called, true, "executeCommand should be called");
         assert.strictEqual(startGanacheServerMock.called, false, "startGanacheServer should not be called");
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, "truffleConfig.setNetwork should not be called");
@@ -283,7 +298,6 @@ describe("TruffleCommands", () => {
       it("to network should throw exception when there is an error on command execution", async () => {
         // Arrange
         checkAppsSilentMock.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.throws(TestConstants.testError);
 
         showQuickPickMock.onCall(0).callsFake((items: any) => {
@@ -296,7 +310,7 @@ describe("TruffleCommands", () => {
         assert.strictEqual(showInputBoxMock.called, false, "showInputBox should not be called");
         assert.strictEqual(checkAppsSilentMock.calledOnce, true, "checkAppsSilent should be called once");
         assert.strictEqual(installTruffleMock.called, false, "installTruffle should not be called");
-        assert.strictEqual(getWorkspaceRootMock.called, true, "getWorkspaceRoot should be called");
+        assert.strictEqual(getWorkspacesMock.called, true, "getWorkspacesMock should be called");
         assert.strictEqual(executeCommandMock.called, true, "executeCommand should be called");
         assert.strictEqual(startGanacheServerMock.called, false, "startGanacheServer should not be called");
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, "truffleConfig.setNetwork should not be called");
@@ -321,7 +335,6 @@ describe("TruffleCommands", () => {
         // Arrange
         const {local} = TestConstants.networkNames;
         checkAppsSilentMock.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.returns(uuid.v4());
 
         const networkNodeName = getDeployName(service.local.prefix, local, local);
@@ -338,7 +351,7 @@ describe("TruffleCommands", () => {
         assert.strictEqual(showInputBoxMock.called, false, "showInputBox should not be called");
         assert.strictEqual(checkAppsSilentMock.calledOnce, true, "checkAppsSilent should be called once");
         assert.strictEqual(installTruffleMock.called, false, "installTruffle should not be called");
-        assert.strictEqual(getWorkspaceRootMock.called, true, "getWorkspaceRoot should be called");
+        assert.strictEqual(getWorkspacesMock.called, true, "getWorkspacesMock should be called");
         assert.strictEqual(executeCommandMock.called, true, "executeCommand should be called");
         assert.strictEqual(startGanacheServerMock.called, true, "startGanacheServer should be called");
         assert.strictEqual(truffleConfigSetNetworkMock.called, true, "truffleConfig.setNetwork should be called");
@@ -363,7 +376,6 @@ describe("TruffleCommands", () => {
         // Arrange
         const {local} = TestConstants.networkNames;
         checkAppsSilentMock.returns(true);
-        getWorkspaceRootMock.returns(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
         executeCommandMock.throws(TestConstants.testError);
 
         const networkNodeName = getDeployName(service.local.prefix, local, local);
@@ -378,7 +390,7 @@ describe("TruffleCommands", () => {
         assert.strictEqual(showInputBoxMock.called, false, "showInputBox should not be called");
         assert.strictEqual(checkAppsSilentMock.calledOnce, true, "checkAppsSilent should be called once");
         assert.strictEqual(installTruffleMock.called, false, "installTruffle should not be called");
-        assert.strictEqual(getWorkspaceRootMock.called, true, "getWorkspaceRoot should be called");
+        assert.strictEqual(getWorkspacesMock.called, true, "getWorkspacesMock should be called");
         assert.strictEqual(executeCommandMock.called, true, "executeCommand should be called");
         assert.strictEqual(startGanacheServerMock.called, true, "startGanacheServer should be called");
         assert.strictEqual(truffleConfigSetNetworkMock.called, true, "truffleConfig.setNetwork should be called");
@@ -410,7 +422,7 @@ async function createTestServicesItems(): Promise<Service[]> {
 
   const defaultPort = 8545;
   const defaultLabel = TestConstants.servicesNames.development;
-  const localProject = new LocalProject(defaultLabel, defaultPort);
+  const localProject = new LocalProject(defaultLabel, defaultPort, options, description);
   const defaultUrl = `${Constants.networkProtocols.http}${Constants.localhost}:${defaultPort}`;
   const localNetworkNode = new LocalNetworkNode(defaultLabel, defaultUrl, "*");
   localProject.addChild(localNetworkNode);

@@ -1,9 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {QuickPickItem} from "vscode";
 import {Constants} from "../Constants";
 import {telemetryHelper} from "../helpers";
-import {showQuickPick} from "../helpers/userInteraction";
+import {showInputBox, showQuickPick} from "../helpers/userInteraction";
 import {ItemType} from "../Models";
 import {
   InfuraProject,
@@ -13,8 +14,11 @@ import {
   Project,
   Service,
   ServiceTypes,
+  TLocalProjectOptions,
+  GenericProject,
+  GenericService,
 } from "../Models/TreeItems";
-import {InfuraResourceExplorer, LocalResourceExplorer} from "../resourceExplorers";
+import {InfuraResourceExplorer, LocalResourceExplorer, GenericResourceExplorer} from "../resourceExplorers";
 import {GanacheService, TreeManager} from "../services";
 import {Telemetry} from "../TelemetryClient";
 import {ProjectView} from "../ViewItems";
@@ -26,9 +30,21 @@ interface IServiceDestination {
   picked?: boolean;
 }
 
+type TNetwork = {
+  label: string;
+};
+
+type TServiceType = {
+  label: string;
+  isForked: boolean;
+  description: string;
+  networks: TNetwork[];
+};
+
 export namespace ServiceCommands {
   export async function createProject(): Promise<Project> {
     Telemetry.sendEvent("ServiceCommands.createProject.commandStarted");
+
     const serviceDestinations: IServiceDestination[] = [
       {
         cmd: createLocalProject,
@@ -64,6 +80,11 @@ export namespace ServiceCommands {
         itemType: ItemType.INFURA_SERVICE,
         label: Constants.treeItemData.service.infura.label,
       },
+      {
+        cmd: connectGenericProject,
+        itemType: ItemType.GENERIC_SERVICE,
+        label: Constants.treeItemData.service.generic.label,
+      },
     ];
 
     const project = await execute(serviceDestinations);
@@ -87,14 +108,15 @@ export namespace ServiceCommands {
       }
     }
 
-    await TreeManager.removeItem(viewItem.extensionItem);
+    TreeManager.removeItem(viewItem.extensionItem);
     Telemetry.sendEvent("ServiceCommands.disconnectProject.commandFinished");
   }
 }
 
 async function execute(serviceDestinations: IServiceDestination[]): Promise<Project> {
   const destination = await selectDestination(serviceDestinations);
-  const service = await TreeManager.getItem(destination.itemType);
+
+  const service = TreeManager.getItem(destination.itemType);
   const child = await destination.cmd(service);
 
   await addChild(service, child);
@@ -132,13 +154,39 @@ async function getExistingProjectIds(service: InfuraService): Promise<string[]> 
 
 // ------------ LOCAL ------------ //
 async function createLocalProject(service: LocalService): Promise<LocalProject> {
+  const serviceTypes: TServiceType[] = await loadServiceType();
+  const serviceType: TServiceType = await getServiceTypes(serviceTypes);
+
+  const options: TLocalProjectOptions = {
+    isForked: serviceType.isForked,
+    forkedNetwork: "",
+    url: "",
+    blockNumber: 0,
+  };
+
+  if (serviceType.isForked) {
+    options.forkedNetwork = (await getNetworks(serviceType.networks)).label;
+
+    if (options.forkedNetwork === Constants.treeItemData.service.local.type.forked.networks.other)
+      options.url = await getHostAddress();
+
+    options.blockNumber = await getBlockNumber();
+  }
+
   const localResourceExplorer = new LocalResourceExplorer();
-  return localResourceExplorer.createProject(await getExistingNames(service), await getExistingPorts(service));
+  return localResourceExplorer.createProject(await getExistingNames(service), await getExistingPorts(service), options);
 }
 
 async function connectLocalProject(service: LocalService): Promise<LocalProject> {
+  const options: TLocalProjectOptions = {
+    isForked: false,
+    blockNumber: 0,
+    forkedNetwork: "",
+    url: "",
+  };
+
   const localResourceExplorer = new LocalResourceExplorer();
-  return localResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
+  return localResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service), options);
 }
 
 async function getExistingNames(service: LocalService): Promise<string[]> {
@@ -149,6 +197,104 @@ async function getExistingNames(service: LocalService): Promise<string[]> {
 async function getExistingPorts(service: LocalService): Promise<number[]> {
   const localProjects = service.getChildren() as LocalProject[];
   return localProjects.map((item) => item.port);
+}
+
+async function getServiceTypes(serviceTypes: TServiceType[]): Promise<TServiceType> {
+  const items: QuickPickItem[] = [];
+
+  serviceTypes.forEach(async (element) => {
+    items.push({
+      label: element.label,
+    });
+  });
+
+  const result: QuickPickItem = await showQuickPick(items, {
+    ignoreFocusOut: true,
+    placeHolder: `${Constants.placeholders.selectType}.`,
+  });
+
+  return serviceTypes.find((item) => item.label === result.label)!;
+}
+
+async function getNetworks(networks: TNetwork[]): Promise<TNetwork> {
+  const items: QuickPickItem[] = [];
+
+  networks.forEach(async (element) => {
+    items.push({
+      label: element.label,
+    });
+  });
+
+  const result: QuickPickItem = await showQuickPick(items, {
+    ignoreFocusOut: true,
+    placeHolder: `${Constants.placeholders.selectNetwork}.`,
+  });
+
+  return networks.find((item) => item.label === result.label)!;
+}
+
+async function getBlockNumber(): Promise<number> {
+  const blockNumber: string = await showInputBox({
+    ignoreFocusOut: true,
+    prompt: Constants.paletteLabels.enterBlockNumber,
+    placeHolder: Constants.placeholders.enterBlockNumber,
+    validateInput: async (value: string) => {
+      if (value.length === 0) return null;
+
+      if (!value.match(Constants.validationRegexps.onlyNumber)) return Constants.validationMessages.valueShouldBeNumber;
+
+      return null;
+    },
+  });
+
+  return Number(blockNumber);
+}
+
+async function getHostAddress(): Promise<string> {
+  const url: string = await showInputBox({
+    ignoreFocusOut: true,
+    prompt: Constants.paletteLabels.enterNetworkUrl,
+    placeHolder: Constants.placeholders.enterNetworkUrl,
+    validateInput: async (value: string) => {
+      if (value.length === 0) return Constants.validationMessages.invalidHostAddress;
+      if (!value.match(Constants.validationRegexps.isUrl)) return Constants.validationMessages.invalidHostAddress;
+
+      return null;
+    },
+  });
+
+  return url;
+}
+
+async function loadServiceType(): Promise<TServiceType[]> {
+  const networks: TServiceType[] = [
+    {
+      label: Constants.treeItemData.service.local.type.default.label,
+      isForked: Constants.treeItemData.service.local.type.default.isForked,
+      description: Constants.treeItemData.service.local.type.default.description,
+      networks: [],
+    },
+    {
+      label: Constants.treeItemData.service.local.type.forked.label,
+      isForked: Constants.treeItemData.service.local.type.forked.isForked,
+      description: Constants.treeItemData.service.local.type.forked.description,
+      networks: [
+        {label: Constants.treeItemData.service.local.type.forked.networks.mainnet},
+        {label: Constants.treeItemData.service.local.type.forked.networks.ropsten},
+        {label: Constants.treeItemData.service.local.type.forked.networks.kovan},
+        {label: Constants.treeItemData.service.local.type.forked.networks.rinkeby},
+        {label: Constants.treeItemData.service.local.type.forked.networks.goerli},
+        {label: Constants.treeItemData.service.local.type.forked.networks.other},
+      ],
+    },
+  ];
+
+  return networks;
+}
+// ------------ GENERIC ------------ //
+async function connectGenericProject(service: GenericService): Promise<GenericProject> {
+  const genericResourceExplorer = new GenericResourceExplorer();
+  return genericResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
 }
 
 async function addChild(service: Service, child: Project): Promise<void> {
