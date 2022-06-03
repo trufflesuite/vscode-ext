@@ -9,7 +9,7 @@ import path from "path";
 import {QuickPickItem, Uri, window} from "vscode";
 import {Constants, RequiredApps} from "../Constants";
 import {
-  getWorkspaceRoot,
+  getWorkspaces,
   outputCommandHelper,
   required,
   showConfirmPaidOperationDialog,
@@ -58,21 +58,28 @@ export namespace TruffleCommands {
    * Call the truffle command line compiler
    * @param args a list of optional compile command args to append in certain circumstances
    */
-  export async function buildContracts(...args: Array<string>): Promise<void> {
+  export async function buildContracts(uri?: Uri): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.buildContracts.commandStarted");
-    await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
-      if (!(await required.checkAppsSilent(RequiredApps.truffle))) {
-        Telemetry.sendEvent("TruffleCommands.buildContracts.truffleInstallation");
-        await required.installTruffle(required.Scope.locally);
-      }
-      await outputCommandHelper.executeCommand(getWorkspaceRoot(), "npx", RequiredApps.truffle, "compile", ...args);
-    });
 
-    Telemetry.sendEvent("TruffleCommands.buildContracts.commandFinished");
+    if (!(await required.checkAppsSilent(RequiredApps.truffle))) {
+      Telemetry.sendEvent("TruffleCommands.buildContracts.truffleInstallation");
+      await required.installTruffle(required.Scope.locally);
+      return;
+    }
+
+    const workspace = await getWorkspace(uri);
+
+    await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
+      await outputCommandHelper.executeCommand(workspace.fsPath, "npx", RequiredApps.truffle, "compile");
+      Telemetry.sendEvent("TruffleCommands.buildContracts.commandFinished");
+    });
   }
 
-  export async function deployContracts(): Promise<void> {
+  export async function deployContracts(uri?: Uri): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.deployContracts.commandStarted");
+
+    uri = uri ? Uri.parse(path.normalize(path.join(uri!.fsPath, ".."))) : undefined;
+    TruffleConfiguration.truffleConfigUri = await getWorkspace(uri);
 
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
     const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri);
@@ -476,4 +483,28 @@ function ensureFileIsContractJson(filePath: string) {
     Telemetry.sendException(error);
     throw error;
   }
+}
+
+async function getWorkspace(uri?: Uri): Promise<Uri> {
+  if (uri) return Uri.parse(path.dirname(uri.fsPath));
+
+  const workspaces = await getWorkspaces();
+
+  if (workspaces.length === 1) return workspaces[0].workspace;
+
+  const folders: QuickPickItem[] = [];
+
+  Array.from(workspaces).forEach((element) => {
+    folders.push({
+      label: element.dirName,
+      detail: element.workspace.fsPath,
+    });
+  });
+
+  const command = await showQuickPick(folders, {
+    ignoreFocusOut: true,
+    placeHolder: Constants.placeholders.selectContract,
+  });
+
+  return Uri.parse(command.detail!);
 }

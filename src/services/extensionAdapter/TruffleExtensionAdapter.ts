@@ -1,18 +1,20 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {Uri} from "vscode";
 import {TruffleCommands} from "../../commands/TruffleCommands";
 import {IExtensionAdapter} from "./IExtensionAdapter";
 
 export class TruffleExtensionAdapter implements IExtensionAdapter {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public async validateExtension(): Promise<void> {}
+  public validateExtension = async (): Promise<void> => {
+    // throw new Error("Method not implemented.");
+  };
 
-  public async build(...args: Array<string>): Promise<void> {
-    return TruffleCommands.buildContracts(...args);
-  }
+  public build = async (uri?: Uri): Promise<void> => {
+    return TruffleCommands.buildContracts(uri);
+  };
 
-  public async deploy() {
-    return TruffleCommands.deployContracts();
-  }
+  public deploy = async (uri?: Uri): Promise<void> => {
+    return TruffleCommands.deployContracts(uri);
+  };
 }

@@ -65,6 +65,7 @@ export class Constants {
   public static defaultLocalhostPort = 8545;
   public static defaultABSPort = 3200;
   public static defaultABSHost = "blockchain.azure.com";
+  public static defaultTruffleConfigFileName = "truffle-config.js";
 
   public static ganacheRetryTimeout = 2000; // milliseconds
   public static ganacheRetryAttempts = 5;
@@ -1005,4 +1006,15 @@ export class Constants {
         return "Blockchain item is unavailable.";
     }
   }
+
+  public static workspaceIgnoredFolders: string[] = [
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/ElectronClient/lib/**",
+    "**/CliClient/build/lib/**",
+    "**/CliClient/tests-build/lib/**",
+    "**/ElectronClient/dist/**",
+    "**/Modules/TinyMCE/JoplinLists/**",
+    "**/Modules/TinyMCE/IconPack/**",
+  ];
 }
