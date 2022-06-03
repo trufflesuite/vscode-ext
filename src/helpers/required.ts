@@ -62,7 +62,7 @@ export namespace required {
    * Show Requirements Page
    */
   export async function checkRequiredApps(): Promise<boolean> {
-    return checkApps(...requiredApps);
+    return await checkApps(...requiredApps);
   }
 
   export async function checkApps(...apps: RequiredApps[]): Promise<boolean> {

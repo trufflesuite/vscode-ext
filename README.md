@@ -50,7 +50,7 @@ For new users, this can be hard to understand, because there are multiple steps 
 
 For rapid development of smart contracts, having the ability to deploy contracts to a blockchain quickly for testing and debugging purposes is a key principle. One of the most popular models to achieve this is using [Ganache](https://trufflesuite.com/docs/ganache/), which acts as a local blockchain simulator to allow this quick deployment and iteration that is ideal for developers.
 
-The extension has integrated Ganache directly into the IDE to further lower the bar to entry, and allow even faster development iteration. By default, there is nothing to configure, and the following steps can be used.
+The extension has integrated Ganache directly into the IDE to further lower the barrier to entry, and allow even faster development iteration. By default, there is nothing to configure, and the following steps can be used.
 
 1. After selecting to deploy the contracts, either from the Command Palette or by right clicking on the contract and selecting Deploy contracts, a dropdown will be presented with options for _where_ to deploy the contract. By default there will be a single entry on this list named development.
 

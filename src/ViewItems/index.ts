@@ -17,6 +17,7 @@ import {
   NullableViewCreator,
   ProjectViewCreator,
   ServiceViewCreator,
+  LayerViewCreator,
 } from "./ViewCreators";
 import {ViewItemFactory} from "./ViewItemFactory";
 
@@ -46,3 +47,5 @@ ViewItemFactory.register(ItemType.GENERIC_NETWORK_NODE, new NetworkNodeViewCreat
 ViewItemFactory.register(ItemType.MEMBER, new GroupViewCreator());
 ViewItemFactory.register(ItemType.BLOCKCHAIN_DATA_MANAGER_INPUT_GROUP, new GroupViewCreator());
 ViewItemFactory.register(ItemType.BLOCKCHAIN_DATA_MANAGER_OUTPUT_GROUP, new GroupViewCreator());
+
+ViewItemFactory.register(ItemType.INFURA_LAYER, new LayerViewCreator());

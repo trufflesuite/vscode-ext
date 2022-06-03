@@ -26,6 +26,7 @@ import {
   GenericServiceItemCreator,
   MemberItemCreator,
   NullableItemCreator,
+  InfuraLayerItemCreator,
 } from "./ItemCreators";
 import {ItemFactory} from "./ItemFactory";
 import {ItemType} from "./ItemType";
@@ -62,3 +63,5 @@ ItemFactory.register(
   ItemType.BLOCKCHAIN_DATA_MANAGER_OUTPUT_GROUP,
   new BlockchainDataManagerInputAndOutputItemCreator()
 );
+
+ItemFactory.register(ItemType.INFURA_LAYER, new InfuraLayerItemCreator());

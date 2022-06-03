@@ -20,3 +20,4 @@ export * from "./GenericProjectItemCreator";
 export * from "./GenericServiceItemCreator";
 export * from "./MemberItemCreator";
 export * from "./NullableItemCreator";
+export * from "./InfuraLayerItemCreator";
