@@ -564,6 +564,7 @@ export class Constants {
 
   public static statusBarMessages = {
     buildingContracts: "Building contracts",
+    executingScript: "Executing script",
     checkingRequirementDependencies: "Checking requirement dependencies version",
     createBDMApplication: "Creating BDM app",
     createBlobs: "Creating blobs",

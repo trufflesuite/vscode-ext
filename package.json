@@ -46,6 +46,7 @@
     "onCommand:truffle-vscode.newSolidityProject",
     "onCommand:truffle-vscode.buildContracts",
     "onCommand:truffle-vscode.deployContracts",
+    "onCommand:truffle-vscode.execScript",
     "onCommand:truffle-vscode.connectProject",
     "onCommand:truffle-vscode.copyRPCEndpointAddress",
     "onCommand:truffle-vscode.createProject",
@@ -228,6 +229,11 @@
       {
         "command": "truffle-vscode.deployContracts",
         "title": "Deploy Contracts",
+        "category": "Truffle"
+      },
+      {
+        "command": "truffle-vscode.execScript",
+        "title": "Truffle: Execute Script",
         "category": "Truffle"
       },
       {
@@ -439,6 +445,11 @@
           "when": "resourceLangId == json",
           "command": "truffle-contract.copyABI",
           "group": "9_copyFromContractGroup"
+        },
+        {
+          "when": "resourceLangId == javascript",
+          "command": "truffle-vscode.execScript",
+          "group": "10_execScriptGroup"
         }
       ]
     },
