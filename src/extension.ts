@@ -10,6 +10,7 @@ import {
   sdkCoreCommands,
   ServiceCommands,
   TruffleCommands,
+  GenericCommands,
 } from "./commands";
 import {Constants} from "./Constants";
 import {CommandContext, isWorkspaceOpen, required, setCommandContext} from "./helpers";
@@ -97,15 +98,24 @@ export async function activate(context: ExtensionContext) {
   );
   //#endregion
 
+  //#region Generic extension commands
+  const checkForConnection = commands.registerCommand(
+    "truffle-vscode.checkForConnection",
+    async (viewItem?: ProjectView) => {
+      await tryExecute(() => GenericCommands.checkForConnection(viewItem));
+    }
+  );
+  //#endregion
+
   //#region truffle commands
   const newSolidityProject = commands.registerCommand("truffle-vscode.newSolidityProject", async () => {
     await tryExecute(() => ProjectCommands.newSolidityProject());
   });
-  const buildContracts = commands.registerCommand("truffle-vscode.buildContracts", async () => {
-    await tryExecute(() => sdkCoreCommands.build());
+  const buildContracts = commands.registerCommand("truffle-vscode.buildContracts", async (uri: Uri) => {
+    await tryExecute(() => sdkCoreCommands.build(uri));
   });
-  const deployContracts = commands.registerCommand("truffle-vscode.deployContracts", async () => {
-    await tryExecute(() => sdkCoreCommands.deploy());
+  const deployContracts = commands.registerCommand("truffle-vscode.deployContracts", async (uri: Uri) => {
+    await tryExecute(() => sdkCoreCommands.deploy(uri));
   });
   const copyByteCode = commands.registerCommand("truffle-contract.copyByteCode", async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeBytecodeToBuffer(uri));
@@ -241,6 +251,7 @@ export async function activate(context: ExtensionContext) {
     showProjectsFromInfuraAccount,
     openAtAzurePortal,
     changeCoreSdkConfigurationListener,
+    checkForConnection,
   ];
   context.subscriptions.push(...subscriptions);
 

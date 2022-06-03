@@ -14,3 +14,5 @@ export * from "./tree/TreeManager";
 export * from "./tree/TreeService";
 export * from "./infuraService/InfuraServiceClient";
 export * from "./storageAccountService/BlobServiceClient";
+export * from "./generic/GenericService";
+export * from "./generic/GenericServiceClient";

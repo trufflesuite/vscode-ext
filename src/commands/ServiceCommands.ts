@@ -20,6 +20,8 @@ import {
   Service,
   ServiceTypes,
   TLocalProjectOptions,
+  GenericProject,
+  GenericService,
 } from "../Models/TreeItems";
 import {
   // BlockchainDataManagerResourceExplorer,
@@ -27,6 +29,7 @@ import {
   InfuraResourceExplorer,
   LocalResourceExplorer,
   // StorageAccountResourceExplorer,
+  GenericResourceExplorer,
 } from "../resourceExplorers";
 import {GanacheService, TreeManager} from "../services";
 import {Telemetry} from "../TelemetryClient";
@@ -109,6 +112,11 @@ export namespace ServiceCommands {
       //   itemType: ItemType.BLOCKCHAIN_DATA_MANAGER_SERVICE,
       //   label: Constants.treeItemData.service.bdm.label,
       // },
+      {
+        cmd: connectGenericProject,
+        itemType: ItemType.GENERIC_SERVICE,
+        label: Constants.treeItemData.service.generic.label,
+      },
     ];
 
     const project = await execute(serviceDestinations);
@@ -368,6 +376,12 @@ async function loadServiceType(): Promise<TServiceType[]> {
 
   return networks;
 }
+// ------------ GENERIC ------------ //
+async function connectGenericProject(service: GenericService): Promise<GenericProject> {
+  const genericResourceExplorer = new GenericResourceExplorer();
+  return genericResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
+}
+
 // ------------ BLOCKCHAIN DATA MANAGER ------------ //
 
 // async function connectBlockchainDataManagerProject(

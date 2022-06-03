@@ -10,6 +10,7 @@ export type ProjectTypes =
   | ItemType.AZURE_BLOCKCHAIN_PROJECT
   | ItemType.LOCAL_PROJECT
   | ItemType.INFURA_PROJECT
+  | ItemType.GENERIC_PROJECT
   | ItemType.BLOCKCHAIN_DATA_MANAGER_PROJECT;
 
 export abstract class Project extends ExtensionItem {

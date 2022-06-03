@@ -7,6 +7,6 @@ export abstract class AbstractAdapter {
   public abstract initialize(): Promise<void>;
   public abstract getContractInstances(contractName: string): Promise<ContractInstance[]>;
   public abstract getContractInstance(contractName: string, instanceId: string): Promise<ContractInstance | undefined>;
-  public abstract getChangedContractInstances(): Promise<ContractInstance[]>;
+  public abstract getChangedContractInstances(truffleConfigPath?: string): Promise<ContractInstance[]>;
   public abstract dispose(): Promise<void>;
 }

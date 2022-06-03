@@ -187,6 +187,11 @@
 				"category": "Blockchain"
 			},
 			{
+				"command": "truffle-vscode.checkForConnection",
+				"title": "Check network connection",
+				"category": "Blockchain"
+			},
+			{
 				"command": "truffle-vscode.showWelcomePage",
 				"title": "Show Welcome Page",
 				"category": "Truffle"
@@ -407,6 +412,16 @@
 					"command": "truffle-vscode.openAtAzurePortal",
 					"when": "view == truffle-vscode.truffle && viewItem == output",
 					"group": "truffle-0@0"
+				},
+				{
+					"command": "truffle-vscode.disconnectProject",
+					"when": "view == truffle-vscode.truffle && viewItem == genericproject",
+					"group": "truffle-0@0"
+				},
+				{
+					"command": "truffle-vscode.checkForConnection",
+					"when": "view == truffle-vscode.truffle && viewItem == genericproject",
+					"group": "truffle-1@0"
 				}
 			],
 			"explorer/context": [
@@ -570,8 +585,8 @@
 		"@types/vscode": "1.39.0",
 		"@typescript-eslint/eslint-plugin": "^5.3.1",
 		"@typescript-eslint/parser": "^5.3.1",
-		"copy-webpack-plugin": "^10.0.0",
 		"copyfiles": "^2.4.1",
+		"copy-webpack-plugin": "^10.0.0",
 		"decache": "^4.5.1",
 		"eslint": "^8.2.0",
 		"eslint-config-prettier": "8.3.0",
@@ -600,11 +615,6 @@
 		"webpack-merge": "^5.8.0"
 	},
 	"dependencies": {
-		"@truffle/codec": "^0.12.8",
-		"@truffle/compile-solidity": "^6.0.8",
-		"@truffle/debug-utils": "^6.0.4",
-		"@truffle/debugger": "^10.0.5",
-		"@truffle/resolver": "^8.0.2",
 		"abi-decoder": "^2.4.0",
 		"acorn": "^6.1.1",
 		"acorn-walk": "^6.1.1",
@@ -622,11 +632,17 @@
 		"request-promise": "^4.2.4",
 		"semver": "^6.0.0",
 		"solidity-parser-antlr": "^0.4.11",
+		"@truffle/codec": "^0.12.8",
+		"@truffle/compile-solidity": "^6.0.8",
+		"@truffle/debug-utils": "^6.0.4",
+		"@truffle/debugger": "^10.0.5",
+		"@truffle/resolver": "^8.0.2",
 		"ts-node": "^10.4.0",
 		"uuid": "^3.3.2",
 		"vscode-azureextensionui": "^0.29.12",
 		"vscode-extension-telemetry": "^0.1.1",
-		"web3": "1.5.3"
+		"web3": "1.5.3",
+		"glob": "^7.1.4"
 	},
 	"extensionDependencies": [
 		"JuanBlanco.solidity",
