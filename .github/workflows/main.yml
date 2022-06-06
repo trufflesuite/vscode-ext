@@ -53,6 +53,9 @@ jobs:
       - name: clean install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: yarn check
+        run: test -z "$(git diff)" || (echo 'Please run yarn and commit all changes to yarn.lock'; false)
+
       - name: run tests
         run: yarn test
 
