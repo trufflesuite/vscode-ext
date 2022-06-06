@@ -17,17 +17,12 @@ export class ChangelogPage extends BasicWebView {
   }
 
   public async checkAndShow(): Promise<void> {
-    const storedVersion = this.context.globalState.get<string>(
-      Constants.globalStateKeys.azureBlockchainExtensionVersion
-    );
+    const storedVersion = this.context.globalState.get<string>(Constants.globalStateKeys.truffleExtensionVersion);
     if (storedVersion && semver.gte(storedVersion, Constants.extensionVersion)) {
       return;
     }
 
-    this.context.globalState.update(
-      Constants.globalStateKeys.azureBlockchainExtensionVersion,
-      Constants.extensionVersion
-    );
+    this.context.globalState.update(Constants.globalStateKeys.truffleExtensionVersion, Constants.extensionVersion);
 
     Telemetry.sendEvent(Constants.telemetryEvents.webPages.showWebPage, {
       trigger: "auto",

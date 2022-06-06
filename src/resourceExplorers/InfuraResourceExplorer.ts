@@ -3,7 +3,7 @@
 
 import {QuickPickItem, window} from "vscode";
 import {Constants} from "../Constants";
-import {showInputBox, showQuickPick} from "../helpers";
+import {showInputBox, showQuickPick} from "../helpers/userInteraction";
 import {InfuraProjectItem} from "../Models/QuickPickItems";
 import {InfuraNetworkNode, InfuraProject} from "../Models/TreeItems";
 import {InfuraLayer} from "../Models/TreeItems/InfuraLayer";

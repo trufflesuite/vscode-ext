@@ -1,12 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { DebugAdapterTracker, DebugSession, window } from "vscode";
+import {DebugAdapterTracker, DebugSession, window} from "vscode";
 import InstructionView from "../instructionsView/instructionView";
 
-import { EVENT_TYPES } from "../constants/debugAdapter";
-import { GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS } from "../constants/debugSessionCommands";
-import { IInstruction } from "../models/IInstruction";
+import {EVENT_TYPES} from "../constants/debugAdapter";
+import {GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS} from "../constants/debugSessionCommands";
+import {IInstruction} from "../models/IInstruction";
+import InstructionTreeNode from "../instructionsView/instructionTreeNode";
 
 export default class SolidityDebugAdapterTracker implements DebugAdapterTracker {
   private session: DebugSession;
@@ -48,11 +49,12 @@ export default class SolidityDebugAdapterTracker implements DebugAdapterTracker 
     this.session.customRequest(GET_CURRENT_INSTRUCTION);
   }
 
-  private updateInstructionView(instructions: IInstruction[]) {
-    this.instructionView.update(instructions);
+  private updateInstructionView(instructions: IInstruction[]): void {
+    const element = this.instructionView.getRootElement();
+    this.instructionView.update(element, instructions);
   }
 
-  private revealInstruction(instruction: IInstruction) {
-    this.instructionView.revealInstruction(instruction);
+  private revealInstruction(instruction: IInstruction): InstructionTreeNode {
+    return this.instructionView.revealInstruction(instruction);
   }
 }

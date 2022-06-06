@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {Constants} from "../Constants";
-import {showInputBox} from "../helpers";
+import {showInputBox} from "../helpers/userInteraction";
 import {GenericNetworkNode, GenericProject} from "../Models/TreeItems";
 import {GenericService} from "../services";
 import {Telemetry} from "../TelemetryClient";

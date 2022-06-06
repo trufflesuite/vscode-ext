@@ -5,8 +5,6 @@ import {Memento} from "vscode";
 import {Constants} from "../../Constants";
 import {ItemFactory} from "../../Models";
 import {
-  AzureBlockchainService,
-  BlockchainDataManagerService,
   Command,
   IExtensionItem,
   InfuraService,
@@ -89,11 +87,6 @@ class ExtensionTreeManager {
 
   // FIXME: We should use factory and ItemTypes instead of direct classes
   private fillDefaultTypes(items: Service[]): Service[] {
-    let trufflesuite = items.find((item) => item instanceof AzureBlockchainService);
-    if (!trufflesuite) {
-      trufflesuite = new AzureBlockchainService();
-    }
-
     let localService = items.find((item) => item instanceof LocalService);
     if (!localService) {
       localService = new LocalService();
@@ -104,17 +97,12 @@ class ExtensionTreeManager {
       infuraService = new InfuraService();
     }
 
-    let bdmService = items.find((item) => item instanceof BlockchainDataManagerService);
-    if (!bdmService) {
-      bdmService = new BlockchainDataManagerService();
-    }
-
     let genericService = items.find((item) => item instanceof GenericService);
     if (!genericService) {
       genericService = new GenericService();
     }
 
-    return [trufflesuite, infuraService, localService, bdmService, genericService];
+    return [infuraService, localService, genericService];
   }
 }
 

@@ -66,7 +66,8 @@ export namespace GanacheService {
     if (portStatus === PortStatus.FREE) {
       ganacheProcesses[port] = await spawnGanacheServer(port, options);
     }
-
+    // open the channel to show the output.
+    ganacheProcesses[port]?.output?.show(false);
     Telemetry.sendEvent("GanacheServiceClient.waitGanacheStarted.serverStarted");
     return ganacheProcesses[port];
   }
@@ -91,7 +92,7 @@ export namespace GanacheService {
     const args: string[] = [RequiredApps.ganache, `--port ${port}`];
 
     if (options?.isForked) {
-      if (options.url !== String.Empty) args.push(`--fork.url ${options.url}`);
+      if (options.url !== "") args.push(`--fork.url ${options.url}`);
 
       if (options.forkedNetwork !== Constants.treeItemData.service.local.type.forked.networks.other)
         args.push(`--fork.network ${options.forkedNetwork.toLowerCase()}`);

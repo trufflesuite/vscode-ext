@@ -9,7 +9,6 @@ import {ServiceCommands} from "../../../src/commands";
 import {Constants} from "../../../src/Constants";
 import {ItemType} from "../../../src/Models";
 import {
-  AzureBlockchainService,
   IExtensionItem,
   InfuraProject,
   InfuraService,
@@ -34,19 +33,17 @@ describe("Service Commands", () => {
   let startGanacheServerMock: sinon.SinonExpectation;
   let selectProjectMock: any;
 
-  let azureGroup: Service;
   let localGroup: Service;
   let infuraGroup: Service;
 
   function initializeNetworks() {
-    azureGroup = new AzureBlockchainService();
     localGroup = new LocalService();
     infuraGroup = new InfuraService();
   }
 
   function createTestServiceItems() {
     const services: Service[] = [];
-    services.push(azureGroup, localGroup);
+    services.push(localGroup);
 
     return services;
   }

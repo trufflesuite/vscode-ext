@@ -5,7 +5,7 @@ import assert from "assert";
 import rewire from "rewire";
 
 describe("TreeManager tests", () => {
-  const numberOfElements = 5;
+  const numberOfElements = 3;
   it(`fillDefaultTypes should return array with ${numberOfElements} elements`, async () => {
     // Arrange
     const treeManagerRewire = rewire("../src/services/tree/TreeManager");

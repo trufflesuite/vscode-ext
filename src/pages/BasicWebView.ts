@@ -13,7 +13,7 @@ import {
   window,
 } from "vscode";
 import {Constants} from "../Constants";
-import {showNotification} from "../helpers";
+import {showNotification} from "../helpers/userInteraction";
 import {Telemetry} from "../TelemetryClient";
 
 export interface IWebViewConfig {

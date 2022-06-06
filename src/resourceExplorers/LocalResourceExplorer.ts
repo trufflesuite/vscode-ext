@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {Constants} from "../Constants";
-import {showInputBox} from "../helpers";
+import {showInputBox} from "../helpers/userInteraction";
 import {LocalNetworkNode, LocalProject, TLocalProjectOptions} from "../Models/TreeItems";
 import {GanacheService} from "../services";
 import {Telemetry} from "../TelemetryClient";
@@ -127,7 +127,7 @@ export class LocalResourceExplorer {
 
   private async getDescription(port: number, options: TLocalProjectOptions) {
     const blockNumber: string = options.blockNumber === 0 ? Constants.latestBlock : options.blockNumber.toString();
-    const forkedNetwork: string = options.url === String.Empty ? options.forkedNetwork : options.url;
+    const forkedNetwork: string = options.url === "" ? options.forkedNetwork : options.url;
 
     let formattedDescription: string;
 

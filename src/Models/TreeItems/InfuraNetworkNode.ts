@@ -3,7 +3,8 @@
 
 import {URL} from "url";
 import {Constants} from "../../Constants";
-import {showInputBox, TruffleConfiguration} from "../../helpers";
+import {TruffleConfiguration} from "../../helpers";
+import {showInputBox} from "../../helpers/userInteraction";
 import {ItemType} from "../ItemType";
 import {MnemonicNetworkNode} from "./MnemonicNetworkNode";
 

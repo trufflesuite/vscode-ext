@@ -8,13 +8,13 @@ import {LocalProject, TLocalProjectOptions} from "../../../src/Models/TreeItems"
 import {GanacheService, TreeManager} from "../../../src/services";
 import {ProjectView} from "../../../src/ViewItems";
 
-const description: string = String.Empty;
+const description: string = "";
 
 const options: TLocalProjectOptions = {
   isForked: false,
-  forkedNetwork: String.Empty,
+  forkedNetwork: "",
   blockNumber: 0,
-  url: String.Empty,
+  url: "",
 };
 
 describe("Disconnect Service", () => {

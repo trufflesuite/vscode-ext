@@ -59,6 +59,6 @@ export namespace GenericService {
       return await getWeb3ClientVersion(port);
     }
 
-    return String.Empty;
+    return "";
   }
 }

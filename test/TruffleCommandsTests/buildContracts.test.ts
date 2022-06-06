@@ -8,6 +8,7 @@ import {CancellationToken, Progress, ProgressOptions, Uri, window} from "vscode"
 import {TruffleCommands} from "../../src/commands/TruffleCommands";
 import * as helpers from "../../src/helpers";
 import * as commands from "../../src/helpers/command";
+import {required} from "../../src/helpers/required";
 import {TestConstants} from "../TestConstants";
 import {TruffleWorkspace} from "../../src/helpers/workspace";
 
@@ -31,7 +32,7 @@ describe("BuildContracts Command", () => {
     ];
 
     beforeEach(() => {
-      requiredMock = mock(helpers.required);
+      requiredMock = mock(required);
 
       getWorkspacesMock = stub(helpers, "getWorkspaces");
       getWorkspacesMock.returns(truffleWorkspace);

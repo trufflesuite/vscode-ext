@@ -3,7 +3,7 @@
 
 import {commands, window} from "vscode";
 import {Constants, RequiredApps} from "../Constants";
-import {required} from "../helpers";
+import {required} from "../helpers/required";
 import {GenericProject} from "../Models/TreeItems";
 import {GenericService, TreeManager} from "../services";
 import {Telemetry} from "../TelemetryClient";
