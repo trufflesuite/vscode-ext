@@ -77,8 +77,8 @@ export namespace TruffleCommands {
   export async function deployContracts(uri?: Uri): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.deployContracts.commandStarted");
 
-    uri = uri ? Uri.parse(path.normalize(path.join(uri!.fsPath, ".."))) : undefined;
-    TruffleConfiguration.truffleConfigUri = await getWorkspace(uri);
+    const contractFolderPath = uri ? Uri.parse(path.resolve(path.join(uri!.fsPath, ".."))) : undefined;
+    TruffleConfiguration.truffleConfigUri = await getWorkspace(contractFolderPath);
 
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
     const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri);
@@ -484,7 +484,7 @@ function ensureFileIsContractJson(filePath: string) {
 }
 
 async function getWorkspace(uri?: Uri): Promise<Uri> {
-  if (uri) return Uri.parse(path.dirname(uri.fsPath));
+  if (uri) return Uri.parse(path.resolve(path.dirname(uri.fsPath)));
 
   const workspaces = await getWorkspaces();
 
