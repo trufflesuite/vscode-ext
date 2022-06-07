@@ -7,8 +7,9 @@ import {
 } from "@microsoft/vscode-azext-utils";
 import fs from "fs";
 import paths from "path";
-import vscode, {commands, ThemeIcon} from "vscode";
+import vscode, {commands, ThemeIcon, Uri} from "vscode";
 import {getChain, getExplorerLink} from "../functions/explorer";
+import {OpenFileTreeItem} from "../Models/TreeItems/OpenFileTreeItem";
 import {OpenUrlTreeItem} from "../Models/TreeItems/OpenUrlTreeItem";
 import {getWorkspaceFolder, pathExists} from "./Utils";
 
@@ -81,6 +82,9 @@ export class ContractDeploymentViewTreeItem extends DeploymentsViewTreeItemBase 
   public constructor(parent: AzExtParentTreeItem, contract: ContractBuildFile) {
     super(parent, contract);
     this.iconPath = new ThemeIcon("file-code");
+    // setup the file opening commands.
+    this.commandId = "truffle-vscode.openFile";
+    this.commandArgs = [Uri.file(contract.sourcePath)];
   }
 
   public get label(): string {
@@ -89,14 +93,22 @@ export class ContractDeploymentViewTreeItem extends DeploymentsViewTreeItemBase 
 
   public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
     const values = ContractDeploymentViewTreeItem.getNetworkObjects(this.contract);
-    console.log("ContractDeploymentViewTreeItem.loadMoreChildrenImpl", {contract: this.contract, values});
     // TODO: once we have multiple networks we might need/want to adapt this to a factory method.
     return [
       new NetworkDeploymentsTreeItem(this, values),
-      new GenericTreeItem(this, {
-        label: `SourcePath: ${this.contract.sourcePath}`,
+      new OpenFileTreeItem(this, {
+        label: `Contract: ${this.contract.sourcePath}`,
+        commandId: "truffle-vscode.openFile",
+        commandArgs: [Uri.file(this.contract.sourcePath)],
         contextValue: "sourcePath",
         iconPath: new ThemeIcon("link-external"),
+      }),
+      new OpenFileTreeItem(this, {
+        label: `Deployment JSON: ${this.contract.path}`,
+        commandId: "truffle-vscode.openFile",
+        commandArgs: [Uri.file(this.contract.path)],
+        contextValue: "contractBuildPath",
+        iconPath: new ThemeIcon("json"),
       }),
       new GenericTreeItem(this, {
         label: `UpdatedAt: ${this.contract.updatedAt}`,
@@ -208,19 +220,27 @@ export class DeploymentsView extends AzExtParentTreeItem {
   public static contextValue: string = "deployments";
   public contextValue: string = DeploymentsView.contextValue;
   public label: string = "Deployments";
-  private readonly pathExists: boolean;
+  private pathExists: boolean = false;
   private buildPath: string;
 
-  public constructor(path: string, parent?: AzExtParentTreeItem) {
+  public constructor(private path: string, parent?: AzExtParentTreeItem) {
     super(parent);
     this.buildPath = "";
     // bit of fudging to get and validate path...
+    this.validatePathExists(path);
+    console.trace("Setup Deployments view: ", {path, parent, pathExists: this.pathExists, buildPath: this.buildPath});
+  }
+
+  async refreshImpl(_: IActionContext): Promise<void> {
+    this.validatePathExists(this.path);
+  }
+
+  private validatePathExists(path: string) {
     const workspacePath = getWorkspaceFolder();
     if (workspacePath) {
       this.buildPath = paths.join(workspacePath.uri.fsPath, path);
     }
     this.pathExists = pathExists(this.buildPath);
-    console.log("Setup Deployments view: ", {path, parent, pathExists: this.pathExists, buildPath: this.buildPath});
   }
 
   hasMoreChildrenImpl(): boolean {
@@ -230,7 +250,6 @@ export class DeploymentsView extends AzExtParentTreeItem {
   public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
     if (this.pathExists) {
       const values = buildContractDeploymentsFromFolder(this.buildPath);
-      console.log("Building Root with file values: ", {values});
       return await this.createTreeItemsWithErrorHandling(
         values,
         "invalidRegistryProvider",
@@ -269,6 +288,15 @@ const buildContractDeploymentsFromFolder = (path: string): ContractBuildFile[] =
     });
 };
 
+/**
+ * Register our deployments view as:
+ *  viewID: "truffle-vscode.views.deployments"
+ *  refresh: "truffle-vscode.views.deployments.refresh"
+ *  loadMore: ""truffle-vscode.views.deployments.loadMore"
+ *
+ * @param viewId - the viewId - defaults to above.
+ * @param baseFolder - the base folder we expect the deployments to live in. Doesn't handle mono-repos right now.
+ */
 export function registerDeploymentView(
   viewId: string = "truffle-vscode.views.deployments",
   baseFolder: string = "build/contracts"

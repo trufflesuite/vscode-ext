@@ -36,7 +36,6 @@ export class Constants {
     executeCommand: "Truffle: Execute command",
     ganacheCommands: "Truffle: Ganache Server",
     genericCommands: "Truffle: Generic Server",
-    //logicAppGenerator: "Logic App Generator",
     requirements: "Truffle: Requirements",
     telemetryClient: "Truffle: Telemetry Client",
     treeManager: "Truffle: Service Tree Manager",
@@ -57,9 +56,7 @@ export class Constants {
   public static defaultTruffleBox = "truffle-box/vscode-starter-box";
   public static defaultDebounceTimeout = 300;
   public static defaultInputNameInBdm = "transaction-node";
-  public static containerTruffleExtension = "container-truffle-extension";
 
-  public static infuraHost = "infura.io";
   public static localhost = "127.0.0.1";
   public static localhostName = "development";
   public static defaultLocalhostPort = 8545;

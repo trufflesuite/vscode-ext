@@ -6,7 +6,7 @@ import fs from "fs-extra";
 // @ts-ignore
 import hdkey from "hdkey";
 import path from "path";
-import {QuickPickItem, Uri, window} from "vscode";
+import {QuickPickItem, Uri, window, commands} from "vscode";
 import {Constants, RequiredApps} from "../Constants";
 import {
   getWorkspaces,
@@ -21,7 +21,7 @@ import {required} from "../helpers/required";
 import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from "../helpers/userInteraction";
 
 import {IDeployDestination, ItemType} from "../Models";
-import {NetworkForContractItem} from "../Models/QuickPickItems/NetworkForContractItem";
+import {NetworkForContractItem} from "../Models/QuickPickItems";
 import {InfuraProject, LocalProject, LocalService} from "../Models/TreeItems";
 import {Project} from "../Models/TreeItems";
 import {Output} from "../Output";
@@ -56,7 +56,6 @@ interface IExtendedQuickPickItem extends QuickPickItem {
 export namespace TruffleCommands {
   /**
    * Call the truffle command line compiler
-   * @param args a list of optional compile command args to append in certain circumstances
    */
   export async function buildContracts(uri?: Uri): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.buildContracts.commandStarted");
@@ -101,9 +100,9 @@ export namespace TruffleCommands {
     Telemetry.sendEvent("TruffleCommands.deployContracts.selectedDestination", {
       url: Telemetry.obfuscate(command.description || ""),
     });
-    console.log("Calling cmd:", {command, cmd: command.cmd});
     await command.cmd();
-
+    // notify our deployment view
+    commands.executeCommand("truffle-vscode.views.deployments.refresh");
     Telemetry.sendEvent("TruffleCommands.deployContracts.commandFinished");
   }
 
