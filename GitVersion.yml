@@ -1,8 +1,8 @@
-mode: ContinuousDelivery
+#mode: ContinuousDelivery
 branches:
   develop:
+    tag: ''
     increment: Patch
-
 ignore:
   sha: []
 merge-message-formats: {}
