@@ -35,6 +35,7 @@ import {
 } from "../services";
 import {Telemetry} from "../TelemetryClient";
 import {NetworkNodeView} from "../ViewItems";
+import {Entry} from "../views/fileExplorer";
 import {ServiceCommands} from "./ServiceCommands";
 
 interface IDeployDestinationItem {
@@ -66,6 +67,9 @@ export namespace TruffleCommands {
       return;
     }
 
+    // Workaround for non URI types. In the future, better to use only Uri as pattern
+    uri = uri ? convertEntryToUri(uri) : uri;
+
     const workspace = await getWorkspace(uri);
 
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
@@ -76,6 +80,9 @@ export namespace TruffleCommands {
 
   export async function deployContracts(uri?: Uri): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.deployContracts.commandStarted");
+
+    // Workaround for non URI types. In the future, better to use only Uri as pattern
+    uri = uri ? convertEntryToUri(uri) : uri;
 
     const contractFolderPath = uri ? Uri.parse(path.resolve(path.join(uri!.fsPath, ".."))) : undefined;
     TruffleConfiguration.truffleConfigUri = await getWorkspace(contractFolderPath);
@@ -505,4 +512,13 @@ async function getWorkspace(uri?: Uri): Promise<Uri> {
   });
 
   return Uri.parse(command.detail!);
+}
+
+function convertEntryToUri(uri: Uri): Uri {
+  if (uri.fsPath) {
+    return uri;
+  } else {
+    const entry: Entry = JSON.parse(JSON.stringify(uri));
+    return Uri.parse(entry.uri.path);
+  }
 }
