@@ -1,7 +1,6 @@
 mode: ContinuousDelivery
 branches:
   develop:
-    tag: alpha
     increment: Patch
 
 ignore:
