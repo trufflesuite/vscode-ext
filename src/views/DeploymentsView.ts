@@ -228,7 +228,6 @@ export class DeploymentsView extends AzExtParentTreeItem {
     this.buildPath = "";
     // bit of fudging to get and validate path...
     this.validatePathExists(path);
-    console.trace("Setup Deployments view: ", {path, parent, pathExists: this.pathExists, buildPath: this.buildPath});
   }
 
   async refreshImpl(_: IActionContext): Promise<void> {
