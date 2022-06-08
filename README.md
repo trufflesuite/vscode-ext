@@ -36,7 +36,7 @@ For developers who are not familiar with Truffle, or prefer to use the Command P
 
 Your newly scaffolded-out directory includes a simple contract and all the necessary files to build and deploy a simple, and working contract to an RPC-endpoint. Use the following steps to build your contract:
 
-1. Select your contract Solidity (.sol) file, right-click and choose `Build Contracts`
+1. Select your contract Solidity (.sol) file, right-click and choose `Truffle: Build Contracts`
 
 ## Deploy to the RPC endpoint
 
@@ -44,7 +44,7 @@ Once compiled, you will have your contract, contract metadata (e.g., contract AB
 
 For new users, this can be hard to understand, because there are multiple steps that need to occur for the deployment to be successful. To ease this burden, the extension provides a simple model to deploy to various networks. By default, this will be a local network, using Ganache. The extension will start and run an instance of ganache for the user. The options to initiate this deployment are below.
 
-1. Select your contract Solidity (.sol) file, right click and choose `Deploy Contracts`
+1. Select your contract Solidity (.sol) file, right click and choose `Truffle: Deploy Contracts`
 
 ## Deploy with Truffle Ganache locally
 
@@ -52,7 +52,7 @@ For rapid development of smart contracts, having the ability to deploy contracts
 
 The extension has integrated Ganache directly into the IDE to further lower the barrier to entry, and allow even faster development iteration. By default, there is nothing to configure, and the following steps can be used.
 
-1. After selecting to deploy the contracts, either from the Command Palette or by right clicking on the contract and selecting Deploy contracts, a dropdown will be presented with options for _where_ to deploy the contract. By default there will be a single entry on this list named development.
+1. After selecting to deploy the contracts, either from the Command Palette or by right clicking on the contract and selecting `Truffle: Deploy contracts`, a dropdown will be presented with options for _where_ to deploy the contract. By default there will be a single entry on this list named development.
 
 2. After selecting development, the IDE will create a new instance of Truffle Ganache, which will use the default configuration for the project as the target. The IDE will then deploy the contracts to this instance.
 
