@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Event, EventEmitter, ProviderResult, TreeDataProvider, TreeItem, TreeItemCollapsibleState } from "vscode";
-import { IInstruction } from "../models/IInstruction";
+import {Event, EventEmitter, ProviderResult, TreeDataProvider, TreeItem, TreeItemCollapsibleState} from "vscode";
+import {IInstruction} from "../models/IInstruction";
 import InstructionDataManager from "./instructionDataManager";
 import InstructionTreeNode from "./instructionTreeNode";
 
@@ -16,9 +16,9 @@ export default class InstructionDataProvider implements TreeDataProvider<Instruc
     this.instructionDataManager = instructionDataManager;
   }
 
-  public refresh(newInstructions: IInstruction[]) {
+  public refresh(element: InstructionTreeNode, newInstructions: IInstruction[]) {
     this.instructionDataManager.load(newInstructions);
-    this._onDidChangeTreeData.fire();
+    this._onDidChangeTreeData.fire(element);
   }
 
   public getChildren(element?: InstructionTreeNode): ProviderResult<InstructionTreeNode[]> {

@@ -6,23 +6,23 @@ import fs from "fs-extra";
 // @ts-ignore
 import hdkey from "hdkey";
 import path from "path";
-import {QuickPickItem, Uri, window} from "vscode";
+import {QuickPickItem, Uri, window, commands} from "vscode";
 import {Constants, RequiredApps} from "../Constants";
 import {
-  getWorkspaceRoot,
+  getWorkspaces,
   outputCommandHelper,
-  required,
-  showConfirmPaidOperationDialog,
-  showIgnorableNotification,
-  showQuickPick,
   telemetryHelper,
   TruffleConfig,
   TruffleConfiguration,
   vscodeEnvironment,
 } from "../helpers";
+import {required} from "../helpers/required";
+
+import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from "../helpers/userInteraction";
+
 import {IDeployDestination, ItemType} from "../Models";
-import {NetworkForContractItem} from "../Models/QuickPickItems/NetworkForContractItem";
-import {AzureBlockchainProject, InfuraProject, LocalProject, LocalService} from "../Models/TreeItems";
+import {NetworkForContractItem} from "../Models/QuickPickItems";
+import {InfuraProject, LocalProject, LocalService} from "../Models/TreeItems";
 import {Project} from "../Models/TreeItems";
 import {Output} from "../Output";
 import {
@@ -56,23 +56,29 @@ interface IExtendedQuickPickItem extends QuickPickItem {
 export namespace TruffleCommands {
   /**
    * Call the truffle command line compiler
-   * @param args a list of optional compile command args to append in certain circumstances
    */
-  export async function buildContracts(...args: Array<string>): Promise<void> {
+  export async function buildContracts(uri?: Uri): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.buildContracts.commandStarted");
-    await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
-      if (!(await required.checkAppsSilent(RequiredApps.truffle))) {
-        Telemetry.sendEvent("TruffleCommands.buildContracts.truffleInstallation");
-        await required.installTruffle(required.Scope.locally);
-      }
-      await outputCommandHelper.executeCommand(getWorkspaceRoot(), "npx", RequiredApps.truffle, "compile", ...args);
-    });
 
-    Telemetry.sendEvent("TruffleCommands.buildContracts.commandFinished");
+    if (!(await required.checkAppsSilent(RequiredApps.truffle))) {
+      Telemetry.sendEvent("TruffleCommands.buildContracts.truffleInstallation");
+      await required.installTruffle(required.Scope.locally);
+      return;
+    }
+
+    const workspace = await getWorkspace(uri);
+
+    await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
+      await outputCommandHelper.executeCommand(workspace.fsPath, "npx", RequiredApps.truffle, "compile");
+      Telemetry.sendEvent("TruffleCommands.buildContracts.commandFinished");
+    });
   }
 
-  export async function deployContracts(): Promise<void> {
+  export async function deployContracts(uri?: Uri): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.deployContracts.commandStarted");
+
+    const contractFolderPath = uri ? Uri.parse(path.resolve(path.join(uri!.fsPath, ".."))) : undefined;
+    TruffleConfiguration.truffleConfigUri = await getWorkspace(contractFolderPath);
 
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
     const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri);
@@ -94,9 +100,9 @@ export namespace TruffleCommands {
     Telemetry.sendEvent("TruffleCommands.deployContracts.selectedDestination", {
       url: Telemetry.obfuscate(command.description || ""),
     });
-
     await command.cmd();
-
+    // notify our deployment view
+    commands.executeCommand("truffle-vscode.views.deployments.refresh");
     Telemetry.sendEvent("TruffleCommands.deployContracts.commandFinished");
   }
 
@@ -306,8 +312,7 @@ async function getProjectDeployDestinationItems(
   const destinations: IDeployDestination[] = [];
 
   const filteredProjects = projects.filter(
-    (project) =>
-      project instanceof AzureBlockchainProject || project instanceof InfuraProject || project instanceof LocalProject
+    (project) => project instanceof InfuraProject || project instanceof LocalProject
   );
 
   for (const project of filteredProjects) {
@@ -476,4 +481,28 @@ function ensureFileIsContractJson(filePath: string) {
     Telemetry.sendException(error);
     throw error;
   }
+}
+
+async function getWorkspace(uri?: Uri): Promise<Uri> {
+  if (uri) return Uri.parse(path.resolve(path.dirname(uri.fsPath)));
+
+  const workspaces = await getWorkspaces();
+
+  if (workspaces.length === 1) return workspaces[0].workspace;
+
+  const folders: QuickPickItem[] = [];
+
+  Array.from(workspaces).forEach((element) => {
+    folders.push({
+      label: element.dirName,
+      detail: element.workspace.fsPath,
+    });
+  });
+
+  const command = await showQuickPick(folders, {
+    ignoreFocusOut: true,
+    placeHolder: Constants.placeholders.selectContract,
+  });
+
+  return Uri.parse(command.detail!);
 }

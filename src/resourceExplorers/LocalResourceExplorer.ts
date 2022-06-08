@@ -1,32 +1,44 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from "../Constants";
-import { showInputBox } from "../helpers";
-import { LocalNetworkNode, LocalProject } from "../Models/TreeItems";
-import { GanacheService } from "../services";
-import { Telemetry } from "../TelemetryClient";
-import { DialogResultValidator } from "../validators/DialogResultValidator";
-import { UrlValidator } from "../validators/UrlValidator";
+import {Constants} from "../Constants";
+import {showInputBox} from "../helpers/userInteraction";
+import {LocalNetworkNode, LocalProject, TLocalProjectOptions} from "../Models/TreeItems";
+import {GanacheService} from "../services";
+import {Telemetry} from "../TelemetryClient";
+import {DialogResultValidator} from "../validators/DialogResultValidator";
+import {UrlValidator} from "../validators/UrlValidator";
 
 export class LocalResourceExplorer {
-  public async createProject(existingProjects: string[] = [], existingPorts: number[] = []): Promise<LocalProject> {
+  public async createProject(
+    existingProjects: string[] = [],
+    existingPorts: number[] = [],
+    options: TLocalProjectOptions
+  ): Promise<LocalProject> {
     Telemetry.sendEvent("LocalResourceExplorer.createProject");
+
     return this.getOrCreateLocalProject(
       existingProjects,
       existingPorts,
       GanacheService.PortStatus.FREE,
-      Constants.validationMessages.portAlreadyInUse
+      Constants.validationMessages.portAlreadyInUse,
+      options
     );
   }
 
-  public async selectProject(existingProjects: string[] = [], existingPorts: number[] = []): Promise<LocalProject> {
+  public async selectProject(
+    existingProjects: string[] = [],
+    existingPorts: number[] = [],
+    options: TLocalProjectOptions
+  ): Promise<LocalProject> {
     Telemetry.sendEvent("LocalResourceExplorer.selectProject");
+
     const localProject = await this.getOrCreateLocalProject(
       existingProjects,
       existingPorts,
       GanacheService.PortStatus.GANACHE,
-      Constants.validationMessages.portNotInUseGanache
+      Constants.validationMessages.portNotInUseGanache,
+      options
     );
 
     await GanacheService.startGanacheServer(localProject.port);
@@ -38,12 +50,29 @@ export class LocalResourceExplorer {
     existingProjects: string[],
     existingPorts: number[],
     portStatus: GanacheService.PortStatus,
-    validateMessage: string
+    validateMessage: string,
+    options: TLocalProjectOptions
   ): Promise<LocalProject> {
-    const localProjectName = await this.getLocalProjectName(existingProjects);
-    const localProjectPort = await this.getLocalProjectPort(existingPorts, portStatus, validateMessage);
+    const port: number = await this.getLocalProjectPort(existingPorts, portStatus, validateMessage);
+    const label: string = await this.getLocalProjectName(existingProjects);
+    const description: string = await this.getDescription(port, options);
 
-    return this.getLocalProject(localProjectName, localProjectPort);
+    return this.getLocalProject(label, port, options, description);
+  }
+
+  private async getLocalProject(
+    label: string,
+    port: number,
+    options: TLocalProjectOptions,
+    description: string
+  ): Promise<LocalProject> {
+    const localProject = new LocalProject(label, port, options, description);
+    const url = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
+    const networkNode = new LocalNetworkNode(label, url, "*");
+
+    localProject.addChild(networkNode);
+
+    return localProject;
   }
 
   private async getLocalProjectName(existingProjects: string[]): Promise<string> {
@@ -96,13 +125,18 @@ export class LocalResourceExplorer {
     return parseInt(port, 10);
   }
 
-  private async getLocalProject(projectName: string, port: number): Promise<LocalProject> {
-    const localProject = new LocalProject(projectName, port);
-    const url = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
-    const networkNode = new LocalNetworkNode(projectName, url, "*");
+  private async getDescription(port: number, options: TLocalProjectOptions) {
+    const blockNumber: string = options.blockNumber === 0 ? Constants.latestBlock : options.blockNumber.toString();
+    const forkedNetwork: string = options.url === "" ? options.forkedNetwork : options.url;
 
-    localProject.addChild(networkNode);
+    let formattedDescription: string;
 
-    return localProject;
+    if (options.isForked)
+      formattedDescription = `${forkedNetwork?.toLowerCase()} - ${Constants.networkProtocols.http}${
+        Constants.localhost
+      }:${port} forking ${forkedNetwork?.toLowerCase()}@${blockNumber}`;
+    else formattedDescription = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
+
+    return formattedDescription;
   }
 }

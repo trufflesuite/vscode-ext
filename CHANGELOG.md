@@ -2,6 +2,24 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
+## 2.2.4
+
+Welcome to the new look Changelog. We will add more info against each release where we think it will add value and inform you of what new cool features we are creating or paving the way for. This month we did a bunch of protoyping and internal features/improvements for viewing your projects, layer 1/2 support via Infura and forking made simple for Ganache from the UI.
+
+- Infura network has been divided into Layer 1/2. Infura will soon be offering a way to group our networkys by layer, this adds support for that in our network views. [PR](https://github.com/trufflesuite/vscode-ext/pull/86)
+- Generic Service added to list of services. This is an internal fix to pave the way for other blockchain (permissioned/private) support. [PR](https://github.com/trufflesuite/vscode-ext/pull/85)
+- Infura network has been divided into Layer 1/2 [PR](https://github.com/trufflesuite/vscode-ext/pull/86)
+- Handling builds and compiles from within projects in subdirectories [PR](https://github.com/trufflesuite/vscode-ext/pull/82)
+- Updating our README.md [PR](https://github.com/trufflesuite/vscode-ext/pull/78)
+- New Truffle view added to VSCode on left hand bar. This is a prototype where you can see your contracts, deployments and some help links. We hope to expand this and add new features, so please let us know if this works for you and how we can make it better. [PR](https://github.com/trufflesuite/vscode-ext/pull/75)
+  - Right now we do have a few caveats with this, not all the features of the main explorer are possible in the explorer view we are working with, you can call build contracts but there are buttons at the top to deploy and build also.
+  - We are working on the basis of single repos (not monorepos of multiple truffle projects) so we are going to be releasing fixes for that in the future.
+- fix: Preventing possible bug on required apps [PR](https://github.com/trufflesuite/vscode-ext/pull/71). There are times when the required apps check can sometimes happen twice internally causing this error to say you have not got all the required apps installed correctly. This fixes that issue. 🤞🏻
+- Forked ganache instance [PR](https://github.com/trufflesuite/vscode-ext/pull/70). Fork your blockchains, just like on the command line. Through a set of dialogs you can now fork any network via Infura at a specific block or latest and this will now configure that and have it visible in your network list.
+
+Most of these are great enhancements to our codebase and thank you to all the contributors!
+
+
 ## 2.2.3
 
 - Required apps validation has fixed.

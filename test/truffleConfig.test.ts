@@ -34,6 +34,7 @@ describe("TruffleConfiguration helper", () => {
     const pathExistsStub = sinon.stub(fs, "pathExistsSync").returns(true);
 
     // Act
+    TruffleConfiguration.truffleConfigUri = null as any;
     const result = TruffleConfiguration.getTruffleConfigUri();
 
     // Assert

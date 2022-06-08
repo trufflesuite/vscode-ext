@@ -13,10 +13,6 @@ describe("Telemetry helper test", () => {
       name: "development",
     },
     {
-      expectedResult: "abs",
-      name: `abs_${uuid.v4()}`,
-    },
-    {
       expectedResult: "inf",
       name: `inf_${uuid.v4()}`,
     },
@@ -42,20 +38,12 @@ describe("Telemetry helper test", () => {
 
   const testItemTypes = [
     {
-      expectedResult: "abs",
-      itemType: ItemType.AZURE_BLOCKCHAIN_PROJECT,
-    },
-    {
       expectedResult: "loc",
       itemType: ItemType.LOCAL_PROJECT,
     },
     {
       expectedResult: "inf",
       itemType: ItemType.INFURA_PROJECT,
-    },
-    {
-      expectedResult: "bdm",
-      itemType: ItemType.BLOCKCHAIN_DATA_MANAGER_PROJECT,
     },
     {
       expectedResult: "other",

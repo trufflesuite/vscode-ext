@@ -21,12 +21,9 @@ const protocolRegExp = new RegExp(
 );
 
 export type NetworkNodeTypes =
-  | ItemType.AZURE_BLOCKCHAIN_NETWORK_NODE
   | ItemType.LOCAL_NETWORK_NODE
   | ItemType.INFURA_NETWORK_NODE
-  | ItemType.BLOCKCHAIN_DATA_MANAGER_APPLICATION
-  | ItemType.BLOCKCHAIN_DATA_MANAGER_INPUT
-  | ItemType.BLOCKCHAIN_DATA_MANAGER_OUTPUT;
+  | ItemType.GENERIC_NETWORK_NODE;
 
 export abstract class NetworkNode extends ExtensionItem {
   public readonly networkId: number | string;
@@ -37,11 +34,12 @@ export abstract class NetworkNode extends ExtensionItem {
     label: string,
     data: ExtensionItemData,
     url: URL | string,
-    networkId: number | string
+    networkId: number | string,
+    description?: string
   ) {
     networkId = networkId === "*" ? networkId : parseInt(networkId + "", 10);
 
-    super(itemType, label, data);
+    super(itemType, label, data, description);
 
     this.url = this.prepareUrl(url);
     this.networkId = networkId;

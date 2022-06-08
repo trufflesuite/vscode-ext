@@ -1,5 +1,9 @@
-mode: Mainline
-branches: {}
+mode: ContinuousDelivery
+branches:
+  develop:
+    tag: alpha
+    increment: Patch
+
 ignore:
   sha: []
 merge-message-formats: {}
