@@ -117,13 +117,13 @@
       },
       {
         "command": "truffle-vscode.buildContracts",
-        "title": "Truffle: Build Contracts",
+        "title": "Build Contracts",
         "category": "Blockchain",
         "icon": "$(run-all)"
       },
       {
         "command": "truffle-vscode.deployContracts",
-        "title": "Truffle: Deploy Contracts",
+        "title": "Deploy Contracts",
         "category": "Blockchain"
       },
       {
@@ -219,13 +219,13 @@
       },
       {
         "command": "truffle-vscode.buildContracts",
-        "title": "Truffle: Build Contracts",
+        "title": "Build Contracts",
         "category": "Truffle",
         "icon": "$(run-all)"
       },
       {
         "command": "truffle-vscode.deployContracts",
-        "title": "Truffle: Deploy Contracts",
+        "title": "Deploy Contracts",
         "category": "Truffle",
         "icon": "$(radio-tower)"
       },
@@ -429,6 +429,11 @@
           "when": "view == truffle-vscode.views.explorer",
           "group": "truffle-0@0"
         },
+        {
+          "command": "truffle-vscode.deployContracts",
+          "when": "view == truffle-vscode.views.explorer",
+          "group": "truffle-0@1"
+        },        
         {
           "command": "truffle-vscode.disconnectProject",
           "when": "view == truffle-vscode.truffle && viewItem == genericproject",
