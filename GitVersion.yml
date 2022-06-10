@@ -1,7 +1,7 @@
 mode: ContinuousDeployment
 branches:
   develop:
-    tag: preview
+    tag: PreRelease
     increment: Patch
 ignore:
   sha: []
