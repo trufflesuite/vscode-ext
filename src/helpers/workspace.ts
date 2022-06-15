@@ -47,6 +47,10 @@ export function isWorkspaceOpen(): boolean {
   return !!(workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath);
 }
 
+export function getPathByPlataform(workspace: Uri): string {
+  return process.platform === "win32" ? `${workspace.scheme}:${workspace.path}` : workspace.fsPath;
+}
+
 async function getWorkspaceFiles(dirPath: string): Promise<TruffleWorkspace[]> {
   const files = glob.sync(`${dirPath}/**/${Constants.defaultTruffleConfigFileName}`, {
     ignore: Constants.workspaceIgnoredFolders,

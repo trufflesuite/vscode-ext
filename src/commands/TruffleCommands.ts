@@ -19,6 +19,7 @@ import {
 import {required} from "../helpers/required";
 
 import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from "../helpers/userInteraction";
+import {getPathByPlataform} from "../helpers/workspace";
 
 import {IDeployDestination, ItemType} from "../Models";
 import {NetworkForContractItem} from "../Models/QuickPickItems";
@@ -71,9 +72,10 @@ export namespace TruffleCommands {
     uri = uri ? convertEntryToUri(uri) : uri;
 
     const workspace = await getWorkspace(uri);
+    const path = getPathByPlataform(workspace);
 
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
-      await outputCommandHelper.executeCommand(workspace.fsPath, "npx", RequiredApps.truffle, "compile");
+      await outputCommandHelper.executeCommand(path, "npx", RequiredApps.truffle, "compile");
       Telemetry.sendEvent("TruffleCommands.buildContracts.commandFinished");
     });
   }
@@ -84,8 +86,9 @@ export namespace TruffleCommands {
     // Workaround for non URI types. In the future, better to use only Uri as pattern
     uri = uri ? convertEntryToUri(uri) : uri;
 
-    const contractFolderPath = uri ? Uri.parse(path.resolve(path.join(uri!.fsPath, ".."))) : undefined;
-    TruffleConfiguration.truffleConfigUri = await getWorkspace(contractFolderPath);
+    TruffleConfiguration.truffleConfigUri = uri
+      ? Uri.parse(path.resolve(path.join(uri!.fsPath, "../..")))
+      : await getWorkspace();
 
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
     const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri);
@@ -502,7 +505,7 @@ async function getWorkspace(uri?: Uri): Promise<Uri> {
   Array.from(workspaces).forEach((element) => {
     folders.push({
       label: element.dirName,
-      detail: element.workspace.fsPath,
+      detail: process.platform === "win32" ? element.dirName : element.workspace.fsPath,
     });
   });
 
