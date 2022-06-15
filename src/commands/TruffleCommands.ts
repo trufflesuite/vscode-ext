@@ -502,6 +502,8 @@ async function deployToMainNetwork(networkName: string, truffleConfigPath: strin
 async function deployToDashboard(truffleConfigPath: string): Promise<void> {
   Telemetry.sendEvent("TruffleCommands.deployContracts.deployToDashboard.commandStarted");
 
+  console.log(truffleConfigPath);
+
   const version = await required.checkDashboardVersion();
 
   if (!version) {
