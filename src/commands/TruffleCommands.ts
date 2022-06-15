@@ -6,7 +6,7 @@ import fs from "fs-extra";
 // @ts-ignore
 import hdkey from "hdkey";
 import path from "path";
-import {QuickPickItem, Uri, window, commands} from "vscode";
+import {QuickPickItem, Uri, window, commands, QuickPickItemKind} from "vscode";
 import {Constants, RequiredApps} from "../Constants";
 import {
   getWorkspaces,
@@ -43,6 +43,7 @@ interface IDeployDestinationItem {
   cwd?: string;
   description?: string;
   detail?: string;
+  kind?: QuickPickItemKind;
   label: string;
   networkId: string | number;
 }
@@ -270,9 +271,32 @@ async function installRequiredDependencies(): Promise<void> {
 function getDefaultDeployDestinations(truffleConfigPath: string): IDeployDestinationItem[] {
   return [
     {
+      cmd: async () => {
+        return;
+      },
+      kind: QuickPickItemKind.Separator,
+      label: Constants.uiCommandSeparators.optionSeparator,
+      networkId: "",
+    },
+    {
       cmd: createNewDeploymentService.bind(undefined, truffleConfigPath),
       label: Constants.uiCommandStrings.createProject,
+      detail: Constants.uiCommandStrings.createProjectDetail,
       networkId: "*",
+    },
+    {
+      cmd: deployToDashboard.bind(undefined, truffleConfigPath),
+      label: Constants.uiCommandStrings.deployViaTruffleDashboard,
+      detail: Constants.uiCommandStrings.deployViaTruffleDashboardDetail,
+      networkId: "*",
+    },
+    {
+      cmd: async () => {
+        return;
+      },
+      kind: QuickPickItemKind.Separator,
+      label: Constants.uiCommandSeparators.networkSeparator,
+      networkId: "",
     },
   ];
 }
@@ -473,6 +497,26 @@ async function deployToMainNetwork(networkName: string, truffleConfigPath: strin
   await showConfirmPaidOperationDialog();
 
   await deployToNetwork(networkName, truffleConfigPath);
+}
+
+async function deployToDashboard(truffleConfigPath: string): Promise<void> {
+  Telemetry.sendEvent("TruffleCommands.deployContracts.deployToDashboard.commandStarted");
+
+  const version = await required.checkDashboardVersion();
+
+  if (!version) {
+    Telemetry.sendEvent("TruffleCommands.deployContracts.deployToDashboard.dashboardVersionError");
+
+    const message = Constants.errorMessageStrings.DashboardVersionError;
+    const buttonUpdate = Constants.placeholders.buttonTruffleUpdate;
+    const buttonClose = Constants.placeholders.buttonClose;
+
+    const item = await window.showErrorMessage(message, buttonUpdate, buttonClose);
+
+    if (item == buttonUpdate) await required.installTruffle();
+
+    return;
+  }
 }
 
 async function readCompiledContract(uri: Uri): Promise<any> {

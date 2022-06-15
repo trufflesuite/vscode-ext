@@ -17,6 +17,7 @@ export enum RequiredApps {
   truffle = "truffle",
   ganache = "ganache",
   hdwalletProvider = "truffle-hdwallet-provider",
+  dashboard = "dashboard",
 }
 
 export enum NotificationOptions {
@@ -88,6 +89,10 @@ export class Constants {
     [RequiredApps.truffle]: {
       max: "6.0.0",
       min: "5.0.0",
+    },
+    [RequiredApps.dashboard]: {
+      max: "",
+      min: "6.5.0",
     },
   };
 
@@ -429,6 +434,8 @@ export class Constants {
     setupMnemonic: "Setup mnemonic",
     enterBlockNumber: "Leave blank for latest block",
     enterNetworkUrl: "Enter a valid url",
+    buttonTruffleUpdate: "Update Truffle",
+    buttonClose: "Close",
   };
 
   // More information see here
@@ -515,7 +522,15 @@ export class Constants {
   public static uiCommandStrings = {
     createInfuraProject: "$(plus) Create Infura Project",
     createProject: "$(plus) Create a new network",
+    createProjectDetail: "Create a new network choosing Ganache, Infura and others",
     createTransactionNode: "$(plus) Create Transaction Node",
+    deployViaTruffleDashboard: "$(arrow-up) Deploy via Truffle Dashboard",
+    deployViaTruffleDashboardDetail: "Deploy your contracts via Truffle Dashboard",
+  };
+
+  public static uiCommandSeparators = {
+    optionSeparator: "Options",
+    networkSeparator: "Networks",
   };
 
   public static errorMessageStrings = {
@@ -555,6 +570,7 @@ export class Constants {
     TruffleConfigIsNotExist: "Truffle configuration file not found",
     VariableShouldBeDefined: Constants.getMessageVariableShouldBeDefined,
     WorkspaceShouldBeOpened: "Workspace should be opened",
+    DashboardVersionError: "Please upgrade to the latest version of Truffle to use this feature",
   };
 
   public static informationMessage = {

@@ -108,6 +108,25 @@ export namespace required {
     }
   }
 
+  export async function checkDashboardVersion(): Promise<boolean> {
+    const installedVersion = await getTruffleVersion();
+    if (!installedVersion) {
+      return false;
+    } else {
+      const requiredVersion = Constants.requiredVersions[RequiredApps.dashboard];
+
+      if (typeof requiredVersion === "string") {
+        return isValid(installedVersion, requiredVersion);
+      } else {
+        return isValid(
+          installedVersion,
+          (requiredVersion as {max: string; min: string}).min,
+          (requiredVersion as {max: string; min: string}).max
+        );
+      }
+    }
+  }
+
   export async function getHdWalletProviderVersion(): Promise<string> {
     try {
       const data =
