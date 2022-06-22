@@ -37,6 +37,7 @@ export class Constants {
     executeCommand: "Truffle: Execute command",
     ganacheCommands: "Truffle: Ganache Server",
     genericCommands: "Truffle: Generic Server",
+    dashboardCommands: "Truffle: Dashboard Server",
     requirements: "Truffle: Requirements",
     telemetryClient: "Truffle: Telemetry Client",
     treeManager: "Truffle: Service Tree Manager",
@@ -67,6 +68,10 @@ export class Constants {
   public static ganacheRetryAttempts = 5;
   public static latestBlock = "latest";
 
+  public static dashboardPort = 24012;
+  public static dashboardRetryTimeout = 2000; // milliseconds
+  public static dashboardRetryAttempts = 5;
+
   // Values are quite brittle and don't map directly to the requirements.html screen.
   public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
     [RequiredApps.ganache]: {
@@ -92,7 +97,7 @@ export class Constants {
     },
     [RequiredApps.dashboard]: {
       max: "",
-      min: "6.5.0",
+      min: "5.5.0",
     },
   };
 
@@ -517,6 +522,14 @@ export class Constants {
     serverNoAvailable: "No network settings available",
     serverRunning: "Server is running",
     serverNotFound: "Not found",
+  };
+
+  public static dashboardCommandStrings = {
+    cannotStartServer: "Cannot start dashboard server",
+    invalidDashboardPort: "Cannot start Dashboard server. Invalid port",
+    dashboardPortIsBusy: "Cannot start dashboard server, port is busy",
+    serverAlreadyRunning: "Dashboard server already running",
+    serverSuccessfullyStarted: "Dashboard server successfully started",
   };
 
   public static uiCommandStrings = {

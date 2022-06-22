@@ -15,3 +15,5 @@ export * from "./tree/TreeService";
 export * from "./infuraService/InfuraServiceClient";
 export * from "./generic/GenericService";
 export * from "./generic/GenericServiceClient";
+export * from "./dashboard/DashboardService";
+export * from "./dashboard/DashboardServiceClient";

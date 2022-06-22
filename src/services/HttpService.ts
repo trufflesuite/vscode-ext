@@ -27,7 +27,22 @@ export namespace HttpService {
       })
       .catch((_errorMessage) => {
         Telemetry.sendException(new Error(`HttpService.sendRPCRequest has done with error for method: ${methodName}`));
+        return undefined;
+      });
+  }
 
+  export async function sendHttpGetRequest(url: string): Promise<{result?: any; error?: any} | undefined> {
+    const address = hasProtocol(url) ? url : `${Constants.networkProtocols.http}${url}`;
+    return requestPromise
+      .get(address, {
+        timeout: requestTimeout,
+        resolveWithFullResponse: true,
+      })
+      .then((response) => {
+        return response.statusCode;
+      })
+      .catch((_errorMessage) => {
+        Telemetry.sendException(new Error(`HttpService.sendHttpGetRequest has done with error for URL: ${url}`));
         return undefined;
       });
   }

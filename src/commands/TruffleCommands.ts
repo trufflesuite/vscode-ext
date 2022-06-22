@@ -37,6 +37,7 @@ import {Telemetry} from "../TelemetryClient";
 import {NetworkNodeView} from "../ViewItems";
 import {Entry} from "../views/fileExplorer";
 import {ServiceCommands} from "./ServiceCommands";
+import {DashboardCommands} from "./DashboardCommands";
 
 interface IDeployDestinationItem {
   cmd: () => Promise<void>;
@@ -504,21 +505,7 @@ async function deployToDashboard(truffleConfigPath: string): Promise<void> {
 
   console.log(truffleConfigPath);
 
-  const version = await required.checkDashboardVersion();
-
-  if (!version) {
-    Telemetry.sendEvent("TruffleCommands.deployContracts.deployToDashboard.dashboardVersionError");
-
-    const message = Constants.errorMessageStrings.DashboardVersionError;
-    const buttonUpdate = Constants.placeholders.buttonTruffleUpdate;
-    const buttonClose = Constants.placeholders.buttonClose;
-
-    const item = await window.showErrorMessage(message, buttonUpdate, buttonClose);
-
-    if (item == buttonUpdate) await required.installTruffle();
-
-    return;
-  }
+  DashboardCommands.startDashboardCmd();
 }
 
 async function readCompiledContract(uri: Uri): Promise<any> {
