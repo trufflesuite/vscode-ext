@@ -21,14 +21,7 @@ module.exports = {
     minimize: true,
   },
   externals: function ({ context, request }, callback) {
-    // don't pack any require/import that requests any file/module with
-    // `"mscorlib"` in it
-    if (/mscorlib/i.test(request)) {
-      return callback(null, "commonjs " + request);
-    } else if (/Nethereum/i.test(request)) {
-      return callback(null, "commonjs " + request);
-      // don't pack any require/import that requests `"vscode"`
-    } else if (/^vscode$/.test(request)) {
+    if (/^vscode$/.test(request)) {
       return callback(null, "commonjs " + request);
     } else if (/^electron$/.test(request)) {
       return callback(null, 'require ("' + request + '")');
@@ -54,8 +47,6 @@ module.exports = {
   plugins: [
     new CopyPlugin({
       patterns: [
-        { from: "./src/Generators/mscorlib.js", to: "./" },
-        { from: "./src/Generators/Nethereum.Generators.DuoCode.js", to: "./" },
         { from: "./src/debugAdapter/web3ProviderResolver.js", to: "./" },
         { from: "./src/helpers/checkTruffleConfigTemplate.js", to: "./" },
       ],

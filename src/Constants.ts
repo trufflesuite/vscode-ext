@@ -1,6 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {IAzExtOutputChannel} from "@microsoft/vscode-azext-utils";
 import os from "os";
 import path from "path";
 import {ExtensionContext, extensions} from "vscode";
@@ -25,7 +26,6 @@ export enum NotificationOptions {
 }
 
 export class Constants {
-  public static extensionContext: ExtensionContext;
   public static temporaryDirectory = "";
   public static extensionName = packageJSON.name;
   public static extensionVersion = packageJSON.version;
@@ -35,7 +35,7 @@ export class Constants {
     truffleForVSCode: "Truffle for VSCode",
     executeCommand: "Truffle: Execute command",
     ganacheCommands: "Truffle: Ganache Server",
-    //logicAppGenerator: "Logic App Generator",
+    genericCommands: "Truffle: Generic Server",
     requirements: "Truffle: Requirements",
     telemetryClient: "Truffle: Telemetry Client",
     treeManager: "Truffle: Service Tree Manager",
@@ -56,45 +56,15 @@ export class Constants {
   public static defaultTruffleBox = "truffle-box/vscode-starter-box";
   public static defaultDebounceTimeout = 300;
   public static defaultInputNameInBdm = "transaction-node";
-  public static containerTruffleExtension = "container-truffle-extension";
 
-  public static infuraHost = "infura.io";
   public static localhost = "127.0.0.1";
   public static localhostName = "development";
   public static defaultLocalhostPort = 8545;
-  public static defaultABSPort = 3200;
-  public static defaultABSHost = "blockchain.azure.com";
+  public static defaultTruffleConfigFileName = "truffle-config.js";
 
   public static ganacheRetryTimeout = 2000; // milliseconds
   public static ganacheRetryAttempts = 5;
-
-  public static truffleResourceName = {
-    eventGrid: "Event Grid",
-    transactionNode: "Transaction Node",
-  };
-
-  public static lengthParam = {
-    azureBlockchainResourceName: {
-      max: 20,
-      min: 2,
-    },
-    bdmName: {
-      max: 20,
-      min: 1,
-    },
-    eventGridName: {
-      max: 50,
-      min: 3,
-    },
-    password: {
-      max: 72,
-      min: 12,
-    },
-    resourceGroup: {
-      max: 90,
-      min: 1,
-    },
-  };
+  public static latestBlock = "latest";
 
   // Values are quite brittle and don't map directly to the requirements.html screen.
   public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
@@ -132,7 +102,7 @@ export class Constants {
   };
 
   public static globalStateKeys = {
-    azureBlockchainExtensionVersion: "azureBlockchainExtensionVersion",
+    truffleExtensionVersion: "truffleExtensionVersion",
     infuraCredentialsCacheKey: "InfuraCache",
     infuraExcludedProjectsListKey: "InfuraExcludedProjects",
     isNotifiedAboutOZSdk: "isNotifiedAboutOZSdk",
@@ -226,6 +196,8 @@ export class Constants {
     enterInfuraProjectName: "Enter project name",
     enterLocalProjectName: "Enter local project name",
     enterLocalProjectPort: "Enter local port number",
+    enterBlockNumber: "Enter a block number",
+    enterNetworkUrl: "Enter a valid host address with no port",
     enterMemberName: "Enter member name",
     enterMemberPassword: "Enter member password",
     enterTransactionNodeName: "Enter transaction node name",
@@ -243,45 +215,7 @@ export class Constants {
   };
 
   public static treeItemData = {
-    group: {
-      azure: {
-        member: {
-          contextValue: "member",
-          iconPath: {dark: "", light: ""},
-        },
-      },
-      bdm: {
-        input: {
-          contextValue: "inputGroup",
-          iconPath: {dark: "", light: ""},
-          label: "Inputs",
-        },
-        output: {
-          contextValue: "outputGroup",
-          iconPath: {dark: "", light: ""},
-          label: "Outputs",
-        },
-      },
-    },
     network: {
-      azure: {
-        contextValue: "network",
-        iconPath: {dark: "", light: ""},
-      },
-      bdm: {
-        application: {
-          contextValue: "bdmApplication",
-          iconPath: {dark: "", light: ""},
-        },
-        input: {
-          contextValue: "input",
-          iconPath: {dark: "", light: ""},
-        },
-        output: {
-          contextValue: "output",
-          iconPath: {dark: "", light: ""},
-        },
-      },
       default: {
         contextValue: "network",
         iconPath: {dark: "", light: ""},
@@ -294,16 +228,26 @@ export class Constants {
         contextValue: "localnetwork",
         iconPath: {dark: "", light: ""},
       },
+      generic: {
+        contextValue: "network",
+        iconPath: {dark: "", light: ""},
+      },
+    },
+    layer: {
+      infura: {
+        contextValue: "layer",
+        iconPath: {dark: "", light: ""},
+        layerOne: {
+          label: "Layer One",
+          value: 1,
+        },
+        layerTwo: {
+          label: "Layer Two",
+          value: 2,
+        },
+      },
     },
     project: {
-      azure: {
-        contextValue: "project",
-        iconPath: {dark: "", light: ""},
-      },
-      bdm: {
-        contextValue: "bdmproject",
-        iconPath: {dark: "", light: ""},
-      },
       default: {
         contextValue: "project",
         iconPath: {dark: "", light: ""},
@@ -316,20 +260,12 @@ export class Constants {
         contextValue: "localproject",
         iconPath: {dark: "", light: ""},
       },
+      generic: {
+        contextValue: "genericproject",
+        iconPath: {dark: "", light: ""},
+      },
     },
     service: {
-      azure: {
-        contextValue: "service",
-        iconPath: {dark: "", light: ""},
-        label: "Azure Service",
-        prefix: "abs",
-      },
-      bdm: {
-        contextValue: "service",
-        iconPath: {dark: "", light: ""},
-        label: "Blockchain Data Manager",
-        prefix: "bdm",
-      },
       default: {
         contextValue: "service",
         iconPath: {dark: "", light: ""},
@@ -346,6 +282,42 @@ export class Constants {
         iconPath: {dark: "", light: ""},
         label: "Ganache Service",
         prefix: "loc",
+        type: {
+          default: {
+            label: "Local",
+            prefix: "dfl",
+            description: "Local",
+            isForked: false,
+            networks: {},
+          },
+          forked: {
+            label: "Fork",
+            prefix: "frk",
+            description: "Fork",
+            isForked: true,
+            networks: {
+              mainnet: "Mainnet",
+              ropsten: "Ropsten",
+              kovan: "Kovan",
+              rinkeby: "Rinkeby",
+              goerli: "Goerli",
+              other: "Other...",
+            },
+          },
+          linked: {
+            label: "Linked",
+            prefix: "lnk",
+            description: "Linked",
+            isForked: false,
+            networks: {},
+          },
+        },
+      },
+      generic: {
+        contextValue: "service",
+        iconPath: {dark: "", light: ""},
+        label: "Other Service",
+        prefix: "gnr",
       },
     },
   };
@@ -369,23 +341,6 @@ export class Constants {
     onlyNumber: /^(-\d+|\d+)$/g,
 
     port: /^([1-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/,
-    specialChars: {
-      azureBlockchainResourceName: /^(?=^[a-z])[a-z0-9]+$/g,
-      bdmName: new RegExp(
-        `^([a-z0-9]){${Constants.lengthParam.bdmName.min},${Constants.lengthParam.bdmName.max}}$`,
-        "g"
-      ),
-      eventGridName: new RegExp(
-        `^([a-zA-Z0-9\-]){${Constants.lengthParam.eventGridName.min},${Constants.lengthParam.eventGridName.max}}$`,
-        "g"
-      ),
-      password: /[!@$^&()+=?\/<>|[\]{}_:.\\~]/g,
-      resourceGroupName: /[-\w.()]/g,
-      transactionNodeName: new RegExp(
-        `^(?=^[a-z])[a-z0-9]{${Constants.lengthParam.azureBlockchainResourceName.min},${Constants.lengthParam.azureBlockchainResourceName.max}}$`,
-        "g"
-      ),
-    },
     types: {
       simpleArray: /\w+\[\]/g,
       simpleMapping: /^\[.+\]$/g,
@@ -405,9 +360,6 @@ export class Constants {
     arrayElementsShouldBeValid: (elementsType: string) => {
       return `Array elements should have valid value of type ${elementsType}`;
     },
-    bdmApplicationNameExist: "Blockchain Data Manager Application name already exists.",
-    bdmNameAlreadyExists: "Blockchain Data Manager name already exists.",
-    eventGridAlreadyExists: "Event Grid name already exists.",
     forbiddenChars: {
       dotAtTheEnd: "Input value must not have '.' at the end.",
       networkName: "Invalid name. Name can contain only lowercase letters and numbers.",
@@ -420,26 +372,9 @@ export class Constants {
     forbiddenSymbols: "Provided name has forbidden symbols.",
     infuraProjectInvalidName:
       'Project name must be at least 3 characters and should have alphanumeric, space, and the symbols "-", "_", ":".',
-    invalidAzureName:
-      "Invalid name. Name can contain only lowercase letters and numbers. " +
-      `The first character must be a letter. Length must be between ${Constants.lengthParam.azureBlockchainResourceName.min} ` +
-      `and ${Constants.lengthParam.azureBlockchainResourceName.max} characters.`,
-    invalidBDMApplicationName:
-      "The Blockchain Data Manager Application name is invalid. Name can contain only lowercase letters and numbers. Length must " +
-      `be between ${Constants.lengthParam.bdmName.min} and ${Constants.lengthParam.bdmName.max} characters.`,
-    invalidBlockchainDataManagerName:
-      "The Blockchain Data Manager name is invalid. Name can contain only lowercase letters and numbers. Length must " +
-      `be between ${Constants.lengthParam.bdmName.min} and ${Constants.lengthParam.bdmName.max} characters.`,
     invalidConfirmationResult: "'yes' or 'no'",
-    invalidEventGridName:
-      "The Event Grid name is invalid. Name can contain only letters, numbers and dashes. " +
-      `Length must be between ${Constants.lengthParam.eventGridName.min} and ${Constants.lengthParam.eventGridName.max} characters.`,
     invalidHostAddress: "Invalid host address",
     invalidPort: "Invalid port.",
-    invalidResourceGroupName:
-      "Resource group names only allow alphanumeric characters, periods," +
-      "underscores, hyphens and parenthesis and cannot end in a period. " +
-      `Length must be between ${Constants.lengthParam.resourceGroup.min} and ${Constants.lengthParam.resourceGroup.max} characters.`,
     lengthRange: Constants.getMessageLengthRange,
     nameAlreadyInUse: "This name is already in use. Choose another one.",
     noDigits: "Password should have at least one digit.",
@@ -450,10 +385,10 @@ export class Constants {
     onlyNumberAllowed: "Value after ':' should be a number.",
     portAlreadyInUse: "This port is already in use. Choose another one.",
     portNotInUseGanache: "No local ganache service running on port. Please start service or select another port.",
+    portNotInUseGeneric: "No local service running on port. Please start service or select another port.",
     projectAlreadyExists: "Network already exists.",
     projectAlreadyExistsOnInfura: "Project already exist with the same name on Infura.",
     projectIdAlreadyExists: "Network with project ID already exists.",
-    resourceGroupAlreadyExists: Constants.getMessageResourceGroupAlreadyExist,
     transactionNodeNameAlreadyExists: "Transaction Node name already exists.",
     unresolvedSymbols: Constants.getMessageInputHasUnresolvedSymbols,
     valueCanSafelyStoreUpToBits: (pow: string) => {
@@ -476,28 +411,24 @@ export class Constants {
     emptyLineText: "<empty line>",
     generateMnemonic: "Generate mnemonic",
     pasteMnemonic: "Paste mnemonic",
-    resourceGroupName: "Resource Group Name",
-    selectBlockchainDataManagerInstance: "Select Blockchain Data Manager instance",
-    selectConsortium: "Select consortium",
     selectContract: "Select contract",
     selectDeployDestination: "Select deploy destination",
     selectDestination: "Select destination",
-    selectEventGrid: "Select event grid",
     selectGanacheServer: "Select Ganache server",
     selectInfuraProject: "Select Infura project",
     selectInfuraProjectAvailability: "Select Infura project availability",
     selectMember: "Select member",
     selectMnemonicExtractKey: "Select mnemonic to extract key",
     selectMnemonicStorage: "Select mnemonic storage",
-    selectNetwork: "Select network",
+    selectType: "Select a type",
+    selectNetwork: "Select a network to fork",
     selectNewProjectPath: "Select new project path",
     selectProjects: "Select Projects",
-    selectResourceGroup: "Select a resource group",
-    selectRgLocation: "Select a location to create your Resource Group in...",
-    selectSubscription: "Select subscription",
     selectTransactionNode: "Select transaction node",
     selectTypeOfSolidityProject: "Select type of solidity project",
     setupMnemonic: "Setup mnemonic",
+    enterBlockNumber: "Leave blank for latest block",
+    enterNetworkUrl: "Enter a valid url",
   };
 
   // More information see here
@@ -508,15 +439,21 @@ export class Constants {
     mainnet: 1,
     rinkeby: 4,
     ropsten: 3,
+    "arbitrum-mainnet": 42161,
+    "arbitrum-rinkeby": 421611,
+    "aurora-mainnet": 1313161554,
+    "aurora-testnet": 1313161555,
+    "near-mainnet": 0,
+    "near-testnet": 0,
+    "optimism-kovan": 69,
+    "optimism-mainnet": 10,
+    "polygon-mainnet": 137,
+    "polygon-mumbai": 80001,
   };
 
   public static projectAvailability = {
     private: "Private",
     public: "Public",
-  };
-
-  public static consortiumMemberStatuses = {
-    ready: "Ready",
   };
 
   public static executeCommandMessage = {
@@ -541,25 +478,17 @@ export class Constants {
   public static statusBarMessages = {
     buildingContracts: "Building contracts",
     checkingRequirementDependencies: "Checking requirement dependencies version",
-    createBDMApplication: "Creating BDM app",
-    createBlobs: "Creating blobs",
-    createContainer: "Creating container",
-    createStorageAccount: "Creating storage account",
-    creatingBlockchainDataManager: "Creating new Blockchain Data Manager",
-    creatingConsortium: "Creating new consortium",
-    creatingEventGrid: "Creating new event grid",
     creatingProject: "Creating new project",
-    deleteBlobs: "Deleting blobs",
     deployingContracts: (destination: string) => {
       return `Deploying contracts to '${destination}'`;
     },
-    generatingLogicApp: (appName: string) => `Generating ${appName}!`,
   };
 
   public static rpcMethods = {
     getCode: "eth_getCode",
     netListening: "net_listening",
     netVersion: "net_version",
+    web3_clientVersion: "web3_clientVersion",
   };
 
   public static ganacheCommandStrings = {
@@ -575,14 +504,18 @@ export class Constants {
     serverSuccessfullyStopped: "Ganache server successfully stopped",
   };
 
+  public static genericCommandStrings = {
+    invalidPort: "Unable to verify connection. Invalid port",
+    portIsBusy: "Cannot start ganache server, port is busy",
+    serverNoAvailable: "No network settings available",
+    serverRunning: "Server is running",
+    serverNotFound: "Not found",
+  };
+
   public static uiCommandStrings = {
-    createBlockchainDataManagerProject: "$(plus) Create Blockchain Data Manager Project",
-    createConsortium: "$(plus) Create Consortium",
-    createEventGrid: "$(plus) Create Event Grid",
     createInfuraProject: "$(plus) Create Infura Project",
     createProject: "$(plus) Create a new network",
     createTransactionNode: "$(plus) Create Transaction Node",
-    deployToConsortium: "Deploy to consortium",
   };
 
   public static errorMessageStrings = {
@@ -613,9 +546,6 @@ export class Constants {
     NetworkNotFound: Constants.getMessageNetworkNotFound,
     NewProjectCreationFailed: "Command createProject has failed.",
     NoContractBody: "No contract body in AST",
-    NoSubscriptionFound: "No subscription found.",
-    NoSubscriptionFoundClick:
-      "No subscription found, click an Azure account " + "at the bottom left corner and choose Select All",
     PleaseRenameOldStyleTruffleConfig: 'Please rename file "truffle.js" to "truffle-config.js"',
     RequiredAppsAreNotInstalled: "To run command you should install required apps",
     SolidityContractsNotFound: "Solidity contracts were not found",
@@ -624,29 +554,17 @@ export class Constants {
     TruffleConfigHasIncorrectFormat: '"truffle-config.js" has incorrect format',
     TruffleConfigIsNotExist: "Truffle configuration file not found",
     VariableShouldBeDefined: Constants.getMessageVariableShouldBeDefined,
-    WaitForLogin: "You should sign-in on Azure Portal",
-    WorkflowTypeDoesNotMatch: "workflowType does not match any available workflows",
     WorkspaceShouldBeOpened: "Workspace should be opened",
   };
 
   public static informationMessage = {
-    bdm: {
-      bdmApplicationNotReady:
-        "Creations of BDM application and dependent resources were started. You can view the status in the status bar below. " +
-        "Please do not close vscode until it is ready. Once ready it will be added to the tree.",
-      contractMustBeDeployedForBDMApplication:
-        "The contract must be compiled and deployed before a BDM application can be created.",
-    },
     cancelButton: "Cancel",
     compileAndDeployButton: "Compile and deploy",
-    consortiumDoesNotHaveMemberWithUrl: "Consortium does not have member with url",
-    consortiumNameValidating: "Consortium name validating...",
     contractNotDeployed: "Contract not deployed yet.",
     deployButton: "Deploy",
     deployFailed: "Deploy failed",
     deploySucceeded: "Deploy succeeded",
     detailsButton: "Details",
-    generatedLogicApp: (appName: string) => `Generated the ${appName}!`,
     infuraAccountSuccessfullyCreated:
       "Your Infura account successfully created. Please check you email for complete registration",
     infuraSignInPrompt: "Not signed in to Infura account, sign in first.",
@@ -656,9 +574,6 @@ export class Constants {
     networkIsNotReady: Constants.getNetworkIsNotReadyMessage,
     openButton: "Open",
     privateKeyWasCopiedToClipboard: "Private key was copied to clipboard",
-    provisioningResource: (name: string) =>
-      `${name} is provisioning. The provisioning status can be viewed in the Azure portal. ` +
-      "You may return and complete this process once the provisioning is complete.",
     requiresDependency: "This project deployment requires the truffle-hdwallet-provider.",
     rpcEndpointCopiedToClipboard: "RPCEndpointAddress copied to clipboard",
     seeDetailsRequirementsPage: "Please see details on the Requirements Page",
@@ -701,54 +616,6 @@ export class Constants {
     refreshToken: "refresh_token",
   };
 
-  public static microservicesWorkflows = {
-    Data: "Data",
-    Messaging: "Messaging",
-    Reporting: "Reporting",
-    Service: "Service",
-  };
-
-  public static azureApps = {
-    AzureFunction: {label: "Azure Function", serviceType: 2, outputDir: "generatedAzureFunction"},
-    FlowApp: {label: "Flow App", serviceType: 0, outputDir: "generatedFlowApp"},
-    LogicApp: {label: "Logic App", serviceType: 1, outputDir: "generatedLogicApp"},
-  };
-
-  public static azureApiVersions = {
-    preview20180601: "2018-06-01-preview",
-    preview20190601: "2019-06-01-preview",
-    preview20200101: "2020-01-01-preview",
-    20190601: "2019-06-01",
-  };
-
-  public static provisioningState = {
-    creating: "Creating",
-    failed: "Failed",
-    resolvingDns: "ResolvingDns",
-    stopped: "Stopped",
-    succeeded: "Succeeded",
-    updating: "Updating",
-  };
-
-  public static availableBlockchainDataManagerLocations = ["eastus", "westeurope"];
-
-  public static azureProviders = {
-    blockchain: "Microsoft.Blockchain",
-    eventGrid: "Microsoft.EventGrid",
-    storage: "Microsoft.Storage",
-  };
-
-  public static azureResourceExplorer = {
-    contentType: "application/json",
-    portalBasUri: "https://ms.portal.azure.com/#@microsoft.onmicrosoft.com",
-    portalBladeUri: "https://ms.portal.azure.com/#blade/ManagedLedgerExtension/TransactionNodeMenuBlade",
-    providerName: "Microsoft.Blockchain",
-    requestAcceptLanguage: "en-US",
-    requestBaseUri: "https://management.azure.com",
-    resourceType: "blockchainMembers",
-    xMsBlockBlobType: "BlockBlob",
-  };
-
   public static solidityTypes = {
     address: "address",
     bool: "bool",
@@ -761,18 +628,12 @@ export class Constants {
     storageAccountUserSettingsKey: "truffle-vscode.storageAccount.name",
   };
 
-  public static bdmApplicationRequestParameters = {
-    artifactType: "EthereumSmartContract",
-    queryTargetTypes: ["ContractProperties", "ContractEvents"],
-  };
-
   public static coreSdk = {
     truffle: "Truffle",
   };
 
   public static initialize(context: ExtensionContext) {
-    this.extensionContext = context;
-    this.temporaryDirectory = context.storagePath ? context.storagePath : os.tmpdir();
+    this.temporaryDirectory = context.storageUri ? context.storageUri.fsPath : os.tmpdir();
     this.webViewPages.contractUI.path = context.asAbsolutePath(path.join("resources", "drizzle", "index.html"));
     this.webViewPages.welcome.path = context.asAbsolutePath(path.join("resources", "welcome", "index.html"));
     this.webViewPages.requirements.path = context.asAbsolutePath(path.join("resources", "welcome", "prereqs.html"));
@@ -781,44 +642,9 @@ export class Constants {
     this.infuraFileResponse.path = context.asAbsolutePath(path.join("resources", "codeFlowResult", "index.html"));
     this.infuraFileResponse.css = context.asAbsolutePath(path.join("resources", "codeFlowResult", "main.css"));
 
-    this.treeItemData.group.azure.member.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "ABS-member.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "ABS-member.svg")),
-    };
-
-    this.treeItemData.group.bdm.input.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "BlockchainDataManagerGroupInput.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "BlockchainDataManagerGroupInput.svg")),
-    };
-
-    this.treeItemData.group.bdm.output.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "BlockchainDataManagerGroupOutput.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "BlockchainDataManagerGroupOutput.svg")),
-    };
-
     this.treeItemData.network.default.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "EthereumNetwork.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "EthereumNetwork.svg")),
-    };
-
-    this.treeItemData.network.azure.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "ABNetwork.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "ABNetwork.svg")),
-    };
-
-    this.treeItemData.network.bdm.application.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "BlockchainDataManagerApplication.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "BlockchainDataManagerApplication.svg")),
-    };
-
-    this.treeItemData.network.bdm.input.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "ABNetwork.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "ABNetwork.svg")),
-    };
-
-    this.treeItemData.network.bdm.output.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "BlockchainDataManagerOutput.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "BlockchainDataManagerOutput.svg")),
     };
 
     this.treeItemData.network.infura.iconPath = {
@@ -831,16 +657,9 @@ export class Constants {
       light: context.asAbsolutePath(path.join("resources/light", "LocalNetwork.svg")),
     };
 
-    // @deprecated
-    this.treeItemData.project.azure.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "ABS-consortium.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "ABS-consortium.svg")),
-    };
-
-    // @deprecated
-    this.treeItemData.project.bdm.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "BlockchainDataManager-service_and_project.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "BlockchainDataManager-service_and_project.svg")),
+    this.treeItemData.network.generic.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "LocalNetwork.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "LocalNetwork.svg")),
     };
 
     this.treeItemData.project.infura.iconPath = {
@@ -853,16 +672,9 @@ export class Constants {
       light: context.asAbsolutePath(path.join("resources/light", "LocalProject.svg")),
     };
 
-    // @deprecated
-    this.treeItemData.service.azure.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "ABS-service.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "ABS-service.svg")),
-    };
-
-    // @deprecated
-    this.treeItemData.service.bdm.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "BlockchainDataManager-service_and_project.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "BlockchainDataManager-service_and_project.svg")),
+    this.treeItemData.project.generic.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "LocalProject.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "LocalProject.svg")),
     };
 
     this.treeItemData.service.infura.iconPath = {
@@ -873,6 +685,16 @@ export class Constants {
     this.treeItemData.service.local.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "LocalService.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "LocalService.svg")),
+    };
+
+    this.treeItemData.layer.infura.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "InfuraLayer.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "InfuraLayer.svg")),
+    };
+
+    this.treeItemData.service.generic.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "GenericService.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "GenericService.svg")),
     };
   }
 
@@ -886,10 +708,6 @@ export class Constants {
 
   private static getMessageValueOrDefault(valueName: string, defaultValue: any): string {
     return `Enter ${valueName}. Default value is ` + `${defaultValue}. ` + "Press Enter for default.";
-  }
-
-  private static getMessageResourceGroupAlreadyExist(resourceGroupName: string): string {
-    return `A resource group with the same name: ${resourceGroupName} already exists. Please select other name`;
   }
 
   private static getMessageContractsBuildDirectoryIsEmpty(buildDirPath: string): string {
@@ -921,8 +739,6 @@ export class Constants {
   }
   private static getNetworkIsNotReadyMessage(itemType: string) {
     switch (itemType) {
-      case "AzureBlockchainNetworkNode":
-        return "AzureBlockchain Service item is not ready yet. Please wait.";
       default:
         return "Blockchain item is not ready yet. Please wait.";
     }
@@ -930,10 +746,64 @@ export class Constants {
 
   private static getNetworkIsNotAvailableMessage(itemType: string) {
     switch (itemType) {
-      case "AzureBlockchainNetworkNode":
-        return "AzureBlockchain Service item is unavailable.";
       default:
         return "Blockchain item is unavailable.";
     }
   }
+
+  public static workspaceIgnoredFolders: string[] = [
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/ElectronClient/lib/**",
+    "**/CliClient/build/lib/**",
+    "**/CliClient/tests-build/lib/**",
+    "**/ElectronClient/dist/**",
+    "**/Modules/TinyMCE/JoplinLists/**",
+    "**/Modules/TinyMCE/IconPack/**",
+  ];
+}
+
+/**
+ * Namespace for common variables used throughout the extension. They must be initialized in the activate() method of extension.ts
+ */
+export namespace ext {
+  export const prefix: string = "truffle-vscode";
+  export let context: ExtensionContext;
+  export let outputChannel: IAzExtOutputChannel;
+}
+
+export enum ChainId {
+  ETHEREUM = 1,
+  ROPSTEN = 3,
+  RINKEBY = 4,
+  GÖRLI = 5,
+  KOVAN = 42,
+  MATIC = 137,
+  MATIC_TESTNET = 80001,
+  FANTOM = 250,
+  FANTOM_TESTNET = 4002,
+  XDAI = 100,
+  BSC = 56,
+  BSC_TESTNET = 97,
+  ARBITRUM = 42161,
+  ARBITRUM_TESTNET = 79377087078960,
+  MOONBEAM_TESTNET = 1287,
+  AVALANCHE = 43114,
+  AVALANCHE_TESTNET = 43113,
+  HECO = 128,
+  HECO_TESTNET = 256,
+  HARMONY = 1666600000,
+  HARMONY_TESTNET = 1666700000,
+  OKEX = 66,
+  OKEX_TESTNET = 65,
+  CELO = 42220,
+  PALM = 11297108109,
+  PALM_TESTNET = 11297108099,
+  MOONRIVER = 1285,
+  FUSE = 122,
+  TELOS = 40,
+  HARDHAT = 31337,
+  MOONBEAM = 1284,
+  TRUFFLE = 1337,
+  KILN = 1337802,
 }

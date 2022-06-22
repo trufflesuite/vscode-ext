@@ -5,7 +5,7 @@ import assert from "assert";
 import fs from "fs";
 import path from "path";
 import sinon from "sinon";
-import vscode from "vscode";
+import vscode, {CancellationToken, QuickPickItem, QuickPickOptions} from "vscode";
 import {window} from "vscode";
 import {TruffleCommands} from "../../src/commands/TruffleCommands";
 import {Constants} from "../../src/Constants";
@@ -14,7 +14,7 @@ import {EnumStorage} from "../../src/Models";
 import {ContractDB, ContractInstanceWithMetadata, ContractService} from "../../src/services";
 import {Contract} from "../../src/services/contract/Contract";
 
-describe("TruffleCommands", () => {
+describe("TruffleCommands - Write To Buffer", () => {
   const fileUri = {
     fsPath: path.join(__dirname, "testData", "TestContract.json"),
   } as vscode.Uri;
@@ -93,9 +93,21 @@ describe("TruffleCommands", () => {
       const selectedNetworkName = mockContractInstance.network.name;
 
       sinon.stub(ContractDB, "getContractInstances").resolves(mockContracts);
-      sinon.stub(window, "showQuickPick").callsFake(async (...args: any[]) => {
-        return args[0].find((arg: any) => arg.label === selectedNetworkName);
-      });
+      sinon
+        .stub(window, "showQuickPick")
+        .callsFake(async function showQuickPick(
+          items: readonly QuickPickItem[] | Thenable<readonly QuickPickItem[]>,
+          options?: QuickPickOptions,
+          token?: CancellationToken
+        ) {
+          console.log("fake Quickpick", {items, options, token});
+          if (items instanceof Array) {
+            console.log("returning somethings", {items});
+            return items.find((arg: any) => arg.label === selectedNetworkName);
+          }
+          //
+          return undefined;
+        });
 
       const writeToClipboardStub = sinon.stub(vscodeEnvironment, "writeToClipboard").resolves();
       const getDeployedByteCodeByAddressStub = sinon

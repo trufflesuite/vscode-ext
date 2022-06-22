@@ -6,15 +6,11 @@ import {ItemType} from "../ItemType";
 import {ExtensionItem, ExtensionItemData} from "./ExtensionItem";
 import {NetworkNode} from "./NetworkNode";
 
-export type ProjectTypes =
-  | ItemType.AZURE_BLOCKCHAIN_PROJECT
-  | ItemType.LOCAL_PROJECT
-  | ItemType.INFURA_PROJECT
-  | ItemType.BLOCKCHAIN_DATA_MANAGER_PROJECT;
+export type ProjectTypes = ItemType.LOCAL_PROJECT | ItemType.INFURA_PROJECT | ItemType.GENERIC_PROJECT;
 
 export abstract class Project extends ExtensionItem {
-  protected constructor(itemType: ProjectTypes, label: string, data: ExtensionItemData) {
-    super(itemType, label, data);
+  protected constructor(itemType: ProjectTypes, label: string, data: ExtensionItemData, description?: string) {
+    super(itemType, label, data, description);
   }
 
   public async getRPCAddress(): Promise<string> {

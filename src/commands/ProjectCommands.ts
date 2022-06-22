@@ -4,16 +4,9 @@
 import fs from "fs-extra";
 import {Uri, window, workspace} from "vscode";
 import {Constants, RequiredApps} from "../Constants";
-import {
-  gitHelper,
-  outputCommandHelper,
-  required,
-  showIgnorableNotification,
-  showInputBox,
-  showOpenFolderDialog,
-  showQuickPick,
-  TruffleConfiguration,
-} from "../helpers";
+import {gitHelper, outputCommandHelper, TruffleConfiguration} from "../helpers";
+import {required} from "../helpers/required";
+import {showIgnorableNotification, showInputBox, showOpenFolderDialog, showQuickPick} from "../helpers/userInteraction";
 import {CancellationEvent} from "../Models";
 import {Telemetry} from "../TelemetryClient";
 

@@ -5,14 +5,37 @@ import assert from "assert";
 import rewire from "rewire";
 import sinon from "sinon";
 import uuid from "uuid";
-import vscode from "vscode";
+import vscode, {Uri} from "vscode";
 import {Constants} from "../../../src/Constants";
 import {ItemType} from "../../../src/Models";
-import {AzureBlockchainService, InfuraProject, Project} from "../../../src/Models/TreeItems";
+import {LocalService, InfuraProject, Project} from "../../../src/Models/TreeItems";
 import {InfuraResourceExplorer} from "../../../src/resourceExplorers";
 import {GanacheService, TreeManager} from "../../../src/services";
-import {AzureAccountHelper} from "../../testHelpers/AzureAccountHelper";
 const {project} = Constants.treeItemData;
+
+const mockExtension: vscode.Extension<{}> = {
+  extensionUri: Uri.parse(""),
+  activate: mockActivate,
+  exports: {},
+  extensionKind: vscode.ExtensionKind.UI,
+  extensionPath: uuid.v4(),
+  id: uuid.v4(),
+  isActive: true,
+  packageJSON: uuid.v4(),
+};
+
+async function waitAmoment(): Promise<void> {
+  await new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, 1);
+  });
+}
+
+async function mockActivate(): Promise<{}> {
+  await waitAmoment();
+  return {};
+}
 
 describe("Service Commands", () => {
   let vscodeWindowMock: sinon.SinonMock;
@@ -37,7 +60,6 @@ describe("Service Commands", () => {
       let addChildStub: sinon.SinonStub<any, any>;
       let showQuickPickMock: sinon.SinonStub<any[], any>;
       let showInputBoxMock: sinon.SinonExpectation;
-      // let selectConsortiumMock: any;
       let startGanacheServerStub: any;
       let selectProjectMock: any;
 
@@ -53,21 +75,12 @@ describe("Service Commands", () => {
         sinon.stub(GanacheService, "getPortStatus").resolves(GanacheService.PortStatus.FREE);
 
         sinon.stub(TreeManager, "getItem").callsFake(() => {
-          const trufflesuite = new AzureBlockchainService();
-          addChildStub = sinon.stub(trufflesuite, "addChild");
-          return trufflesuite;
+          const ret = new LocalService();
+          addChildStub = sinon.stub(ret, "addChild");
+          return ret;
         });
 
-        // selectConsortiumMock = sinon
-        //   .stub(ConsortiumResourceExplorer.prototype, "selectProject")
-        //   .returns(
-        //     Promise.resolve(
-        //       new AzureBlockchainProject(defaultConsortiumName, defaultSubscriptionId, defaultResourceGroup, [
-        //         defaultMemberName,
-        //       ])
-        //     )
-        //   );
-        sinon.stub(vscode.extensions, "getExtension").returns(AzureAccountHelper.mockExtension);
+        sinon.stub(vscode.extensions, "getExtension").returns(mockExtension);
       });
 
       afterEach(() => {
@@ -102,13 +115,13 @@ describe("Service Commands", () => {
 
         showInputBoxMock.twice();
         showInputBoxMock.onCall(0).callsFake(async (..._args: any[]) => {
-          validationMessage = await _args[0].validateInput(defaultName);
-          return defaultName;
+          validationMessage = await _args[0].validateInput(defaultPort);
+          return defaultPort;
         });
 
         showInputBoxMock.onCall(1).callsFake(async (..._args: any[]) => {
-          validationMessage = await _args[0].validateInput(defaultPort);
-          return defaultPort;
+          validationMessage = await _args[0].validateInput(defaultName);
+          return defaultName;
         });
 
         // Act

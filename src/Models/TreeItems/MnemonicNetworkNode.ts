@@ -3,7 +3,8 @@
 
 import {window} from "vscode";
 import {Constants, RequiredApps} from "../../Constants";
-import {saveTextInFile, showInputBox, showQuickPick, TruffleConfiguration} from "../../helpers";
+import {TruffleConfiguration} from "../../helpers";
+import {showInputBox, showQuickPick, saveTextInFile} from "../../helpers/userInteraction";
 import {MnemonicRepository} from "../../services/MnemonicRepository"; // Should be full path since cycle dependencies
 import {Telemetry} from "../../TelemetryClient";
 import {NetworkNode} from "./NetworkNode";
@@ -15,8 +16,8 @@ export abstract class MnemonicNetworkNode extends NetworkNode {
     const network = await super.getTruffleNetwork();
     const mnemonic = await this.getMnemonic();
     const {fs, fsPackageName, hdwalletProvider} = Constants.truffleConfigRequireNames;
-    await config.importPackage(fs, fsPackageName);
-    await config.importPackage(hdwalletProvider, RequiredApps.hdwalletProvider);
+    config.importPackage(fs, fsPackageName);
+    config.importPackage(hdwalletProvider, RequiredApps.hdwalletProvider);
 
     let targetURL = "";
     try {

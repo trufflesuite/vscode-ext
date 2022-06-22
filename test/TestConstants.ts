@@ -21,15 +21,14 @@ export class TestConstants {
     "nO",
   ];
 
-  public static consortiumTestNames = {
-    local: "localNetworkName",
-  };
-
   public static servicesNames = {
     development: "development",
     localProject: "LocalProject",
-    testConsortium: "testConsortium",
     testNetwork: "testNetwork",
+  };
+
+  public static networkNames = {
+    local: "development",
   };
 
   public static truffleCommandTestDataFolder: string = "testData";

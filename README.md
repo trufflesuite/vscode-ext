@@ -18,7 +18,7 @@ Truffle for VS Code also offers comprehensive native IDE [Solidity](https://docs
 
 ### Installation
 
-To install add extension to VS Code, simply click the "Install" button above. Beyond this there are some local dependencies which you may have already installed. If not, the extension will prompt you accordingly. To help smooth out the dependency installation process, we've created a guide which you can find [here](https://trufflesuite.com/).
+To install this extension to VS Code, simply click the "Install" button above. Beyond this, there are some local dependencies you may have already installed. If not, the extension will prompt you accordingly. To help smooth out the dependency installation process, we've created a guide which you can find [here](https://trufflesuite.com/docs/vscode-ext/installation-guide/).
 
 ### Create a New Project
 
@@ -34,27 +34,28 @@ For developers who are not familiar with Truffle, or prefer to use the Command P
 4. Press Enter.
 ## Build your smart contracts
 
-Your newly scaffolded out directory includes a simple contract and all the necessary files to build and deploy a simple, working, contract to an RPC-endpoint. Use the following steps to build your contract:
+Your newly scaffolded-out directory includes a simple contract and all the necessary files to build and deploy a simple, and working contract to an RPC-endpoint. Use the following steps to build your contract:
 
-1. Select your contract Solidity (.sol) file, right-click and choose `Build Contracts`
+1. Select your contract Solidity (.sol) file, right-click and choose `Truffle: Build Contracts`
 
 ## Deploy to the RPC endpoint
 
-Once compiled, you will have your contract, contract metadata (e.g., contract ABI, bytecode) available in the smart contract .json file which will be located in the`./build directory` The next steps is to deploy these contracts to a network.
+Once compiled, you will have your contract, contract metadata (e.g., contract ABI, bytecode) available in the smart contract .json file which will be located in the `./build directory`. The next step is to deploy these contracts to a network.
 
-For new users, this can be hard to understand, because there are multiple steps that need to occur for the deployment to be successful. To ease this burden the extension provide a simple model to deploy to various networks. By default, this will be a local network, using Ganache. The extension will start and run an instance of ganache for the user. The options to initiate this deployment are below.
+For new users, this can be hard to understand, because there are multiple steps that need to occur for the deployment to be successful. To ease this burden, the extension provides a simple model to deploy to various networks. By default, this will be a local network, using Ganache. The extension will start and run an instance of ganache for the user. The options to initiate this deployment are below.
 
-1. Select your contract Solidity (.sol) file, right click and choose `Deploy Contracts`
+1. Select your contract Solidity (.sol) file, right click and choose `Truffle: Deploy Contracts`
 
 ## Deploy with Truffle Ganache locally
 
-For rapid development of smart contracts, having the ability deploy contracts to a blockchain quickly to test and debug is a key principle. One of the most popular models to achive this is using [Ganache](https://trufflesuite.com/docs/ganache/), which acts as a local blockchain simulator to allow this quick deployment and iteration that is ideal for developers.
+For rapid development of smart contracts, having the ability to deploy contracts to a blockchain quickly for testing and debugging purposes is a key principle. One of the most popular models to achieve this is using [Ganache](https://trufflesuite.com/docs/ganache/), which acts as a local blockchain simulator to allow this quick deployment and iteration that is ideal for developers.
 
-The extension has integrated Ganache directly into the IDE to further lower the bar to entry, and allow even faster development iteration. By default, there is nothing to configure, and the following steps can be used.
+The extension has integrated Ganache directly into the IDE to further lower the barrier to entry, and allow even faster development iteration. By default, there is nothing to configure, and the following steps can be used.
 
-1. After selecting to deploy the contracts, either from the Command Pallette or by right clicking on the contract and selecting Deploy contracts, a dropdown will be presented with options for _where_ to deploy the contract. By default there will be a single entry on this list named development.
+1. After selecting to deploy the contracts, either from the Command Palette or by right clicking on the contract and selecting `Truffle: Deploy contracts`, a dropdown will be presented with options for _where_ to deploy the contract. By default there will be a single entry on this list named development.
 
 2. After selecting development, the IDE will create a new instance of Truffle Ganache, which will use the default configuration for the project as the target. The IDE will then deploy the contracts to this instance.
+
 
 **OPTIONAL**: If there is a need to control this Ganache instance more or change the configuration, there are some other options that can be used that the IDE can help with as well.
 

@@ -1,6 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {registerUIExtensionVariables} from "@microsoft/vscode-azext-utils";
 import {commands, ExtensionContext, Uri, window, workspace} from "vscode";
 import {
   DebuggerCommands,
@@ -10,9 +11,13 @@ import {
   sdkCoreCommands,
   ServiceCommands,
   TruffleCommands,
+  GenericCommands,
 } from "./commands";
-import {Constants} from "./Constants";
-import {CommandContext, isWorkspaceOpen, required, setCommandContext} from "./helpers";
+import {Constants, ext} from "./Constants";
+
+import {DebuggerConfiguration} from "./debugAdapter/configuration/debuggerConfiguration";
+import {CommandContext, isWorkspaceOpen, setCommandContext} from "./helpers";
+import {required} from "./helpers/required";
 import {CancellationEvent} from "./Models";
 import {Output} from "./Output";
 import {ChangelogPage, RequirementsPage, WelcomePage} from "./pages";
@@ -27,16 +32,33 @@ import {
 } from "./services";
 import {Telemetry} from "./TelemetryClient";
 import {NetworkNodeView, ProjectView} from "./ViewItems";
+import {registerDeploymentView} from "./views/DeploymentsView";
+import {registerFileExplorerView} from "./views/fileExplorer";
+import {registerHelpView} from "./views/HelpView";
 
-import {DebuggerConfiguration} from "./debugAdapter/configuration/debuggerConfiguration";
+/**
+ * This function registers variables similar to docker plugin, going forward this seems a better method of doing things.
+ *
+ * @param ctx the context we want to work on.
+ */
+function initializeExtensionVariables(ctx: ExtensionContext): void {
+  ext.context = ctx;
+  ext.outputChannel = Output.subscribe();
+  registerUIExtensionVariables(ext);
+}
 
 export async function activate(context: ExtensionContext) {
   if (process.env.CODE_TEST) {
     return;
   }
 
-  Constants.initialize(context);
+  Constants.initialize(context); // still do this first.
+  initializeExtensionVariables(context);
+
   DebuggerConfiguration.initialize(context);
+
+  await required.checkAllApps();
+
   await ContractDB.initialize(AdapterType.IN_MEMORY);
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
@@ -94,15 +116,24 @@ export async function activate(context: ExtensionContext) {
   );
   //#endregion
 
+  //#region Generic extension commands
+  const checkForConnection = commands.registerCommand(
+    "truffle-vscode.checkForConnection",
+    async (viewItem?: ProjectView) => {
+      await tryExecute(() => GenericCommands.checkForConnection(viewItem));
+    }
+  );
+  //#endregion
+
   //#region truffle commands
   const newSolidityProject = commands.registerCommand("truffle-vscode.newSolidityProject", async () => {
     await tryExecute(() => ProjectCommands.newSolidityProject());
   });
-  const buildContracts = commands.registerCommand("truffle-vscode.buildContracts", async () => {
-    await tryExecute(() => sdkCoreCommands.build());
+  const buildContracts = commands.registerCommand("truffle-vscode.buildContracts", async (uri: Uri) => {
+    await tryExecute(() => sdkCoreCommands.build(uri));
   });
-  const deployContracts = commands.registerCommand("truffle-vscode.deployContracts", async () => {
-    await tryExecute(() => sdkCoreCommands.deploy());
+  const deployContracts = commands.registerCommand("truffle-vscode.deployContracts", async (uri: Uri) => {
+    await tryExecute(() => sdkCoreCommands.deploy(uri));
   });
   const copyByteCode = commands.registerCommand("truffle-contract.copyByteCode", async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeBytecodeToBuffer(uri));
@@ -137,10 +168,6 @@ export async function activate(context: ExtensionContext) {
       await tryExecute(() => ServiceCommands.disconnectProject(viewItem));
     }
   );
-  const openAtAzurePortal = commands.registerCommand(
-    "truffle-vscode.openAtAzurePortal",
-    async (viewItem: NetworkNodeView) => ServiceCommands.openAtAzurePortal(viewItem)
-  );
   //#endregion
 
   //#region Infura commands
@@ -158,42 +185,6 @@ export async function activate(context: ExtensionContext) {
   );
   //#endregion
 
-  //#region contract commands
-  // const createNewBDMApplication = commands.registerCommand(
-  //   "truffle-vscode.createNewBDMApplication",
-  //   async (viewItem: ProjectView) => {
-  //     await tryExecute(() => ServiceCommands.createNewBDMApplication(viewItem));
-  //   }
-  // );
-  // const deleteBDMApplication = commands.registerCommand(
-  //   "truffle-vscode.deleteBDMApplication",
-  //   async (viewItem: NetworkNodeView) => await tryExecute(() => ServiceCommands.deleteBDMApplication(viewItem))
-  // );
-  //#endregion
-
-  //#region logic app commands
-  // const generateMicroservicesWorkflows = commands.registerCommand(
-  //   'truffle-vscode.generateMicroservicesWorkflows',
-  //   async (filePath: Uri | undefined) => {
-  //     await tryExecute(async () => await LogicAppCommands.generateMicroservicesWorkflows(filePath));
-  //   });
-  // const generateDataPublishingWorkflows = commands.registerCommand(
-  //   'truffle-vscode.generateDataPublishingWorkflows',
-  //   async (filePath: Uri | undefined) => {
-  //     await tryExecute(async () => await LogicAppCommands.generateDataPublishingWorkflows(filePath));
-  //   });
-  // const generateEventPublishingWorkflows = commands.registerCommand(
-  //   'truffle-vscode.generateEventPublishingWorkflows',
-  //   async (filePath: Uri | undefined) => {
-  //     await tryExecute(async () => await LogicAppCommands.generateEventPublishingWorkflows(filePath));
-  //   });
-  // const generateReportPublishingWorkflows = commands.registerCommand(
-  //   'truffle-vscode.generateReportPublishingWorkflows',
-  //   async (filePath: Uri | undefined) => {
-  //     await tryExecute(async () => await LogicAppCommands.generateReportPublishingWorkflows(filePath));
-  //   });
-  //#endregion
-
   //#region debugger commands
   const startDebugger = commands.registerCommand("truffle-vscode.debugTransaction", async () => {
     await tryExecute(() => DebuggerCommands.startSolidityDebugger());
@@ -208,6 +199,15 @@ export async function activate(context: ExtensionContext) {
   });
   //#endregion
 
+  // #region truffle views
+
+  const fileExplorerView = registerFileExplorerView("truffle-vscode", "views.explorer");
+  const helpView = registerHelpView();
+
+  const deploymentView = registerDeploymentView();
+
+  // #endregion
+
   const subscriptions = [
     showWelcomePage,
     showRequirementsPage,
@@ -215,10 +215,8 @@ export async function activate(context: ExtensionContext) {
     newSolidityProject,
     buildContracts,
     deployContracts,
-    // createNewBDMApplication,
     createProject,
     connectProject,
-    // deleteBDMApplication,
     disconnectProject,
     copyByteCode,
     copyDeployedByteCode,
@@ -228,20 +226,18 @@ export async function activate(context: ExtensionContext) {
     startGanacheServer,
     stopGanacheServer,
     resartGanacheServer,
-    // generateMicroservicesWorkflows,
-    // generateDataPublishingWorkflows,
-    // generateEventPublishingWorkflows,
-    // generateReportPublishingWorkflows,
     getPrivateKeyFromMnemonic,
     signInToInfuraAccount,
     signOutOfInfuraAccount,
     showProjectsFromInfuraAccount,
-    openAtAzurePortal,
     changeCoreSdkConfigurationListener,
+    // new view - main views
+    fileExplorerView,
+    helpView,
+    deploymentView,
+    checkForConnection,
   ];
   context.subscriptions.push(...subscriptions);
-
-  required.checkAllApps();
 
   Telemetry.sendEvent(Constants.telemetryEvents.extensionActivated);
 }

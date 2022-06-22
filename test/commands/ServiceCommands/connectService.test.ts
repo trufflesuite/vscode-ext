@@ -9,7 +9,6 @@ import {ServiceCommands} from "../../../src/commands";
 import {Constants} from "../../../src/Constants";
 import {ItemType} from "../../../src/Models";
 import {
-  AzureBlockchainService,
   IExtensionItem,
   InfuraProject,
   InfuraService,
@@ -34,19 +33,17 @@ describe("Service Commands", () => {
   let startGanacheServerMock: sinon.SinonExpectation;
   let selectProjectMock: any;
 
-  let azureGroup: Service;
   let localGroup: Service;
   let infuraGroup: Service;
 
   function initializeNetworks() {
-    azureGroup = new AzureBlockchainService();
     localGroup = new LocalService();
     infuraGroup = new InfuraService();
   }
 
   function createTestServiceItems() {
     const services: Service[] = [];
-    services.push(azureGroup, localGroup);
+    services.push(localGroup);
 
     return services;
   }
@@ -90,8 +87,8 @@ describe("Service Commands", () => {
         showQuickPickMock.onCall(0).callsFake((items: any) => {
           return items.find((item: any) => item.label === service.local.label);
         });
-        showInputBoxMock.onCall(0).returns(name);
-        showInputBoxMock.onCall(1).returns(port);
+        showInputBoxMock.onCall(0).returns(port);
+        showInputBoxMock.onCall(1).returns(name);
         getPortStatusMock.returns(GanacheService.PortStatus.FREE);
 
         // Act

@@ -5,7 +5,7 @@
   "publisher": "trufflesuite-csi",
   "preview": true,
   "icon": "images/TruffleLogo.png",
-  "version": "2.2.1",
+  "version": "2.3.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/trufflesuite/vscode-ext"
@@ -16,7 +16,7 @@
   "homepage": "https://github.com/trufflesuite/vscode-ext/blob/master/README.md",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.63.0"
+    "vscode": "^1.66.0"
   },
   "keywords": [
     "blockchain",
@@ -37,6 +37,7 @@
   "main": "./out/src/extension.js",
   "activationEvents": [
     "onView:truffle-vscode.truffle",
+    "onView:truffle-vscode.explorer-view",
     "onCommand:truffle-vscode.showWelcomePage",
     "onCommand:truffle-vscode.refresh",
     "onCommand:truffle-contract.copyByteCode",
@@ -53,7 +54,10 @@
     "onCommand:truffle-vscode.debugTransaction",
     "onCommand:truffle-vscode.signInToInfuraAccount",
     "onCommand:truffle-vscode.signOutOfInfuraAccount",
-    "onCommand:truffle-vscode.openAtAzurePortal",
+    "onCommand:truffle-vscode.startGanacheServer",
+    "onCommand:truffle-vscode.stopGanacheServer",
+    "onCommand:truffle-vscode.views.explorer.refreshExplorer",
+    "onCommand:truffle-vscode.views.deployments.refresh",
     "onDebug"
   ],
   "contributes": {
@@ -89,10 +93,7 @@
         "command": "truffle-vscode.refresh",
         "title": "Refresh",
         "category": "Blockchain",
-        "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
-        }
+        "icon": "$(refresh)"
       },
       {
         "command": "truffle-contract.copyByteCode",
@@ -117,7 +118,8 @@
       {
         "command": "truffle-vscode.buildContracts",
         "title": "Build Contracts",
-        "category": "Blockchain"
+        "category": "Blockchain",
+        "icon": "$(run-all)"
       },
       {
         "command": "truffle-vscode.deployContracts",
@@ -177,11 +179,6 @@
       {
         "command": "truffle-vscode.getPrivateKey",
         "title": "Retrieve private key",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.openAtAzurePortal",
-        "title": "Open at Azure Portal",
         "category": "Blockchain"
       },
       {
@@ -190,13 +187,15 @@
         "category": "Truffle"
       },
       {
+        "command": "truffle-vscode.checkForConnection",
+        "title": "Check network connection",
+        "category": "Blockchain"
+      },
+      {
         "command": "truffle-vscode.refresh",
         "title": "Refresh",
         "category": "Truffle",
-        "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
-        }
+        "icon": "$(refresh)"
       },
       {
         "command": "truffle-contract.copyByteCode",
@@ -221,12 +220,14 @@
       {
         "command": "truffle-vscode.buildContracts",
         "title": "Build Contracts",
-        "category": "Truffle"
+        "category": "Truffle",
+        "icon": "$(run-all)"
       },
       {
         "command": "truffle-vscode.deployContracts",
         "title": "Deploy Contracts",
-        "category": "Truffle"
+        "category": "Truffle",
+        "icon": "$(radio-tower)"
       },
       {
         "command": "truffle-vscode.connectProject",
@@ -284,9 +285,20 @@
         "category": "Truffle"
       },
       {
-        "command": "truffle-vscode.openAtAzurePortal",
-        "title": "Open at Azure Portal",
-        "category": "Truffle"
+        "command": "truffle-vscode.views.explorer.refreshExplorer",
+        "title": "Refresh Explorer",
+        "category": "Truffle",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "truffle-vscode.views.explorer.openFile",
+        "title": "Open File"
+      },
+      {
+        "command": "truffle-vscode.views.deployments.refresh",
+        "title": "Refresh Deployments",
+        "category": "Truffle",
+        "icon": "$(refresh)"
       }
     ],
     "breakpoints": [
@@ -330,10 +342,6 @@
         {
           "when": "truffle-vscode:isWorkspaceOpen",
           "command": "truffle-vscode.deployContracts"
-        },
-        {
-          "when": "false",
-          "command": "truffle-vscode.openAtAzurePortal"
         }
       ],
       "view/title": [
@@ -352,6 +360,26 @@
         {
           "command": "truffle-vscode.refresh",
           "when": "view == truffle-vscode.truffle",
+          "group": "navigation"
+        },
+        {
+          "command": "truffle-vscode.views.explorer.refreshExplorer",
+          "when": "view == truffle-vscode.views.explorer",
+          "group": "navigation"
+        },
+        {
+          "command": "truffle-vscode.buildContracts",
+          "when": "view == truffle-vscode.views.explorer",
+          "group": "navigation"
+        },
+        {
+          "command": "truffle-vscode.deployContracts",
+          "when": "view == truffle-vscode.views.explorer",
+          "group": "navigation"
+        },
+        {
+          "command": "truffle-vscode.views.deployments.refresh",
+          "when": "view == truffle-vscode.views.deployments",
           "group": "navigation"
         }
       ],
@@ -397,14 +425,24 @@
           "group": "truffle-0@0"
         },
         {
-          "command": "truffle-vscode.openAtAzurePortal",
-          "when": "view == truffle-vscode.truffle && viewItem == input",
+          "command": "truffle-vscode.buildContracts",
+          "when": "view == truffle-vscode.views.explorer",
           "group": "truffle-0@0"
         },
         {
-          "command": "truffle-vscode.openAtAzurePortal",
-          "when": "view == truffle-vscode.truffle && viewItem == output",
+          "command": "truffle-vscode.deployContracts",
+          "when": "view == truffle-vscode.views.explorer",
+          "group": "truffle-0@1"
+        },        
+        {
+          "command": "truffle-vscode.disconnectProject",
+          "when": "view == truffle-vscode.truffle && viewItem == genericproject",
           "group": "truffle-0@0"
+        },
+        {
+          "command": "truffle-vscode.checkForConnection",
+          "when": "view == truffle-vscode.truffle && viewItem == genericproject",
+          "group": "truffle-1@0"
         }
       ],
       "explorer/context": [
@@ -440,11 +478,35 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "truffle-vscode.views.explorer",
+        "contents": "In order to use truffle features, you can open a folder containing a truffle project with a `contracts` folder present.\n[Open Folder](command:vscode.openFolder)\n[Clone Repository](command:git.clone)\nTo learn more about how to create a Truffle project [read our docs](https://trufflesuite.com/docs/vscode-ext/quickstart/#create-a-new-solidity-contract)."
+      },
+      {
+        "view": "truffle-vscode.views.deployments",
+        "contents": "Deployed contracts will appear here."
+      }
+    ],
     "views": {
-      "explorer": [
+      "truffle-activitybar-container": [
+        {
+          "id": "truffle-vscode.views.explorer",
+          "name": "Explorer - Truffle"
+        },
         {
           "id": "truffle-vscode.truffle",
-          "name": "Truffle - Networks"
+          "name": "Networks",
+          "contextualTitle": "List of all known Networks"
+        },
+        {
+          "id": "truffle-vscode.views.deployments",
+          "name": "Deployments"
+        },
+        {
+          "id": "truffle-vscode.views.help",
+          "name": "Help & Feedback",
+          "contextualTitle": "Help & Feedback section"
         }
       ],
       "debug": [
@@ -527,7 +589,16 @@
         ],
         "variables": {}
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "truffle-activitybar-container",
+          "title": "Truffle",
+          "icon": "images/truffle.svg"
+        }
+      ]
+    }
   },
   "scripts": {
     "package": "npx vsce package",
@@ -561,15 +632,17 @@
     "@types/request": "^2.48.1",
     "@types/request-promise": "^4.1.44",
     "@types/rewire": "^2.5.28",
+    "@types/rimraf": "^3.0.2",
+    "@types/mkdirp": "^1.0.2",
     "@types/semver": "^6.0.0",
     "@types/sinon": "^7.0.11",
     "@types/source-map": "^0.5.2",
     "@types/uuid": "^3.4.4",
-    "@types/vscode": "1.39.0",
+    "@types/vscode": "1.66.0",
     "@typescript-eslint/eslint-plugin": "^5.3.1",
     "@typescript-eslint/parser": "^5.3.1",
-    "copyfiles": "^2.4.1",
     "copy-webpack-plugin": "^10.0.0",
+    "copyfiles": "^2.4.1",
     "decache": "^4.5.1",
     "eslint": "^8.2.0",
     "eslint-config-prettier": "8.3.0",
@@ -589,46 +662,45 @@
     "truffle": "^5.4.22",
     "ts-loader": "7.0.2",
     "tsc-watch": "^4.5.0",
-    "typescript": "3.8.3",
-    "vscode-debugadapter": "^1.33.0",
-    "vscode-debugprotocol": "^1.33.0",
-    "vscode-test": "^1.2.0",
-    "webpack": "5.64.4",
-    "webpack-cli": "4.9.1",
+    "typescript": "4.6.4",
+    "@vscode/debugadapter": "^1.55.1",
+    "@vscode/debugprotocol": "^1.55.1",
+    "@vscode/test-electron": "^2.1.3",
+    "webpack": "5.72.0",
+    "webpack-cli": "4.9.2",
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "@microsoft/vscode-azext-utils": "^0.2.3",
+    "@truffle/codec": "^0.12.10",
+    "@truffle/compile-solidity": "^6.0.25",
+    "@truffle/debug-utils": "^6.0.20",
+    "@truffle/debugger": "^10.0.8",
+    "@truffle/resolver": "^8.0.19",
     "abi-decoder": "^2.4.0",
     "acorn": "^6.1.1",
     "acorn-walk": "^6.1.1",
     "astring": "^1.7.5",
-    "azure-arm-resource": "^7.3.0",
     "bip39": "^3.0.1",
     "download": "^7.1.0",
     "fs-extra": "^7.0.1",
     "hdkey": "^1.1.1",
     "lodash": "4.17.21",
-    "ms-rest": "^2.5.0",
-    "ms-rest-azure": "^2.6.0",
+    "mkdirp": "^1.0.4",
     "open": "^6.4.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
+    "rimraf": "^3.0.2",
     "semver": "^6.0.0",
     "solidity-parser-antlr": "^0.4.11",
-    "@truffle/codec": "^0.12.8",
-    "@truffle/compile-solidity": "^6.0.8",
-    "@truffle/debug-utils": "^6.0.4",
-    "@truffle/debugger": "^10.0.5",
-    "@truffle/resolver": "^8.0.2",
     "ts-node": "^10.4.0",
     "uuid": "^3.3.2",
-    "vscode-azureextensionui": "^0.29.12",
     "vscode-extension-telemetry": "^0.1.1",
-    "web3": "1.5.3"
+    "web3": "1.7.3",
+    "glob": "^7.1.4"
   },
   "extensionDependencies": [
-    "JuanBlanco.solidity",
-    "ms-vscode.azure-account"
+    "JuanBlanco.solidity"
   ],
   "husky": {
     "hooks": {

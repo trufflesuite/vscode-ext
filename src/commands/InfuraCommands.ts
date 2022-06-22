@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from "../Constants";
-import { showQuickPickMany } from "../helpers";
-import { InfuraResourceExplorer } from "../resourceExplorers";
-import { InfuraServiceClient } from "../services";
+import {Constants} from "../Constants";
+import {showQuickPickMany} from "../helpers/userInteraction";
+import {InfuraResourceExplorer} from "../resourceExplorers";
+import {InfuraServiceClient} from "../services";
 
 export namespace InfuraCommands {
   export async function signIn(): Promise<void> {

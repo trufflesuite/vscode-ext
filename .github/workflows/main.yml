@@ -50,8 +50,8 @@ jobs:
           node-version: "16.4.x"
           cache: "yarn"
 
-      - name: clean install dependencies
-        run: yarn install --frozen-lockfile
+      - name: clean install dependencies. Fail on lockfile Changes.
+        run: yarn install --immutable --immutable-cache --check-cache
 
       - name: run tests
         run: yarn test

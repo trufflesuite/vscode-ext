@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Handles, Scope} from "vscode-debugadapter";
-import {DebugProtocol} from "vscode-debugprotocol";
+import {Handles, Scope} from "@vscode/debugadapter";
+import {DebugProtocol} from "@vscode/debugprotocol";
 import {OBJECT_VARIABLE_DISPLAY_NAME, SCOPES} from "./constants/variablesView";
 import {TranslatedResult} from "./helpers";
 import {IExpressionEval} from "./models/IExpressionEval";

@@ -1,5 +1,8 @@
-mode: Mainline
-branches: {}
+mode: ContinuousDeployment
+branches:
+  develop:
+    tag: PreRelease
+    increment: Patch
 ignore:
   sha: []
 merge-message-formats: {}

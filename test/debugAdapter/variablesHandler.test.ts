@@ -1,6 +1,6 @@
 import assert from "assert";
 import sinon from "sinon";
-import {Handles} from "vscode-debugadapter";
+import {Handles} from "@vscode/debugadapter";
 import {OBJECT_VARIABLE_DISPLAY_NAME, SCOPES} from "../../src/debugAdapter/constants/variablesView";
 import RuntimeInterface from "../../src/debugAdapter/runtimeInterface";
 import VariablesHandler from "../../src/debugAdapter/variablesHandler";

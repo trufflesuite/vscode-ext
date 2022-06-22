@@ -6,6 +6,7 @@ import {OutputChannel, window} from "vscode";
 import {Constants, RequiredApps} from "../../Constants";
 import {shell, spawnProcess} from "../../helpers";
 import {findPid, killPid} from "../../helpers/shell";
+import {TLocalProjectOptions} from "../../Models/TreeItems";
 import {Telemetry} from "../../TelemetryClient";
 import {UrlValidator} from "../../validators/UrlValidator";
 import {isGanacheServer, waitGanacheStarted} from "./GanacheServiceClient";
@@ -41,7 +42,10 @@ export namespace GanacheService {
     return PortStatus.FREE;
   }
 
-  export async function startGanacheServer(port: number | string): Promise<IGanacheProcess> {
+  export async function startGanacheServer(
+    port: number | string,
+    options?: TLocalProjectOptions
+  ): Promise<IGanacheProcess> {
     Telemetry.sendEvent("GanacheService.startGanacheServer");
     if (UrlValidator.validatePort(port)) {
       Telemetry.sendException(new Error(Constants.ganacheCommandStrings.invalidGanachePort));
@@ -60,9 +64,10 @@ export namespace GanacheService {
     }
 
     if (portStatus === PortStatus.FREE) {
-      ganacheProcesses[port] = await spawnGanacheServer(port);
+      ganacheProcesses[port] = await spawnGanacheServer(port, options);
     }
-
+    // open the channel to show the output.
+    ganacheProcesses[port]?.output?.show(false);
     Telemetry.sendEvent("GanacheServiceClient.waitGanacheStarted.serverStarted");
     return ganacheProcesses[port];
   }
@@ -83,10 +88,23 @@ export namespace GanacheService {
     return Promise.all(shouldBeFree).then(() => undefined);
   }
 
-  async function spawnGanacheServer(port: number | string): Promise<IGanacheProcess> {
-    const process = spawnProcess(undefined, "npx", [RequiredApps.ganache, `-p ${port}`]);
+  async function spawnGanacheServer(port: number | string, options?: TLocalProjectOptions): Promise<IGanacheProcess> {
+    const args: string[] = [RequiredApps.ganache, `--port ${port}`];
+
+    if (options?.isForked) {
+      if (options.url !== "") args.push(`--fork.url ${options.url}`);
+
+      if (options.forkedNetwork !== Constants.treeItemData.service.local.type.forked.networks.other)
+        args.push(`--fork.network ${options.forkedNetwork.toLowerCase()}`);
+
+      if (options.blockNumber > 0) args.push(`--fork.blockNumber ${options.blockNumber}`);
+    }
+
+    const process = spawnProcess(undefined, "npx", args);
     const output = window.createOutputChannel(`${Constants.outputChannel.ganacheCommands}:${port}`);
     const ganacheProcess = {port, process, output} as IGanacheProcess;
+
+    output.show(true);
 
     try {
       addAllListeners(output, port, process);
