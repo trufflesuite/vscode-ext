@@ -7,8 +7,8 @@ import {ConfigurationReader} from "./configurationReader";
 
 export class Web3Wrapper extends Web3 {
     private _networkId: number | undefined;
-  private _options: ConfigurationReader.INetworkOption;
-  private _cachedProvider: any;
+    private _options: ConfigurationReader.INetworkOption;
+    private _cachedProvider: any;
 
   public constructor(options: ConfigurationReader.INetworkOption) {
     const innerProvider = getWeb3InnerProvider(options);
