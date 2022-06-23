@@ -616,7 +616,8 @@
     "eslint": "eslint src/* test/*",
     "version": "tsc -v",
     "test": "npm run compile && node ./out/test/runTest",
-    "clean": "npx rimraf -- ./out/*"
+    "clean": "npx rimraf -- ./out/*",
+    "postinstall": "husky install"
   },
   "devDependencies": {
     "@types/big.js": "^6.1.2",
