@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { NetworkNode } from "../Models/TreeItems";
-import { ExtensionView } from "./ExtensionView";
+import {NetworkNode} from "../Models/TreeItems";
+import {ExtensionView} from "./ExtensionView";
 
 export class NetworkNodeView extends ExtensionView<NetworkNode> {
   constructor(networkNode: NetworkNode) {

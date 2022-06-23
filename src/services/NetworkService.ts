@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from "../Constants";
-import { TruffleConfig, TruffleConfiguration } from "../helpers";
-import { Network } from "./contract/Network";
-import { Provider } from "./contract/Provider";
-import { HttpService } from "./HttpService";
+import {Constants} from "../Constants";
+import {TruffleConfig, TruffleConfiguration} from "../helpers";
+import {Network} from "./contract/Network";
+import {Provider} from "./contract/Provider";
+import {HttpService} from "./HttpService";
 
 export namespace NetworkService {
   interface INetworkResponse {
@@ -73,8 +73,8 @@ export namespace NetworkService {
     }
 
     return {
-      network: { id: networkId || "*", name: truffleNetwork.name },
-      provider: host ? { host, options: { mnemonic: options.provider && options.provider.mnemonic } } : null,
+      network: {id: networkId || "*", name: truffleNetwork.name},
+      provider: host ? {host, options: {mnemonic: options.provider && options.provider.mnemonic}} : null,
     };
   }
 

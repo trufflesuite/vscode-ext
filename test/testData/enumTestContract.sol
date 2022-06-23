@@ -7,14 +7,8 @@ contract Base {
 }
 
 contract HelloBlockchain is Base {
-  enum StateType {
-    Request,
-    Respond
-  }
-  enum SwitcherEnum {
-    On,
-    Off
-  }
+  enum StateType {Request, Respond}
+  enum SwitcherEnum {On, Off}
 
   StateType public State;
   SwitcherEnum public Flag;

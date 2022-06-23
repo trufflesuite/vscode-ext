@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Event, EventEmitter, ProviderResult, TreeDataProvider, window } from "vscode";
-import { IExtensionItem } from "../../Models/TreeItems";
-import { IExtensionView, ViewItemFactory } from "../../ViewItems";
-import { TreeManager } from "./TreeManager";
+import {Event, EventEmitter, ProviderResult, TreeDataProvider, window} from "vscode";
+import {IExtensionItem} from "../../Models/TreeItems";
+import {IExtensionView, ViewItemFactory} from "../../ViewItems";
+import {TreeManager} from "./TreeManager";
 
 export class ExtensionTreeService implements TreeDataProvider<IExtensionView> {
   public readonly onDidChangeTreeData: Event<IExtensionView>;

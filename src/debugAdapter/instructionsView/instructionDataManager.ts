@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { IInstruction } from "../models/IInstruction";
+import {IInstruction} from "../models/IInstruction";
 import InstructionTreeNode from "./instructionTreeNode";
 
 export default class InstructionDataManager {

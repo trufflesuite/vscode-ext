@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { ExtensionContext } from "vscode";
-import { Constants } from "../Constants";
-import { ContractDB } from "../services";
-import { BasicWebView, IWebViewConfig } from "./BasicWebView";
+import {ExtensionContext} from "vscode";
+import {Constants} from "../Constants";
+import {ContractDB} from "../services";
+import {BasicWebView, IWebViewConfig} from "./BasicWebView";
 
 export class ContractUI extends BasicWebView {
   protected readonly config: IWebViewConfig;
@@ -34,7 +34,7 @@ export class ContractUI extends BasicWebView {
     return false;
   }
 
-  protected async receiveMessage(message: { [key: string]: any }): Promise<void> {
+  protected async receiveMessage(message: {[key: string]: any}): Promise<void> {
     await super.receiveMessage(message);
 
     if (!this.panel) {
@@ -60,7 +60,7 @@ export class ContractUI extends BasicWebView {
       return;
     }
     const contractHistory = await ContractDB.getContractInstances(this.contractName);
-    await this.postMessage({ command: "contracts", value: contractHistory });
+    await this.postMessage({command: "contracts", value: contractHistory});
   }
 
   private async onChangeContract(contractNames: string[]): Promise<void> {

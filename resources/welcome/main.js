@@ -7,9 +7,9 @@ function main() {
 
   $("a").click(function () {
     if (this.href) {
-      vscode.postMessage({ command: "openLink", value: this.href });
+      vscode.postMessage({command: "openLink", value: this.href});
     } else {
-      vscode.postMessage({ command: "executeCommand", value: this.id });
+      vscode.postMessage({command: "executeCommand", value: this.id});
     }
 
     if ($(this).hasClass("action")) {
@@ -40,16 +40,16 @@ function main() {
   });
 
   $(document).ready(() => {
-    vscode.postMessage({ command: "documentReady" });
+    vscode.postMessage({command: "documentReady"});
   });
 
   $("#showOnStartup").change(function () {
-    vscode.postMessage({ command: "toggleShowPage", value: this.checked });
+    vscode.postMessage({command: "toggleShowPage", value: this.checked});
   });
 
   window.addEventListener("message", function (event) {
     const message = event.data; // The JSON data our extension sent
-    console.log("MESSAGE:", {message})
+    console.log("MESSAGE:", {message});
     if (message.command === "versions") {
       const versions = message.value;
       if (Array.isArray(versions)) {

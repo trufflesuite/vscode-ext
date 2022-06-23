@@ -10,5 +10,5 @@ declare module "abi-decoder" {
   function addABI(abi: []): void;
   function decodeMethod(input: string): Decoded;
 
-  export { addABI, decodeMethod };
+  export {addABI, decodeMethod};
 }

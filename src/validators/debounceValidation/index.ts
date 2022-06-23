@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from "../../Constants";
+import {Constants} from "../../Constants";
 
 export class Debounce {
   private debounceEvent: {
@@ -11,7 +11,7 @@ export class Debounce {
 
   private readonly timeout: number;
 
-  constructor(options: { timeout: number } = { timeout: Constants.defaultDebounceTimeout }) {
+  constructor(options: {timeout: number} = {timeout: Constants.defaultDebounceTimeout}) {
     this.timeout = options.timeout;
   }
 

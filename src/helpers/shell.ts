@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { tryExecuteCommand } from "./command";
+import {tryExecuteCommand} from "./command";
 
 const isWin = process.platform === "win32";
 

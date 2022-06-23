@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { AbstractAdapter } from "./AbstractAdapter";
-import { ContractInstance } from "./ContractInstance";
+import {AbstractAdapter} from "./AbstractAdapter";
+import {ContractInstance} from "./ContractInstance";
 
 export class TruffleDBAdapter extends AbstractAdapter {
   public async initialize(): Promise<void> {

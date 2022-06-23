@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { DebugAdapterTracker, DebugAdapterTrackerFactory, DebugSession, ProviderResult } from "vscode";
+import {DebugAdapterTracker, DebugAdapterTrackerFactory, DebugSession, ProviderResult} from "vscode";
 import SolidityDebugAdapterTracker from "./debugAdapterTracker";
 
 export default class SolidityDebugAdapterTrackerFactory implements DebugAdapterTrackerFactory {

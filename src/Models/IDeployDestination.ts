@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { TruffleConfiguration } from "../helpers/truffleConfig";
-import { ItemType } from "./ItemType";
+import {TruffleConfiguration} from "../helpers/truffleConfig";
+import {ItemType} from "./ItemType";
 
 export interface IDeployDestination {
   description?: string;

@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { debug, ExtensionContext } from "vscode";
-import { DEBUG_TYPE, EMBED_DEBUG_ADAPTER } from "../constants/debugAdapter";
+import {debug, ExtensionContext} from "vscode";
+import {DEBUG_TYPE, EMBED_DEBUG_ADAPTER} from "../constants/debugAdapter";
 import DebugAdapterTrackerFactory from "../debugAdapterTracker/debugAdapterTrackerFactory";
 import DebugAdapterDescriptorFactory from "./debugAdapterDescriptorFactory";
 import DebuggerConfigurationProvider from "./debugConfigurationProvider";

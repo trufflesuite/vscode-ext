@@ -17,7 +17,7 @@ module.exports = function (callback) {
     protocol = "ws";
     providerUrl = currentProvider.connection.url;
   }
-  var result = "provider%=" + JSON.stringify({ url: providerUrl, protocol: protocol });
+  var result = "provider%=" + JSON.stringify({url: providerUrl, protocol: protocol});
   // console.log(result);
   callback();
 };

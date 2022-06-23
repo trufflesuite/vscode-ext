@@ -9,5 +9,5 @@ declare module "@truffle/provider" {
     websockets?: boolean;
   }
   function create(networkOptions: IProviderOptions): any;
-  export { create };
+  export {create};
 }

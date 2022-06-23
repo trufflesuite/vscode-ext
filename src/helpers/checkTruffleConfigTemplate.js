@@ -40,4 +40,4 @@ const getCircularReplacer = () => {
 
 let message = JSON.stringify(truffleConfig, getCircularReplacer());
 
-process.send({ command: "truffleConfig", message: message }, () => process.exit());
+process.send({command: "truffleConfig", message: message}, () => process.exit());

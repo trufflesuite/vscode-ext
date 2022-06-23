@@ -618,7 +618,8 @@
     "version": "tsc -v",
     "test": "npm run compile && node ./out/test/runTest",
     "clean": "npx rimraf -- ./out/*",
-    "postinstall": "husky install"
+    "postinstall": "husky install",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@types/big.js": "^6.1.2",
@@ -704,16 +705,10 @@
   "extensionDependencies": [
     "JuanBlanco.solidity"
   ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged && npm run compile"
-    }
-  },
-  "lint-staged": {
-    "*.{ts,js}": [
-      "eslint src/* test/*",
-      "pretty-quick --staged",
-      "git add"
-    ]
+  "__metadata": {
+    "id": "6b46df02-0a05-4fe7-a214-48530cdace4e",
+    "publisherDisplayName": "ConsenSys Software Inc.",
+    "publisherId": "0e0a6137-fd21-4312-b0f5-ff30c8d7a457",
+    "isPreReleaseVersion": false
   }
 }

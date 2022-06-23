@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { expect } from "chai";
+import {expect} from "chai";
 import * as clipboard from "clipboardy";
 import * as fs from "fs-extra";
 import * as os from "os";
@@ -20,7 +20,7 @@ import {
   WebDriver,
   Workbench,
 } from "vscode-extension-tester";
-import { commonTestTimeout, setupTimeout, testProjectDirectory } from "./config";
+import {commonTestTimeout, setupTimeout, testProjectDirectory} from "./config";
 
 const tempProjectPrefix = "ui-test-";
 

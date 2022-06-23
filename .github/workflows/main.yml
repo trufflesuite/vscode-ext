@@ -13,7 +13,7 @@ jobs:
     name: cicd
     runs-on: windows-latest
     env:
-      VSCE_FLAGS: ''
+      VSCE_FLAGS: ""
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
@@ -75,8 +75,8 @@ jobs:
         id: package_flags
         if: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
         run: |
-           echo "VSCE_FLAGS=--pre-release --yarn " | Out-File -FilePath $env:GITHUB_ENV -Append
-           echo "flags_set=true" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "VSCE_FLAGS=--pre-release --yarn " | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "flags_set=true" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: compile and create vsix MASTER Release
         if: github.ref == 'refs/heads/master'
@@ -103,7 +103,6 @@ jobs:
         with:
           path: ${{ github.workspace }}/${{ env.vsix_path }}.vsix
           name: ${{ env.vsix_path }}${{ env.vsix_type }}.vsix
-
 #      - name: publish to marketplace
 #        if: github.ref == 'refs/heads/master'
 #        run: npm run deploy ${{ env.PAT }}

@@ -20,7 +20,7 @@ module.exports = {
   optimization: {
     minimize: true,
   },
-  externals: function ({ context, request }, callback) {
+  externals: function ({context, request}, callback) {
     if (/^vscode$/.test(request)) {
       return callback(null, "commonjs " + request);
     } else if (/^electron$/.test(request)) {
@@ -47,8 +47,8 @@ module.exports = {
   plugins: [
     new CopyPlugin({
       patterns: [
-        { from: "./src/debugAdapter/web3ProviderResolver.js", to: "./" },
-        { from: "./src/helpers/checkTruffleConfigTemplate.js", to: "./" },
+        {from: "./src/debugAdapter/web3ProviderResolver.js", to: "./"},
+        {from: "./src/helpers/checkTruffleConfigTemplate.js", to: "./"},
       ],
     }),
     new webpack.DefinePlugin({

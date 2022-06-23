@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { QuickPickItem } from "vscode";
-import { IInfuraEndpointDto } from "../../services/infuraService/InfuraDto/IInfuraEndpointDto";
+import {QuickPickItem} from "vscode";
+import {IInfuraEndpointDto} from "../../services/infuraService/InfuraDto/IInfuraEndpointDto";
 
 export class InfuraProjectItem implements QuickPickItem {
   public readonly label: string;
