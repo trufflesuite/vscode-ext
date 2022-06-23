@@ -25,10 +25,10 @@ module.exports = {
   ],
   rules: {
     // TODO: ADD THIS IN SOON - 2
-    // indent: [
-    //   'error',
-    //   2,
-    // ],
+    indent: [
+      'error',
+      2,
+    ],
 
     "linebreak-style": [
       "error",
