@@ -3,12 +3,7 @@
 
 import {Memento, window, Uri} from "vscode";
 import {Constants} from "../Constants";
-import {
-  // getWorkspaceRoot,
-  // outputCommandHelper,
-  // showNotificationConfirmationDialog,
-  userSettings,
-} from "../helpers";
+import {userSettings} from "../helpers";
 import {IExtensionAdapter, TruffleExtensionAdapter} from "../services/extensionAdapter";
 
 class SdkCoreCommands {

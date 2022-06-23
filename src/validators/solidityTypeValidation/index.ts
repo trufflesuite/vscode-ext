@@ -1,5 +1,5 @@
-import { Constants } from "../../Constants";
-import { bigIntMath } from "../../helpers/bigIntMath";
+import {Constants} from "../../Constants";
+import {bigIntMath} from "../../helpers/bigIntMath";
 
 export function validateSolidityType(value: string, type: string): string | undefined {
   if (type.match(Constants.validationRegexps.types.simpleMapping)) {

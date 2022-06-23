@@ -3,10 +3,7 @@
     "module": "commonjs",
     "target": "es6",
     "outDir": "out",
-    "lib": [
-      "es6",
-      "dom"
-    ],
+    "lib": ["es6", "dom"],
     "sourceMap": true,
     "resolveJsonModule": true,
     "rootDir": ".",
@@ -25,11 +22,7 @@
     "allowJs": true,
     "checkJs": false,
     "skipLibCheck": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules/@machinomy",
-      "./src/debugger/types"
-    ]
+    "typeRoots": ["./node_modules/@types", "./node_modules/@machinomy", "./src/debugger/types"]
   },
   "include": [
     ".eslintrc.js",
@@ -40,10 +33,5 @@
     "test/**/*.ts",
     "test/**/*.json"
   ],
-  "exclude": [
-    "node_modules",
-    ".vscode-test",
-    "drizzleUI",
-    "ui-test"
-  ]
+  "exclude": ["node_modules", ".vscode-test", "drizzleUI", "ui-test"]
 }

@@ -3,12 +3,10 @@
 
 import truffleProvider from "@truffle/provider";
 import Web3 from "web3";
-import { ConfigurationReader } from "./configurationReader";
-
-// import * as web3core from "web3-core";
+import {ConfigurationReader} from "./configurationReader";
 
 export class Web3Wrapper extends Web3 {
-  private _networkId: number | undefined;
+    private _networkId: number | undefined;
   private _options: ConfigurationReader.INetworkOption;
   private _cachedProvider: any;
 
@@ -25,7 +23,7 @@ export class Web3Wrapper extends Web3 {
       const truffleProviderOptions = {
         provider: () => {
           return web3Provider;
-        }
+        },
       };
       this._cachedProvider = truffleProvider.create(truffleProviderOptions);
     }
@@ -85,7 +83,7 @@ function PromiseBatch(batch: Web3.IBatchRequest) {
     async execute(): Promise<any> {
       _batch.execute();
       return Promise.all(_requests);
-    }
+    },
   };
 }
 

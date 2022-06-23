@@ -3,17 +3,17 @@
 
 import crypto from "crypto";
 import os from "os";
-import { OutputChannel, window, workspace } from "vscode";
+import {OutputChannel, window, workspace} from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
-import { Constants } from "./Constants";
-import { Output } from "./Output";
+import {Constants} from "./Constants";
+import {Output} from "./Output";
 
 class ExtensionTelemetry {
   private readonly output?: OutputChannel;
 
   private readonly reporter?: TelemetryReporter;
 
-  private readonly defaultProperties: { [key: string]: any } = {};
+  private readonly defaultProperties: {[key: string]: any} = {};
 
   constructor() {
     const isEnableTelemetry = workspace.getConfiguration("telemetry").get("enableTelemetry") || true;
@@ -41,25 +41,25 @@ class ExtensionTelemetry {
 
   public sendEvent(
     eventName: string,
-    properties?: { [key: string]: string },
-    measurements?: { [key: string]: number }
+    properties?: {[key: string]: string},
+    measurements?: {[key: string]: number}
   ): void {
-    const props = { ...this.defaultProperties, ...properties };
+    const props = {...this.defaultProperties, ...properties};
     if (this.reporter) {
       this.reporter.sendTelemetryEvent(eventName, props, measurements);
     }
 
     if (this.output) {
-      this.output.appendLine(`telemetry/${eventName} ${JSON.stringify({ props, measurements })}`);
+      this.output.appendLine(`telemetry/${eventName} ${JSON.stringify({props, measurements})}`);
     }
   }
 
   public sendException(
     exception: Error,
-    properties?: { [key: string]: string },
-    measurements?: { [key: string]: number }
+    properties?: {[key: string]: string},
+    measurements?: {[key: string]: number}
   ): void {
-    const props = { ...this.defaultProperties, ...properties };
+    const props = {...this.defaultProperties, ...properties};
     const error = new Error(exception.message);
     error.stack = "";
 
@@ -68,7 +68,7 @@ class ExtensionTelemetry {
     }
 
     if (this.output) {
-      this.output.appendLine(`telemetry/${error} ${JSON.stringify({ props, measurements })}`);
+      this.output.appendLine(`telemetry/${error} ${JSON.stringify({props, measurements})}`);
     }
   }
 

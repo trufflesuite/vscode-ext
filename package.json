@@ -614,6 +614,7 @@
     "watch": "npm run watch:tsc",
     "prettier:fix": "prettier --write .",
     "eslint": "eslint src/* test/*",
+    "eslint:fix": "eslint --fix src/* test/*",
     "version": "tsc -v",
     "test": "npm run compile && node ./out/test/runTest",
     "clean": "npx rimraf -- ./out/*",

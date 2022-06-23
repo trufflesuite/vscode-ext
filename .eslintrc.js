@@ -3,37 +3,28 @@ module.exports = {
     browser: true,
     es2021: true,
     node: true,
-    mocha: true
+    mocha: true,
   },
   extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     // Adding this in future would be good but its problematic.
     // "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "prettier"
+    "prettier",
   ],
-  ignorePatterns: ["ui-test/**/*.ts", ".eslintrc.js" ],
+  ignorePatterns: ["ui-test/**/*.ts", ".eslintrc.js"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: "latest",
     sourceType: "module",
-    project: ["./tsconfig.json"]
+    project: ["./tsconfig.json"],
   },
-  plugins: [
-    "@typescript-eslint",
-    "prettier"
-  ],
+  plugins: ["@typescript-eslint", "prettier"],
   rules: {
     // TODO: ADD THIS IN SOON - 2
-    indent: [
-      'error',
-      2,
-    ],
+    indent: ["error", 2],
 
-    "linebreak-style": [
-      "error",
-      "unix"
-    ],
+    "linebreak-style": ["error", "unix"],
 
     // TODO: move to forced single quotes.
     // quotes: [
@@ -50,25 +41,25 @@ module.exports = {
       {
         types: {
           Object: {
-            message: "Avoid using the `Object` type. Did you mean `object`?"
+            message: "Avoid using the `Object` type. Did you mean `object`?",
           },
           Function: {
-            message: "Avoid using the `Function` type. Prefer a specific function type, like `() => void`."
+            message: "Avoid using the `Function` type. Prefer a specific function type, like `() => void`.",
           },
           Boolean: {
-            message: "Avoid using the `Boolean` type. Did you mean `boolean`?"
+            message: "Avoid using the `Boolean` type. Did you mean `boolean`?",
           },
           Number: {
-            message: "Avoid using the `Number` type. Did you mean `number`?"
+            message: "Avoid using the `Number` type. Did you mean `number`?",
           },
           String: {
-            message: "Avoid using the `String` type. Did you mean `string`?"
+            message: "Avoid using the `String` type. Did you mean `string`?",
           },
           Symbol: {
-            message: "Avoid using the `Symbol` type. Did you mean `symbol`?"
-          }
-        }
-      }
+            message: "Avoid using the `Symbol` type. Did you mean `symbol`?",
+          },
+        },
+      },
     ],
 
     "dot-notation": "off",
@@ -95,11 +86,11 @@ module.exports = {
       {
         path: "always",
         types: "prefer-import",
-        lib: "always"
-      }
+        lib: "always",
+      },
     ],
 
-    "no-constant-condition": ["error", { checkLoops: false }],
+    "no-constant-condition": ["error", {checkLoops: false}],
     // FIXME: tech-debt.
     "no-extra-boolean-cast": "off",
     // FIXME: rework this eventually. Tech-debt
@@ -112,6 +103,6 @@ module.exports = {
     "no-useless-escape": "off",
     "no-use-before-define": "off",
     // FIXME: rework this eventually. Tech-debt
-    "no-var": "off"
-  }
+    "no-var": "off",
+  },
 };
