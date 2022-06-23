@@ -614,7 +614,6 @@
     "watch": "npm run watch:tsc",
     "prettier:fix": "prettier --write .",
     "eslint": "eslint src/* test/*",
-    "eslint2": "eslint -c .eslintrc.js.OLD --ext .ts src/**/*.ts test/**/*.ts",
     "version": "tsc -v",
     "test": "npm run compile && node ./out/test/runTest",
     "clean": "npx rimraf -- ./out/*"
@@ -710,7 +709,7 @@
   },
   "lint-staged": {
     "*.{ts,js}": [
-      "eslint -c .eslintrc.js --ext .ts src/**/*.ts test/**/*.ts",
+      "eslint src/* test/*",
       "pretty-quick --staged",
       "git add"
     ]
