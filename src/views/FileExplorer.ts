@@ -1,8 +1,8 @@
-import * as vscode from "vscode";
-import * as path from "path";
 import * as fs from "fs";
 import * as mkdirp from "mkdirp";
+import * as path from "path";
 import * as rimraf from "rimraf";
+import * as vscode from "vscode";
 import {ext} from "../Constants";
 import {getWorkspaceFolder} from "./Utils";
 
@@ -196,6 +196,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
   get onDidChangeFile(): vscode.Event<vscode.FileChangeEvent[]> {
     return this._onDidChangeFile.event;
   }
+
   get onDidChangeTreeData(): vscode.Event<Entry[] | void | null> {
     return this._onDidChangeTree.event;
   }
