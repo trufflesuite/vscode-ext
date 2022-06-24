@@ -61,7 +61,10 @@ module.exports = {
     '@typescript-eslint/no-namespace': 'off',
     // FIXME: rework this eventually. Tech-debt
     '@typescript-eslint/no-non-null-assertion': 'off',
-    '@typescript-eslint/no-unused-vars': 'off',
+
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
+
     '@typescript-eslint/no-use-before-define': 'off',
     // FIXME: rework this eventually. Tech-debt
     '@typescript-eslint/no-var-requires': 'off',
@@ -85,7 +88,6 @@ module.exports = {
     'no-prototype-builtins': 'off',
     // FIXME: This needs removed. Tech-Debt
     'no-undef': 'off',
-    'no-unused-vars': 'off',
     'no-useless-escape': 'off',
     'no-use-before-define': 'off',
     // FIXME: rework this eventually. Tech-debt

@@ -17,8 +17,7 @@ describe('ContractInstanceWithMetadata ExtractEnumsInfo tests', () => {
 
     // Act and Assert
     assert.doesNotThrow(() => {
-      // @ts-ignore
-      const instance = new ContractInstanceWithMetadata(contract, {id: 'testNetworkKey'}, null);
+      return new ContractInstanceWithMetadata(contract, {id: 'testNetworkKey'}, null);
     }, 'ExtractEnumsInfo() failed the ContractInstance constructor');
   });
 

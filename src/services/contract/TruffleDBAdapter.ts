@@ -8,17 +8,21 @@ export class TruffleDBAdapter extends AbstractAdapter {
   public async initialize(): Promise<void> {
     return;
   }
+
   // @ts-ignore
-  public async getContractInstances(contractName: string): Promise<ContractInstance[]> {
+  public async getContractInstances(_contractName: string): Promise<ContractInstance[]> {
     throw new Error('Method is not implemented yet');
   }
+
   // @ts-ignore
-  public async getContractInstance(contractName: string, instanceId: string): Promise<ContractInstance | undefined> {
+  public async getContractInstance(_contractName: string, _instanceId: string): Promise<ContractInstance | undefined> {
     throw new Error('Method is not implemented yet');
   }
+
   public async getChangedContractInstances(): Promise<ContractInstance[]> {
     throw new Error('Method is not implemented yet');
   }
+
   public async dispose(): Promise<void> {
     return;
   }
