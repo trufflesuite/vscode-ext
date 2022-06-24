@@ -1,3 +1,3 @@
-import {SolidityDebugSession} from "./debugAdapter/debugSession";
+import {SolidityDebugSession} from './debugAdapter/debugSession';
 
 SolidityDebugSession.run(SolidityDebugSession);

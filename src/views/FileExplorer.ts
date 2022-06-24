@@ -1,10 +1,10 @@
-import * as fs from "fs";
-import * as mkdirp from "mkdirp";
-import * as path from "path";
-import * as rimraf from "rimraf";
-import * as vscode from "vscode";
-import {ext} from "../Constants";
-import {getWorkspaceFolder} from "./Utils";
+import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
+import * as path from 'path';
+import * as rimraf from 'rimraf';
+import * as vscode from 'vscode';
+import {ext} from '../Constants';
+import {getWorkspaceFolder} from './Utils';
 
 //#region Utilities
 
@@ -23,19 +23,19 @@ namespace _ {
   }
 
   function massageError(error: Error & {code?: string}): Error {
-    if (error.code === "ENOENT") {
+    if (error.code === 'ENOENT') {
       return vscode.FileSystemError.FileNotFound();
     }
 
-    if (error.code === "EISDIR") {
+    if (error.code === 'EISDIR') {
       return vscode.FileSystemError.FileIsADirectory();
     }
 
-    if (error.code === "EEXIST") {
+    if (error.code === 'EEXIST') {
       return vscode.FileSystemError.FileExists();
     }
 
-    if (error.code === "EPERM" || error.code === "EACCESS") {
+    if (error.code === 'EPERM' || error.code === 'EACCESS') {
       return vscode.FileSystemError.NoPermissions();
     }
 
@@ -44,22 +44,22 @@ namespace _ {
 
   export function checkCancellation(token: vscode.CancellationToken): void {
     if (token.isCancellationRequested) {
-      throw new Error("Operation cancelled");
+      throw new Error('Operation cancelled');
     }
   }
 
   export function normalizeNFC(items: string): string;
   export function normalizeNFC(items: string[]): string[];
   export function normalizeNFC(items: string | string[]): string | string[] {
-    if (process.platform !== "darwin") {
+    if (process.platform !== 'darwin') {
       return items;
     }
 
     if (Array.isArray(items)) {
-      return items.map((item) => item.normalize("NFC"));
+      return items.map((item) => item.normalize('NFC'));
     }
 
-    return items.normalize("NFC");
+    return items.normalize('NFC');
   }
 
   export function readdir(path: string): Promise<string[]> {
@@ -190,7 +190,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
       }
     }
     // fallback
-    return vscode.Uri.file(".");
+    return vscode.Uri.file('.');
   }
 
   get onDidChangeFile(): vscode.Event<vscode.FileChangeEvent[]> {
@@ -213,7 +213,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
         this._onDidChangeFile.fire([
           {
             type:
-              event === "change"
+              event === 'change'
                 ? vscode.FileChangeType.Changed
                 : (await _.exists(filepath))
                 ? vscode.FileChangeType.Created
@@ -376,8 +376,8 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
         : vscode.TreeItemCollapsibleState.None
     );
     if (element.type === vscode.FileType.File) {
-      treeItem.command = {command: this._openFileCommand, title: "Open File", arguments: [element.uri]};
-      treeItem.contextValue = "file";
+      treeItem.command = {command: this._openFileCommand, title: 'Open File', arguments: [element.uri]};
+      treeItem.contextValue = 'file';
     }
     return treeItem;
   }
@@ -388,12 +388,12 @@ const openResource = (resource: vscode.Uri): void => {
 };
 
 export function registerFileExplorerView(
-  commandPrefix = "truffle-vscode",
-  viewName = "views.explorer"
+  commandPrefix = 'truffle-vscode',
+  viewName = 'views.explorer'
 ): vscode.TreeView<Entry> {
   const openFileCommand = `${commandPrefix}.openFile`;
   const refreshExplorerCommand = `${commandPrefix}.${viewName}.refreshExplorer`;
-  const treeDataProvider = new FileSystemProvider(openFileCommand, "contracts");
+  const treeDataProvider = new FileSystemProvider(openFileCommand, 'contracts');
   vscode.commands.registerCommand(openFileCommand, (resource) => openResource(resource));
   vscode.commands.registerCommand(refreshExplorerCommand, (_) => treeDataProvider.refresh());
   return vscode.window.createTreeView(`${commandPrefix}.${viewName}`, {treeDataProvider});

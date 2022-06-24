@@ -6,98 +6,91 @@ module.exports = {
     mocha: true,
   },
   extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
     // Adding this in future would be good but its problematic.
     // "plugin:@typescript-eslint/recommended-requiring-type-checking",
-    "prettier",
+    'prettier',
   ],
-  ignorePatterns: ["ui-test/**/*.ts", ".eslintrc.js"],
-  parser: "@typescript-eslint/parser",
+  ignorePatterns: ['ui-test/**/*.ts', '.eslintrc.js'],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
-    project: ["./tsconfig.json"],
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: ['./tsconfig.json'],
   },
-  plugins: ["@typescript-eslint", "prettier"],
+  plugins: ['@typescript-eslint', 'prettier'],
   rules: {
-    // TODO: move to forced single quotes.
-    // quotes: [
-    //   'error',
-    //   'single',
-    // ],
-    // TODO: ENFORCE SEMICOLONS
-
     // FIXME: rework this eventually. Tech-debt
-    "@typescript-eslint/ban-ts-comment": "off",
+    '@typescript-eslint/ban-ts-comment': 'off',
     // FIXME: rework this eventually. Tech-debt
-    "@typescript-eslint/ban-types": [
-      "off",
+    '@typescript-eslint/ban-types': [
+      'off',
       {
         types: {
           Object: {
-            message: "Avoid using the `Object` type. Did you mean `object`?",
+            message: 'Avoid using the `Object` type. Did you mean `object`?',
           },
           Function: {
-            message: "Avoid using the `Function` type. Prefer a specific function type, like `() => void`.",
+            message: 'Avoid using the `Function` type. Prefer a specific function type, like `() => void`.',
           },
           Boolean: {
-            message: "Avoid using the `Boolean` type. Did you mean `boolean`?",
+            message: 'Avoid using the `Boolean` type. Did you mean `boolean`?',
           },
           Number: {
-            message: "Avoid using the `Number` type. Did you mean `number`?",
+            message: 'Avoid using the `Number` type. Did you mean `number`?',
           },
           String: {
-            message: "Avoid using the `String` type. Did you mean `string`?",
+            message: 'Avoid using the `String` type. Did you mean `string`?',
           },
           Symbol: {
-            message: "Avoid using the `Symbol` type. Did you mean `symbol`?",
+            message: 'Avoid using the `Symbol` type. Did you mean `symbol`?',
           },
         },
       },
     ],
 
-    "dot-notation": "off",
-    "@typescript-eslint/dot-notation": ["error"],
+    'dot-notation': 'off',
+    '@typescript-eslint/dot-notation': ['error'],
 
     // FIXME: rework this eventually. Tech-debt
-    "@typescript-eslint/no-empty-interface": "off",
+    '@typescript-eslint/no-empty-interface': 'off',
     // FIXME: rework this eventually. Tech-debt
-    "@typescript-eslint/no-explicit-any": "off",
+    '@typescript-eslint/no-explicit-any': 'off',
     // FIXME: rework this eventually. Tech-debt - FIX 1
-    "@typescript-eslint/no-inferrable-types": "off",
+    '@typescript-eslint/no-inferrable-types': 'off',
     // FIXME: rework this eventually. Tech-debt
-    "@typescript-eslint/no-namespace": "off",
+    '@typescript-eslint/no-namespace': 'off',
     // FIXME: rework this eventually. Tech-debt
-    "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/no-unused-vars": "off",
-    "@typescript-eslint/no-use-before-define": "off",
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/no-use-before-define': 'off',
     // FIXME: rework this eventually. Tech-debt
-    "@typescript-eslint/no-var-requires": "off",
+    '@typescript-eslint/no-var-requires': 'off',
     // FIXME: rework this eventually. Tech-debt
-    "@typescript-eslint/prefer-namespace-keyword": "off",
-    "@typescript-eslint/triple-slash-reference": [
-      "warn",
+    '@typescript-eslint/prefer-namespace-keyword': 'off',
+    '@typescript-eslint/triple-slash-reference': [
+      'warn',
       {
-        path: "always",
-        types: "prefer-import",
-        lib: "always",
+        path: 'always',
+        types: 'prefer-import',
+        lib: 'always',
       },
     ],
 
-    "no-constant-condition": ["error", {checkLoops: false}],
+    'no-constant-condition': ['error', {checkLoops: false}],
     // FIXME: tech-debt.
-    "no-extra-boolean-cast": "off",
+    'no-extra-boolean-cast': 'off',
     // FIXME: rework this eventually. Tech-debt
-    "no-inner-declarations": "off",
+    'no-inner-declarations': 'off',
     // FIXME: rework this eventually. Tech-debt
-    "no-prototype-builtins": "off",
+    'no-prototype-builtins': 'off',
     // FIXME: This needs removed. Tech-Debt
-    "no-undef": "off",
-    "no-unused-vars": "off",
-    "no-useless-escape": "off",
-    "no-use-before-define": "off",
+    'no-undef': 'off',
+    'no-unused-vars': 'off',
+    'no-useless-escape': 'off',
+    'no-use-before-define': 'off',
     // FIXME: rework this eventually. Tech-debt
-    "no-var": "off",
+    'no-var': 'off',
   },
 };

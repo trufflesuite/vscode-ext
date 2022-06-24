@@ -1,23 +1,23 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {URL} from "url";
-import {Constants} from "../../Constants";
-import {TruffleConfiguration} from "../../helpers";
-import {ItemType} from "../ItemType";
-import {ExtensionItem, ExtensionItemData} from "./ExtensionItem";
+import {URL} from 'url';
+import {Constants} from '../../Constants';
+import {TruffleConfiguration} from '../../helpers';
+import {ItemType} from '../ItemType';
+import {ExtensionItem, ExtensionItemData} from './ExtensionItem';
 
 const protocolRegExp = new RegExp(
-  "^(" +
+  '^(' +
     Constants.networkProtocols.http +
-    "|" +
+    '|' +
     Constants.networkProtocols.https +
-    "|" +
+    '|' +
     Constants.networkProtocols.ftp +
-    "|" +
+    '|' +
     Constants.networkProtocols.file +
-    ").*",
-  "i"
+    ').*',
+  'i'
 );
 
 export type NetworkNodeTypes =
@@ -37,7 +37,7 @@ export abstract class NetworkNode extends ExtensionItem {
     networkId: number | string,
     description?: string
   ) {
-    networkId = networkId === "*" ? networkId : parseInt(networkId + "", 10);
+    networkId = networkId === '*' ? networkId : parseInt(networkId + '', 10);
 
     super(itemType, label, data, description);
 
@@ -56,10 +56,10 @@ export abstract class NetworkNode extends ExtensionItem {
 
   public async getRPCAddress(): Promise<string> {
     if (!this.url) {
-      return "";
+      return '';
     }
 
-    return this.url.pathname === "/" ? this.url.origin : this.url.href;
+    return this.url.pathname === '/' ? this.url.origin : this.url.href;
   }
 
   public async getTruffleNetwork(): Promise<TruffleConfiguration.INetwork> {
@@ -79,7 +79,7 @@ export abstract class NetworkNode extends ExtensionItem {
   protected abstract defaultProtocol(): string;
 
   private prepareUrl(url: URL | string): URL {
-    if (typeof url === "string") {
+    if (typeof url === 'string') {
       if (!url.match(protocolRegExp)) {
         url = `${this.defaultProtocol()}${url}`;
       }

@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Handles, Scope} from "@vscode/debugadapter";
-import {DebugProtocol} from "@vscode/debugprotocol";
-import {OBJECT_VARIABLE_DISPLAY_NAME, SCOPES} from "./constants/variablesView";
-import {TranslatedResult} from "./helpers";
-import {IExpressionEval} from "./models/IExpressionEval";
-import RuntimeInterface from "./runtimeInterface";
-import _ from "lodash";
+import {Handles, Scope} from '@vscode/debugadapter';
+import {DebugProtocol} from '@vscode/debugprotocol';
+import {OBJECT_VARIABLE_DISPLAY_NAME, SCOPES} from './constants/variablesView';
+import {TranslatedResult} from './helpers';
+import {IExpressionEval} from './models/IExpressionEval';
+import RuntimeInterface from './runtimeInterface';
+import _ from 'lodash';
 
 export default class VariablesHandler {
   private _runtime: RuntimeInterface;
@@ -32,7 +32,7 @@ export default class VariablesHandler {
   public async getVariableAttributesByVariableRef(variablesReference: number): Promise<DebugProtocol.Variable[]> {
     let result: DebugProtocol.Variable[] = [];
     let variables: Record<string, TranslatedResult>;
-    let variablePath: string = "";
+    let variablePath: string = '';
     switch (variablesReference) {
       case SCOPES.all.ref:
         variables = await this._runtime.variables();
@@ -58,12 +58,12 @@ export default class VariablesHandler {
     const isObjType = this.isSpecificObjectTypeValue(variable, typeof variable);
     return {
       result: this.getDisplayValue(variable, isObjType),
-      variablesReference: isObjType ? this._handles.create(this.generateVariablesAttrKey("", expression)) : 0,
+      variablesReference: isObjType ? this._handles.create(this.generateVariablesAttrKey('', expression)) : 0,
     };
   }
 
   private isSpecificObjectTypeValue(value: any, valueType: string) {
-    return !Array.isArray(value) && value !== null && value !== undefined && valueType === "object";
+    return !Array.isArray(value) && value !== null && value !== undefined && valueType === 'object';
   }
 
   // generate "path.to.attribute"
@@ -71,7 +71,7 @@ export default class VariablesHandler {
     if (_.isEmpty(variablePath)) {
       return attribute;
     } else {
-      return `${_.trimStart(variablePath, ".")}.${attribute}`;
+      return `${_.trimStart(variablePath, '.')}.${attribute}`;
     }
   }
 
@@ -105,7 +105,7 @@ export default class VariablesHandler {
 
     for (const attr in variable) {
       // remove our metadata fields...
-      if (variable.hasOwnProperty(attr) && attr !== "typeName") {
+      if (variable.hasOwnProperty(attr) && attr !== 'typeName') {
         const value = variable[attr];
         result.push(this.buildResult(value, attr, variablePath));
       }

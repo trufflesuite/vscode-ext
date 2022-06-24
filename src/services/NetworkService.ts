@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from "../Constants";
-import {TruffleConfig, TruffleConfiguration} from "../helpers";
-import {Network} from "./contract/Network";
-import {Provider} from "./contract/Provider";
-import {HttpService} from "./HttpService";
+import {Constants} from '../Constants';
+import {TruffleConfig, TruffleConfiguration} from '../helpers';
+import {Network} from './contract/Network';
+import {Provider} from './contract/Provider';
+import {HttpService} from './HttpService';
 
 export namespace NetworkService {
   interface INetworkResponse {
@@ -66,22 +66,22 @@ export namespace NetworkService {
   ): Promise<NetworkMap | undefined> {
     const options = truffleNetwork.options;
     const host = getTruffleNetworkHost(options);
-    const networkId = options.network_id !== "*" ? options.network_id + "" : await getNetworkIdByHost(host);
+    const networkId = options.network_id !== '*' ? options.network_id + '' : await getNetworkIdByHost(host);
 
     if (ignoreUnidentifiedNetworks && networkId === undefined) {
       return;
     }
 
     return {
-      network: {id: networkId || "*", name: truffleNetwork.name},
+      network: {id: networkId || '*', name: truffleNetwork.name},
       provider: host ? {host, options: {mnemonic: options.provider && options.provider.mnemonic}} : null,
     };
   }
 
   function getTruffleNetworkHost(networkOptions: TruffleConfiguration.INetworkOption): string {
     return (
-      `${networkOptions.provider ? networkOptions.provider.url : ""}` ||
-      `${networkOptions.host ? networkOptions.host : ""}${networkOptions.port ? ":" + networkOptions.port : ""}`
+      `${networkOptions.provider ? networkOptions.provider.url : ''}` ||
+      `${networkOptions.host ? networkOptions.host : ''}${networkOptions.port ? ':' + networkOptions.port : ''}`
     );
   }
 }

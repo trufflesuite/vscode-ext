@@ -6,14 +6,14 @@ on:
       - develop
       - master
     paths-ignore: # dont run when changes made to these folders
-      - ".vscode/**"
+      - '.vscode/**'
 
 jobs:
   cicd:
     name: cicd
     runs-on: windows-latest
     env:
-      VSCE_FLAGS: ""
+      VSCE_FLAGS: ''
     steps:
       - name: checkout repo
         uses: actions/checkout@v2
@@ -24,7 +24,7 @@ jobs:
       - name: install gitversion tool
         uses: gittools/actions/gitversion/setup@v0.9.13
         with:
-          versionSpec: "5.x"
+          versionSpec: '5.x'
 
       - name: execute gitversion
         id: gitversion # step id used as reference for output values
@@ -47,8 +47,8 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v2
         with:
-          node-version: "16.4.x"
-          cache: "yarn"
+          node-version: '16.4.x'
+          cache: 'yarn'
 
       - name: clean install dependencies. Fail on lockfile Changes.
         run: yarn install --immutable --immutable-cache --check-cache
@@ -59,7 +59,7 @@ jobs:
       - name: update metadata in package.json
         uses: onlyutkarsh/patch-files-action@v1.0.3
         with:
-          files: "${{github.workspace}}/package.json"
+          files: '${{github.workspace}}/package.json'
           patch-syntax: |
             = /version => "${{ steps.gitversion.outputs.majorMinorPatch }}"
             = /aiKey => "${{ secrets.AIKEY }}"
@@ -67,9 +67,9 @@ jobs:
       - name: add version in CHANGELOG.md
         uses: cschleiden/replace-tokens@v1.1
         with:
-          files: "${{github.workspace}}/CHANGELOG.md"
+          files: '${{github.workspace}}/CHANGELOG.md'
         env:
-          VERSION: "${{ steps.gitversion.outputs.majorMinorPatch }}"
+          VERSION: '${{ steps.gitversion.outputs.majorMinorPatch }}'
 
       - name: configure package flags
         id: package_flags

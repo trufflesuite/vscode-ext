@@ -5,16 +5,16 @@
 // @ts-ignore
 process.browser = true;
 // @ts-ignore
-global.window = {process: {type: "renderer"}};
+global.window = {process: {type: 'renderer'}};
 
-import truffleDebugger from "@truffle/debugger";
-import {EventEmitter} from "events";
-import {filterContractsWithAddress, prepareContracts} from "./contracts/contractsPrepareHelpers";
-import {TranslatedResult, translateTruffleVariables} from "./helpers";
-import {DebuggerTypes} from "./models/debuggerTypes";
-import {ICallInfo} from "./models/ICallInfo";
-import {IContractModel} from "./models/IContractModel";
-import {IInstruction} from "./models/IInstruction";
+import truffleDebugger from '@truffle/debugger';
+import {EventEmitter} from 'events';
+import {filterContractsWithAddress, prepareContracts} from './contracts/contractsPrepareHelpers';
+import {TranslatedResult, translateTruffleVariables} from './helpers';
+import {DebuggerTypes} from './models/debuggerTypes';
+import {ICallInfo} from './models/ICallInfo';
+import {IContractModel} from './models/IContractModel';
+import {IInstruction} from './models/IInstruction';
 
 export default class RuntimeInterface extends EventEmitter {
   private _isDebuggerAttached: boolean;
@@ -84,7 +84,7 @@ export default class RuntimeInterface extends EventEmitter {
     const callStack = this._session!.view(this._selectors.evm.current.callstack);
     const currentLine = this.currentLine();
     if (callStack.length === 1) {
-      return [{...currentLine, method: "Current"}];
+      return [{...currentLine, method: 'Current'}];
     }
 
     const result: ICallInfo[] = [];
@@ -99,10 +99,10 @@ export default class RuntimeInterface extends EventEmitter {
       if (contract === undefined) {
         throw new Error(`Coundn\'t find contract by address ${callStack[i].address || callStack[i].storageAddress}`);
       }
-      result.push({file: contract.sourcePath, ...defaultLine, method: "Previous"});
+      result.push({file: contract.sourcePath, ...defaultLine, method: 'Previous'});
     }
 
-    result.push({...currentLine, method: "Current"});
+    result.push({...currentLine, method: 'Current'});
     return result;
   }
 
@@ -124,30 +124,30 @@ export default class RuntimeInterface extends EventEmitter {
   public async continue(): Promise<void> {
     this.validateSession();
     await this._session!.continueUntilBreakpoint();
-    this.processStepping("stopOnBreakpoint");
+    this.processStepping('stopOnBreakpoint');
   }
 
   public continueReverse(): void {
     this.validateSession();
-    this.sendEvent("stopOnBreakpoint");
+    this.sendEvent('stopOnBreakpoint');
   }
 
   public async stepNext(): Promise<void> {
     this.validateSession();
     await this._session!.stepNext();
-    this.processStepping("stopOnStepOver");
+    this.processStepping('stopOnStepOver');
   }
 
   public async stepIn(): Promise<void> {
     this.validateSession();
     await this._session!.stepInto();
-    this.processStepping("stopOnStepIn");
+    this.processStepping('stopOnStepIn');
   }
 
   public async stepOut(): Promise<void> {
     this.validateSession();
     await this._session!.stepOut();
-    this.processStepping("stopOnStepOut");
+    this.processStepping('stopOnStepOut');
   }
   /**
    * FIXME: rework this
@@ -174,7 +174,7 @@ export default class RuntimeInterface extends EventEmitter {
     const currentLocation = this._session!.view(this._selectors.controller.current.location);
     const sourcePath = this._session!.view(this._selectors.sourcemapping.current.source).sourcePath;
     if (!sourcePath) {
-      throw new Error("No source file");
+      throw new Error('No source file');
     }
     // so if we have a file in a location that doesn't map 1:1 to the actual file name in the compiler we map it here...
     const file = this._fileLookupMap.has(sourcePath) ? this._fileLookupMap.get(sourcePath) : sourcePath;
@@ -210,7 +210,7 @@ export default class RuntimeInterface extends EventEmitter {
   private processStepping(event: any) {
     const isEndOfTransactionTrace = this._session!.view(this._selectors.trace.finished);
     if (isEndOfTransactionTrace) {
-      this.sendEvent("end");
+      this.sendEvent('end');
     } else {
       this.sendEvent(event);
     }
@@ -223,7 +223,7 @@ export default class RuntimeInterface extends EventEmitter {
 
   private validateSession() {
     if (!this._session) {
-      throw new Error("Debug session is undefined");
+      throw new Error('Debug session is undefined');
     }
   }
 }

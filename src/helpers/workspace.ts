@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Uri, workspace} from "vscode";
-import {Constants} from "../Constants";
-import {Telemetry} from "../TelemetryClient";
-import * as path from "path";
-import glob from "glob";
+import {Uri, workspace} from 'vscode';
+import {Constants} from '../Constants';
+import {Telemetry} from '../TelemetryClient';
+import * as path from 'path';
+import glob from 'glob';
 
 export interface TruffleWorkspace {
   dirName: string;
@@ -17,7 +17,7 @@ export function getWorkspaceRoot(ignoreException: boolean = false): string | und
   const workspaceRoot = workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
   if (workspaceRoot === undefined && !ignoreException) {
-    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined("Workspace root"));
+    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root'));
     Telemetry.sendException(error);
     throw error;
   }
@@ -35,7 +35,7 @@ export async function getWorkspaces(): Promise<TruffleWorkspace[]> {
   );
 
   if (workspaces.length === 0) {
-    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined("Workspace root"));
+    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root'));
     Telemetry.sendException(error);
     throw error;
   }
@@ -48,7 +48,7 @@ export function isWorkspaceOpen(): boolean {
 }
 
 export function getPathByPlataform(workspace: Uri): string {
-  return process.platform === "win32" ? `${workspace.scheme}:${workspace.path}` : workspace.fsPath;
+  return process.platform === 'win32' ? `${workspace.scheme}:${workspace.path}` : workspace.fsPath;
 }
 
 async function getWorkspaceFiles(dirPath: string): Promise<TruffleWorkspace[]> {

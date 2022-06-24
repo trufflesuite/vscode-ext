@@ -1,57 +1,57 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import assert from "assert";
-import fs from "fs-extra";
-import path from "path";
-import {ContractInstanceWithMetadata} from "../src/services";
-import {Contract} from "../src/services/contract/Contract";
+import assert from 'assert';
+import fs from 'fs-extra';
+import path from 'path';
+import {ContractInstanceWithMetadata} from '../src/services';
+import {Contract} from '../src/services/contract/Contract';
 
-describe("ContractInstanceWithMetadata ExtractEnumsInfo tests", () => {
-  const testContractFilePath = path.join(__dirname, "testData", "enumTestContract.json");
+describe('ContractInstanceWithMetadata ExtractEnumsInfo tests', () => {
+  const testContractFilePath = path.join(__dirname, 'testData', 'enumTestContract.json');
 
-  it("ExtractEnumsInfo() does not throw exception", async () => {
+  it('ExtractEnumsInfo() does not throw exception', async () => {
     // Arrange
-    const fileData = fs.readFileSync(testContractFilePath, "utf-8");
+    const fileData = fs.readFileSync(testContractFilePath, 'utf-8');
     const contract = new Contract(JSON.parse(fileData));
 
     // Act and Assert
     assert.doesNotThrow(() => {
       // @ts-ignore
-      const instance = new ContractInstanceWithMetadata(contract, {id: "testNetworkKey"}, null);
-    }, "ExtractEnumsInfo() failed the ContractInstance constructor");
+      const instance = new ContractInstanceWithMetadata(contract, {id: 'testNetworkKey'}, null);
+    }, 'ExtractEnumsInfo() failed the ContractInstance constructor');
   });
 
-  describe("ExtractEnumsInfo() extracting a correct data", () => {
+  describe('ExtractEnumsInfo() extracting a correct data', () => {
     let instance: ContractInstanceWithMetadata;
     const stateEnumCollection = [
       {
-        name: "Request",
+        name: 'Request',
         value: 0,
       },
       {
-        name: "Respond",
+        name: 'Respond',
         value: 1,
       },
     ];
     const switcherEnumCollection = [
       {
-        name: "On",
+        name: 'On',
         value: 0,
       },
       {
-        name: "Off",
+        name: 'Off',
         value: 1,
       },
     ];
 
     before(() => {
-      const fileData = fs.readFileSync(testContractFilePath, "utf-8");
+      const fileData = fs.readFileSync(testContractFilePath, 'utf-8');
       const contract = new Contract(JSON.parse(fileData));
-      instance = new ContractInstanceWithMetadata(contract, {id: "testNetworkKey"}, null);
+      instance = new ContractInstanceWithMetadata(contract, {id: 'testNetworkKey'}, null);
     });
 
-    it("methods parameters section", async () => {
+    it('methods parameters section', async () => {
       // Arrange
       const methodsCounter = 2;
       const sendRequestArgCounter = 1;
@@ -61,22 +61,22 @@ describe("ContractInstanceWithMetadata ExtractEnumsInfo tests", () => {
       assert.strictEqual(
         Object.keys(instance.enumsInfo.methods).length,
         methodsCounter,
-        "Not all methods are extracted from AST"
+        'Not all methods are extracted from AST'
       );
       assert.strictEqual(
         Object.keys(instance.enumsInfo.methods.SendRequest).length,
         sendRequestArgCounter,
-        "Not all arguments are extracted for SendRequest method"
+        'Not all arguments are extracted for SendRequest method'
       );
       assert.strictEqual(
         Object.keys(instance.enumsInfo.methods.SendResponse).length,
         sendResponseArgCounter,
-        "Not all arguments are extracted for SendResponse method"
+        'Not all arguments are extracted for SendResponse method'
       );
       assert.deepStrictEqual(
         instance.enumsInfo.methods.SendRequest,
         {state: stateEnumCollection},
-        "Arguments for SendRequest method are extracted incorrect"
+        'Arguments for SendRequest method are extracted incorrect'
       );
       assert.deepStrictEqual(
         instance.enumsInfo.methods.SendResponse,
@@ -84,11 +84,11 @@ describe("ContractInstanceWithMetadata ExtractEnumsInfo tests", () => {
           flag: switcherEnumCollection,
           state: stateEnumCollection,
         },
-        "Arguments for SendResponse method are extracted incorrect"
+        'Arguments for SendResponse method are extracted incorrect'
       );
     });
 
-    it("contract fields section", async () => {
+    it('contract fields section', async () => {
       // Assert
       assert.deepStrictEqual(
         instance.enumsInfo.fields,
@@ -96,7 +96,7 @@ describe("ContractInstanceWithMetadata ExtractEnumsInfo tests", () => {
           Flag: switcherEnumCollection,
           State: stateEnumCollection,
         },
-        "Fields of test contract are extracted incorrect"
+        'Fields of test contract are extracted incorrect'
       );
     });
   });

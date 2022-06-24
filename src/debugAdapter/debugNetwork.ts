@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import path from "path";
-import {executeCommand} from "./cmdCommandExecutor";
-import {ConfigurationReader} from "./configurationReader";
-import {TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE, TRUFFLE_CONFIG_NAME} from "./constants/truffleConfig";
+import path from 'path';
+import {executeCommand} from './cmdCommandExecutor';
+import {ConfigurationReader} from './configurationReader';
+import {TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE, TRUFFLE_CONFIG_NAME} from './constants/truffleConfig';
 
 export class DebugNetwork {
   public workingDirectory: string;
@@ -32,7 +32,7 @@ export class DebugNetwork {
   // Port and host are defined
   public isLocalNetwork() {
     if (!this._networkForDebug || !this._networkForDebug.options) {
-      throw new Error("Network is not defined. Try to call this.load()");
+      throw new Error('Network is not defined. Try to call this.load()');
     }
     const options = this._networkForDebug.options;
     return !!(options.host && options.port);
@@ -87,10 +87,10 @@ export class DebugNetwork {
 
   private async getProviderByResolvingConfig(network: string) {
     // use truffle exec web3ProviderResolver.js to solve http- or websocket- web3 provider
-    const truffleConfigReaderPath = path.join(__dirname, "web3ProviderResolver.js");
-    const args = ["truffle", "exec", truffleConfigReaderPath, "--network", network];
-    const result = await executeCommand(this.workingDirectory, "npx", ...args);
-    const providerJson = result.split("provider%=")[1];
+    const truffleConfigReaderPath = path.join(__dirname, 'web3ProviderResolver.js');
+    const args = ['truffle', 'exec', truffleConfigReaderPath, '--network', network];
+    const result = await executeCommand(this.workingDirectory, 'npx', ...args);
+    const providerJson = result.split('provider%=')[1];
     return JSON.parse(providerJson);
   }
 

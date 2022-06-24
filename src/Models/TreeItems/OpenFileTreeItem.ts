@@ -1,4 +1,4 @@
-import {AzExtParentTreeItem, GenericTreeItem, IGenericTreeItemOptions} from "@microsoft/vscode-azext-utils";
+import {AzExtParentTreeItem, GenericTreeItem, IGenericTreeItemOptions} from '@microsoft/vscode-azext-utils';
 
 type OpenFileTreeItemOptions = IGenericTreeItemOptions & {
   commandArgs: any[] | undefined;

@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-export * from "./CancellationEvent";
-export * from "./EnumStorage";
-export * from "./ItemFactory";
-export * from "./ItemType";
-export * from "./IDeployDestination";
+export * from './CancellationEvent';
+export * from './EnumStorage';
+export * from './ItemFactory';
+export * from './ItemType';
+export * from './IDeployDestination';
 import {
   CommandItemCreator,
   InfuraNetworkNodeItemCreator,
@@ -19,9 +19,9 @@ import {
   GenericServiceItemCreator,
   NullableItemCreator,
   InfuraLayerItemCreator,
-} from "./ItemCreators";
-import {ItemFactory} from "./ItemFactory";
-import {ItemType} from "./ItemType";
+} from './ItemCreators';
+import {ItemFactory} from './ItemFactory';
+import {ItemType} from './ItemType';
 
 ItemFactory.register(ItemType.COMMAND, new CommandItemCreator());
 ItemFactory.register(ItemType.NULLABLE, new NullableItemCreator());

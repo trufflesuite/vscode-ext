@@ -48,6 +48,6 @@ declare class Web3 {
   BatchRequest: new () => Web3.IBatchRequest;
 }
 
-declare module "web3" {
+declare module 'web3' {
   export = Web3;
 }

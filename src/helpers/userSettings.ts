@@ -1,4 +1,4 @@
-import {ConfigurationTarget, workspace} from "vscode";
+import {ConfigurationTarget, workspace} from 'vscode';
 
 export async function getConfigurationAsync(key: string): Promise<{defaultValue: string; userValue: string}> {
   const config = await workspace.getConfiguration().inspect(key);

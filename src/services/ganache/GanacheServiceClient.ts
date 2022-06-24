@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from "../../Constants";
-import {Telemetry} from "../../TelemetryClient";
-import {HttpService} from "../HttpService";
+import {Constants} from '../../Constants';
+import {Telemetry} from '../../TelemetryClient';
+import {HttpService} from '../HttpService';
 
 export async function isGanacheServer(port: number | string): Promise<boolean> {
   try {

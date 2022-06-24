@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from "../../Constants";
-import {IDeployDestination} from "../IDeployDestination";
-import {ItemType} from "../ItemType";
-import {GenericNetworkNode} from "./GenericNetworkNode";
-import {Project} from "./Project";
+import {Constants} from '../../Constants';
+import {IDeployDestination} from '../IDeployDestination';
+import {ItemType} from '../ItemType';
+import {GenericNetworkNode} from './GenericNetworkNode';
+import {Project} from './Project';
 
 export class GenericProject extends Project {
   public readonly port: number;
@@ -27,7 +27,7 @@ export class GenericProject extends Project {
   public async getDeployDestinations(): Promise<IDeployDestination[]> {
     const {generic} = Constants.treeItemData.service;
 
-    const getDeployName = (labelNode: string) => [generic.prefix, this.label, labelNode].join("_");
+    const getDeployName = (labelNode: string) => [generic.prefix, this.label, labelNode].join('_');
 
     return Promise.all(
       (this.getChildren() as GenericNetworkNode[]).map(async (node) => {

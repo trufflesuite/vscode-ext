@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Telemetry} from "../../TelemetryClient";
-import {IExtensionItem} from "../TreeItems";
+import {Telemetry} from '../../TelemetryClient';
+import {IExtensionItem} from '../TreeItems';
 
 export abstract class ItemCreator {
   public create(obj: {[key: string]: any}): IExtensionItem {
@@ -18,7 +18,7 @@ export abstract class ItemCreator {
   protected abstract createFromObject(...args: any[]): IExtensionItem;
 
   protected getRequiredFields(): Array<{fieldName: string; type: string}> {
-    return [{fieldName: "itemType", type: "number"}];
+    return [{fieldName: 'itemType', type: 'number'}];
   }
 
   protected getAdditionalConstructorArguments(_obj: {[key: string]: any}): any[] {
@@ -36,7 +36,7 @@ export abstract class ItemCreator {
         throw new Error(`Missed required field ${item.fieldName}. JSON: ${JSON.stringify(obj)}`);
       }
 
-      if ((item.type === "array" && Array.isArray(field)) || typeof field === item.type) {
+      if ((item.type === 'array' && Array.isArray(field)) || typeof field === item.type) {
         return;
       }
 

@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from "../../Constants";
+import {Constants} from '../../Constants';
 
 export class Debounce {
   private debounceEvent: {

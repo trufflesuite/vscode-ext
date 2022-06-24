@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Memento, window, Uri} from "vscode";
-import {Constants} from "../Constants";
-import {userSettings} from "../helpers";
-import {IExtensionAdapter, TruffleExtensionAdapter} from "../services/extensionAdapter";
+import {Memento, window, Uri} from 'vscode';
+import {Constants} from '../Constants';
+import {userSettings} from '../helpers';
+import {IExtensionAdapter, TruffleExtensionAdapter} from '../services/extensionAdapter';
 
 class SdkCoreCommands {
   // @ts-ignore

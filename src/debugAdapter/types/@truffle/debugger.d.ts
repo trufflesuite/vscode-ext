@@ -1,12 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-declare module "@truffle/debugger" {
+declare module '@truffle/debugger' {
   // Fixme: bumping TS might make all this work...
   // import type {ContractObject} from "@truffle/contract-schema/spec";
   // import type Common from "@truffle/compile-common";
   // import {Compilations} from "@truffle/codec";
-  import {provider as Web3Provider} from "web3-core";
+  import {provider as Web3Provider} from 'web3-core';
   // import type Web3 from "web3";
   interface Selectors {
     // FIXME: there are more selectors in the latest release we can add in here?

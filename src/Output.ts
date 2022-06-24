@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {createAzExtOutputChannel, IAzExtOutputChannel} from "@microsoft/vscode-azext-utils";
-import {ext, Constants} from "./Constants";
+import {createAzExtOutputChannel, IAzExtOutputChannel} from '@microsoft/vscode-azext-utils';
+import {ext, Constants} from './Constants';
 
 export class Output {
   public static output(label: string, message: string): void {
@@ -30,8 +30,8 @@ export class Output {
     ext.prefix
   );
 
-  private static formatMessage(label: string = "", message: string = ""): string {
-    return `${label ? `[${label}] ` : ""}${message}`;
+  private static formatMessage(label: string = '', message: string = ''): string {
+    return `${label ? `[${label}] ` : ''}${message}`;
   }
 
   /**
