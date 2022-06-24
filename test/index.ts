@@ -3,7 +3,7 @@
 
 'use strict';
 
-declare var global: any;
+declare let global: any;
 
 import fs from 'fs';
 import glob from 'glob';
@@ -30,6 +30,7 @@ let mocha = new Mocha({
 function configure(mochaOpts: any): void {
   mocha = new Mocha(mochaOpts);
 }
+
 exports.configure = configure;
 
 function _mkDirIfExists(dir: string): void {
@@ -76,6 +77,7 @@ function run(testsRoot: string, clb: any): any {
     }
   });
 }
+
 exports.run = run;
 
 interface ITestRunnerOptions {

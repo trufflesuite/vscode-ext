@@ -78,7 +78,7 @@ describe('VariablesHandler unit tests', () => {
       assert.strictEqual(
         objectVar!.value,
         OBJECT_VARIABLE_DISPLAY_NAME,
-        `objectVar\'s value should be ${OBJECT_VARIABLE_DISPLAY_NAME}`
+        `objectVar's value should be ${OBJECT_VARIABLE_DISPLAY_NAME}`
       );
       assert.strictEqual(
         generateVariablesAttrKeyStub.calledWith('', objProp.key),
@@ -102,7 +102,7 @@ describe('VariablesHandler unit tests', () => {
       assert.strictEqual(
         objectVar!.value,
         OBJECT_VARIABLE_DISPLAY_NAME,
-        `objectVar\'s value should be ${OBJECT_VARIABLE_DISPLAY_NAME}`
+        `objectVar's value should be ${OBJECT_VARIABLE_DISPLAY_NAME}`
       );
       assert.strictEqual(
         handlesCreateStub.calledWithMatch(variablePath),

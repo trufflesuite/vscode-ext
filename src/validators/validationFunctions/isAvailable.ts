@@ -18,7 +18,7 @@ export class IsAvailable implements IRule {
   ) {}
 
   public async validate(name: string): Promise<string | null> {
-    if (!!name) {
+    if (name) {
       const response = (await this.checkAvailable(name)) as {message: string; nameAvailable: boolean; reason: string};
       if (response && !response.nameAvailable && response.reason === Constants.responseReason.alreadyExists) {
         return (this.errorMessage && this.errorMessage(name)) || response.message;

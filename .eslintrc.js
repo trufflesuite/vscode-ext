@@ -21,6 +21,32 @@ module.exports = {
   },
   plugins: ['@typescript-eslint', 'prettier'],
   rules: {
+    'dot-notation': 'off',
+    '@typescript-eslint/dot-notation': ['error'],
+
+    // We can ignore vars in overridden methods with this rule.
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
+
+    // need this as we have a few while(true) loops.
+    'no-constant-condition': ['error', {checkLoops: false}],
+
+    // FIXME: rework this eventually. Tech-debt
+    '@typescript-eslint/no-empty-interface': 'off',
+    // FIXME: rework this eventually. Tech-debt
+    '@typescript-eslint/no-explicit-any': 'off',
+    // FIXME: rework this eventually. Tech-debt
+    '@typescript-eslint/no-namespace': 'off',
+    // FIXME: rework this eventually. Tech-debt
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    // FIXME: rework this eventually. Tech-debt
+    '@typescript-eslint/no-var-requires': 'off',
+    // FIXME: rework this eventually. Tech-debt
+    'no-inner-declarations': 'off',
+    // FIXME: rework this eventually. Tech-debt
+    'no-prototype-builtins': 'off',
+    // FIXME: This needs removed. Tech-Debt
+    'no-undef': 'off',
     // FIXME: rework this eventually. Tech-debt
     '@typescript-eslint/ban-ts-comment': 'off',
     // FIXME: rework this eventually. Tech-debt
@@ -49,47 +75,5 @@ module.exports = {
         },
       },
     ],
-
-    'dot-notation': 'off',
-    '@typescript-eslint/dot-notation': ['error'],
-
-    // FIXME: rework this eventually. Tech-debt
-    '@typescript-eslint/no-empty-interface': 'off',
-    // FIXME: rework this eventually. Tech-debt
-    '@typescript-eslint/no-explicit-any': 'off',
-    // FIXME: rework this eventually. Tech-debt
-    '@typescript-eslint/no-namespace': 'off',
-    // FIXME: rework this eventually. Tech-debt
-    '@typescript-eslint/no-non-null-assertion': 'off',
-
-    // We can ignore vars in overridden methods with this rule.
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
-
-    // FIXME: rework this eventually. Tech-debt
-    '@typescript-eslint/no-var-requires': 'off',
-
-    '@typescript-eslint/triple-slash-reference': [
-      'warn',
-      {
-        path: 'always',
-        types: 'prefer-import',
-        lib: 'always',
-      },
-    ],
-
-    'no-constant-condition': ['error', {checkLoops: false}],
-    // FIXME: tech-debt.
-    'no-extra-boolean-cast': 'off',
-    // FIXME: rework this eventually. Tech-debt
-    'no-inner-declarations': 'off',
-    // FIXME: rework this eventually. Tech-debt
-    'no-prototype-builtins': 'off',
-    // FIXME: This needs removed. Tech-Debt
-    'no-undef': 'off',
-    'no-useless-escape': 'off',
-    'no-use-before-define': 'off',
-    // FIXME: rework this eventually. Tech-debt
-    'no-var': 'off',
   },
 };

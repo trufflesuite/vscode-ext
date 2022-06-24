@@ -246,7 +246,7 @@ export namespace ConfigurationReader {
 
   async function getTruffleMetadata(workingDirectory: string): Promise<IConfiguration> {
     const truffleConfigTemplatePath =
-      typeof IS_BUNDLE_TIME === 'undefined' || IS_BUNDLE_TIME === false
+      typeof IS_BUNDLE_TIME === 'undefined' || !IS_BUNDLE_TIME
         ? path.join(__dirname, '..', 'helpers', 'checkTruffleConfigTemplate.js')
         : path.join(__dirname, 'checkTruffleConfigTemplate.js');
     const truffleConfigPath = path.relative(
@@ -579,7 +579,7 @@ export namespace ConfigurationReader {
     const call = {
       arguments: [
         {
-          raw: `\'${args}\'`,
+          raw: `'${args}'`,
           type: 'Literal',
           value: `${args}`,
         },
@@ -609,7 +609,7 @@ export namespace ConfigurationReader {
           init: {
             arguments: [
               {
-                raw: `\'${loaderArg}\'`,
+                raw: `'${loaderArg}'`,
                 type: 'Literal',
                 value: `${loaderArg}`,
               },

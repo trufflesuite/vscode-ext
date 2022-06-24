@@ -12,7 +12,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import {Uri} from 'vscode';
 import {Constants} from '../Constants';
-import {getWorkspaceRoot} from '../helpers';
+import {getWorkspaceRoot} from './index';
 import {MnemonicRepository} from '../services';
 import {Telemetry} from '../TelemetryClient';
 import {tryExecuteCommandInFork} from './command';
@@ -602,7 +602,7 @@ export namespace TruffleConfiguration {
     const call = {
       arguments: [
         {
-          raw: `\'${args}\'`,
+          raw: `'${args}'`,
           type: 'Literal',
           value: `${args}`,
         },
@@ -632,7 +632,7 @@ export namespace TruffleConfiguration {
           init: {
             arguments: [
               {
-                raw: `\'${loaderArg}\'`,
+                raw: `'${loaderArg}'`,
                 type: 'Literal',
                 value: `${loaderArg}`,
               },

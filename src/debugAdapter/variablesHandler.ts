@@ -11,8 +11,8 @@ import _ from 'lodash';
 
 export default class VariablesHandler {
   private _runtime: RuntimeInterface;
-  private _scopes: Scope[];
-  private _handles: Handles<string>;
+  private readonly _scopes: Scope[];
+  private readonly _handles: Handles<string>;
 
   constructor(runtime: RuntimeInterface) {
     this._runtime = runtime;
@@ -76,12 +76,6 @@ export default class VariablesHandler {
   }
 
   private getVariableAttributesByKeyPath(keyPath: string, variable: Record<string, TranslatedResult>): any {
-    // trim off the first . to make object get work properly.
-    // let key = keyPath;
-    // if(keyPath.indexOf('.') === 0){
-    //   key = _.trimStart(key, '.');
-    // }
-    // console.log("getVariableAttributesByKeyPath", {keyPath, variable});
     try {
       return _.get(variable, keyPath);
     } catch (e) {

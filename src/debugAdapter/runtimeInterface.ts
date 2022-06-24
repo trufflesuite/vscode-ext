@@ -97,7 +97,7 @@ export default class RuntimeInterface extends EventEmitter {
         (c: any) => c.address === (callStack[i].address || callStack[i].storageAddress)
       );
       if (contract === undefined) {
-        throw new Error(`Coundn\'t find contract by address ${callStack[i].address || callStack[i].storageAddress}`);
+        throw new Error(`Coundn't find contract by address ${callStack[i].address || callStack[i].storageAddress}`);
       }
       result.push({file: contract.sourcePath, ...defaultLine, method: 'Previous'});
     }
@@ -149,6 +149,7 @@ export default class RuntimeInterface extends EventEmitter {
     await this._session!.stepOut();
     this.processStepping('stopOnStepOut');
   }
+
   /**
    * FIXME: rework this
    * @param txHash
@@ -188,8 +189,7 @@ export default class RuntimeInterface extends EventEmitter {
 
   public getInstructionSteps(): IInstruction[] {
     this.validateSession();
-    const steps: IInstruction[] = this._session!.view(this._selectors.trace.steps);
-    return steps;
+    return this._session!.view(this._selectors.trace.steps);
   }
 
   public getCurrentInstructionStep(): IInstruction {
