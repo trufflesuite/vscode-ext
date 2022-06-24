@@ -12,7 +12,6 @@ import {
   ServiceCommands,
   TruffleCommands,
   GenericCommands,
-  DashboardCommands,
 } from "./commands";
 import {Constants, ext} from "./Constants";
 
@@ -128,22 +127,6 @@ export async function activate(context: ExtensionContext) {
   );
   //#endregion
 
-  //#region Dashboard extension commands
-  const startDashboardServer = commands.registerCommand("truffle-vscode.startDashboardServer", async () => {
-    await tryExecute(() => DashboardCommands.startDashboardCmd());
-  });
-
-  const stopDashboardServer = commands.registerCommand("truffle-vscode.stopDashboardServer", async () => {
-    await tryExecute(() => DashboardCommands.stopDashboardCmd());
-  });
-
-  const resartDashboardServer = commands.registerCommand("truffle-vscode.restartDashboardServer", async () => {
-    await tryExecute(() => DashboardCommands.stopDashboardCmd()).then(() =>
-      tryExecute(() => DashboardCommands.startDashboardCmd())
-    );
-  });
-  //#endregion
-
   //#region truffle commands
   const newSolidityProject = commands.registerCommand("truffle-vscode.newSolidityProject", async () => {
     await tryExecute(() => ProjectCommands.newSolidityProject());
@@ -246,9 +229,6 @@ export async function activate(context: ExtensionContext) {
     startGanacheServer,
     stopGanacheServer,
     resartGanacheServer,
-    startDashboardServer,
-    stopDashboardServer,
-    resartDashboardServer,
     getPrivateKeyFromMnemonic,
     signInToInfuraAccount,
     signOutOfInfuraAccount,

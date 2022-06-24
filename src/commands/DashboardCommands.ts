@@ -1,13 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {commands, window} from "vscode";
-import {Constants, RequiredApps} from "../Constants";
+import {window} from "vscode";
+import {Constants} from "../Constants";
 import {required} from "../helpers/required";
 import {showIgnorableNotification} from "../helpers/userInteraction";
-import {ItemType} from "../Models/ItemType";
-import {DashboardNetworkNode, DashboardProject} from "../Models/TreeItems";
-import {DashboardService, TreeManager} from "../services";
+import {DashboardService} from "../services";
 import {Telemetry} from "../TelemetryClient";
 export namespace DashboardCommands {
   // Command to bind to UI commands
@@ -23,19 +21,12 @@ export namespace DashboardCommands {
         const buttonClose = Constants.placeholders.buttonClose;
 
         const item = await window.showErrorMessage(message, buttonUpdate, buttonClose);
-
         if (item == buttonUpdate) await required.installTruffle();
 
         return;
       }
 
-      const project = RequiredApps.dashboard;
-      const port = Constants.dashboardPort;
-
-      await DashboardService.startDashboardServer(port);
-
-      await addTreeItemService(project, port);
-
+      await DashboardService.startDashboardServer(Constants.dashboardPort);
       Telemetry.sendEvent("DashboardCommands.startDashboardCmd.commandFinished");
     });
   }
@@ -59,29 +50,5 @@ export namespace DashboardCommands {
     }
 
     Telemetry.sendEvent("DashboardCommands.stopDashboardCmd.commandFinished");
-  }
-
-  async function addTreeItemService(projectName: string, port: number): Promise<void> {
-    const service = TreeManager.getItem(ItemType.DASHBOARD_SERVICE);
-    const projects = service.getChildren() as DashboardProject[];
-
-    if (projects.length > 0) return;
-
-    const description = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
-    const url = `${Constants.networkProtocols.http}${Constants.localhost}:${port}/rpc`;
-    const networkNode = new DashboardNetworkNode(projectName, url, "*");
-    const project = new DashboardProject(projectName, port, description);
-
-    project.addChild(networkNode);
-    service.addChild(project);
-
-    TreeManager.saveState();
-    commands.executeCommand("truffle-vscode.refresh");
-
-    Telemetry.sendEvent("ServiceCommands.execute.newServiceItem", {
-      ruri: Telemetry.obfuscate((project.resourceUri || "").toString()),
-      type: Telemetry.obfuscate(project.itemType.toString()),
-      url: Telemetry.obfuscate(JSON.stringify(await project.getRPCAddress())),
-    });
   }
 }

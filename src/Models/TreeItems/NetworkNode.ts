@@ -23,8 +23,7 @@ const protocolRegExp = new RegExp(
 export type NetworkNodeTypes =
   | ItemType.LOCAL_NETWORK_NODE
   | ItemType.INFURA_NETWORK_NODE
-  | ItemType.GENERIC_NETWORK_NODE
-  | ItemType.DASHBOARD_NETWORK_NODE;
+  | ItemType.GENERIC_NETWORK_NODE;
 
 export abstract class NetworkNode extends ExtensionItem {
   public readonly networkId: number | string;

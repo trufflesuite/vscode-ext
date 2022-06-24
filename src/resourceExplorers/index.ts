@@ -5,4 +5,3 @@ export * from "./InfuraResourceExplorer";
 export * from "./LocalResourceExplorer";
 export * from "./InfuraResourceExplorer";
 export * from "./GenericResourceExplorer";
-export * from "./DashboardResourceExplorer";

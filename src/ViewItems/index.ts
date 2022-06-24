@@ -27,17 +27,14 @@ ViewItemFactory.register(ItemType.NULLABLE, new NullableViewCreator());
 ViewItemFactory.register(ItemType.LOCAL_SERVICE, new ServiceViewCreator());
 ViewItemFactory.register(ItemType.INFURA_SERVICE, new ServiceViewCreator());
 ViewItemFactory.register(ItemType.GENERIC_SERVICE, new ServiceViewCreator());
-ViewItemFactory.register(ItemType.DASHBOARD_SERVICE, new ServiceViewCreator());
 
 ViewItemFactory.register(ItemType.LOCAL_PROJECT, new ProjectViewCreator());
 ViewItemFactory.register(ItemType.INFURA_PROJECT, new ProjectViewCreator());
 ViewItemFactory.register(ItemType.GENERIC_PROJECT, new ProjectViewCreator());
-ViewItemFactory.register(ItemType.DASHBOARD_PROJECT, new ProjectViewCreator());
 
 ViewItemFactory.register(ItemType.LOCAL_NETWORK_NODE, new NetworkNodeViewCreator());
 ViewItemFactory.register(ItemType.INFURA_NETWORK_NODE, new NetworkNodeViewCreator());
 ViewItemFactory.register(ItemType.GENERIC_NETWORK_NODE, new NetworkNodeViewCreator());
-ViewItemFactory.register(ItemType.DASHBOARD_NETWORK_NODE, new NetworkNodeViewCreator());
 
 ViewItemFactory.register(ItemType.MEMBER, new GroupViewCreator());
 

@@ -238,10 +238,6 @@ export class Constants {
         contextValue: "localnetwork",
         iconPath: {dark: "", light: ""},
       },
-      dashboard: {
-        contextValue: "network",
-        iconPath: {dark: "", light: ""},
-      },
       generic: {
         contextValue: "network",
         iconPath: {dark: "", light: ""},
@@ -272,10 +268,6 @@ export class Constants {
       },
       local: {
         contextValue: "localproject",
-        iconPath: {dark: "", light: ""},
-      },
-      dashboard: {
-        contextValue: "dashboardproject",
         iconPath: {dark: "", light: ""},
       },
       generic: {
@@ -708,11 +700,6 @@ export class Constants {
       light: context.asAbsolutePath(path.join("resources/light", "LocalNetwork.svg")),
     };
 
-    this.treeItemData.network.dashboard.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "LocalNetwork.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "LocalNetwork.svg")),
-    };
-
     this.treeItemData.project.infura.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "InfuraProject.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "InfuraProject.svg")),
@@ -724,11 +711,6 @@ export class Constants {
     };
 
     this.treeItemData.project.generic.iconPath = {
-      dark: context.asAbsolutePath(path.join("resources/dark", "LocalProject.svg")),
-      light: context.asAbsolutePath(path.join("resources/light", "LocalProject.svg")),
-    };
-
-    this.treeItemData.project.dashboard.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "LocalProject.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "LocalProject.svg")),
     };
