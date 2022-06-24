@@ -11,9 +11,10 @@ import {ItemType} from '../../../src/Models';
 import {LocalService, InfuraProject, Project} from '../../../src/Models/TreeItems';
 import {InfuraResourceExplorer} from '../../../src/resourceExplorers';
 import {GanacheService, TreeManager} from '../../../src/services';
+
 const {project} = Constants.treeItemData;
 
-const mockExtension: vscode.Extension<{}> = {
+const mockExtension: vscode.Extension<unknown> = {
   extensionUri: Uri.parse(''),
   activate: mockActivate,
   exports: {},
@@ -32,7 +33,7 @@ async function waitAmoment(): Promise<void> {
   });
 }
 
-async function mockActivate(): Promise<{}> {
+async function mockActivate(): Promise<unknown> {
   await waitAmoment();
   return {};
 }

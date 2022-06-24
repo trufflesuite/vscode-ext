@@ -318,7 +318,7 @@ export class SolidityDebugSession extends LoggingDebugSession {
     return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, null);
   }
 
-  private async sendErrorIfFailed(response: DebugProtocol.Response, fn: () => {}) {
+  private async sendErrorIfFailed(response: DebugProtocol.Response, fn: () => unknown): Promise<void> {
     try {
       await fn();
     } catch (e) {
