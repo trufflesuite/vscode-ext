@@ -21,7 +21,7 @@ describe('Integration tests GanacheCommands', () => {
   let loadStateMock: sinon.SinonStub<[], IExtensionItem[]>;
   let projectView: ProjectView;
 
-  const description: string = '';
+  const description = '';
 
   const options: TLocalProjectOptions = {
     isForked: false,

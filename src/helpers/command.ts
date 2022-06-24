@@ -76,8 +76,8 @@ export async function tryExecuteCommandAsync(
   commands: string,
   ...args: string[]
 ): Promise<ICommandExecute> {
-  let cmdOutput: string = '';
-  let cmdOutputIncludingStderr: string = '';
+  let cmdOutput = '';
+  let cmdOutputIncludingStderr = '';
 
   const childProcess = spawnProcess(workingDirectory, commands, args);
   const result = new Promise((resolve: (res: any) => void, reject: (error: Error) => void): void => {
@@ -156,8 +156,8 @@ export function tryExecuteCommandInForkAsync(
   modulePath: string,
   ...args: string[]
 ): ICommandExecute {
-  let cmdOutput: string = '';
-  let cmdOutputIncludingStderr: string = '';
+  let cmdOutput = '';
+  let cmdOutputIncludingStderr = '';
   const messages: Array<string | object> = [];
   const batches: {[key: string]: string[]} = {};
 

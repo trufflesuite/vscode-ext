@@ -15,10 +15,10 @@ import {
   StringValueInfoValid,
   UintValue,
 } from '@truffle/codec/dist/lib/format/elementary';
-import {ArrayValue, Result} from '@truffle/codec/dist/lib/format/values';
 import * as Exception from '@truffle/codec/dist/lib/format/utils/exception';
-import {relative as pathRelative, sep as pathSep} from 'path';
+import {ArrayValue, Result} from '@truffle/codec/dist/lib/format/values';
 import _ from 'lodash';
+import {relative as pathRelative, sep as pathSep} from 'path';
 
 export function sortFilePaths(filePaths: string[]): string[] {
   return filePaths.sort(comparePaths);
@@ -52,13 +52,11 @@ function getPathsDiff(source: string, diffBy: string) {
 }
 
 export function groupBy(array: any[], key: any) {
-  const groupedArray = array.reduce((acc, curr) => {
+  return array.reduce((acc, curr) => {
     (acc[curr[key]] = acc[curr[key]] || []).push(curr);
 
     return acc;
   }, {});
-
-  return groupedArray;
 }
 
 /**
@@ -131,11 +129,12 @@ function createResult(
 /**
  *
  * @param variable Parse a debug variable and return the formatted value.
+ * @param breaklength Set the length at which the line breaks.
  *
  * If the value can't be transformed then the raw version is returned.
  * @returns the formatted value.
  */
-export function translate(variable: Format.Values.Result, breaklength: number = 20): TranslatedResult {
+export function translate(variable: Format.Values.Result, breaklength = 20): TranslatedResult {
   switch (variable.kind) {
     case 'value':
       if (!_.has(variable, 'type.typeClass')) {

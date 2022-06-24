@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import glob from 'glob';
+import * as path from 'path';
 import {Uri, workspace} from 'vscode';
 import {Constants} from '../Constants';
 import {Telemetry} from '../TelemetryClient';
-import * as path from 'path';
-import glob from 'glob';
 
 export interface TruffleWorkspace {
   dirName: string;
@@ -13,7 +13,7 @@ export interface TruffleWorkspace {
   truffleConfig: Uri;
 }
 
-export function getWorkspaceRoot(ignoreException: boolean = false): string | undefined {
+export function getWorkspaceRoot(ignoreException = false): string | undefined {
   const workspaceRoot = workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
   if (workspaceRoot === undefined && !ignoreException) {
@@ -56,13 +56,11 @@ async function getWorkspaceFiles(dirPath: string): Promise<TruffleWorkspace[]> {
     ignore: Constants.workspaceIgnoredFolders,
   });
 
-  const truffleWorkSpaces: TruffleWorkspace[] = files.map((file) => {
+  return files.map((file) => {
     return {
       dirName: path.dirname(file).split(path.sep).pop()!.toString(),
       workspace: Uri.parse(path.dirname(file)),
       truffleConfig: Uri.parse(file),
     };
   });
-
-  return truffleWorkSpaces;
 }

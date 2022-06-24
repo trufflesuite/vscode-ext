@@ -19,7 +19,7 @@ export namespace NetworkService {
     provider: Provider | null;
   }
 
-  export async function getNetworkMaps(ignoreUnidentifiedNetworks: boolean = true): Promise<NetworkMap[]> {
+  export async function getNetworkMaps(ignoreUnidentifiedNetworks = true): Promise<NetworkMap[]> {
     const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
     const truffleConfig = new TruffleConfig(truffleConfigPath);
     const truffleNetworks = truffleConfig.getNetworks();
@@ -37,7 +37,7 @@ export namespace NetworkService {
 
   export async function getNetworkMapByNetworkName(
     networkName: string,
-    ignoreUnidentifiedNetworks: boolean = true
+    ignoreUnidentifiedNetworks = true
   ): Promise<NetworkMap | undefined> {
     const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
     const truffleConfig = new TruffleConfig(truffleConfigPath);

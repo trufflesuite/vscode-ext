@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 
 export class TestConstants {
-  public static testError: string = 'TestError';
+  public static testError = 'TestError';
 
-  public static testMnemonic: string = 'test test test test test test test test test test test test';
+  public static testMnemonic = 'test test test test test test test test test test test test';
 
   public static testDialogAnswers: string[] = [
     'yes',
@@ -31,5 +31,5 @@ export class TestConstants {
     local: 'development',
   };
 
-  public static truffleCommandTestDataFolder: string = 'testData';
+  public static truffleCommandTestDataFolder = 'testData';
 }

@@ -768,7 +768,7 @@ export class Constants {
  * Namespace for common variables used throughout the extension. They must be initialized in the activate() method of extension.ts
  */
 export namespace ext {
-  export const prefix: string = 'truffle-vscode';
+  export const prefix = 'truffle-vscode';
   export let context: ExtensionContext;
   export let outputChannel: IAzExtOutputChannel;
 }

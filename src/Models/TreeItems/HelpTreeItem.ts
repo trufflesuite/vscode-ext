@@ -3,8 +3,8 @@ import {ThemeIcon} from 'vscode';
 import {OpenUrlTreeItem} from './OpenUrlTreeItem';
 
 export class HelpTreeItem extends AzExtParentTreeItem {
-  public label: string = 'help';
-  public contextValue: string = 'help';
+  public label = 'help';
+  public contextValue = 'help';
 
   private values: AzExtTreeItem[];
 

@@ -30,7 +30,7 @@ export class Output {
     ext.prefix
   );
 
-  private static formatMessage(label: string = '', message: string = ''): string {
+  private static formatMessage(label = '', message = ''): string {
     return `${label ? `[${label}] ` : ''}${message}`;
   }
 

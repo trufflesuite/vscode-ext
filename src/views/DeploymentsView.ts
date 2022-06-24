@@ -217,10 +217,10 @@ export class NetworkDeploymentTreeItem extends AzExtParentTreeItem {
 
 // This is the root of the view port.
 export class DeploymentsView extends AzExtParentTreeItem {
-  public static contextValue: string = 'deployments';
+  public static contextValue = 'deployments';
   public contextValue: string = DeploymentsView.contextValue;
-  public label: string = 'Deployments';
-  private pathExists: boolean = false;
+  public label = 'Deployments';
+  private pathExists = false;
   private buildPath: string;
 
   public constructor(private path: string, parent?: AzExtParentTreeItem) {
@@ -297,8 +297,8 @@ const buildContractDeploymentsFromFolder = (path: string): ContractBuildFile[] =
  * @param baseFolder - the base folder we expect the deployments to live in. Doesn't handle mono-repos right now.
  */
 export function registerDeploymentView(
-  viewId: string = 'truffle-vscode.views.deployments',
-  baseFolder: string = 'build/contracts'
+  viewId = 'truffle-vscode.views.deployments',
+  baseFolder = 'build/contracts'
 ): vscode.TreeView<AzExtTreeItem> {
   const root = new DeploymentsView(baseFolder, undefined);
   const treeDataProvider = new AzExtTreeDataProvider(root, `${viewId}.loadMore`);

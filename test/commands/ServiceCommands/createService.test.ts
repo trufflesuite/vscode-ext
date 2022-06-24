@@ -12,7 +12,7 @@ import {ItemType} from '../../../src/Models';
 import {LocalProject, LocalService, TLocalProjectOptions} from '../../../src/Models/TreeItems';
 import {TreeManager} from '../../../src/services';
 
-const description: string = '';
+const description = '';
 
 const options: TLocalProjectOptions = {
   isForked: false,

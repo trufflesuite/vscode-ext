@@ -9,7 +9,7 @@ import {OpenUrlTreeItem} from '../Models/TreeItems/OpenUrlTreeItem';
  * @param viewId the id of the view, defaults
  * @returns The tree view for use/subscribing in the main extension code.
  */
-export function registerHelpView(viewId: string = 'truffle-vscode.views.help'): vscode.TreeView<AzExtTreeItem> {
+export function registerHelpView(viewId = 'truffle-vscode.views.help'): vscode.TreeView<AzExtTreeItem> {
   const helpRoot = new HelpTreeItem(undefined);
   const helpTreeDataProvider = new AzExtTreeDataProvider(helpRoot, 'truffle-vscode.views.help.loadMore');
   // register the opening command.

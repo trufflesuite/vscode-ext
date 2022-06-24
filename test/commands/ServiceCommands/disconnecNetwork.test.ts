@@ -8,7 +8,7 @@ import {LocalProject, TLocalProjectOptions} from '../../../src/Models/TreeItems'
 import {GanacheService, TreeManager} from '../../../src/services';
 import {ProjectView} from '../../../src/ViewItems';
 
-const description: string = '';
+const description = '';
 
 const options: TLocalProjectOptions = {
   isForked: false,

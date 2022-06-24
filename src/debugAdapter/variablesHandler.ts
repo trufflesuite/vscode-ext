@@ -30,9 +30,9 @@ export default class VariablesHandler {
   }
 
   public async getVariableAttributesByVariableRef(variablesReference: number): Promise<DebugProtocol.Variable[]> {
-    let result: DebugProtocol.Variable[] = [];
+    let result: DebugProtocol.Variable[];
     let variables: Record<string, TranslatedResult>;
-    let variablePath: string = '';
+    let variablePath = '';
     switch (variablesReference) {
       case SCOPES.all.ref:
         variables = await this._runtime.variables();

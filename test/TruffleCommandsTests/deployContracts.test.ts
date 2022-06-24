@@ -6,7 +6,7 @@ import path from 'path';
 import sinon, {stub} from 'sinon';
 import uuid from 'uuid';
 import vscode, {Uri} from 'vscode';
-import {TruffleCommands} from '../../src/commands/TruffleCommands';
+import {TruffleCommands} from '../../src/commands';
 import {Constants} from '../../src/Constants';
 import * as helpers from '../../src/helpers';
 import * as requiredHelpers from '../../src/helpers/required';
@@ -27,8 +27,9 @@ import {
 import {GanacheService, TreeManager} from '../../src/services';
 import {TestConstants} from '../TestConstants';
 import {TruffleWorkspace} from '../../src/helpers/workspace';
+
 const {service} = Constants.treeItemData;
-const description: string = '';
+const description = '';
 
 const options: TLocalProjectOptions = {
   isForked: false,

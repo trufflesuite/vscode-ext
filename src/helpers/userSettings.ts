@@ -8,7 +8,7 @@ export async function getConfigurationAsync(key: string): Promise<{defaultValue:
   return {defaultValue, userValue};
 }
 
-export function updateConfigurationAsync(key: string, value: any, isGlobal: boolean = true): Thenable<void> {
+export function updateConfigurationAsync(key: string, value: any, isGlobal = true): Thenable<void> {
   const scope = isGlobal ? ConfigurationTarget.Global : ConfigurationTarget.Workspace;
   return workspace.getConfiguration().update(key, value, scope);
 }

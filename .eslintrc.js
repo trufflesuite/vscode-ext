@@ -57,8 +57,6 @@ module.exports = {
     '@typescript-eslint/no-empty-interface': 'off',
     // FIXME: rework this eventually. Tech-debt
     '@typescript-eslint/no-explicit-any': 'off',
-    // FIXME: rework this eventually. Tech-debt - FIX 1
-    '@typescript-eslint/no-inferrable-types': 'off',
     // FIXME: rework this eventually. Tech-debt
     '@typescript-eslint/no-namespace': 'off',
     // FIXME: rework this eventually. Tech-debt

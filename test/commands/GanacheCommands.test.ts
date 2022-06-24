@@ -16,7 +16,7 @@ import * as GanacheServiceClient from '../../src/services/ganache/GanacheService
 import {ProjectView} from '../../src/ViewItems';
 import {TestConstants} from '../TestConstants';
 
-const description: string = '';
+const description = '';
 
 const options: TLocalProjectOptions = {
   isForked: false,

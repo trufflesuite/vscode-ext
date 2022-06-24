@@ -11,7 +11,7 @@ export async function killPort(port: string | number): Promise<void> {
   return killPid(pid);
 }
 
-export async function killPid(pid: number = NaN): Promise<void> {
+export async function killPid(pid = NaN): Promise<void> {
   if (isNaN(pid)) {
     return;
   }

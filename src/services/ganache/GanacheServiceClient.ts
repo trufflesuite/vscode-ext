@@ -18,7 +18,7 @@ export async function isGanacheServer(port: number | string): Promise<boolean> {
   }
 }
 
-export async function waitGanacheStarted(port: number | string, maxRetries: number = 1): Promise<void> {
+export async function waitGanacheStarted(port: number | string, maxRetries = 1): Promise<void> {
   const retry = async (retries: number) => {
     if (retries < maxRetries) {
       if (await isGanacheServer(port)) {

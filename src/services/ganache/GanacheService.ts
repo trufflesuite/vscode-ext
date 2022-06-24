@@ -72,7 +72,7 @@ export namespace GanacheService {
     return ganacheProcesses[port];
   }
 
-  export async function stopGanacheServer(port: number | string, killOutOfBand: boolean = true): Promise<void> {
+  export async function stopGanacheServer(port: number | string, killOutOfBand = true): Promise<void> {
     return stopGanacheProcess(ganacheProcesses[port], killOutOfBand);
   }
 

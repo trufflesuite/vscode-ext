@@ -32,7 +32,7 @@ export namespace DebuggerTypes {
 
   export class LaunchedEvent implements DebugProtocol.Event {
     public event: string = EVENT_TYPES.launched;
-    public seq: number = 1000;
-    public type: string = 'event';
+    public seq = 1000;
+    public type = 'event';
   }
 }
