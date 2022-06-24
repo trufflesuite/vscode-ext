@@ -458,8 +458,9 @@ async function createNetwork(
 async function deployToNetwork(networkName: string, truffleConfigPath: string): Promise<void> {
   await showIgnorableNotification(Constants.statusBarMessages.deployingContracts(networkName), async () => {
     const workspaceRoot = path.dirname(truffleConfigPath);
-
     await fs.ensureDir(workspaceRoot);
+
+    Output.show();
 
     try {
       await installRequiredDependencies();
@@ -473,6 +474,7 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
         "--network",
         networkName
       );
+
       Output.outputLine(Constants.outputChannel.truffleForVSCode, Constants.informationMessage.deploySucceeded);
       Telemetry.sendEvent("TruffleCommands.deployToNetwork.deployedSuccessfully", {
         destination: telemetryHelper.mapNetworkName(networkName),
@@ -496,16 +498,12 @@ async function deployToLocalGanache(networkName: string, truffleConfigPath: stri
 
 async function deployToMainNetwork(networkName: string, truffleConfigPath: string): Promise<void> {
   await showConfirmPaidOperationDialog();
-
   await deployToNetwork(networkName, truffleConfigPath);
 }
 
 async function deployToDashboard(truffleConfigPath: string): Promise<void> {
-  Telemetry.sendEvent("TruffleCommands.deployContracts.deployToDashboard.commandStarted");
-
-  console.log(truffleConfigPath);
-
-  DashboardCommands.startDashboardCmd();
+  await DashboardCommands.startDashboardCmd();
+  await deployToNetwork(RequiredApps.dashboard, truffleConfigPath);
 }
 
 async function readCompiledContract(uri: Uri): Promise<any> {

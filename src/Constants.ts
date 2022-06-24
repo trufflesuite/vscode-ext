@@ -238,6 +238,10 @@ export class Constants {
         contextValue: "localnetwork",
         iconPath: {dark: "", light: ""},
       },
+      dashboard: {
+        contextValue: "network",
+        iconPath: {dark: "", light: ""},
+      },
       generic: {
         contextValue: "network",
         iconPath: {dark: "", light: ""},
@@ -268,6 +272,10 @@ export class Constants {
       },
       local: {
         contextValue: "localproject",
+        iconPath: {dark: "", light: ""},
+      },
+      dashboard: {
+        contextValue: "dashboardproject",
         iconPath: {dark: "", light: ""},
       },
       generic: {
@@ -322,6 +330,12 @@ export class Constants {
             networks: {},
           },
         },
+      },
+      dashboard: {
+        contextValue: "service",
+        iconPath: {dark: "", light: ""},
+        label: "Dashboard Service",
+        prefix: "dsh",
       },
       generic: {
         contextValue: "service",
@@ -530,6 +544,9 @@ export class Constants {
     dashboardPortIsBusy: "Cannot start dashboard server, port is busy",
     serverAlreadyRunning: "Dashboard server already running",
     serverSuccessfullyStarted: "Dashboard server successfully started",
+    serverSuccessfullyStopped: "Dashboard server successfully stopped",
+    serverCanNotStop: "Dashboard stop server was failed because is not dashboard application",
+    connectingDashboardServer: "Connecting to Dashboard server",
   };
 
   public static uiCommandStrings = {
@@ -691,6 +708,11 @@ export class Constants {
       light: context.asAbsolutePath(path.join("resources/light", "LocalNetwork.svg")),
     };
 
+    this.treeItemData.network.dashboard.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "LocalNetwork.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "LocalNetwork.svg")),
+    };
+
     this.treeItemData.project.infura.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "InfuraProject.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "InfuraProject.svg")),
@@ -702,6 +724,11 @@ export class Constants {
     };
 
     this.treeItemData.project.generic.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "LocalProject.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "LocalProject.svg")),
+    };
+
+    this.treeItemData.project.dashboard.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "LocalProject.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "LocalProject.svg")),
     };
@@ -724,6 +751,11 @@ export class Constants {
     this.treeItemData.service.generic.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "GenericService.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "GenericService.svg")),
+    };
+
+    this.treeItemData.service.dashboard.iconPath = {
+      dark: context.asAbsolutePath(path.join("resources/dark", "DashboardService.svg")),
+      light: context.asAbsolutePath(path.join("resources/light", "DashboardService.svg")),
     };
   }
 

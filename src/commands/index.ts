@@ -10,3 +10,4 @@ export * from "./ServiceCommands";
 export * from "./TruffleCommands";
 export * from "./SdkCoreCommands";
 export * from "./GenericCommands";
+export * from "./DashboardCommands";

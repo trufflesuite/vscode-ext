@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {QuickPickItem} from "vscode";
-import {Constants} from "../Constants";
+import {Constants, RequiredApps} from "../Constants";
 import {telemetryHelper} from "../helpers";
 import {showInputBox, showQuickPick} from "../helpers/userInteraction";
 import {ItemType} from "../Models";
@@ -17,9 +17,15 @@ import {
   TLocalProjectOptions,
   GenericProject,
   GenericService,
+  DashboardProject,
 } from "../Models/TreeItems";
-import {InfuraResourceExplorer, LocalResourceExplorer, GenericResourceExplorer} from "../resourceExplorers";
-import {GanacheService, TreeManager} from "../services";
+import {
+  InfuraResourceExplorer,
+  LocalResourceExplorer,
+  GenericResourceExplorer,
+  DashboardResourceExplorer,
+} from "../resourceExplorers";
+import {GanacheService, DashboardService, TreeManager} from "../services";
 import {Telemetry} from "../TelemetryClient";
 import {ProjectView} from "../ViewItems";
 
@@ -55,6 +61,11 @@ export namespace ServiceCommands {
         cmd: createInfuraProject,
         itemType: ItemType.INFURA_SERVICE,
         label: Constants.treeItemData.service.infura.label,
+      },
+      {
+        cmd: createDashboardProject,
+        itemType: ItemType.DASHBOARD_SERVICE,
+        label: Constants.treeItemData.service.dashboard.label,
       },
     ];
 
@@ -95,9 +106,9 @@ export namespace ServiceCommands {
 
     return project;
   }
-
   export async function disconnectProject(viewItem: ProjectView): Promise<void> {
     Telemetry.sendEvent("ServiceCommands.disconnectProject.commandStarted");
+
     if (viewItem.extensionItem instanceof LocalProject) {
       Telemetry.sendEvent("ServiceCommands.disconnectProject.LocalNetworkSelected");
       const port = viewItem.extensionItem.port;
@@ -105,6 +116,16 @@ export namespace ServiceCommands {
       if (port) {
         Telemetry.sendEvent("ServiceCommands.disconnectProject.stopGanacheServer");
         await GanacheService.stopGanacheServer(port);
+      }
+    }
+
+    if (viewItem.extensionItem instanceof DashboardProject) {
+      Telemetry.sendEvent("ServiceCommands.disconnectProject.DashboardNetworkSelected");
+      const port = viewItem.extensionItem.port;
+
+      if (port) {
+        Telemetry.sendEvent("ServiceCommands.disconnectProject.stopDashboardServer");
+        await DashboardService.stopDashboardServer(port);
       }
     }
 
@@ -189,6 +210,19 @@ async function connectLocalProject(service: LocalService): Promise<LocalProject>
   return localResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service), options);
 }
 
+// ------------ GENERIC ------------ //
+async function connectGenericProject(service: GenericService): Promise<GenericProject> {
+  const genericResourceExplorer = new GenericResourceExplorer();
+  return genericResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
+}
+
+// ------------ DASHBOARD ------------ //
+async function createDashboardProject(): Promise<DashboardProject> {
+  const dashboardResourceExplorer = new DashboardResourceExplorer();
+  return dashboardResourceExplorer.createDashboardProject(RequiredApps.dashboard, Constants.dashboardPort);
+}
+
+// ------------ COMMON ------------ //
 async function getExistingNames(service: LocalService): Promise<string[]> {
   const localProjects = service.getChildren() as LocalProject[];
   return localProjects.map((item) => item.label);
@@ -290,11 +324,6 @@ async function loadServiceType(): Promise<TServiceType[]> {
   ];
 
   return networks;
-}
-// ------------ GENERIC ------------ //
-async function connectGenericProject(service: GenericService): Promise<GenericProject> {
-  const genericResourceExplorer = new GenericResourceExplorer();
-  return genericResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
 }
 
 async function addChild(service: Service, child: Project): Promise<void> {

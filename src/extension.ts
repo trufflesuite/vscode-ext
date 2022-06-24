@@ -12,6 +12,7 @@ import {
   ServiceCommands,
   TruffleCommands,
   GenericCommands,
+  DashboardCommands,
 } from "./commands";
 import {Constants, ext} from "./Constants";
 
@@ -29,9 +30,11 @@ import {
   MnemonicRepository,
   TreeManager,
   TreeService,
+  DashboardService,
 } from "./services";
 import {Telemetry} from "./TelemetryClient";
 import {NetworkNodeView, ProjectView} from "./ViewItems";
+import {registerDashboardView} from "./views/DashboardView";
 import {registerDeploymentView} from "./views/DeploymentsView";
 import {registerFileExplorerView} from "./views/fileExplorer";
 import {registerHelpView} from "./views/HelpView";
@@ -125,6 +128,22 @@ export async function activate(context: ExtensionContext) {
   );
   //#endregion
 
+  //#region Dashboard extension commands
+  const startDashboardServer = commands.registerCommand("truffle-vscode.startDashboardServer", async () => {
+    await tryExecute(() => DashboardCommands.startDashboardCmd());
+  });
+
+  const stopDashboardServer = commands.registerCommand("truffle-vscode.stopDashboardServer", async () => {
+    await tryExecute(() => DashboardCommands.stopDashboardCmd());
+  });
+
+  const resartDashboardServer = commands.registerCommand("truffle-vscode.restartDashboardServer", async () => {
+    await tryExecute(() => DashboardCommands.stopDashboardCmd()).then(() =>
+      tryExecute(() => DashboardCommands.startDashboardCmd())
+    );
+  });
+  //#endregion
+
   //#region truffle commands
   const newSolidityProject = commands.registerCommand("truffle-vscode.newSolidityProject", async () => {
     await tryExecute(() => ProjectCommands.newSolidityProject());
@@ -205,6 +224,7 @@ export async function activate(context: ExtensionContext) {
   const helpView = registerHelpView();
 
   const deploymentView = registerDeploymentView();
+  const dashboardView = registerDashboardView();
 
   // #endregion
 
@@ -226,6 +246,9 @@ export async function activate(context: ExtensionContext) {
     startGanacheServer,
     stopGanacheServer,
     resartGanacheServer,
+    startDashboardServer,
+    stopDashboardServer,
+    resartDashboardServer,
     getPrivateKeyFromMnemonic,
     signInToInfuraAccount,
     signOutOfInfuraAccount,
@@ -235,6 +258,7 @@ export async function activate(context: ExtensionContext) {
     fileExplorerView,
     helpView,
     deploymentView,
+    dashboardView,
     checkForConnection,
   ];
   context.subscriptions.push(...subscriptions);
@@ -248,6 +272,7 @@ export async function deactivate(): Promise<void> {
   // Therefore, please, call important dispose functions first and don't use await
   // For more information see https://github.com/Microsoft/vscode/issues/47881
   GanacheService.dispose();
+  DashboardService.dispose();
   ContractDB.dispose();
   Telemetry.dispose();
   TreeManager.dispose();

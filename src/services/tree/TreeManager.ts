@@ -10,6 +10,7 @@ import {
   InfuraService,
   LocalService,
   GenericService,
+  DashboardService,
   Service,
   ServiceTypes,
 } from "../../Models/TreeItems";
@@ -102,7 +103,12 @@ class ExtensionTreeManager {
       genericService = new GenericService();
     }
 
-    return [infuraService, localService, genericService];
+    let dashboardService = items.find((item) => item instanceof DashboardService);
+    if (!dashboardService) {
+      dashboardService = new DashboardService();
+    }
+
+    return [infuraService, localService, genericService, dashboardService];
   }
 }
 

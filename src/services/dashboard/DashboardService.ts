@@ -94,12 +94,12 @@ export namespace DashboardService {
     const output = window.createOutputChannel(`${Constants.outputChannel.dashboardCommands}:${port}`);
     const dashboardProcess = {port, process, output} as IDashboardProcess;
 
-    output.show(true);
-
     try {
       addAllListeners(output, port, process);
       await waitDashboardStarted(port, Constants.dashboardRetryAttempts);
       dashboardProcess.pid = await findPid(port);
+
+      window.showInformationMessage(Constants.dashboardCommandStrings.serverSuccessfullyStarted);
     } catch (error) {
       Telemetry.sendException(error as Error);
       await stopDashboardProcess(dashboardProcess, true);

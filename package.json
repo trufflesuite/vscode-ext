@@ -58,6 +58,11 @@
     "onCommand:truffle-vscode.stopGanacheServer",
     "onCommand:truffle-vscode.views.explorer.refreshExplorer",
     "onCommand:truffle-vscode.views.deployments.refresh",
+    "onCommand:truffle-vscode.views.dashboard.startDashboardServer",
+    "onCommand:truffle-vscode.views.dashboard.stopDashboardServer",
+    "onCommand:truffle-vscode.views.dashboard.restartDashboardServer",
+    "onCommand:truffle-vscode.views.dashboard.copyRPCEndpointAddress",
+    "onCommand:truffle-vscode.views.dashboard.copyRPCEndpointAddress",
     "onDebug"
   ],
   "contributes": {
@@ -161,6 +166,21 @@
         "title": "Restart Ganache",
         "category": "Blockchain"
       },
+      {
+        "command": "truffle-vscode.startDashboardServer",
+        "title": "Start Dashboard",
+        "category": "Blockchain"
+      },
+      {
+        "command": "truffle-vscode.stopDashboardServer",
+        "title": "Stop Dashboard",
+        "category": "Blockchain"
+      },
+      {
+        "command": "truffle-vscode.restartDashboardServer",
+        "title": "Restart Dashboard",
+        "category": "Blockchain"
+      },         
       {
         "command": "truffle-vscode.signInToInfuraAccount",
         "title": "Sign in to Infura account",
@@ -299,7 +319,27 @@
         "title": "Refresh Deployments",
         "category": "Truffle",
         "icon": "$(refresh)"
-      }
+      },
+      {
+        "command": "truffle-vscode.views.dashboard.startDashboardServer",
+        "title": "Start Dashboard",
+        "category": "Truffle"
+      },
+      {
+        "command": "truffle-vscode.views.dashboard.stopDashboardServer",
+        "title": "Stop Dashboard",
+        "category": "Truffle"
+      },
+      {
+        "command": "truffle-vscode.views.dashboard.restartDashboardServer",
+        "title": "Restart Dashboard",
+        "category": "Truffle"
+      },
+      {
+        "command": "truffle-vscode.views.dashboard.copyRPCEndpointAddress",
+        "title": "Copy RPC Endpoint Address",
+        "category": "Truffle"
+      }          
     ],
     "breakpoints": [
       {
@@ -381,7 +421,7 @@
           "command": "truffle-vscode.views.deployments.refresh",
           "when": "view == truffle-vscode.views.deployments",
           "group": "navigation"
-        }
+        }       
       ],
       "view/item/context": [
         {
@@ -443,7 +483,47 @@
           "command": "truffle-vscode.checkForConnection",
           "when": "view == truffle-vscode.truffle && viewItem == genericproject",
           "group": "truffle-1@0"
-        }
+        },
+        {
+          "command": "truffle-vscode.startDashboardServer",
+          "when": "view == truffle-vscode.truffle && viewItem == dashboardproject",
+          "group": "truffle-1@0"
+        },
+        {
+          "command": "truffle-vscode.stopDashboardServer",
+          "when": "view == truffle-vscode.truffle && viewItem == dashboardproject",
+          "group": "truffle-1@1"
+        },
+        {
+          "command": "truffle-vscode.restartDashboardServer",
+          "when": "view == truffle-vscode.truffle && viewItem == dashboardproject",
+          "group": "truffle-1@2"
+        },
+        {
+          "command": "truffle-vscode.disconnectProject",
+          "when": "view == truffle-vscode.truffle && viewItem == dashboardproject",
+          "group": "truffle-0@0"
+        },
+        {
+          "command": "truffle-vscode.views.dashboard.startDashboardServer",
+          "when": "view == truffle-vscode.views.dashboard",
+          "group": "truffle-0@0"
+        },
+        {
+          "command": "truffle-vscode.views.dashboard.stopDashboardServer",
+          "when": "view == truffle-vscode.views.dashboard",
+          "group": "truffle-0@1"
+        },
+        {
+          "command": "truffle-vscode.views.dashboard.restartDashboardServer",
+          "when": "view == truffle-vscode.views.dashboard",
+          "group": "truffle-0@2"
+        },
+        {
+          "command": "truffle-vscode.views.dashboard.copyRPCEndpointAddress",
+          "when": "view == truffle-vscode.views.dashboard",
+          "group": "truffle-1@0"
+        }      
       ],
       "explorer/context": [
         {
@@ -494,6 +574,10 @@
           "id": "truffle-vscode.views.explorer",
           "name": "Explorer - Truffle"
         },
+        {
+          "id": "truffle-vscode.views.dashboard",
+          "name": "Dashboard"
+        },        
         {
           "id": "truffle-vscode.truffle",
           "name": "Networks",
