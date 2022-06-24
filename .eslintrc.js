@@ -21,11 +21,6 @@ module.exports = {
   },
   plugins: ["@typescript-eslint", "prettier"],
   rules: {
-    // TODO: ADD THIS IN SOON - 2
-    indent: ["error", 2],
-
-    "linebreak-style": ["error", "unix"],
-
     // TODO: move to forced single quotes.
     // quotes: [
     //   'error',

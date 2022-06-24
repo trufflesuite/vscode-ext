@@ -612,6 +612,7 @@
     "copyFiles": "copyfiles -V -f ./src/debugAdapter/web3ProviderResolver.js ./src/helpers/checkTruffleConfigTemplate.js ./out/src/ ",
     "watch:tsc": "tsc-watch --onCompilationComplete \"npm run copyFiles\" ",
     "watch": "npm run watch:tsc",
+    "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "eslint": "eslint src/* test/*",
     "eslint:fix": "eslint --fix src/* test/*",

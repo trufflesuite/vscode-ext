@@ -323,7 +323,7 @@ export class Constants {
   };
 
   public static validationRegexps = {
-    array: /^\[.*\]$/g,
+    array: /^\[.*]$/g,
     forbiddenChars: {
       dotAtTheEnd: /^(?=.*[.]$).*$/g,
       networkName: /[^0-9a-z]/g,
@@ -342,8 +342,8 @@ export class Constants {
 
     port: /^([1-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/,
     types: {
-      simpleArray: /\w+\[\]/g,
-      simpleMapping: /^\[.+\]$/g,
+      simpleArray: /\w+\[]/g,
+      simpleMapping: /^\[.+]$/g,
       solidityAddress: /^(0x)[a-zA-Z0-9]{40}$/g,
       solidityInt: /^int\d+$/g,
       solidityInteger: /u*int\d*/g,
@@ -737,6 +737,7 @@ export class Constants {
   private static getMessageInputHasUnresolvedSymbols(unresolvedSymbols: string): string {
     return `Input value must not have '${unresolvedSymbols}'.`;
   }
+
   private static getNetworkIsNotReadyMessage(itemType: string) {
     switch (itemType) {
       default:
