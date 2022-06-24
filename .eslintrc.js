@@ -62,14 +62,13 @@ module.exports = {
     // FIXME: rework this eventually. Tech-debt
     '@typescript-eslint/no-non-null-assertion': 'off',
 
+    // We can ignore vars in overridden methods with this rule.
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
 
-    '@typescript-eslint/no-use-before-define': 'off',
     // FIXME: rework this eventually. Tech-debt
     '@typescript-eslint/no-var-requires': 'off',
-    // FIXME: rework this eventually. Tech-debt
-    '@typescript-eslint/prefer-namespace-keyword': 'off',
+
     '@typescript-eslint/triple-slash-reference': [
       'warn',
       {
