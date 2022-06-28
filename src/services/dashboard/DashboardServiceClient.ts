@@ -21,7 +21,7 @@ export async function waitDashboardStarted(port: number | string, maxRetries: nu
       if (await isDashboardRunning(port)) {
         return;
       }
-      await new Promise((resolve) => setTimeout(resolve, Constants.ganacheRetryTimeout));
+      await new Promise((resolve) => setTimeout(resolve, Constants.dashboardRetryTimeout));
       await retry(retries + 1);
     } else {
       const error = new Error(Constants.ganacheCommandStrings.cannotStartServer);

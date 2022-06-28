@@ -98,8 +98,6 @@ export namespace DashboardService {
       addAllListeners(output, port, process);
       await waitDashboardStarted(port, Constants.dashboardRetryAttempts);
       dashboardProcess.pid = await findPid(port);
-
-      window.showInformationMessage(Constants.dashboardCommandStrings.serverSuccessfullyStarted);
     } catch (error) {
       Telemetry.sendException(error as Error);
       await stopDashboardProcess(dashboardProcess, true);

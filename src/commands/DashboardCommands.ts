@@ -26,8 +26,16 @@ export namespace DashboardCommands {
         return;
       }
 
-      await DashboardService.startDashboardServer(Constants.dashboardPort);
+      const dashboardProcess = await DashboardService.startDashboardServer(Constants.dashboardPort);
+
+      if (!dashboardProcess.process) {
+        Telemetry.sendEvent("DashboardCommands.startDashboardCmd.serverAlreadyRunning");
+        window.showInformationMessage(Constants.dashboardCommandStrings.serverAlreadyRunning);
+        return;
+      }
+
       Telemetry.sendEvent("DashboardCommands.startDashboardCmd.commandFinished");
+      window.showInformationMessage(Constants.dashboardCommandStrings.serverSuccessfullyStarted);
     });
   }
 
