@@ -16,7 +16,7 @@ import {getWorkspaceRoot} from "../helpers";
 import {MnemonicRepository} from "../services";
 import {Telemetry} from "../TelemetryClient";
 import {tryExecuteCommandInFork} from "./command";
-import {getPathByPlataform} from "./workspace";
+import {getPathByPlatform} from "./workspace";
 
 export namespace TruffleConfiguration {
   const notAllowedSymbols = new RegExp(
@@ -121,7 +121,7 @@ export namespace TruffleConfiguration {
   export let truffleConfigUri: Uri;
 
   export function getTruffleConfigUri(): string {
-    const workspaceRoot = truffleConfigUri ? getPathByPlataform(truffleConfigUri) : getWorkspaceRoot()!;
+    const workspaceRoot = truffleConfigUri ? getPathByPlatform(truffleConfigUri) : getWorkspaceRoot()!;
     const configFilePath = path.join(workspaceRoot, Constants.defaultTruffleConfigFileName);
 
     if (!fs.pathExistsSync(configFilePath)) {

@@ -19,7 +19,7 @@ import {
 import {required} from "../helpers/required";
 
 import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from "../helpers/userInteraction";
-import {getPathByPlataform} from "../helpers/workspace";
+import {getPathByPlatform} from "../helpers/workspace";
 
 import {IDeployDestination, ItemType} from "../Models";
 import {NetworkForContractItem} from "../Models/QuickPickItems";
@@ -72,7 +72,7 @@ export namespace TruffleCommands {
     uri = uri ? convertEntryToUri(uri) : uri;
 
     const workspace = await getWorkspace(uri);
-    const path = getPathByPlataform(workspace);
+    const path = getPathByPlatform(workspace);
 
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
       await outputCommandHelper.executeCommand(path, "npx", RequiredApps.truffle, "compile");
@@ -240,6 +240,16 @@ export namespace TruffleCommands {
       window.showErrorMessage(Constants.errorMessageStrings.InvalidMnemonic);
     }
     Telemetry.sendEvent("TruffleCommands.getPrivateKeyFromMnemonic.commandFinished");
+  }
+  export async function createContract(uri: Uri): Promise<void> {
+    uri = uri ? convertEntryToUri(uri) : uri;
+
+    const workspace = await getWorkspace(uri);
+    const p = getPathByPlatform(workspace);
+
+    const contractPath = path.join(p, "NewContract.sol");
+    window.showInformationMessage(contractPath);
+    await fs.createFile(contractPath);
   }
 }
 
