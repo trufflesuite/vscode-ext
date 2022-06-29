@@ -29,6 +29,7 @@ import {
   ContractDB,
   ContractInstanceWithMetadata,
   ContractService,
+  DashboardService,
   GanacheService,
   MnemonicRepository,
   TreeManager,
@@ -37,7 +38,6 @@ import {Telemetry} from "../TelemetryClient";
 import {NetworkNodeView} from "../ViewItems";
 import {Entry} from "../views/fileExplorer";
 import {ServiceCommands} from "./ServiceCommands";
-import {DashboardCommands} from "./DashboardCommands";
 
 interface IDeployDestinationItem {
   cmd: () => Promise<void>;
@@ -502,7 +502,7 @@ async function deployToMainNetwork(networkName: string, truffleConfigPath: strin
 }
 
 async function deployToDashboard(truffleConfigPath: string): Promise<void> {
-  await DashboardCommands.startDashboardCmd();
+  await DashboardService.startDashboardServer(Constants.dashboardPort);
   await deployToNetwork(RequiredApps.dashboard, truffleConfigPath);
 }
 
