@@ -555,13 +555,13 @@
 					"name": "Explorer - Truffle"
 				},
 				{
-					"id": "truffle-vscode.views.dashboard",
-					"name": "Dashboard"
-				},
-				{
 					"id": "truffle-vscode.truffle",
 					"name": "Networks",
 					"contextualTitle": "List of all known Networks"
+				},				
+				{
+					"id": "truffle-vscode.views.dashboard",
+					"name": "Dashboard"
 				},
 				{
 					"id": "truffle-vscode.views.deployments",
