@@ -58,7 +58,7 @@ export namespace DashboardService {
 
     if (portStatus === PortStatus.RUNNING) {
       const pid = await findPid(port);
-      dashboardProcesses[port] = {pid, port};
+      dashboardProcesses[port] = dashboardProcesses[port] ? dashboardProcesses[port] : {pid, port};
     }
 
     if (portStatus === PortStatus.FREE) {
