@@ -241,6 +241,7 @@ export namespace TruffleCommands {
     }
     Telemetry.sendEvent("TruffleCommands.getPrivateKeyFromMnemonic.commandFinished");
   }
+  
   export async function createContract(uri: Uri): Promise<void> {
     uri = uri ? convertEntryToUri(uri) : uri;
 
@@ -248,7 +249,6 @@ export namespace TruffleCommands {
     const p = getPathByPlatform(workspace);
 
     const contractPath = path.join(p, "NewContract.sol");
-    window.showInformationMessage(contractPath);
     await fs.createFile(contractPath);
   }
 }
