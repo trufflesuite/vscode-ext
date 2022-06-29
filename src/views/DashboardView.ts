@@ -13,6 +13,21 @@ import {DashboardCommands} from "../commands";
 import {Constants} from "../Constants";
 import {vscodeEnvironment} from "../helpers";
 
+class DashboardTreeItem extends TreeItem {
+  constructor(
+    readonly label: string,
+    readonly description: string,
+    readonly iconPath: string | Uri | {light: string | Uri; dark: string | Uri} | ThemeIcon,
+    readonly contextValue: string,
+    readonly children?: DashboardTreeItem[]
+  ) {
+    super(label, children === undefined ? TreeItemCollapsibleState.None : TreeItemCollapsibleState.Expanded);
+    this.description = description;
+    this.iconPath = iconPath;
+    this.contextValue = contextValue;
+  }
+}
+
 class DashboardTreeDataProvider implements TreeDataProvider<DashboardTreeItem> {
   onDidChangeTreeData?: Event<void | DashboardTreeItem | DashboardTreeItem[] | null | undefined> | undefined;
 
@@ -41,25 +56,9 @@ class DashboardTreeDataProvider implements TreeDataProvider<DashboardTreeItem> {
   }
 }
 
-class DashboardTreeItem extends TreeItem {
-  constructor(
-    readonly label: string,
-    readonly description: string,
-    readonly iconPath: string | Uri | {light: string | Uri; dark: string | Uri} | ThemeIcon,
-    readonly contextValue: string,
-    readonly children?: DashboardTreeItem[]
-  ) {
-    super(label, children === undefined ? TreeItemCollapsibleState.None : TreeItemCollapsibleState.Expanded);
-    this.description = description;
-    this.iconPath = iconPath;
-    this.contextValue = contextValue;
-  }
-}
-
 /**
  * Register our dashboard view as:
  *  viewID: "truffle-vscode.views.dashboard"
- *  loadMore: ""truffle-vscode.views.dashboard.loadMore"
  *
  * @param viewId - the viewId - defaults to above.
  */
@@ -80,7 +79,7 @@ export function registerDashboardView(viewId: string = "truffle-vscode.views.das
     vscode.window.showInformationMessage(Constants.informationMessage.rpcEndpointCopiedToClipboard);
   });
 
-  return vscode.window.createTreeView("truffle-vscode.views.dashboard", {
+  return vscode.window.createTreeView(viewId, {
     treeDataProvider: new DashboardTreeDataProvider(),
   });
 }

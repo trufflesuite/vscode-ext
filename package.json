@@ -485,26 +485,6 @@
 					"group": "truffle-1@0"
 				},
 				{
-					"command": "truffle-vscode.startDashboardServer",
-					"when": "view == truffle-vscode.truffle && viewItem == dashboardproject",
-					"group": "truffle-1@0"
-				},
-				{
-					"command": "truffle-vscode.stopDashboardServer",
-					"when": "view == truffle-vscode.truffle && viewItem == dashboardproject",
-					"group": "truffle-1@1"
-				},
-				{
-					"command": "truffle-vscode.restartDashboardServer",
-					"when": "view == truffle-vscode.truffle && viewItem == dashboardproject",
-					"group": "truffle-1@2"
-				},
-				{
-					"command": "truffle-vscode.disconnectProject",
-					"when": "view == truffle-vscode.truffle && viewItem == dashboardproject",
-					"group": "truffle-0@0"
-				},
-				{
 					"command": "truffle-vscode.views.dashboard.startDashboardServer",
 					"when": "view == truffle-vscode.views.dashboard",
 					"group": "truffle-0@0"
