@@ -26,7 +26,6 @@ import {
 } from "../../src/Models/TreeItems";
 import {GanacheService, TreeManager} from "../../src/services";
 import {TestConstants} from "../TestConstants";
-import {TruffleWorkspace} from "../../src/helpers/workspace";
 const {service} = Constants.treeItemData;
 const description: string = "";
 
@@ -37,14 +36,7 @@ const options: TLocalProjectOptions = {
   url: "",
 };
 
-const root: Uri = Uri.parse(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-const truffleWorkspace: TruffleWorkspace[] = [
-  {
-    dirName: "xpto",
-    workspace: root,
-    truffleConfig: Uri.parse(`${root.fsPath}/truffle-config.js`),
-  },
-];
+const truffleWorkspace: Uri = Uri.parse(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
 
 describe("TruffleCommands", () => {
   describe("Integration test", async () => {

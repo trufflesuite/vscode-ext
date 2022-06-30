@@ -2,25 +2,35 @@
 // Licensed under the MIT license.
 
 import assert from "assert";
+import path from "path";
 import sinon from "sinon";
-import {debug, QuickPickItem, workspace} from "vscode";
+import {debug, QuickPickItem, Uri, workspace} from "vscode";
 
 import {DebugNetwork} from "../../src/debugAdapter/debugNetwork";
 import {ITransactionResponse} from "../../src/debugAdapter/models/ITransactionResponse";
 import {TransactionProvider} from "../../src/debugAdapter/transaction/transactionProvider";
 
 import * as userInteraction from "../../src/helpers/userInteraction";
+import {TestConstants} from "../TestConstants";
+
+import * as helpers from "../../src/helpers";
+
+const truffleWorkspace: Uri = Uri.parse(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
 
 describe("DebuggerCommands unit tests", () => {
   let mockGetTxHashes: sinon.SinonStub<[(number | undefined)?], Promise<string[]>>;
   let mockGetTxInfos: sinon.SinonStub<[string[]], Promise<ITransactionResponse[]>>;
   let debugCommands: any;
+  let getWorkspacesMock: any;
 
   beforeEach(() => {
     mockGetTxHashes = sinon.stub(TransactionProvider.prototype, "getLastTransactionHashes");
     mockGetTxHashes.resolves([]);
     mockGetTxInfos = sinon.stub(TransactionProvider.prototype, "getTransactionsInfo");
     mockGetTxInfos.resolves([]);
+
+    getWorkspacesMock = sinon.stub(helpers, "getWorkspace");
+    getWorkspacesMock.returns(truffleWorkspace);
 
     sinon.stub(debug, "startDebugging").resolves();
     sinon.stub(workspace, "workspaceFolders").value([{uri: {fsPath: "workspace"}}]);
