@@ -7,12 +7,12 @@ import path from 'path';
 import sinon from 'sinon';
 import vscode, {CancellationToken, QuickPickItem, QuickPickOptions} from 'vscode';
 import {window} from 'vscode';
-import {TruffleCommands} from '../../src/commands/TruffleCommands';
-import {Constants} from '../../src/Constants';
+import {TruffleCommands} from '@/commands';
+import {Constants} from '@/Constants';
 import {vscodeEnvironment} from '../../src/helpers';
-import {EnumStorage} from '../../src/Models';
-import {ContractDB, ContractInstanceWithMetadata, ContractService} from '../../src/services';
-import {Contract} from '../../src/services/contract/Contract';
+import {EnumStorage} from '@/Models';
+import {ContractDB, ContractInstanceWithMetadata, ContractService} from '@/services';
+import {Contract} from '@/services/contract/Contract';
 
 describe('TruffleCommands - Write To Buffer', () => {
   const fileUri = {
@@ -97,12 +97,10 @@ describe('TruffleCommands - Write To Buffer', () => {
         .stub(window, 'showQuickPick')
         .callsFake(async function showQuickPick(
           items: readonly QuickPickItem[] | Thenable<readonly QuickPickItem[]>,
-          options?: QuickPickOptions,
-          token?: CancellationToken
+          _options?: QuickPickOptions,
+          _token?: CancellationToken
         ) {
-          console.log('fake Quickpick', {items, options, token});
           if (items instanceof Array) {
-            console.log('returning somethings', {items});
             return items.find((arg: any) => arg.label === selectedNetworkName);
           }
           //

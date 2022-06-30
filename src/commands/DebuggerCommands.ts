@@ -3,13 +3,13 @@
 
 import path from 'path';
 import {debug, DebugConfiguration, QuickPickItem, workspace, WorkspaceFolder} from 'vscode';
-import {DEBUG_TYPE} from '../debugAdapter/constants/debugAdapter';
-import {DebugNetwork} from '../debugAdapter/debugNetwork';
-import {shortenHash} from '../debugAdapter/functions';
-import {TransactionProvider} from '../debugAdapter/transaction/transactionProvider';
-import {Web3Wrapper} from '../debugAdapter/web3Wrapper';
-import {showInputBox, showQuickPick} from '../helpers/userInteraction';
-import {Telemetry} from '../TelemetryClient';
+import {DEBUG_TYPE} from '@/debugAdapter/constants/debugAdapter';
+import {DebugNetwork} from '@/debugAdapter/debugNetwork';
+import {shortenHash} from '@/debugAdapter/functions';
+import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvider';
+import {Web3Wrapper} from '@/debugAdapter/web3Wrapper';
+import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
+import {Telemetry} from '@/TelemetryClient';
 
 export namespace DebuggerCommands {
   export async function startSolidityDebugger() {
@@ -21,9 +21,6 @@ export namespace DebuggerCommands {
     const debugNetwork = new DebugNetwork(workingDirectory);
     await debugNetwork.load();
     const contractBuildDir = debugNetwork.getTruffleConfiguration()!.contracts_build_directory;
-    // const buildDir = debugNetwork.getTruffleConfiguration()!.build_directory;
-    // TODO: here we need to work on the build. see if our fancy dan output is present.
-    // console.log("Build config:", {buildDir, contractBuildDir, truffleConfig: debugNetwork.getTruffleConfiguration()});
 
     const debugNetworkOptions = debugNetwork.getNetwork()!.options;
     const web3 = new Web3Wrapper(debugNetworkOptions);

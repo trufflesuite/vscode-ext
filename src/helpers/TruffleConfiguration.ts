@@ -1,5 +1,4 @@
 import {Constants} from '@/Constants';
-import {tryExecuteCommandInFork} from '@/debugAdapter/cmdCommandExecutor';
 import {MnemonicRepository} from '@/services';
 import {Telemetry} from '@/TelemetryClient';
 import * as acorn from 'acorn';
@@ -12,7 +11,7 @@ import ESTree from 'estree';
 import fs from 'fs-extra';
 import path from 'path';
 import {Uri} from 'vscode';
-import {ICommandResult} from './command';
+import {ICommandResult, tryExecuteCommandInFork} from './command';
 import {IConfiguration, INetwork, INetworkOption, IProvider, notAllowedSymbols} from './ConfigurationReader';
 import {getWorkspaceRoot} from './index';
 import {getPathByPlataform} from './workspace';
@@ -119,7 +118,7 @@ const generateVariableDeclaration = (
         type: 'Identifier',
       },
       init: {
-        optional: true,
+        optional: false,
         arguments: [
           {
             raw: `'${loaderArg}'`,
@@ -531,7 +530,6 @@ export class TruffleConfig {
   }
 
   public async getConfiguration(workingDirectory?: string): Promise<IConfiguration> {
-    // TODO: is this the inflection point? Between both versions?
     const truffleConfig = await getTruffleMetadata(workingDirectory);
 
     if (truffleConfig) {

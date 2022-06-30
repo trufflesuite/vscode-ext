@@ -262,7 +262,6 @@ describe('getConfiguration() in class TruffleConfig', () => {
 
     // Act
     const result = await truffleConfig.getConfiguration();
-
     // Assert
     assert.strictEqual(
       result.contracts_build_directory,

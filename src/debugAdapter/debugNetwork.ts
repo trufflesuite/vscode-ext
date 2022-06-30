@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {executeCommand} from '@/helpers/command';
 import path from 'path';
-import {IConfiguration, INetwork} from '../helpers/ConfigurationReader';
-import {TruffleConfig} from '../helpers/TruffleConfiguration';
-import {executeCommand} from './cmdCommandExecutor';
+import {IConfiguration, INetwork} from '@/helpers/ConfigurationReader';
+import {TruffleConfig} from '@/helpers/TruffleConfiguration';
 import {TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE, TRUFFLE_CONFIG_NAME} from './constants/truffleConfig';
 
 export class DebugNetwork {
@@ -53,7 +53,7 @@ export class DebugNetwork {
   private async loadNetworkForDebug(): Promise<INetwork> {
     const networks = this._basedConfig!.getNetworks();
     const networkForDebug = networks.find((n) => n.name === TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE);
-    if (!this.isNetworkForDebugValid(networkForDebug)) {
+    if (!DebugNetwork.isNetworkForDebugValid(networkForDebug)) {
       const provider = await this.getProviderByResolvingConfig(TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE);
       if (provider.url) {
         networkForDebug!.options.provider = {
@@ -69,7 +69,7 @@ export class DebugNetwork {
     return networkForDebug!;
   }
 
-  private isNetworkForDebugValid(networkForDebug: INetwork | undefined): boolean {
+  private static isNetworkForDebugValid(networkForDebug: INetwork | undefined): boolean {
     if (!networkForDebug || !networkForDebug.options) {
       throw new Error(`No ${TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE} network in the truffle config`);
     }
