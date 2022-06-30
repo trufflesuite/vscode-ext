@@ -1,3 +1,7 @@
+import {Constants} from '@/Constants';
+import {tryExecuteCommandInFork} from '@/debugAdapter/cmdCommandExecutor';
+import {MnemonicRepository} from '@/services';
+import {Telemetry} from '@/TelemetryClient';
 import * as acorn from 'acorn';
 import {Node} from 'acorn';
 import * as walk from 'acorn-walk';
@@ -8,14 +12,10 @@ import ESTree from 'estree';
 import fs from 'fs-extra';
 import path from 'path';
 import {Uri} from 'vscode';
-import {IConfiguration, INetwork, INetworkOption, IProvider, notAllowedSymbols} from './ConfigurationReader';
-import {Constants} from '@/Constants';
-import {tryExecuteCommandInFork} from '@/debugAdapter/cmdCommandExecutor';
-import {getWorkspaceRoot} from './index';
 import {ICommandResult} from './command';
+import {IConfiguration, INetwork, INetworkOption, IProvider, notAllowedSymbols} from './ConfigurationReader';
+import {getWorkspaceRoot} from './index';
 import {getPathByPlataform} from './workspace';
-import {MnemonicRepository} from '@/services';
-import {Telemetry} from '@/TelemetryClient';
 
 //region Internal Functions
 const isHdWalletProviderDeclaration = (nodeType: string, node: Node): boolean => {
@@ -339,7 +339,7 @@ const astToHDWalletProvider = (node: ESTree.NewExpression): IProvider => {
   // a lot of pulava for the mnemonic if you ask me... use truffle dashboard instead.
   if (mnemonicNode.type === 'Literal' && isMnemonicNode(mnemonicNode)) {
     provider.mnemonic = '' + mnemonicNode.value;
-  } else if (mnemonicNode.type === 'NewExpression') {
+  } else if (mnemonicNode.type === 'NewExpression' || mnemonicNode.type === 'CallExpression') {
     const mnemonicFilePathNode: ESTree.Literal =
       mnemonicNode && mnemonicNode.arguments && (mnemonicNode.arguments[0] as ESTree.Literal);
     if (isMnemonicNode(mnemonicFilePathNode)) {
@@ -479,7 +479,6 @@ export class TruffleConfig {
 
   public getNetworks(): INetwork[] {
     const moduleExports = getModuleExportsObjectExpression(this.ast);
-
     if (moduleExports) {
       Telemetry.sendEvent('TruffleConfig.getNetworks.moduleExports');
       const networksNode = findProperty(moduleExports, 'networks');
@@ -488,7 +487,6 @@ export class TruffleConfig {
         return astToNetworks(networksNode.value);
       }
     }
-
     return [];
   }
 
