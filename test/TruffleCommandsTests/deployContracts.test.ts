@@ -77,7 +77,7 @@ describe("TruffleCommands", () => {
       let executeCommandMock: sinon.SinonExpectation;
 
       beforeEach(async () => {
-        getWorkspacesMock = stub(helpers, "getWorkspaces");
+        getWorkspacesMock = stub(helpers, "getWorkspace");
         getWorkspacesMock.returns(truffleWorkspace);
 
         requiredMock = sinon.mock(requiredHelpers.required);

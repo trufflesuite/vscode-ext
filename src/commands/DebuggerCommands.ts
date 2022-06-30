@@ -2,22 +2,24 @@
 // Licensed under the MIT license.
 
 import path from "path";
-import {debug, DebugConfiguration, QuickPickItem, workspace, WorkspaceFolder} from "vscode";
+import {debug, DebugConfiguration, QuickPickItem, workspace} from "vscode";
 import {DEBUG_TYPE} from "../debugAdapter/constants/debugAdapter";
 import {DebugNetwork} from "../debugAdapter/debugNetwork";
 import {shortenHash} from "../debugAdapter/functions";
 import {TransactionProvider} from "../debugAdapter/transaction/transactionProvider";
 import {Web3Wrapper} from "../debugAdapter/web3Wrapper";
+import {getWorkspace} from "../helpers";
 import {showInputBox, showQuickPick} from "../helpers/userInteraction";
+import {getPathByPlataform} from "../helpers/workspace";
 import {Telemetry} from "../TelemetryClient";
 
 export namespace DebuggerCommands {
   export async function startSolidityDebugger() {
     Telemetry.sendEvent("DebuggerCommands.startSolidityDebugger.commandStarted");
-    const workingDirectory = getWorkingDirectory();
-    if (!workingDirectory) {
-      return;
-    }
+
+    const workspaceUri = await getWorkspace();
+    const workingDirectory = getPathByPlataform(workspaceUri);
+
     const debugNetwork = new DebugNetwork(workingDirectory);
     await debugNetwork.load();
     const contractBuildDir = debugNetwork.getTruffleConfiguration()!.contracts_build_directory;
@@ -29,7 +31,7 @@ export namespace DebuggerCommands {
     const web3 = new Web3Wrapper(debugNetworkOptions);
     const providerUrl = web3.getProviderUrl();
 
-    const workspaceFolder = getRootWorkspace();
+    const workspaceFolder = workspace.getWorkspaceFolder(workspaceUri);
 
     if (debugNetwork.isLocalNetwork()) {
       // if local service then provide last transactions to choose
@@ -69,18 +71,6 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
     const description = generateDescription(txInfo.contractName, txInfo.methodName);
     return {alwaysShow: true, label, description, detail: txInfo.hash} as QuickPickItem;
   });
-}
-
-function getRootWorkspace(): WorkspaceFolder | undefined {
-  if (typeof workspace.workspaceFolders === "undefined" || workspace.workspaceFolders.length === 0) {
-    return undefined;
-  }
-  return workspace.workspaceFolders[0];
-}
-
-function getWorkingDirectory(): string {
-  const wsf = getRootWorkspace();
-  return wsf === undefined ? "" : wsf.uri.fsPath;
 }
 
 function generateDebugAdapterConfig(txHash: string, workingDirectory: string, providerUrl: string): DebugConfiguration {

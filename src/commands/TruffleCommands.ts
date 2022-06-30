@@ -9,7 +9,7 @@ import path from "path";
 import {QuickPickItem, Uri, window, commands} from "vscode";
 import {Constants, RequiredApps} from "../Constants";
 import {
-  getWorkspaces,
+  getWorkspace,
   outputCommandHelper,
   telemetryHelper,
   TruffleConfig,
@@ -36,7 +36,6 @@ import {
 } from "../services";
 import {Telemetry} from "../TelemetryClient";
 import {NetworkNodeView} from "../ViewItems";
-import {Entry} from "../views/fileExplorer";
 import {ServiceCommands} from "./ServiceCommands";
 
 interface IDeployDestinationItem {
@@ -68,14 +67,11 @@ export namespace TruffleCommands {
       return;
     }
 
-    // Workaround for non URI types. In the future, better to use only Uri as pattern
-    uri = uri ? convertEntryToUri(uri) : uri;
-
     const workspace = await getWorkspace(uri);
-    const path = getPathByPlataform(workspace);
+    const contractDirectory = getPathByPlataform(workspace);
 
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
-      await outputCommandHelper.executeCommand(path, "npx", RequiredApps.truffle, "compile");
+      await outputCommandHelper.executeCommand(contractDirectory, "npx", RequiredApps.truffle, "compile");
       Telemetry.sendEvent("TruffleCommands.buildContracts.commandFinished");
     });
   }
@@ -83,12 +79,8 @@ export namespace TruffleCommands {
   export async function deployContracts(uri?: Uri): Promise<void> {
     Telemetry.sendEvent("TruffleCommands.deployContracts.commandStarted");
 
-    // Workaround for non URI types. In the future, better to use only Uri as pattern
-    uri = uri ? convertEntryToUri(uri) : uri;
-
-    TruffleConfiguration.truffleConfigUri = uri
-      ? Uri.parse(path.resolve(path.join(uri!.fsPath, "../..")))
-      : await getWorkspace();
+    const workspace = await getWorkspace(uri);
+    TruffleConfiguration.truffleConfigUri = getPathByPlataform(workspace);
 
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
     const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri);
@@ -490,38 +482,5 @@ function ensureFileIsContractJson(filePath: string) {
     const error = new Error(Constants.errorMessageStrings.InvalidContract);
     Telemetry.sendException(error);
     throw error;
-  }
-}
-
-async function getWorkspace(uri?: Uri): Promise<Uri> {
-  if (uri) return Uri.parse(path.resolve(path.dirname(uri.fsPath)));
-
-  const workspaces = await getWorkspaces();
-
-  if (workspaces.length === 1) return workspaces[0].workspace;
-
-  const folders: QuickPickItem[] = [];
-
-  Array.from(workspaces).forEach((element) => {
-    folders.push({
-      label: element.dirName,
-      detail: process.platform === "win32" ? element.dirName : element.workspace.fsPath,
-    });
-  });
-
-  const command = await showQuickPick(folders, {
-    ignoreFocusOut: true,
-    placeHolder: Constants.placeholders.selectContract,
-  });
-
-  return Uri.parse(command.detail!);
-}
-
-function convertEntryToUri(uri: Uri): Uri {
-  if (uri.fsPath) {
-    return uri;
-  } else {
-    const entry: Entry = JSON.parse(JSON.stringify(uri));
-    return Uri.parse(entry.uri.path);
   }
 }
