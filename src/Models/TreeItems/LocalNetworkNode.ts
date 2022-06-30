@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {INetwork} from '@/helpers/ConfigurationReader';
 import {URL} from 'url';
-import {Constants} from '../../Constants';
-import {TruffleConfiguration} from '../../helpers';
-import {ItemType} from '../ItemType';
+import {Constants} from '@/Constants';
+import {ItemType} from '@/Models';
 import {NetworkNode} from './NetworkNode';
 
 export class LocalNetworkNode extends NetworkNode {
@@ -16,7 +16,7 @@ export class LocalNetworkNode extends NetworkNode {
     this.port = parseInt(this.url.port, 10) || Constants.defaultLocalhostPort;
   }
 
-  public async getTruffleNetwork(): Promise<TruffleConfiguration.INetwork> {
+  public async getTruffleNetwork(): Promise<INetwork> {
     const network = await super.getTruffleNetwork();
 
     network.options.host = this.url.hostname || Constants.localhost;

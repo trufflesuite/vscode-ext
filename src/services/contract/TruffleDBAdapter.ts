@@ -2,19 +2,17 @@
 // Licensed under the MIT license.
 
 import {AbstractAdapter} from './AbstractAdapter';
-import {ContractInstance} from './ContractInstance';
+import {ContractInstance} from '@/services';
 
 export class TruffleDBAdapter extends AbstractAdapter {
   public async initialize(): Promise<void> {
     return;
   }
 
-  // @ts-ignore
   public async getContractInstances(_contractName: string): Promise<ContractInstance[]> {
     throw new Error('Method is not implemented yet');
   }
 
-  // @ts-ignore
   public async getContractInstance(_contractName: string, _instanceId: string): Promise<ContractInstance | undefined> {
     throw new Error('Method is not implemented yet');
   }

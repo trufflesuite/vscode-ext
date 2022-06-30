@@ -2,21 +2,22 @@
 // Licensed under the MIT license.
 
 import path from 'path';
+import {IConfiguration, INetwork} from '../helpers/ConfigurationReader';
+import {TruffleConfig} from '../helpers/TruffleConfiguration';
 import {executeCommand} from './cmdCommandExecutor';
-import {ConfigurationReader} from './configurationReader';
 import {TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE, TRUFFLE_CONFIG_NAME} from './constants/truffleConfig';
 
 export class DebugNetwork {
   public workingDirectory: string;
-  private _basedConfig: ConfigurationReader.TruffleConfig | undefined;
-  private _truffleConfiguration: ConfigurationReader.IConfiguration | undefined;
-  private _networkForDebug: ConfigurationReader.INetwork | undefined;
+  private _basedConfig: TruffleConfig | undefined;
+  private _truffleConfiguration: IConfiguration | undefined;
+  private _networkForDebug: INetwork | undefined;
   constructor(truffleConfigDirectory: string) {
     this.workingDirectory = truffleConfigDirectory;
   }
 
   public async load(): Promise<void> {
-    this._basedConfig = new ConfigurationReader.TruffleConfig(path.join(this.workingDirectory, TRUFFLE_CONFIG_NAME));
+    this._basedConfig = new TruffleConfig(path.join(this.workingDirectory, TRUFFLE_CONFIG_NAME));
     this._truffleConfiguration = await this.loadConfiguration();
     this._networkForDebug = await this.loadNetworkForDebug();
   }
@@ -38,7 +39,7 @@ export class DebugNetwork {
     return !!(options.host && options.port);
   }
 
-  private async loadConfiguration(): Promise<ConfigurationReader.IConfiguration> {
+  private async loadConfiguration(): Promise<IConfiguration> {
     const configuration = await this._basedConfig!.getConfiguration(this.workingDirectory);
 
     return {
@@ -49,7 +50,7 @@ export class DebugNetwork {
     };
   }
 
-  private async loadNetworkForDebug(): Promise<ConfigurationReader.INetwork> {
+  private async loadNetworkForDebug(): Promise<INetwork> {
     const networks = this._basedConfig!.getNetworks();
     const networkForDebug = networks.find((n) => n.name === TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE);
     if (!this.isNetworkForDebugValid(networkForDebug)) {
@@ -68,7 +69,7 @@ export class DebugNetwork {
     return networkForDebug!;
   }
 
-  private isNetworkForDebugValid(networkForDebug: ConfigurationReader.INetwork | undefined): boolean {
+  private isNetworkForDebugValid(networkForDebug: INetwork | undefined): boolean {
     if (!networkForDebug || !networkForDebug.options) {
       throw new Error(`No ${TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE} network in the truffle config`);
     }
@@ -77,12 +78,7 @@ export class DebugNetwork {
       return true;
     }
     // truffle-config helper can read only hdwallet provider
-    const isHdWalletProvider = !!networkForDebug.options.provider;
-    if (isHdWalletProvider) {
-      return true;
-    }
-
-    return false;
+    return !!networkForDebug.options.provider;
   }
 
   private async getProviderByResolvingConfig(network: string) {

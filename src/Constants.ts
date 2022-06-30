@@ -48,6 +48,7 @@ export class Constants {
   };
 
   public static truffleConfigDefaultDirectory = {
+    build_directory: path.join('./', 'build'),
     contracts_build_directory: path.join('./', 'build', 'contracts'),
     contracts_directory: path.join('./', 'contracts'),
     migrations_directory: path.join('./', 'migrations'),

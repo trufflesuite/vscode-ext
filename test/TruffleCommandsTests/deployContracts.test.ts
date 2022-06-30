@@ -1,18 +1,20 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {INetwork} from '@/helpers/ConfigurationReader';
 import assert from 'assert';
 import path from 'path';
 import sinon, {stub} from 'sinon';
 import uuid from 'uuid';
 import vscode, {Uri} from 'vscode';
-import {TruffleCommands} from '../../src/commands';
-import {Constants} from '../../src/Constants';
+import {TruffleCommands} from '@/commands';
+import {Constants} from '@/Constants';
 import * as helpers from '../../src/helpers';
 import * as requiredHelpers from '../../src/helpers/required';
-import {TruffleConfiguration} from '../../src/helpers';
+import * as TruffleConfiguration from '@/helpers/TruffleConfiguration';
+import {TruffleConfig} from '@/helpers/TruffleConfiguration';
 import * as commands from '../../src/helpers/command';
-import {CancellationEvent} from '../../src/Models';
+import {CancellationEvent} from '@/Models';
 import {
   IExtensionItem,
   InfuraNetworkNode,
@@ -23,10 +25,10 @@ import {
   LocalService,
   Service,
   TLocalProjectOptions,
-} from '../../src/Models/TreeItems';
-import {GanacheService, TreeManager} from '../../src/services';
+} from '@/Models/TreeItems';
+import {GanacheService, TreeManager} from '@/services';
 import {TestConstants} from '../TestConstants';
-import {TruffleWorkspace} from '../../src/helpers/workspace';
+import {TruffleWorkspace} from '@/helpers/workspace';
 
 const {service} = Constants.treeItemData;
 const description = '';
@@ -104,8 +106,8 @@ describe('TruffleCommands', () => {
         getItemsMock.returns(servicesItems);
         loadStateMock.returns(servicesItems);
 
-        truffleConfigSetNetworkMock = sinon.stub(TruffleConfiguration.TruffleConfig.prototype, 'setNetworks');
-        truffleConfigGetNetworkMock = sinon.stub(TruffleConfiguration.TruffleConfig.prototype, 'getNetworks');
+        truffleConfigSetNetworkMock = sinon.stub(TruffleConfig.prototype, 'setNetworks');
+        truffleConfigGetNetworkMock = sinon.stub(TruffleConfig.prototype, 'getNetworks');
         truffleConfigGetNetworkMock.returns(getTestTruffleNetworks());
         truffleConfigGenerateMnemonicMock = sinon.stub(TruffleConfiguration, 'generateMnemonic');
         truffleConfigGenerateMnemonicMock.returns(TestConstants.testMnemonic);
@@ -440,8 +442,8 @@ async function createTestServicesItems(): Promise<Service[]> {
   return services;
 }
 
-function getTestTruffleNetworks(): TruffleConfiguration.INetwork[] {
-  const networks: TruffleConfiguration.INetwork[] = [];
+function getTestTruffleNetworks(): INetwork[] {
+  const networks: INetwork[] = [];
 
   networks.push(
     {

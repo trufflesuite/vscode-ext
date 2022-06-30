@@ -2,14 +2,15 @@
 // Licensed under the MIT license.
 
 import assert from 'assert';
+import {generateMnemonic} from 'bip39';
 import fs from 'fs-extra';
 import path from 'path';
 import sinon from 'sinon';
-import {Constants} from '../src/Constants';
-import {TruffleConfiguration} from '../src/helpers';
+import {Constants} from '@/Constants';
 import * as helpers from '../src/helpers';
 import * as commands from '../src/helpers/command';
-import {ICommandResult} from '../src/helpers/command';
+import {ICommandResult} from '@/helpers/command';
+import {getTruffleConfigUri, TruffleConfig, TruffleConstants} from '@/helpers/TruffleConfiguration';
 import * as testData from './testData/truffleConfigTestdata';
 
 describe('TruffleConfiguration helper', () => {
@@ -19,7 +20,7 @@ describe('TruffleConfiguration helper', () => {
 
   it('generateMnemonic should return correct sequence', async () => {
     // Act
-    const result = TruffleConfiguration.generateMnemonic();
+    const result = generateMnemonic();
 
     // Assert
     // 11 spaces + 12 words, 1 word = at least 1 char
@@ -34,8 +35,8 @@ describe('TruffleConfiguration helper', () => {
     const pathExistsStub = sinon.stub(fs, 'pathExistsSync').returns(true);
 
     // Act
-    TruffleConfiguration.truffleConfigUri = null as any;
-    const result = TruffleConfiguration.getTruffleConfigUri();
+    TruffleConstants.truffleConfigUri = null as any;
+    const result = getTruffleConfigUri();
 
     // Assert
     assert.strictEqual(result, referencePath, 'result should be correct uri');
@@ -48,7 +49,7 @@ describe('TruffleConfiguration helper', () => {
     sinon.stub(fs, 'pathExistsSync').returns(false);
 
     // Act and Assert
-    assert.throws(TruffleConfiguration.getTruffleConfigUri);
+    assert.throws(getTruffleConfigUri);
   });
 });
 
@@ -78,7 +79,7 @@ describe('class TruffleConfig', () => {
     // Arrange
 
     // Act
-    const result = new TruffleConfiguration.TruffleConfig(configPathStub).getAST();
+    const result = new TruffleConfig(configPathStub).getAST();
 
     // Assert
     assert.deepEqual(result, testData.referenceAstObject, 'result should be equal to expected result');
@@ -94,7 +95,7 @@ describe('class TruffleConfig', () => {
     // Arrange
 
     // Act
-    const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+    const truffleConfig = new TruffleConfig(configPathStub);
     truffleConfig.getAST();
     truffleConfig.writeAST();
 
@@ -115,7 +116,7 @@ describe('class TruffleConfig', () => {
 
   it('getNetworks should returns correct networks', async () => {
     // Arrange
-    const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+    const truffleConfig = new TruffleConfig(configPathStub);
 
     // Act
     const result = truffleConfig.getNetworks();
@@ -135,7 +136,7 @@ describe('class TruffleConfig', () => {
 
   it('setNetworks should add a network item', async () => {
     // Arrange
-    const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+    const truffleConfig = new TruffleConfig(configPathStub);
     const newNetwork = {
       name: 'newNetworkName',
       options: {
@@ -156,7 +157,7 @@ describe('class TruffleConfig', () => {
 
   it('setNetworks should threw an exception if network already existed', async () => {
     // Arrange
-    const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+    const truffleConfig = new TruffleConfig(configPathStub);
     const newNetwork = {
       name: 'development',
       options: {
@@ -173,7 +174,7 @@ describe('class TruffleConfig', () => {
 
   it('importFs should add correct import line', async () => {
     // Arrange
-    const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+    const truffleConfig = new TruffleConfig(configPathStub);
 
     // Act
     truffleConfig.importPackage('fs', 'fs');
@@ -214,7 +215,7 @@ describe('getConfiguration() in class TruffleConfig', () => {
 
     sinon.stub(commands, 'tryExecuteCommandInFork').returns(Promise.resolve(commandResult));
     readFileStub.returns('');
-    const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+    const truffleConfig = new TruffleConfig(configPathStub);
 
     // Act
     const result = await truffleConfig.getConfiguration();
@@ -257,7 +258,7 @@ describe('getConfiguration() in class TruffleConfig', () => {
 
     sinon.stub(commands, 'tryExecuteCommandInFork').returns(Promise.resolve(commandResult));
     readFileStub.returns('');
-    const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+    const truffleConfig = new TruffleConfig(configPathStub);
 
     // Act
     const result = await truffleConfig.getConfiguration();
@@ -296,7 +297,7 @@ describe('getConfiguration() in class TruffleConfig', () => {
 
     sinon.stub(commands, 'tryExecuteCommandInFork').returns(Promise.resolve(commandResult));
     readFileStub.returns('');
-    const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+    const truffleConfig = new TruffleConfig(configPathStub);
 
     // Act
     const result = await truffleConfig.getConfiguration();
@@ -323,7 +324,7 @@ describe('getConfiguration() in class TruffleConfig', () => {
 
     sinon.stub(commands, 'tryExecuteCommandInFork').returns(Promise.resolve(commandResult));
     readFileStub.returns('');
-    const truffleConfig = new TruffleConfiguration.TruffleConfig(configPathStub);
+    const truffleConfig = new TruffleConfig(configPathStub);
 
     // Act, Assert
     try {

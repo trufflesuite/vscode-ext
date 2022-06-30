@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {INetwork} from '@/helpers/ConfigurationReader';
 import {URL} from 'url';
-import {Constants} from '../../Constants';
-import {TruffleConfiguration} from '../../helpers';
-import {ItemType} from '../ItemType';
+import {Constants} from '@/Constants';
+import {ItemType} from '@/Models';
 import {ExtensionItem, ExtensionItemData} from './ExtensionItem';
 
 const protocolRegExp = new RegExp(
@@ -62,7 +62,7 @@ export abstract class NetworkNode extends ExtensionItem {
     return this.url.pathname === '/' ? this.url.origin : this.url.href;
   }
 
-  public async getTruffleNetwork(): Promise<TruffleConfiguration.INetwork> {
+  public async getTruffleNetwork(): Promise<INetwork> {
     return {
       name: this.label,
       options: {

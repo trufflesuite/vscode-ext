@@ -620,13 +620,13 @@
     "test": "npm run compile && node ./out/test/runTest",
     "clean": "npx rimraf -- ./out/*",
     "postinstall": "husky install",
-    "prepare": "husky install"
+    "prepare": "husky install && ts-patch install -s"
   },
   "devDependencies": {
     "@types/big.js": "^6.1.2",
     "@types/copy-webpack-plugin": "^8.0.1",
     "@types/download": "^6.2.4",
-    "@types/estree": "^0.0.39",
+    "@types/estree": "^0.0.52",
     "@types/fs-extra": "^7.0.0",
     "@types/glob": "^7.1.1",
     "@types/hdkey": "^0.7.0",
@@ -668,8 +668,11 @@
     "sinon": "^7.3.2",
     "truffle": "^5.5.18",
     "ts-loader": "9.3.1",
+    "ts-node": "^10.8.1",
+    "ts-patch": "^2.0.1",
     "tsc-watch": "^5.0.3",
     "typescript": "4.7.4",
+    "typescript-transform-paths": "^3.3.1",
     "webpack": "5.73.0",
     "webpack-cli": "4.10.0",
     "webpack-merge": "^5.8.0"
@@ -682,8 +685,8 @@
     "@truffle/debugger": "^10.0.14",
     "@truffle/resolver": "^9.0.4",
     "abi-decoder": "^2.4.0",
-    "acorn": "^6.1.1",
-    "acorn-walk": "^6.1.1",
+    "acorn": "^8.7.1",
+    "acorn-walk": "^8.2.0",
     "astring": "^1.7.5",
     "bip39": "^3.0.1",
     "download": "^7.1.0",
@@ -698,7 +701,7 @@
     "rimraf": "^3.0.2",
     "semver": "^6.0.0",
     "solidity-parser-antlr": "^0.4.11",
-    "ts-node": "^10.8.1",
+
     "uuid": "^3.3.2",
     "vscode-extension-telemetry": "^0.4.5",
     "web3": "1.7.4"
