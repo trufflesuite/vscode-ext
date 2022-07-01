@@ -623,6 +623,8 @@
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.0.3",
+    "@commitlint/config-conventional": "^17.0.3",
     "@types/big.js": "^6.1.2",
     "@types/copy-webpack-plugin": "^8.0.1",
     "@types/download": "^6.2.4",
