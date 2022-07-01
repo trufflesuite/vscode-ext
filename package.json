@@ -435,6 +435,11 @@
           "group": "truffle-0@1"
         },
         {
+          "command": "truffle-vscode.debugTransaction",
+          "when": "view == truffle-vscode.views.explorer",
+          "group": "truffle-0@2"
+        },
+        {
           "command": "truffle-vscode.disconnectProject",
           "when": "view == truffle-vscode.truffle && viewItem == genericproject",
           "group": "truffle-0@0"
