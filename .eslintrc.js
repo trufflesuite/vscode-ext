@@ -31,23 +31,21 @@ module.exports = {
     // need this as we have a few while(true) loops.
     'no-constant-condition': ['error', {checkLoops: false}],
 
-    // FIXME: rework this eventually. Tech-debt
-    '@typescript-eslint/no-empty-interface': 'off',
-    // FIXME: rework this eventually. Tech-debt
+    // FIXME: rework this eventually. Tech-debt - 200+ warnings right now.
     '@typescript-eslint/no-explicit-any': 'off',
-    // FIXME: rework this eventually. Tech-debt
+    // FIXME: rework this eventually. Tech-debt - 24 Issues. Prob quite complex rework.
     '@typescript-eslint/no-namespace': 'off',
-    // FIXME: rework this eventually. Tech-debt
+    // FIXME: rework this eventually. Tech-debt  - 70 Warnings
     '@typescript-eslint/no-non-null-assertion': 'off',
-    // FIXME: rework this eventually. Tech-debt
+    // FIXME: rework this eventually. Tech-debt - cant enable this - some require code/voodoo hacks.
     '@typescript-eslint/no-var-requires': 'off',
-    // FIXME: rework this eventually. Tech-debt
+    // FIXME: rework this eventually. Tech-debt - 55 Errors
     'no-inner-declarations': 'off',
-    // FIXME: rework this eventually. Tech-debt
+    // FIXME: rework this eventually. Tech-debt - 4 hasOwnProperty Errors
     'no-prototype-builtins': 'off',
-    // FIXME: This needs removed. Tech-Debt
+    // FIXME: This needs removed. Tech-Debt - 1 error for web3 in a voodoo JS script.
     'no-undef': 'off',
-    // FIXME: rework this eventually. Tech-debt
+    // FIXME: rework this eventually. Tech-debt - 3 Errors right now. Fixed in a later commit.
     '@typescript-eslint/ban-ts-comment': 'off',
   },
 };

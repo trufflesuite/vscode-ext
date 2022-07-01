@@ -9,12 +9,10 @@ export class TruffleDBAdapter extends AbstractAdapter {
     return;
   }
 
-  // @ts-ignore
   public async getContractInstances(_contractName: string): Promise<ContractInstance[]> {
     throw new Error('Method is not implemented yet');
   }
 
-  // @ts-ignore
   public async getContractInstance(_contractName: string, _instanceId: string): Promise<ContractInstance | undefined> {
     throw new Error('Method is not implemented yet');
   }
