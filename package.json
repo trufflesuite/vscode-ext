@@ -435,6 +435,11 @@
           "group": "truffle-0@1"
         },
         {
+          "command": "truffle-vscode.debugTransaction",
+          "when": "view == truffle-vscode.views.explorer",
+          "group": "truffle-0@2"
+        },
+        {
           "command": "truffle-vscode.disconnectProject",
           "when": "view == truffle-vscode.truffle && viewItem == genericproject",
           "group": "truffle-0@0"
@@ -623,6 +628,8 @@
     "prepare": "husky install && ts-patch install -s"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.0.3",
+    "@commitlint/config-conventional": "^17.0.3",
     "@types/big.js": "^6.1.2",
     "@types/copy-webpack-plugin": "^8.0.1",
     "@types/download": "^6.2.4",
@@ -701,7 +708,6 @@
     "rimraf": "^3.0.2",
     "semver": "^6.0.0",
     "solidity-parser-antlr": "^0.4.11",
-
     "uuid": "^3.3.2",
     "vscode-extension-telemetry": "^0.4.5",
     "web3": "1.7.4"

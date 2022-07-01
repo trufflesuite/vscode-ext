@@ -39,7 +39,6 @@ export async function showQuickPick<T extends QuickPickItem>(
   items: T[] | Promise<T[]>,
   options: QuickPickOptions
 ): Promise<T> {
-  // console.log('showQuickPick-ours', {items, options, real: window.showQuickPick});
   const result = await window.showQuickPick(items, options);
 
   if (result === undefined) {

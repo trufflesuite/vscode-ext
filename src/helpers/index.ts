@@ -13,7 +13,7 @@ import * as workspaceHelpers from './workspace';
 
 const spawnProcess = outputCommandHelper.spawnProcess;
 const getWorkspaceRoot = workspaceHelpers.getWorkspaceRoot;
-const getWorkspaces = workspaceHelpers.getWorkspaces;
+const getWorkspace = workspaceHelpers.getWorkspace;
 const isWorkspaceOpen = workspaceHelpers.isWorkspaceOpen;
 const CommandContext = commandContext.CommandContext;
 const setCommandContext = commandContext.setCommandContext;
@@ -23,7 +23,7 @@ export {
   extractEnumsInfo,
   extractEnumsInfoSafe,
   getWorkspaceRoot,
-  getWorkspaces,
+  getWorkspace,
   gitHelper,
   isWorkspaceOpen,
   outputCommandHelper,

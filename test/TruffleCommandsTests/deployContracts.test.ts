@@ -28,8 +28,6 @@ import {
 } from '@/Models/TreeItems';
 import {GanacheService, TreeManager} from '@/services';
 import {TestConstants} from '../TestConstants';
-import {TruffleWorkspace} from '@/helpers/workspace';
-
 const {service} = Constants.treeItemData;
 const description = '';
 
@@ -40,14 +38,7 @@ const options: TLocalProjectOptions = {
   url: '',
 };
 
-const root: Uri = Uri.parse(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
-const truffleWorkspace: TruffleWorkspace[] = [
-  {
-    dirName: 'xpto',
-    workspace: root,
-    truffleConfig: Uri.parse(`${root.fsPath}/truffle-config.js`),
-  },
-];
+const truffleWorkspace: Uri = Uri.parse(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
 
 describe('TruffleCommands', () => {
   describe('Integration test', async () => {
@@ -80,7 +71,7 @@ describe('TruffleCommands', () => {
       let executeCommandMock: sinon.SinonExpectation;
 
       beforeEach(async () => {
-        getWorkspacesMock = stub(helpers, 'getWorkspaces');
+        getWorkspacesMock = stub(helpers, 'getWorkspace');
         getWorkspacesMock.returns(truffleWorkspace);
 
         requiredMock = sinon.mock(requiredHelpers.required);

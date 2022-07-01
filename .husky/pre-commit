@@ -4,4 +4,3 @@
 yarn test
 npx eslint src/* test/*
 npx pretty-quick --staged
-git add

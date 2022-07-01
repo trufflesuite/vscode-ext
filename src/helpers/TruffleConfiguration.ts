@@ -14,7 +14,7 @@ import {Uri} from 'vscode';
 import {ICommandResult, tryExecuteCommandInFork} from './command';
 import {IConfiguration, INetwork, INetworkOption, IProvider, notAllowedSymbols} from './ConfigurationReader';
 import {getWorkspaceRoot} from './index';
-import {getPathByPlataform} from './workspace';
+import {getPathByPlatform} from './workspace';
 
 //region Internal Functions
 const isHdWalletProviderDeclaration = (nodeType: string, node: Node): boolean => {
@@ -556,7 +556,7 @@ export class TruffleConstants {
 
 export function getTruffleConfigUri(): string {
   const workspaceRoot = TruffleConstants.truffleConfigUri
-    ? getPathByPlataform(TruffleConstants.truffleConfigUri)
+    ? getPathByPlatform(TruffleConstants.truffleConfigUri)
     : getWorkspaceRoot()!;
   const configFilePath = path.join(workspaceRoot, Constants.defaultTruffleConfigFileName);
   if (!fs.pathExistsSync(configFilePath)) {
