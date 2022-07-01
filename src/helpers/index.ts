@@ -15,7 +15,7 @@ import * as workspaceHelpers from "./workspace";
 
 const spawnProcess = outputCommandHelper.spawnProcess;
 const getWorkspaceRoot = workspaceHelpers.getWorkspaceRoot;
-const getWorkspaces = workspaceHelpers.getWorkspaces;
+const getWorkspace = workspaceHelpers.getWorkspace;
 const isWorkspaceOpen = workspaceHelpers.isWorkspaceOpen;
 const TruffleConfig = TruffleConfiguration.TruffleConfig;
 const CommandContext = commandContext.CommandContext;
@@ -29,7 +29,7 @@ export {
   extractEnumsInfo,
   extractEnumsInfoSafe,
   getWorkspaceRoot,
-  getWorkspaces,
+  getWorkspace,
   gitHelper,
   isWorkspaceOpen,
   outputCommandHelper,

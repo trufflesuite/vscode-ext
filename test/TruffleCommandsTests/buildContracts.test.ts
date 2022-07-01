@@ -34,7 +34,7 @@ describe("BuildContracts Command", () => {
     beforeEach(() => {
       requiredMock = mock(required);
 
-      getWorkspacesMock = stub(helpers, "getWorkspaces");
+      getWorkspacesMock = stub(helpers, "getWorkspace");
       getWorkspacesMock.returns(truffleWorkspace);
 
       checkAppsSilent = requiredMock.expects("checkAppsSilent");
