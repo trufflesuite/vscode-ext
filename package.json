@@ -433,7 +433,7 @@
           "command": "truffle-vscode.deployContracts",
           "when": "view == truffle-vscode.views.explorer",
           "group": "truffle-0@1"
-        }, 
+        },
         {
           "command": "truffle-vscode.debugTransaction",
           "when": "view == truffle-vscode.views.explorer",
@@ -497,7 +497,7 @@
       "truffle-activitybar-container": [
         {
           "id": "truffle-vscode.views.explorer",
-          "name": "Explorer - Truffle"
+          "name": "Contract Explorer"
         },
         {
           "id": "truffle-vscode.truffle",
