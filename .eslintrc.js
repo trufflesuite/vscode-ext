@@ -12,7 +12,7 @@ module.exports = {
     // "plugin:@typescript-eslint/recommended-requiring-type-checking",
     'prettier',
   ],
-  ignorePatterns: ['ui-test/**/*.ts', '.eslintrc.js'],
+  ignorePatterns: ['ui-test/**/*.ts', '.eslintrc.js', 'webpack*.js'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',

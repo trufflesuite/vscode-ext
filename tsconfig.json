@@ -6,16 +6,23 @@
     "lib": ["es6", "dom"],
     "sourceMap": true,
     "resolveJsonModule": true,
+    "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"]
     },
     // Note: To transform paths for both the output .js and .d.ts files, you need both of the below entries
     "plugins": [
       // Transform paths in output .js files
-      { "transform": "typescript-transform-paths" },
-
+      {
+        "transform": "typescript-transform-paths",
+        "exclude": ["**/node_modules/**"]
+      },
       // Transform paths in output .d.ts files (Include this line if you output declarations files)
-      { "transform": "typescript-transform-paths", "afterDeclarations": true }
+      {
+        "transform": "typescript-transform-paths",
+        "afterDeclarations": true,
+        "exclude": ["**/node_modules/**"]
+      }
     ],
     "rootDir": ".",
     "strict": true,
