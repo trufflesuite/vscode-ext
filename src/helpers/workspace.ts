@@ -49,7 +49,7 @@ export function isWorkspaceOpen(): boolean {
   return !!(workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath);
 }
 
-export function getPathByPlataform(workspace: Uri): string {
+export function getPathByPlatform(workspace: Uri): string {
   return process.platform === 'win32' ? `${workspace.scheme}:${workspace.path}` : workspace.fsPath;
 }
 

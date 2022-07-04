@@ -10,7 +10,7 @@ import {TransactionProvider} from '../debugAdapter/transaction/transactionProvid
 import {Web3Wrapper} from '../debugAdapter/web3Wrapper';
 import {getWorkspace} from '../helpers';
 import {showInputBox, showQuickPick} from '../helpers/userInteraction';
-import {getPathByPlataform} from '../helpers/workspace';
+import {getPathByPlatform} from '../helpers/workspace';
 import {Telemetry} from '../TelemetryClient';
 
 export namespace DebuggerCommands {
@@ -18,7 +18,7 @@ export namespace DebuggerCommands {
     Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandStarted');
 
     const workspaceUri = await getWorkspace();
-    const workingDirectory = getPathByPlataform(workspaceUri);
+    const workingDirectory = getPathByPlatform(workspaceUri);
     const debugNetwork = new DebugNetwork(workingDirectory);
     await debugNetwork.load();
     const contractBuildDir = debugNetwork.getTruffleConfiguration()!.contracts_build_directory;

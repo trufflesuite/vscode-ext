@@ -19,7 +19,7 @@ import {
 import {required} from '../helpers/required';
 
 import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from '../helpers/userInteraction';
-import {getPathByPlataform} from '../helpers/workspace';
+import {getPathByPlatform} from '../helpers/workspace';
 
 import {IDeployDestination, ItemType} from '../Models';
 import {NetworkForContractItem} from '../Models/QuickPickItems';
@@ -68,7 +68,7 @@ export namespace TruffleCommands {
     }
 
     const workspace = await getWorkspace(uri);
-    const contractDirectory = getPathByPlataform(workspace);
+    const contractDirectory = getPathByPlatform(workspace);
 
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
       await outputCommandHelper.executeCommand(contractDirectory, 'npx', RequiredApps.truffle, 'compile');
@@ -80,7 +80,7 @@ export namespace TruffleCommands {
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandStarted');
 
     const workspace = await getWorkspace(uri);
-    TruffleConfiguration.truffleConfigUri = getPathByPlataform(workspace);
+    TruffleConfiguration.truffleConfigUri = getPathByPlatform(workspace);
 
     const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
     const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri);
@@ -165,6 +165,13 @@ export namespace TruffleCommands {
     }
 
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
+  }
+
+  export async function createContract(uri: Uri): Promise<void> {
+    const workspace = await getWorkspace(uri);
+    const contractDirectory = getPathByPlatform(workspace);
+
+    await fs.createFile(path.join(contractDirectory, 'contracts', 'NewContract.sol'));
   }
 
   export async function writeRPCEndpointAddressToBuffer(networkNodeView: NetworkNodeView): Promise<void> {
