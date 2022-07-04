@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import requestPromise from "request-promise";
-import {Constants} from "../Constants";
-import {Telemetry} from "../TelemetryClient";
+import requestPromise from 'request-promise';
+import {Constants} from '../Constants';
+import {Telemetry} from '../TelemetryClient';
 
 const requestTimeout = 10000;
 
@@ -18,7 +18,7 @@ export namespace HttpService {
       .post(address, {
         body: {
           id: 1,
-          jsonrpc: "2.0",
+          jsonrpc: '2.0',
           method: methodName,
           params: parameters || [],
         },

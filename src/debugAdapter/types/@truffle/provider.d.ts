@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-declare module "@truffle/provider" {
+declare module '@truffle/provider' {
   interface IProviderOptions {
     provider?: any;
     host?: string;
@@ -9,5 +9,5 @@ declare module "@truffle/provider" {
     websockets?: boolean;
   }
   function create(networkOptions: IProviderOptions): any;
-  export { create };
+  export {create};
 }

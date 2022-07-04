@@ -1,28 +1,28 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import assert from "assert";
-import cp from "child_process";
-import sinon from "sinon";
-import {Constants, RequiredApps} from "../../src/Constants";
-import stream from "stream";
-import {OutputChannel, window} from "vscode";
-import * as outputCommandHelper from "../../src/helpers";
-import * as shell from "../../src/helpers/shell";
-import {DashboardService} from "../../src/services";
-import * as DashboardServiceClient from "../../src/services/dashboard/DashboardServiceClient";
-import {UrlValidator} from "../../src/validators/UrlValidator";
+import assert from 'assert';
+import cp from 'child_process';
+import sinon from 'sinon';
+import {Constants, RequiredApps} from '../../src/Constants';
+import stream from 'stream';
+import {OutputChannel, window} from 'vscode';
+import * as outputCommandHelper from '../../src/helpers';
+import * as shell from '../../src/helpers/shell';
+import {DashboardService} from '../../src/services';
+import * as DashboardServiceClient from '../../src/services/dashboard/DashboardServiceClient';
+import {UrlValidator} from '../../src/validators/UrlValidator';
 
 const defaultPort = Constants.dashboardPort;
 
-describe("Unit tests DashboardService", () => {
+describe('Unit tests DashboardService', () => {
   let streamMock: stream.Readable;
   let processMock: cp.ChildProcess;
   let channel: OutputChannel;
 
   beforeEach(() => {
     streamMock = {
-      on(_event: "data", _listener: (chunk: any) => void): any {
+      on(_event: 'data', _listener: (chunk: any) => void): any {
         /* empty */
       },
       removeAllListeners() {
@@ -30,7 +30,7 @@ describe("Unit tests DashboardService", () => {
       },
     } as stream.Readable;
     processMock = {
-      on(_event: "exit", _listener: (code: number, signal: string) => void): any {
+      on(_event: 'exit', _listener: (code: number, signal: string) => void): any {
         /* empty */
       },
       kill() {
@@ -59,22 +59,22 @@ describe("Unit tests DashboardService", () => {
     sinon.restore();
   });
 
-  ["-1", "qwe", "asd8545", "65536", "70000", 0].forEach((port) => {
+  ['-1', 'qwe', 'asd8545', '65536', '70000', 0].forEach((port) => {
     it(`startDashboardServer should throw an exception if port is invalid(${port})`, async () => {
       // Arrange
-      const urlValidatorSpy = sinon.spy(UrlValidator, "validatePort");
+      const urlValidatorSpy = sinon.spy(UrlValidator, 'validatePort');
       // Act and Assert
       await assert.rejects(DashboardService.startDashboardServer(port));
-      assert.strictEqual(urlValidatorSpy.called, true, "should call url validator");
+      assert.strictEqual(urlValidatorSpy.called, true, 'should call url validator');
     });
   });
 
-  ["1", "65535", "8454", 8000, 8454].forEach((port) => {
+  ['1', '65535', 8000, 8454].forEach((port) => {
     it(`startDashboardServer should pass validation if port is ${port}`, async () => {
       // Arrange
-      const urlValidatorSpy = sinon.spy(UrlValidator, "validatePort");
-      sinon.stub(shell, "findPid").returns(Promise.resolve(312));
-      sinon.stub(DashboardServiceClient, "isDashboardRunning").returns(Promise.resolve(true));
+      const urlValidatorSpy = sinon.spy(UrlValidator, 'validatePort');
+      sinon.stub(shell, 'findPid').returns(Promise.resolve(312));
+      sinon.stub(DashboardServiceClient, 'isDashboardRunning').returns(Promise.resolve(true));
 
       // Act
       const result = await DashboardService.startDashboardServer(port);
@@ -85,22 +85,22 @@ describe("Unit tests DashboardService", () => {
     });
   });
 
-  it("startDashboardServer should throw an exception if port is busy", async () => {
+  it('startDashboardServer should throw an exception if port is busy', async () => {
     // Arrange
-    sinon.stub(shell, "findPid").returns(Promise.resolve(312));
-    sinon.stub(DashboardServiceClient, "isDashboardRunning").returns(Promise.resolve(false));
+    sinon.stub(shell, 'findPid').returns(Promise.resolve(312));
+    sinon.stub(DashboardServiceClient, 'isDashboardRunning').returns(Promise.resolve(false));
 
     // Act and Assert
     await assert.rejects(DashboardService.startDashboardServer(defaultPort));
   });
 
-  it("startDashboardServer should execute cmd if port is valid and free", async () => {
+  it('startDashboardServer should execute cmd if port is valid and free', async () => {
     // Arrange
-    const urlValidatorSpy = sinon.spy(UrlValidator, "validatePort");
-    const spawnStub = sinon.stub(outputCommandHelper, "spawnProcess").returns(processMock as cp.ChildProcess);
-    sinon.stub(shell, "findPid").returns(Promise.resolve(Number.NaN));
-    sinon.stub(window, "createOutputChannel").returns(channel as OutputChannel);
-    sinon.stub(DashboardServiceClient, "waitDashboardStarted");
+    const urlValidatorSpy = sinon.spy(UrlValidator, 'validatePort');
+    const spawnStub = sinon.stub(outputCommandHelper, 'spawnProcess').returns(processMock as cp.ChildProcess);
+    sinon.stub(shell, 'findPid').returns(Promise.resolve(Number.NaN));
+    sinon.stub(window, 'createOutputChannel').returns(channel as OutputChannel);
+    sinon.stub(DashboardServiceClient, 'waitDashboardStarted');
 
     // Act
     await DashboardService.startDashboardServer(defaultPort);
@@ -111,19 +111,19 @@ describe("Unit tests DashboardService", () => {
     assert.strictEqual(spawnStub.getCall(0).args[1], `${RequiredApps.truffle} ${RequiredApps.dashboard}`);
   });
 
-  it("startDashboardServer if server was not started should throw exception and dispose all", async () => {
+  it('startDashboardServer if server was not started should throw exception and dispose all', async () => {
     // Arrange
-    const channelDisposeSpy = sinon.spy(channel, "dispose");
-    const killProcessStub = sinon.stub(processMock, "kill");
-    const processRemoveAllListenersSpy = sinon.spy(processMock, "removeAllListeners");
+    const channelDisposeSpy = sinon.spy(channel, 'dispose');
+    const killProcessStub = sinon.stub(processMock, 'kill');
+    const processRemoveAllListenersSpy = sinon.spy(processMock, 'removeAllListeners');
 
-    sinon.spy(UrlValidator, "validatePort");
-    sinon.stub(shell, "findPid").returns(Promise.resolve(Number.NaN));
-    sinon.stub(outputCommandHelper, "spawnProcess").returns(processMock as cp.ChildProcess);
+    sinon.spy(UrlValidator, 'validatePort');
+    sinon.stub(shell, 'findPid').returns(Promise.resolve(Number.NaN));
+    sinon.stub(outputCommandHelper, 'spawnProcess').returns(processMock as cp.ChildProcess);
     sinon
-      .stub(DashboardServiceClient, "waitDashboardStarted")
+      .stub(DashboardServiceClient, 'waitDashboardStarted')
       .throws(new Error(Constants.dashboardCommandStrings.cannotStartServer));
-    sinon.stub(window, "createOutputChannel").returns(channel as OutputChannel);
+    sinon.stub(window, 'createOutputChannel').returns(channel as OutputChannel);
 
     // Act and Assert
     await assert.rejects(
@@ -153,10 +153,10 @@ describe("Unit tests DashboardService", () => {
 
     it('stopDashboardServer should kill process and remove element from "dashboardProcesses" list', async () => {
       // Arrange
-      const killPidStub = sinon.stub(shell, "killPid");
-      const killProcessStub = sinon.stub(processMock, "kill");
-      const processSpy = sinon.spy(processMock, "removeAllListeners");
-      const channelDisposeSpy = sinon.spy(channel, "dispose");
+      const killPidStub = sinon.stub(shell, 'killPid');
+      const killProcessStub = sinon.stub(processMock, 'kill');
+      const processSpy = sinon.spy(processMock, 'removeAllListeners');
+      const channelDisposeSpy = sinon.spy(channel, 'dispose');
 
       DashboardService.dashboardProcesses[defaultPort] = {
         output: channel,
@@ -177,10 +177,10 @@ describe("Unit tests DashboardService", () => {
 
     it('stopDashboardServer should kill out of band process and remove element from "dashboardProcesses" list', async () => {
       // Arrange
-      const killPidStub = sinon.stub(shell, "killPid");
-      const killProcessStub = sinon.stub(processMock, "kill");
-      const processSpy = sinon.spy(processMock, "removeAllListeners");
-      const channelDisposeSpy = sinon.spy(channel, "dispose");
+      const killPidStub = sinon.stub(shell, 'killPid');
+      const killProcessStub = sinon.stub(processMock, 'kill');
+      const processSpy = sinon.spy(processMock, 'removeAllListeners');
+      const channelDisposeSpy = sinon.spy(channel, 'dispose');
 
       DashboardService.dashboardProcesses[defaultPort] = {
         pid: 321,
@@ -200,8 +200,8 @@ describe("Unit tests DashboardService", () => {
 
     it('dispose should kill all process and cleanup "dashboardProcesses" list', async () => {
       // Arrange
-      const killPidStub = sinon.stub(shell, "killPid");
-      const killProcessStub = sinon.stub(processMock, "kill");
+      const killPidStub = sinon.stub(shell, 'killPid');
+      const killProcessStub = sinon.stub(processMock, 'kill');
 
       // Act
       await DashboardService.dispose();

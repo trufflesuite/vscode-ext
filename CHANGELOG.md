@@ -2,7 +2,13 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
-## 2.2.4
+## 2.3.4
+
+This release is a fix to the windows path issues that were reported.
+
+- fix: Build/Deploy commands were not working with mapping volumes on Windows 11 [PR](https://github.com/trufflesuite/vscode-ext/pull/110). The issue was found on windows 11 platform only. It was related to volume mapping. If the user open a project in root (C:), the build/deploy commands are working fine. But, if the project is opened in a mapping volume, the problem occurred. A fix was made and applied for windows platforms only.
+
+## 2.3.3
 
 Welcome to the new look Changelog. We will add more info against each release where we think it will add value and inform you of what new cool features we are creating or paving the way for. This month we did a bunch of protoyping and internal features/improvements for viewing your projects, layer 1/2 support via Infura and forking made simple for Ganache from the UI.
 
@@ -16,9 +22,9 @@ Welcome to the new look Changelog. We will add more info against each release wh
   - We are working on the basis of single repos (not monorepos of multiple truffle projects) so we are going to be releasing fixes for that in the future.
 - fix: Preventing possible bug on required apps [PR](https://github.com/trufflesuite/vscode-ext/pull/71). There are times when the required apps check can sometimes happen twice internally causing this error to say you have not got all the required apps installed correctly. This fixes that issue. 🤞🏻
 - Forked ganache instance [PR](https://github.com/trufflesuite/vscode-ext/pull/70). Fork your blockchains, just like on the command line. Through a set of dialogs you can now fork any network via Infura at a specific block or latest and this will now configure that and have it visible in your network list.
+- fix: Build/Deploy commands were not working with mapping volumes on Windows 11 [PR](https://github.com/trufflesuite/vscode-ext/pull/110). The issue was found on windows 11 platform only. It was related to volume mapping. If the user open a project in root (C:), the build/deploy commands are working fine. But, if the project is opened in a mapping volume, the problem occurred. A fix was made and applied for windows platforms only.
 
 Most of these are great enhancements to our codebase and thank you to all the contributors!
-
 
 ## 2.2.3
 

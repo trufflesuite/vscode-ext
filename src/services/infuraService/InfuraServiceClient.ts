@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import requestPromise from "request-promise";
-import {Disposable, Event, EventEmitter, Memento, StatusBarItem, window} from "vscode";
-import {Constants} from "../../Constants";
-import {IToken, refreshToken, signIn, signOut} from "./codeFlowLogin";
-import {ICreateProjectRequestDto, IInfuraProjectDto, IInfuraUserDto, IProjectsResultDto} from "./InfuraDto";
+import requestPromise from 'request-promise';
+import {Disposable, Event, EventEmitter, Memento, StatusBarItem, window} from 'vscode';
+import {Constants} from '../../Constants';
+import {IToken, refreshToken, signIn, signOut} from './codeFlowLogin';
+import {ICreateProjectRequestDto, IInfuraProjectDto, IInfuraUserDto, IProjectsResultDto} from './InfuraDto';
 
 interface IInfuraCache {
   user: IInfuraUserDto;
@@ -18,7 +18,7 @@ class InfuraClient {
   private readonly disposables: Disposable[];
   private readonly eventEmitter: EventEmitter<string | undefined>;
   private readonly onCacheChange: Event<string | undefined>;
-  private readonly showProjectsFromInfuraCommand = "truffle-vscode.showProjectsFromInfuraAccount";
+  private readonly showProjectsFromInfuraCommand = 'truffle-vscode.showProjectsFromInfuraAccount';
 
   constructor() {
     this.disposables = [];
@@ -48,7 +48,7 @@ class InfuraClient {
 
       await this.updateCredentials(user, token);
     } catch (error) {
-      this.eventEmitter.fire("sign-in");
+      this.eventEmitter.fire('sign-in');
       throw error;
     }
   }
@@ -80,7 +80,7 @@ class InfuraClient {
   public async getUserData(): Promise<IInfuraUserDto> {
     const url = new URL(Constants.infuraAPIUrls.userMe, Constants.infuraAPIUrls.rootURL).toString();
     const params = {
-      method: "GET",
+      method: 'GET',
       url,
     };
     const response = await this.sendRequest(params);
@@ -121,7 +121,7 @@ class InfuraClient {
   public async getProjectDetails(projectId: string): Promise<IInfuraProjectDto> {
     const url = new URL(`${Constants.infuraAPIUrls.projects}/${projectId}`, Constants.infuraAPIUrls.rootURL).toString();
     const params = {
-      method: "GET",
+      method: 'GET',
       url,
     };
     const response = await this.sendRequest(params);
@@ -135,7 +135,7 @@ class InfuraClient {
     const params = {
       body: project,
       json: true,
-      method: "POST",
+      method: 'POST',
       url,
     };
 
@@ -163,7 +163,7 @@ class InfuraClient {
   private async receiveProjects(): Promise<IProjectsResultDto> {
     const url = new URL(Constants.infuraAPIUrls.projects, Constants.infuraAPIUrls.rootURL).toString();
     const params = {
-      method: "GET",
+      method: 'GET',
       url,
     };
     const response = await this.sendRequest(params);
@@ -190,14 +190,14 @@ class InfuraClient {
     if (tokens && !user.email) {
       this.eventEmitter.fire(Constants.infuraSigningIn);
     } else {
-      this.eventEmitter.fire("update-credentials");
+      this.eventEmitter.fire('update-credentials');
     }
   }
 
   private async cleanCredentials(): Promise<void> {
     await this.updateInfuraCache();
     await this.setExcludedProjects([], []);
-    this.eventEmitter.fire("clean-credentials");
+    this.eventEmitter.fire('clean-credentials');
   }
 
   private async signInSilently(): Promise<boolean> {
@@ -245,7 +245,7 @@ class InfuraClient {
     if (this.statusBarItem) {
       switch (event) {
         case Constants.infuraSigningIn:
-          this.statusBarItem.text = "Infura: Signing in...";
+          this.statusBarItem.text = 'Infura: Signing in...';
           this.statusBarItem.show();
           break;
         default: {
@@ -254,7 +254,7 @@ class InfuraClient {
             this.statusBarItem.text = `Infura: ${infuraCache.user.email}`;
             this.statusBarItem.show();
           } else {
-            this.statusBarItem.text = "";
+            this.statusBarItem.text = '';
             this.statusBarItem.hide();
           }
           break;

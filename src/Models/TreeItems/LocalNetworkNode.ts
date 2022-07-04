@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { URL } from "url";
-import { Constants } from "../../Constants";
-import { TruffleConfiguration } from "../../helpers";
-import { ItemType } from "../ItemType";
-import { NetworkNode } from "./NetworkNode";
+import {URL} from 'url';
+import {Constants} from '../../Constants';
+import {TruffleConfiguration} from '../../helpers';
+import {ItemType} from '../ItemType';
+import {NetworkNode} from './NetworkNode';
 
 export class LocalNetworkNode extends NetworkNode {
   public readonly port: number;

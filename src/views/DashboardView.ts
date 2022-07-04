@@ -8,11 +8,11 @@ import vscode, {
   TreeDataProvider,
   TreeItemCollapsibleState,
   TreeView,
-} from "vscode";
-import {DashboardCommands} from "../commands";
-import {DashboardService} from "../services";
-import {Constants} from "../Constants";
-import {vscodeEnvironment} from "../helpers";
+} from 'vscode';
+import {DashboardCommands} from '../commands';
+import {DashboardService} from '../services';
+import {Constants} from '../Constants';
+import {vscodeEnvironment} from '../helpers';
 
 class DashboardTreeItem extends TreeItem {
   constructor(
@@ -63,9 +63,9 @@ class DashboardTreeDataProvider implements TreeDataProvider<DashboardTreeItem> {
  *
  * @param viewId - the viewId - defaults to above.
  */
-export function registerDashboardView(viewId: string = "truffle-vscode.views.dashboard"): TreeView<DashboardTreeItem> {
-  const dashboardUrl: string = `${Constants.networkProtocols.http}${Constants.localhost}:${Constants.dashboardPort}`;
-  
+export function registerDashboardView(viewId = 'truffle-vscode.views.dashboard'): TreeView<DashboardTreeItem> {
+  const dashboardUrl = `${Constants.networkProtocols.http}${Constants.localhost}:${Constants.dashboardPort}`;
+
   commands.registerCommand(`${viewId}.startDashboardServer`, async () => {
     await DashboardCommands.startDashboardCmd();
   });
@@ -78,13 +78,12 @@ export function registerDashboardView(viewId: string = "truffle-vscode.views.das
   commands.registerCommand(`${viewId}.openDashboard`, async () => {
     const portStatus = await DashboardService.getPortStatus(Constants.dashboardPort);
 
-    if (portStatus === DashboardService.PortStatus.FREE)
-      return await DashboardCommands.startDashboardCmd();
+    if (portStatus === DashboardService.PortStatus.FREE) return await DashboardCommands.startDashboardCmd();
 
     await vscode.env.openExternal(vscode.Uri.parse(dashboardUrl));
-  });  
+  });
   commands.registerCommand(`${viewId}.copyRPCEndpointAddress`, async () => {
-    const rpc: string = `${dashboardUrl}/rpc`;
+    const rpc = `${dashboardUrl}/rpc`;
     await vscodeEnvironment.writeToClipboard(rpc);
 
     vscode.window.showInformationMessage(Constants.informationMessage.rpcEndpointCopiedToClipboard);

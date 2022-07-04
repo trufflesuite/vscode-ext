@@ -1,18 +1,18 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import assert from "assert";
-import uuid from "uuid";
-import {Constants} from "../../src/Constants";
-import {DialogResultValidator} from "../../src/validators/DialogResultValidator";
-import {TestConstants} from "../TestConstants";
+import assert from 'assert';
+import uuid from 'uuid';
+import {Constants} from '../../src/Constants';
+import {DialogResultValidator} from '../../src/validators/DialogResultValidator';
+import {TestConstants} from '../TestConstants';
 
-describe("DialogResultValidator", () => {
-  describe("Unit test", () => {
-    describe("validateConfirmationResult", () => {
-      it("should fail when result is empty", () => {
+describe('DialogResultValidator', () => {
+  describe('Unit test', () => {
+    describe('validateConfirmationResult', () => {
+      it('should fail when result is empty', () => {
         // Arrange
-        const testString = "";
+        const testString = '';
 
         // Act
         const result = DialogResultValidator.validateConfirmationResult(testString) as string;
@@ -30,7 +30,7 @@ describe("DialogResultValidator", () => {
         );
       });
 
-      it("should fail when result different from yes or no", () => {
+      it('should fail when result different from yes or no', () => {
         // Arrange
         const testString = uuid.v4();
 
@@ -51,7 +51,7 @@ describe("DialogResultValidator", () => {
           const result = DialogResultValidator.validateConfirmationResult(answer);
 
           // Assert
-          assert.strictEqual(result, null, "validation result should be null");
+          assert.strictEqual(result, null, 'validation result should be null');
         });
       });
     });

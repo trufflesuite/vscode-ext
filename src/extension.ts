@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {registerUIExtensionVariables} from "@microsoft/vscode-azext-utils";
-import {commands, ExtensionContext, Uri, window, workspace} from "vscode";
+import {registerUIExtensionVariables} from '@microsoft/vscode-azext-utils';
+import {commands, ExtensionContext, Uri, window, workspace} from 'vscode';
 import {
   DebuggerCommands,
   GanacheCommands,
@@ -12,15 +12,15 @@ import {
   ServiceCommands,
   TruffleCommands,
   GenericCommands,
-} from "./commands";
-import {Constants, ext} from "./Constants";
+} from './commands';
+import {Constants, ext} from './Constants';
 
-import {DebuggerConfiguration} from "./debugAdapter/configuration/debuggerConfiguration";
-import {CommandContext, isWorkspaceOpen, setCommandContext} from "./helpers";
-import {required} from "./helpers/required";
-import {CancellationEvent} from "./Models";
-import {Output} from "./Output";
-import {ChangelogPage, RequirementsPage, WelcomePage} from "./pages";
+import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
+import {CommandContext, isWorkspaceOpen, setCommandContext} from './helpers';
+import {required} from './helpers/required';
+import {CancellationEvent} from './Models';
+import {Output} from './Output';
+import {ChangelogPage, RequirementsPage, WelcomePage} from './pages';
 import {
   AdapterType,
   ContractDB,
@@ -30,13 +30,13 @@ import {
   TreeManager,
   TreeService,
   DashboardService,
-} from "./services";
-import {Telemetry} from "./TelemetryClient";
-import {NetworkNodeView, ProjectView} from "./ViewItems";
-import {registerDashboardView} from "./views/DashboardView";
-import {registerDeploymentView} from "./views/DeploymentsView";
-import {registerFileExplorerView} from "./views/fileExplorer";
-import {registerHelpView} from "./views/HelpView";
+} from './services';
+import {Telemetry} from './TelemetryClient';
+import {NetworkNodeView, ProjectView} from './ViewItems';
+import {registerDashboardView} from './views/DashboardView';
+import {registerDeploymentView} from './views/DeploymentsView';
+import {registerFileExplorerView} from './views/fileExplorer';
+import {registerHelpView} from './views/HelpView';
 
 /**
  * This function registers variables similar to docker plugin, going forward this seems a better method of doing things.
@@ -65,7 +65,7 @@ export async function activate(context: ExtensionContext) {
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
   TreeManager.initialize(context.globalState);
-  TreeService.initialize("truffle-vscode.truffle");
+  TreeService.initialize('truffle-vscode.truffle');
   await sdkCoreCommands.initialize(context.globalState);
 
   setCommandContext(CommandContext.Enabled, true);
@@ -79,14 +79,14 @@ export async function activate(context: ExtensionContext) {
   await changelogPage.checkAndShow();
 
   //#region trufflesuite extension commands
-  const refresh = commands.registerCommand("truffle-vscode.refresh", (element) => {
+  const refresh = commands.registerCommand('truffle-vscode.refresh', (element) => {
     TreeService.refresh(element);
   });
-  const showWelcomePage = commands.registerCommand("truffle-vscode.showWelcomePage", async () => {
+  const showWelcomePage = commands.registerCommand('truffle-vscode.showWelcomePage', async () => {
     return welcomePage.show();
   });
   const showRequirementsPage = commands.registerCommand(
-    "truffle-vscode.showRequirementsPage",
+    'truffle-vscode.showRequirementsPage',
     async (checkShowOnStartup: boolean) => {
       return checkShowOnStartup ? await requirementsPage.checkAndShow() : await requirementsPage.show();
     }
@@ -95,21 +95,21 @@ export async function activate(context: ExtensionContext) {
 
   //#region Ganache extension commands
   const startGanacheServer = commands.registerCommand(
-    "truffle-vscode.startGanacheServer",
+    'truffle-vscode.startGanacheServer',
     async (viewItem?: ProjectView) => {
       await tryExecute(() => GanacheCommands.startGanacheCmd(viewItem));
     }
   );
 
   const stopGanacheServer = commands.registerCommand(
-    "truffle-vscode.stopGanacheServer",
+    'truffle-vscode.stopGanacheServer',
     async (viewItem?: ProjectView) => {
       await tryExecute(() => GanacheCommands.stopGanacheCmd(viewItem));
     }
   );
 
   const resartGanacheServer = commands.registerCommand(
-    "truffle-vscode.restartGanacheServer",
+    'truffle-vscode.restartGanacheServer',
     async (viewItem?: ProjectView) => {
       await tryExecute(() => GanacheCommands.stopGanacheCmd(viewItem)).then(() =>
         tryExecute(() => GanacheCommands.startGanacheCmd(viewItem))
@@ -120,7 +120,7 @@ export async function activate(context: ExtensionContext) {
 
   //#region Generic extension commands
   const checkForConnection = commands.registerCommand(
-    "truffle-vscode.checkForConnection",
+    'truffle-vscode.checkForConnection',
     async (viewItem?: ProjectView) => {
       await tryExecute(() => GenericCommands.checkForConnection(viewItem));
     }
@@ -128,44 +128,44 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region truffle commands
-  const newSolidityProject = commands.registerCommand("truffle-vscode.newSolidityProject", async () => {
+  const newSolidityProject = commands.registerCommand('truffle-vscode.newSolidityProject', async () => {
     await tryExecute(() => ProjectCommands.newSolidityProject());
   });
-  const buildContracts = commands.registerCommand("truffle-vscode.buildContracts", async (uri: Uri) => {
+  const buildContracts = commands.registerCommand('truffle-vscode.buildContracts', async (uri: Uri) => {
     await tryExecute(() => sdkCoreCommands.build(uri));
   });
-  const deployContracts = commands.registerCommand("truffle-vscode.deployContracts", async (uri: Uri) => {
+  const deployContracts = commands.registerCommand('truffle-vscode.deployContracts', async (uri: Uri) => {
     await tryExecute(() => sdkCoreCommands.deploy(uri));
   });
-  const copyByteCode = commands.registerCommand("truffle-contract.copyByteCode", async (uri: Uri) => {
+  const copyByteCode = commands.registerCommand('truffle-contract.copyByteCode', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeBytecodeToBuffer(uri));
   });
-  const copyDeployedByteCode = commands.registerCommand("truffle-contract.copyDeployedByteCode", async (uri: Uri) => {
+  const copyDeployedByteCode = commands.registerCommand('truffle-contract.copyDeployedByteCode', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeDeployedBytecodeToBuffer(uri));
   });
-  const copyABI = commands.registerCommand("truffle-contract.copyABI", async (uri: Uri) => {
+  const copyABI = commands.registerCommand('truffle-contract.copyABI', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeAbiToBuffer(uri));
   });
   const copyRPCEndpointAddress = commands.registerCommand(
-    "truffle-vscode.copyRPCEndpointAddress",
+    'truffle-vscode.copyRPCEndpointAddress',
     async (viewItem: NetworkNodeView) => {
       await tryExecute(() => TruffleCommands.writeRPCEndpointAddressToBuffer(viewItem));
     }
   );
-  const getPrivateKeyFromMnemonic = commands.registerCommand("truffle-vscode.getPrivateKey", async () => {
+  const getPrivateKeyFromMnemonic = commands.registerCommand('truffle-vscode.getPrivateKey', async () => {
     await tryExecute(() => TruffleCommands.getPrivateKeyFromMnemonic());
   });
   //#endregion
 
   //#region services with dialog
-  const createProject = commands.registerCommand("truffle-vscode.createProject", async () => {
+  const createProject = commands.registerCommand('truffle-vscode.createProject', async () => {
     await tryExecute(() => ServiceCommands.createProject());
   });
-  const connectProject = commands.registerCommand("truffle-vscode.connectProject", async () => {
+  const connectProject = commands.registerCommand('truffle-vscode.connectProject', async () => {
     await tryExecute(() => ServiceCommands.connectProject());
   });
   const disconnectProject = commands.registerCommand(
-    "truffle-vscode.disconnectProject",
+    'truffle-vscode.disconnectProject',
     async (viewItem: ProjectView) => {
       await tryExecute(() => ServiceCommands.disconnectProject(viewItem));
     }
@@ -173,14 +173,14 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region Infura commands
-  const signInToInfuraAccount = commands.registerCommand("truffle-vscode.signInToInfuraAccount", async () => {
+  const signInToInfuraAccount = commands.registerCommand('truffle-vscode.signInToInfuraAccount', async () => {
     await tryExecute(() => InfuraCommands.signIn());
   });
-  const signOutOfInfuraAccount = commands.registerCommand("truffle-vscode.signOutOfInfuraAccount", async () => {
+  const signOutOfInfuraAccount = commands.registerCommand('truffle-vscode.signOutOfInfuraAccount', async () => {
     await tryExecute(() => InfuraCommands.signOut());
   });
   const showProjectsFromInfuraAccount = commands.registerCommand(
-    "truffle-vscode.showProjectsFromInfuraAccount",
+    'truffle-vscode.showProjectsFromInfuraAccount',
     async () => {
       await tryExecute(() => InfuraCommands.showProjectsFromAccount());
     }
@@ -188,7 +188,7 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region debugger commands
-  const startDebugger = commands.registerCommand("truffle-vscode.debugTransaction", async () => {
+  const startDebugger = commands.registerCommand('truffle-vscode.debugTransaction', async () => {
     await tryExecute(() => DebuggerCommands.startSolidityDebugger());
   });
   //#endregion
@@ -203,7 +203,7 @@ export async function activate(context: ExtensionContext) {
 
   // #region truffle views
 
-  const fileExplorerView = registerFileExplorerView("truffle-vscode", "views.explorer");
+  const fileExplorerView = registerFileExplorerView('truffle-vscode', 'views.explorer');
   const helpView = registerHelpView();
 
   const deploymentView = registerDeploymentView();

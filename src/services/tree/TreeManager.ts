@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Memento} from "vscode";
-import {Constants} from "../../Constants";
-import {ItemFactory} from "../../Models";
+import {Memento} from 'vscode';
+import {Constants} from '../../Constants';
+import {ItemFactory} from '../../Models';
 import {
   Command,
   IExtensionItem,
@@ -12,9 +12,9 @@ import {
   GenericService,
   Service,
   ServiceTypes,
-} from "../../Models/TreeItems";
-import {Output} from "../../Output";
-import {Telemetry} from "../../TelemetryClient";
+} from '../../Models/TreeItems';
+import {Output} from '../../Output';
+import {Telemetry} from '../../TelemetryClient';
 
 class ExtensionTreeManager {
   private items: Service[];
@@ -70,7 +70,7 @@ class ExtensionTreeManager {
   public getItems(): Service[] {
     let result = this.items.filter((item) => item.getChildren().length !== 0);
     if (result.length === 0) {
-      Telemetry.sendEvent("TreeManager.getItems.returnDefaultCommandsItems");
+      Telemetry.sendEvent('TreeManager.getItems.returnDefaultCommandsItems');
       result = defaultCommandsItems();
     }
 
@@ -108,8 +108,8 @@ class ExtensionTreeManager {
 
 function defaultCommandsItems(): Command[] {
   return [
-    new Command("Connect to network", "truffle-vscode.connectProject"),
-    new Command("Create a new network", "truffle-vscode.createProject"),
+    new Command('Connect to network', 'truffle-vscode.connectProject'),
+    new Command('Create a new network', 'truffle-vscode.createProject'),
   ];
 }
 

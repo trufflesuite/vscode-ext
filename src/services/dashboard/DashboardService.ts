@@ -1,14 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {ChildProcess} from "child_process";
-import {OutputChannel, window} from "vscode";
-import {Constants, RequiredApps} from "../../Constants";
-import {shell, spawnProcess} from "../../helpers";
-import {findPid, killPid} from "../../helpers/shell";
-import {Telemetry} from "../../TelemetryClient";
-import {UrlValidator} from "../../validators/UrlValidator";
-import {isDashboardRunning, waitDashboardStarted} from "./DashboardServiceClient";
+import {ChildProcess} from 'child_process';
+import {OutputChannel, window} from 'vscode';
+import {Constants, RequiredApps} from '../../Constants';
+import {shell, spawnProcess} from '../../helpers';
+import {findPid, killPid} from '../../helpers/shell';
+import {Telemetry} from '../../TelemetryClient';
+import {UrlValidator} from '../../validators/UrlValidator';
+import {isDashboardRunning, waitDashboardStarted} from './DashboardServiceClient';
 
 export namespace DashboardService {
   export interface IDashboardProcess {
@@ -29,20 +29,20 @@ export namespace DashboardService {
   export async function getPortStatus(port: number | string): Promise<PortStatus> {
     if (!isNaN(await shell.findPid(port))) {
       if (await isDashboardRunning(port)) {
-        Telemetry.sendEvent("DashboardService.isDashboardServerRunning.isDashboardServer", {port: "" + port});
+        Telemetry.sendEvent('DashboardService.isDashboardServerRunning.isDashboardServer', {port: '' + port});
         return PortStatus.RUNNING;
       } else {
-        Telemetry.sendEvent("DashboardService.isDashboardServerRunning.portIsBusy", {port: "" + port});
+        Telemetry.sendEvent('DashboardService.isDashboardServerRunning.portIsBusy', {port: '' + port});
         return PortStatus.BUSY;
       }
     }
 
-    Telemetry.sendEvent("DashboardService.isDashboardServerRunning.portIsFree", {port: "" + port});
+    Telemetry.sendEvent('DashboardService.isDashboardServerRunning.portIsFree', {port: '' + port});
     return PortStatus.FREE;
   }
 
   export async function startDashboardServer(port: number | string): Promise<IDashboardProcess> {
-    Telemetry.sendEvent("DashboardService.startDashboardServer");
+    Telemetry.sendEvent('DashboardService.startDashboardServer');
 
     if (UrlValidator.validatePort(port)) {
       Telemetry.sendException(new Error(Constants.dashboardCommandStrings.invalidDashboardPort));
@@ -68,12 +68,12 @@ export namespace DashboardService {
     // open the channel to show the output.
     dashboardProcesses[port]?.output?.show(false);
 
-    Telemetry.sendEvent("DashboardService.waitDashboardStarted.serverStarted");
+    Telemetry.sendEvent('DashboardService.waitDashboardStarted.serverStarted');
 
     return dashboardProcesses[port];
   }
 
-  export async function stopDashboardServer(port: number | string, killOutOfBand: boolean = true): Promise<void> {
+  export async function stopDashboardServer(port: number | string, killOutOfBand = true): Promise<void> {
     return stopDashboardProcess(dashboardProcesses[port], killOutOfBand);
   }
 
@@ -117,7 +117,7 @@ export namespace DashboardService {
 
     if (process) {
       removeAllListeners(process);
-      process.kill("SIGINT");
+      process.kill('SIGINT');
     }
 
     if (output) {
@@ -130,15 +130,15 @@ export namespace DashboardService {
   }
 
   function addAllListeners(output: OutputChannel, port: number | string, process: ChildProcess): void {
-    process.stdout!.on("data", (data: string | Buffer) => {
+    process.stdout!.on('data', (data: string | Buffer) => {
       output.appendLine(data.toString());
     });
 
-    process.stderr!.on("data", (data: string | Buffer) => {
+    process.stderr!.on('data', (data: string | Buffer) => {
       output.appendLine(data.toString());
     });
 
-    process.on("exit", () => {
+    process.on('exit', () => {
       stopDashboardServer(port);
     });
   }

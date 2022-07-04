@@ -7,7 +7,7 @@ import {
   DebugConfigurationProvider,
   ProviderResult,
   WorkspaceFolder,
-} from "vscode";
+} from 'vscode';
 
 export default class TruffleDebuggerConfigurationProvider implements DebugConfigurationProvider {
   /**

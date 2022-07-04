@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {TreeView, window} from "vscode";
-import {IInstruction} from "../models/IInstruction";
-import InstructionDataManager from "./instructionDataManager";
-import InstructionDataProvider from "./instructionDataProvider";
-import InstructionTreeNode from "./instructionTreeNode";
+import {TreeView, window} from 'vscode';
+import {IInstruction} from '../models/IInstruction';
+import InstructionDataManager from './instructionDataManager';
+import InstructionDataProvider from './instructionDataProvider';
+import InstructionTreeNode from './instructionTreeNode';
 
-const INSTRUCTION_VIEW_ID = "truffle-vscode.InstructionView";
+const INSTRUCTION_VIEW_ID = 'truffle-vscode.InstructionView';
 
 export default class InstructionView {
   private view: TreeView<InstructionTreeNode>;
