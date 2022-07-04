@@ -172,6 +172,8 @@ export namespace TruffleCommands {
     const contractDirectory = getPathByPlatform(workspace);
 
     await fs.createFile(path.join(contractDirectory, 'contracts', 'NewContract.sol'));
+
+    await commands.executeCommand('truffle-vscode.views.explorer.refreshExplorer');
   }
 
   export async function writeRPCEndpointAddressToBuffer(networkNodeView: NetworkNodeView): Promise<void> {
