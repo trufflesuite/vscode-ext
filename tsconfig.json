@@ -24,6 +24,14 @@
     "skipLibCheck": true,
     "typeRoots": ["./node_modules/@types", "./node_modules/@machinomy", "./src/debugger/types"]
   },
-  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.json", "test/**/*.js", "test/**/*.ts", "test/**/*.json"],
+  "include": [
+    ".eslintrc.js",
+    "src/**/*.js",
+    "src/**/*.ts",
+    "src/**/*.json",
+    "test/**/*.js",
+    "test/**/*.ts",
+    "test/**/*.json"
+  ],
   "exclude": ["node_modules", ".vscode-test", "drizzleUI", "ui-test"]
 }

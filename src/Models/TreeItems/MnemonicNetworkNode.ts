@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {window} from "vscode";
-import {Constants, RequiredApps} from "../../Constants";
-import {TruffleConfiguration} from "../../helpers";
-import {showInputBox, showQuickPick, saveTextInFile} from "../../helpers/userInteraction";
-import {MnemonicRepository} from "../../services/MnemonicRepository"; // Should be full path since cycle dependencies
-import {Telemetry} from "../../TelemetryClient";
-import {NetworkNode} from "./NetworkNode";
+import {window} from 'vscode';
+import {Constants, RequiredApps} from '../../Constants';
+import {TruffleConfiguration} from '../../helpers';
+import {showInputBox, showQuickPick, saveTextInFile} from '../../helpers/userInteraction';
+import {MnemonicRepository} from '../../services/MnemonicRepository'; // Should be full path since cycle dependencies
+import {Telemetry} from '../../TelemetryClient';
+import {NetworkNode} from './NetworkNode';
 
 export abstract class MnemonicNetworkNode extends NetworkNode {
   public async getTruffleNetwork(): Promise<TruffleConfiguration.INetwork> {
@@ -19,7 +19,7 @@ export abstract class MnemonicNetworkNode extends NetworkNode {
     config.importPackage(fs, fsPackageName);
     config.importPackage(hdwalletProvider, RequiredApps.hdwalletProvider);
 
-    let targetURL = "";
+    let targetURL = '';
     try {
       targetURL = await this.getRPCAddress();
 
@@ -79,7 +79,7 @@ export abstract class MnemonicNetworkNode extends NetworkNode {
   }
 
   private async saveMnemonicFile(mnemonic: string): Promise<string> {
-    const path = await saveTextInFile(mnemonic, "", {Files: [Constants.mnemonicConstants.fileExt]});
+    const path = await saveTextInFile(mnemonic, '', {Files: [Constants.mnemonicConstants.fileExt]});
     MnemonicRepository.saveMnemonicPath(path);
     return path;
   }

@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import abiDecoder from "abi-decoder";
-import {TRANSACTION_DEFAULT_METHOD_NAME} from "../constants/transaction";
-import {ITransactionInputData} from "../models/ITransactionInputData";
+import abiDecoder from 'abi-decoder';
+import {TRANSACTION_DEFAULT_METHOD_NAME} from '../constants/transaction';
+import {ITransactionInputData} from '../models/ITransactionInputData';
 
 export class TransactionInputDataDecoder {
   public addContractAbi(abi: []) {

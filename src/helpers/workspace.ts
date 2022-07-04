@@ -1,14 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {QuickPickItem, Uri, workspace} from "vscode";
-import {Constants} from "../Constants";
-import {Telemetry} from "../TelemetryClient";
-import fs from "fs-extra";
-import * as path from "path";
-import glob from "glob";
-import {showQuickPick} from "./userInteraction";
-import {Entry} from "../views/fileExplorer";
+import {QuickPickItem, Uri, workspace} from 'vscode';
+import {Constants} from '../Constants';
+import {Telemetry} from '../TelemetryClient';
+import fs from 'fs-extra';
+import * as path from 'path';
+import glob from 'glob';
+import {showQuickPick} from './userInteraction';
+import {Entry} from '../views/fileExplorer';
 
 export interface TruffleWorkspace {
   dirName: string;
@@ -16,11 +16,11 @@ export interface TruffleWorkspace {
   truffleConfig: Uri;
 }
 
-export function getWorkspaceRoot(ignoreException: boolean = false): string | undefined {
+export function getWorkspaceRoot(ignoreException = false): string | undefined {
   const workspaceRoot = workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
   if (workspaceRoot === undefined && !ignoreException) {
-    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined("Workspace root"));
+    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root'));
     Telemetry.sendException(error);
     throw error;
   }
@@ -50,7 +50,7 @@ export function isWorkspaceOpen(): boolean {
 }
 
 export function getPathByPlataform(workspace: Uri): string {
-  return process.platform === "win32" ? `${workspace.scheme}:${workspace.path}` : workspace.fsPath;
+  return process.platform === 'win32' ? `${workspace.scheme}:${workspace.path}` : workspace.fsPath;
 }
 
 async function getWorkspacesFolders(): Promise<TruffleWorkspace[]> {
@@ -63,7 +63,7 @@ async function getWorkspacesFolders(): Promise<TruffleWorkspace[]> {
   );
 
   if (workspaces.length === 0) {
-    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined("Workspace root"));
+    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root'));
     Telemetry.sendException(error);
     throw error;
   }
@@ -76,22 +76,20 @@ async function getTruffleWorkspaces(dirPath: string): Promise<TruffleWorkspace[]
     ignore: Constants.workspaceIgnoredFolders,
   });
 
-  const truffleWorkSpaces: TruffleWorkspace[] = files.map((file) => {
+  return files.map((file) => {
     return {
       dirName: path.dirname(file).split(path.sep).pop()!.toString(),
       workspace: Uri.parse(path.dirname(file)),
       truffleConfig: Uri.parse(file),
     };
   });
-
-  return truffleWorkSpaces;
 }
 
 async function getWorkspaceFromQuickPick(workspaces: TruffleWorkspace[]): Promise<Uri> {
   const folders: QuickPickItem[] = Array.from(workspaces).map((element) => {
     return {
       label: element.dirName,
-      detail: process.platform === "win32" ? element.dirName : element.workspace.fsPath,
+      detail: process.platform === 'win32' ? element.dirName : element.workspace.fsPath,
     };
   });
 
@@ -113,6 +111,6 @@ function convertEntryToUri(uri: Uri): Uri {
 }
 
 function getRootDirectoryFromWorkspace(uri: Uri): Uri {
-  if (fs.lstatSync(uri.fsPath).isDirectory()) return Uri.parse(path.resolve(path.join(uri.fsPath, "../")));
-  else return Uri.parse(path.resolve(path.join(uri.fsPath, "../..")));
+  if (fs.lstatSync(uri.fsPath).isDirectory()) return Uri.parse(path.resolve(path.join(uri.fsPath, '../')));
+  else return Uri.parse(path.resolve(path.join(uri.fsPath, '../..')));
 }

@@ -1,25 +1,24 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import path from "path";
-import {debug, DebugConfiguration, QuickPickItem, workspace} from "vscode";
-import {DEBUG_TYPE} from "../debugAdapter/constants/debugAdapter";
-import {DebugNetwork} from "../debugAdapter/debugNetwork";
-import {shortenHash} from "../debugAdapter/functions";
-import {TransactionProvider} from "../debugAdapter/transaction/transactionProvider";
-import {Web3Wrapper} from "../debugAdapter/web3Wrapper";
-import {getWorkspace} from "../helpers";
-import {showInputBox, showQuickPick} from "../helpers/userInteraction";
-import {getPathByPlataform} from "../helpers/workspace";
-import {Telemetry} from "../TelemetryClient";
+import path from 'path';
+import {debug, DebugConfiguration, QuickPickItem, workspace} from 'vscode';
+import {DEBUG_TYPE} from '../debugAdapter/constants/debugAdapter';
+import {DebugNetwork} from '../debugAdapter/debugNetwork';
+import {shortenHash} from '../debugAdapter/functions';
+import {TransactionProvider} from '../debugAdapter/transaction/transactionProvider';
+import {Web3Wrapper} from '../debugAdapter/web3Wrapper';
+import {getWorkspace} from '../helpers';
+import {showInputBox, showQuickPick} from '../helpers/userInteraction';
+import {getPathByPlataform} from '../helpers/workspace';
+import {Telemetry} from '../TelemetryClient';
 
 export namespace DebuggerCommands {
   export async function startSolidityDebugger() {
-    Telemetry.sendEvent("DebuggerCommands.startSolidityDebugger.commandStarted");
+    Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandStarted');
 
     const workspaceUri = await getWorkspace();
     const workingDirectory = getPathByPlataform(workspaceUri);
-
     const debugNetwork = new DebugNetwork(workingDirectory);
     await debugNetwork.load();
     const contractBuildDir = debugNetwork.getTruffleConfiguration()!.contracts_build_directory;
@@ -40,22 +39,22 @@ export namespace DebuggerCommands {
 
       const txHashSelection = await showQuickPick(txHashesAsQuickPickItems, {
         ignoreFocusOut: true,
-        placeHolder: "Enter the transaction hash to debug",
+        placeHolder: 'Enter the transaction hash to debug',
       });
 
       const txHash = txHashSelection.detail || txHashSelection.label;
       const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
       debug.startDebugging(workspaceFolder, config).then(() => {
-        Telemetry.sendEvent("DebuggerCommands.startSolidityDebugger.commandFinished");
+        Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandFinished');
       });
     } else {
       // if remote network then require txHash
-      const placeHolder = "Type the transaction hash you want to debug (0x...)";
+      const placeHolder = 'Type the transaction hash you want to debug (0x...)';
       const txHash = await showInputBox({placeHolder});
       if (txHash) {
         const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
         debug.startDebugging(workspaceFolder, config).then(() => {
-          Telemetry.sendEvent("DebuggerCommands.startSolidityDebugger.commandFinished");
+          Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandFinished');
         });
       }
     }
@@ -76,9 +75,9 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
 function generateDebugAdapterConfig(txHash: string, workingDirectory: string, providerUrl: string): DebugConfiguration {
   return {
     files: [],
-    name: "Debug Transactions",
+    name: 'Debug Transactions',
     providerUrl,
-    request: "launch",
+    request: 'launch',
     txHash,
     type: DEBUG_TYPE,
     workingDirectory,
@@ -88,6 +87,6 @@ function generateDebugAdapterConfig(txHash: string, workingDirectory: string, pr
 
 // Migration.json, setComplete => Migration.setComplete()
 function generateDescription(contractName?: string, methodName?: string) {
-  const contractNameWithoutExt = path.basename(contractName || "", ".json");
+  const contractNameWithoutExt = path.basename(contractName || '', '.json');
   return `${contractNameWithoutExt}.${methodName}()`;
 }

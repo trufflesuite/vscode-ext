@@ -26,7 +26,6 @@ Welcome to the new look Changelog. We will add more info against each release wh
 
 Most of these are great enhancements to our codebase and thank you to all the contributors!
 
-
 ## 2.2.3
 
 - Required apps validation has fixed.

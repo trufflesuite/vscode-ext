@@ -8,7 +8,7 @@ Truffle for VS Code simplifies how you create, build, debug and deploy smart con
 
 ## Native IDE Debugging
 
-*Please note that this is a beta release of the IDE debugger and there are some known (and possibly unknown) issues that we are actively resolving. Feel free to review status and / or open any new issues or feature requests [here](https://github.com/trufflesuite/vscode-ext/issues).*
+_Please note that this is a beta release of the IDE debugger and there are some known (and possibly unknown) issues that we are actively resolving. Feel free to review status and / or open any new issues or feature requests [here](https://github.com/trufflesuite/vscode-ext/issues)._
 
 Truffle for VS Code also offers comprehensive native IDE [Solidity](https://docs.soliditylang.org/) debugging support, taking advantage of VS Code's great debugging features such variables, watches, and breakpoints. No more jumping between differents tools or windows during your edit, compile, deploy, transact, debug loop.
 
@@ -32,6 +32,7 @@ For developers who are not familiar with Truffle, or prefer to use the Command P
 2. Select an empty directory to scaffold out your project.
 3. Choose a name for your project.
 4. Press Enter.
+
 ## Build your smart contracts
 
 Your newly scaffolded-out directory includes a simple contract and all the necessary files to build and deploy a simple, and working contract to an RPC-endpoint. Use the following steps to build your contract:
@@ -55,7 +56,6 @@ The extension has integrated Ganache directly into the IDE to further lower the 
 1. After selecting to deploy the contracts, either from the Command Palette or by right clicking on the contract and selecting `Truffle: Deploy contracts`, a dropdown will be presented with options for _where_ to deploy the contract. By default there will be a single entry on this list named development.
 
 2. After selecting development, the IDE will create a new instance of Truffle Ganache, which will use the default configuration for the project as the target. The IDE will then deploy the contracts to this instance.
-
 
 **OPTIONAL**: If there is a need to control this Ganache instance more or change the configuration, there are some other options that can be used that the IDE can help with as well.
 

@@ -1,24 +1,24 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {commands, QuickPickItem, window} from "vscode";
-import {Constants, RequiredApps} from "../Constants";
-import {required} from "../helpers/required";
-import {showQuickPick} from "../helpers/userInteraction";
-import {ItemType} from "../Models";
-import {LocalProject, TLocalProjectOptions} from "../Models/TreeItems";
-import {GanacheService, TreeManager} from "../services";
-import {Telemetry} from "../TelemetryClient";
-import {ProjectView} from "../ViewItems";
+import {commands, QuickPickItem, window} from 'vscode';
+import {Constants, RequiredApps} from '../Constants';
+import {required} from '../helpers/required';
+import {showQuickPick} from '../helpers/userInteraction';
+import {ItemType} from '../Models';
+import {LocalProject, TLocalProjectOptions} from '../Models/TreeItems';
+import {GanacheService, TreeManager} from '../services';
+import {Telemetry} from '../TelemetryClient';
+import {ProjectView} from '../ViewItems';
 
 export namespace GanacheCommands {
   // Command to bind to UI commands
   export async function startGanacheCmd(projectView?: ProjectView): Promise<void> {
-    Telemetry.sendEvent("GanacheCommands.startGanacheCmd.commandStarted");
+    Telemetry.sendEvent('GanacheCommands.startGanacheCmd.commandStarted');
 
     if (!(await required.checkApps(RequiredApps.node))) {
-      Telemetry.sendEvent("GanacheCommands.startGanacheCmd.nodeIsNotInstalled");
-      commands.executeCommand("truffle-vscode.showRequirementsPage");
+      Telemetry.sendEvent('GanacheCommands.startGanacheCmd.nodeIsNotInstalled');
+      commands.executeCommand('truffle-vscode.showRequirementsPage');
       return;
     }
 
@@ -28,34 +28,34 @@ export namespace GanacheCommands {
     const ganacheProcess = await GanacheService.startGanacheServer(port, options);
 
     if (!ganacheProcess.process) {
-      Telemetry.sendEvent("GanacheCommands.startGanacheCmd.serverAlreadyRunning");
+      Telemetry.sendEvent('GanacheCommands.startGanacheCmd.serverAlreadyRunning');
       window.showInformationMessage(Constants.ganacheCommandStrings.serverAlreadyRunning);
       return;
     }
 
-    Telemetry.sendEvent("GanacheCommands.startGanacheCmd.commandFinished");
+    Telemetry.sendEvent('GanacheCommands.startGanacheCmd.commandFinished');
     window.showInformationMessage(Constants.ganacheCommandStrings.serverSuccessfullyStarted);
   }
 
   // Command to bind to UI commands
   export async function stopGanacheCmd(projectView?: ProjectView): Promise<void> {
-    Telemetry.sendEvent("GanacheCommands.stopGanacheCmd.commandStarted");
+    Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.commandStarted');
     const port = await getGanachePort(projectView);
     const portStatus = await GanacheService.getPortStatus(port);
 
     if (portStatus === GanacheService.PortStatus.GANACHE) {
       await GanacheService.stopGanacheServer(port);
-      Telemetry.sendEvent("GanacheCommands.stopGanacheCmd.isGanacheServer");
+      Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.isGanacheServer');
       window.showInformationMessage(Constants.ganacheCommandStrings.serverSuccessfullyStopped);
     } else if (portStatus === GanacheService.PortStatus.FREE) {
-      Telemetry.sendEvent("GanacheCommands.stopGanacheCmd.portIsFree");
+      Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.portIsFree');
       window.showInformationMessage(Constants.ganacheCommandStrings.serverSuccessfullyStopped);
     } else {
-      Telemetry.sendEvent("GanacheCommands.stopGanacheCmd.noGanacheServer");
+      Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.noGanacheServer');
       window.showWarningMessage(Constants.ganacheCommandStrings.serverCanNotStop);
     }
 
-    Telemetry.sendEvent("GanacheCommands.stopGanacheCmd.commandFinished");
+    Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.commandFinished');
   }
 
   export async function getGanachePort(projectView?: ProjectView): Promise<number | string> {

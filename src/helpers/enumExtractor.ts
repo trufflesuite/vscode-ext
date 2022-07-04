@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from "../Constants";
-import {EnumStorage} from "../Models";
-import {Output} from "../Output";
-import {Telemetry} from "../TelemetryClient";
+import {Constants} from '../Constants';
+import {EnumStorage} from '../Models';
+import {Output} from '../Output';
+import {Telemetry} from '../TelemetryClient';
 
 interface INode {
   id: number;
@@ -36,17 +36,17 @@ export function extractEnumsInfo(contractName: string, ast: {[key: string]: any}
     throw new Error(Constants.errorMessageStrings.AstIsEmpty);
   }
   const rootNode = ast.nodes.find(
-    (node: INode) => node.nodeType === "ContractDefinition" && node.name === contractName
+    (node: INode) => node.nodeType === 'ContractDefinition' && node.name === contractName
   );
   if (!rootNode) {
     throw new Error(Constants.errorMessageStrings.NoContractBody);
   }
 
   const result = new EnumStorage();
-  const enumNodes = GetEnumDeclarations("EnumDefinition", rootNode);
+  const enumNodes = GetEnumDeclarations('EnumDefinition', rootNode);
   if (enumNodes.length > 0) {
     const methods = GetMethodsWithEnum(
-      "FunctionDefinition",
+      'FunctionDefinition',
       rootNode,
       enumNodes.map((enumNode) => enumNode.name)
     );
@@ -69,7 +69,7 @@ export function extractEnumsInfo(contractName: string, ast: {[key: string]: any}
     });
     // contract members
     const enumNames = enumNodes.map((enumItems) => enumItems.name);
-    const contractMembers = GetEnumMembers("VariableDeclaration", rootNode, enumNames);
+    const contractMembers = GetEnumMembers('VariableDeclaration', rootNode, enumNames);
     contractMembers.forEach((contractMember) => {
       const enumItemsWithoutOffset = enumNodes.find((enumNode) => enumNode.name === contractMember.typeName.name)!;
       const offset = enumItemsWithoutOffset.members[0].id;
@@ -85,7 +85,7 @@ export function extractEnumsInfo(contractName: string, ast: {[key: string]: any}
 
 function ContainsEnum(node: INode, enumNames: string[]): boolean {
   return node.parameters.parameters.some(
-    (parameter: any) => enumNames.includes(parameter.typeName.name) && parameter.nodeType === "VariableDeclaration"
+    (parameter: any) => enumNames.includes(parameter.typeName.name) && parameter.nodeType === 'VariableDeclaration'
   );
 }
 

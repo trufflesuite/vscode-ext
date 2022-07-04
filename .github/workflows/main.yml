@@ -6,7 +6,7 @@ on:
       - develop
       - master
     paths-ignore: # dont run when changes made to these folders
-      - ".vscode/**"
+      - '.vscode/**'
 
 jobs:
   cicd:
@@ -24,7 +24,7 @@ jobs:
       - name: install gitversion tool
         uses: gittools/actions/gitversion/setup@v0.9.13
         with:
-          versionSpec: "5.x"
+          versionSpec: '5.x'
 
       - name: execute gitversion
         id: gitversion # step id used as reference for output values
@@ -47,8 +47,8 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v2
         with:
-          node-version: "16.4.x"
-          cache: "yarn"
+          node-version: '16.4.x'
+          cache: 'yarn'
 
       - name: clean install dependencies. Fail on lockfile Changes.
         run: yarn install --immutable --immutable-cache --check-cache
@@ -59,7 +59,7 @@ jobs:
       - name: update metadata in package.json
         uses: onlyutkarsh/patch-files-action@v1.0.3
         with:
-          files: "${{github.workspace}}/package.json"
+          files: '${{github.workspace}}/package.json'
           patch-syntax: |
             = /version => "${{ steps.gitversion.outputs.majorMinorPatch }}"
             = /aiKey => "${{ secrets.AIKEY }}"
@@ -67,16 +67,16 @@ jobs:
       - name: add version in CHANGELOG.md
         uses: cschleiden/replace-tokens@v1.1
         with:
-          files: "${{github.workspace}}/CHANGELOG.md"
+          files: '${{github.workspace}}/CHANGELOG.md'
         env:
-          VERSION: "${{ steps.gitversion.outputs.majorMinorPatch }}"
+          VERSION: '${{ steps.gitversion.outputs.majorMinorPatch }}'
 
       - name: configure package flags
         id: package_flags
         if: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
         run: |
-           echo "VSCE_FLAGS=--pre-release --yarn " | Out-File -FilePath $env:GITHUB_ENV -Append
-           echo "flags_set=true" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "VSCE_FLAGS=--pre-release --yarn " | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "flags_set=true" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: compile and create vsix MASTER Release
         if: github.ref == 'refs/heads/master'
@@ -103,7 +103,6 @@ jobs:
         with:
           path: ${{ github.workspace }}/${{ env.vsix_path }}.vsix
           name: ${{ env.vsix_path }}${{ env.vsix_type }}.vsix
-
 #      - name: publish to marketplace
 #        if: github.ref == 'refs/heads/master'
 #        run: npm run deploy ${{ env.PAT }}
