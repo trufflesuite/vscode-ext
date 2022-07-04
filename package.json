@@ -61,7 +61,7 @@
 		"onCommand:truffle-vscode.views.dashboard.startDashboardServer",
 		"onCommand:truffle-vscode.views.dashboard.stopDashboardServer",
 		"onCommand:truffle-vscode.views.dashboard.restartDashboardServer",
-		"onCommand:truffle-vscode.views.dashboard.copyRPCEndpointAddress",
+		"onCommand:truffle-vscode.views.dashboard.openDashboard",		
 		"onCommand:truffle-vscode.views.dashboard.copyRPCEndpointAddress",
 		"onDebug"
 	],
@@ -336,10 +336,15 @@
 				"category": "Truffle"
 			},
 			{
+				"command": "truffle-vscode.views.dashboard.openDashboard",
+				"title": "Open Dashboard in Web Browser",
+				"category": "Truffle"
+			},			
+			{
 				"command": "truffle-vscode.views.dashboard.copyRPCEndpointAddress",
 				"title": "Copy RPC Endpoint Address",
 				"category": "Truffle"
-			}
+			}	
 		],
 		"breakpoints": [
 			{
@@ -500,10 +505,15 @@
 					"group": "truffle-0@2"
 				},
 				{
-					"command": "truffle-vscode.views.dashboard.copyRPCEndpointAddress",
+					"command": "truffle-vscode.views.dashboard.openDashboard",
 					"when": "view == truffle-vscode.views.dashboard",
 					"group": "truffle-1@0"
-				}
+				},				
+				{
+					"command": "truffle-vscode.views.dashboard.copyRPCEndpointAddress",
+					"when": "view == truffle-vscode.views.dashboard",
+					"group": "truffle-1@1"
+				}				
 			],
 			"explorer/context": [
 				{
@@ -555,13 +565,13 @@
 					"name": "Explorer - Truffle"
 				},
 				{
+					"id": "truffle-vscode.views.dashboard",
+					"name": "Dashboard"
+				},				
+				{
 					"id": "truffle-vscode.truffle",
 					"name": "Networks",
 					"contextualTitle": "List of all known Networks"
-				},				
-				{
-					"id": "truffle-vscode.views.dashboard",
-					"name": "Dashboard"
 				},
 				{
 					"id": "truffle-vscode.views.deployments",

@@ -10,6 +10,7 @@ import vscode, {
   TreeView,
 } from "vscode";
 import {DashboardCommands} from "../commands";
+import {DashboardService} from "../services";
 import {Constants} from "../Constants";
 import {vscodeEnvironment} from "../helpers";
 
@@ -36,10 +37,10 @@ class DashboardTreeDataProvider implements TreeDataProvider<DashboardTreeItem> {
   constructor() {
     this.parent = [
       new DashboardTreeItem(
-        Constants.treeItemData.service.dashboard.label,
+        Constants.treeItemData.dashboard.label,
         `${Constants.networkProtocols.http}${Constants.localhost}:${Constants.dashboardPort}`,
-        Constants.treeItemData.service.dashboard.iconPath,
-        Constants.treeItemData.service.dashboard.contextValue
+        Constants.treeItemData.dashboard.iconPath,
+        Constants.treeItemData.dashboard.contextValue
       ),
     ];
   }
@@ -63,6 +64,8 @@ class DashboardTreeDataProvider implements TreeDataProvider<DashboardTreeItem> {
  * @param viewId - the viewId - defaults to above.
  */
 export function registerDashboardView(viewId: string = "truffle-vscode.views.dashboard"): TreeView<DashboardTreeItem> {
+  const dashboardUrl: string = `${Constants.networkProtocols.http}${Constants.localhost}:${Constants.dashboardPort}`;
+  
   commands.registerCommand(`${viewId}.startDashboardServer`, async () => {
     await DashboardCommands.startDashboardCmd();
   });
@@ -72,10 +75,18 @@ export function registerDashboardView(viewId: string = "truffle-vscode.views.das
   commands.registerCommand(`${viewId}.restartDashboardServer`, async () => {
     await DashboardCommands.stopDashboardCmd().then(() => DashboardCommands.startDashboardCmd());
   });
+  commands.registerCommand(`${viewId}.openDashboard`, async () => {
+    const portStatus = await DashboardService.getPortStatus(Constants.dashboardPort);
+
+    if (portStatus === DashboardService.PortStatus.FREE)
+      return await DashboardCommands.startDashboardCmd();
+
+    await vscode.env.openExternal(vscode.Uri.parse(dashboardUrl));
+  });  
   commands.registerCommand(`${viewId}.copyRPCEndpointAddress`, async () => {
-    await vscodeEnvironment.writeToClipboard(
-      `${Constants.networkProtocols.http}${Constants.localhost}:${Constants.dashboardPort}/rpc`
-    );
+    const rpc: string = `${dashboardUrl}/rpc`;
+    await vscodeEnvironment.writeToClipboard(rpc);
+
     vscode.window.showInformationMessage(Constants.informationMessage.rpcEndpointCopiedToClipboard);
   });
 

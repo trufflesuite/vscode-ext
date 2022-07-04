@@ -225,6 +225,12 @@ export class Constants {
   };
 
   public static treeItemData = {
+    dashboard: {
+      contextValue: "dashboard",
+      iconPath: {dark: "", light: ""},
+      label: "Truffle Dashboard",
+      prefix: "dsh",
+    },    
     network: {
       default: {
         contextValue: "network",
@@ -322,12 +328,6 @@ export class Constants {
             networks: {},
           },
         },
-      },
-      dashboard: {
-        contextValue: "service",
-        iconPath: {dark: "", light: ""},
-        label: "Dashboard Service",
-        prefix: "dsh",
       },
       generic: {
         contextValue: "service",
@@ -735,7 +735,7 @@ export class Constants {
       light: context.asAbsolutePath(path.join("resources/light", "GenericService.svg")),
     };
 
-    this.treeItemData.service.dashboard.iconPath = {
+    this.treeItemData.dashboard.iconPath = {
       dark: context.asAbsolutePath(path.join("resources/dark", "DashboardService.svg")),
       light: context.asAbsolutePath(path.join("resources/light", "DashboardService.svg")),
     };
