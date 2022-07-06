@@ -1,18 +1,19 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {INetwork} from '@/helpers/ConfigurationReader';
+import {generateMnemonic, getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
 import {window} from 'vscode';
-import {Constants, RequiredApps} from '../../Constants';
-import {TruffleConfiguration} from '../../helpers';
-import {showInputBox, showQuickPick, saveTextInFile} from '../../helpers/userInteraction';
-import {MnemonicRepository} from '../../services/MnemonicRepository'; // Should be full path since cycle dependencies
-import {Telemetry} from '../../TelemetryClient';
+import {Constants, RequiredApps} from '@/Constants';
+import {showInputBox, showQuickPick, saveTextInFile} from '@/helpers/userInteraction';
+import {MnemonicRepository} from '@/services'; // Should be full path since cycle dependencies
+import {Telemetry} from '@/TelemetryClient';
 import {NetworkNode} from './NetworkNode';
 
 export abstract class MnemonicNetworkNode extends NetworkNode {
-  public async getTruffleNetwork(): Promise<TruffleConfiguration.INetwork> {
-    const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
-    const config = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
+  public async getTruffleNetwork(): Promise<INetwork> {
+    const truffleConfigPath = getTruffleConfigUri();
+    const config = new TruffleConfig(truffleConfigPath);
     const network = await super.getTruffleNetwork();
     const mnemonic = await this.getMnemonic();
     const {fs, fsPackageName, hdwalletProvider} = Constants.truffleConfigRequireNames;
@@ -42,7 +43,7 @@ export abstract class MnemonicNetworkNode extends NetworkNode {
     const mnemonicOptions = [
       {
         cmd: async () => {
-          const mnemonic = await TruffleConfiguration.generateMnemonic();
+          const mnemonic = generateMnemonic();
           const path = await this.saveMnemonicFile(mnemonic);
           return {mnemonic, path};
         },

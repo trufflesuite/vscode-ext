@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 
 import {Memento, window, Uri} from 'vscode';
-import {Constants} from '../Constants';
+import {Constants} from '@/Constants';
 import {userSettings} from '../helpers';
-import {IExtensionAdapter, TruffleExtensionAdapter} from '../services/extensionAdapter';
+import {IExtensionAdapter, TruffleExtensionAdapter} from '@/services/extensionAdapter';
 
 class SdkCoreCommands {
   private extensionAdapter!: IExtensionAdapter;
@@ -18,7 +18,7 @@ class SdkCoreCommands {
   }
 
   /**
-   * call build on an extension
+   * Calls build on an extension
    */
   public async build(uri: Uri): Promise<void> {
     return this.extensionAdapter.build(uri);

@@ -1,16 +1,16 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {INetworkOption} from '@/helpers/ConfigurationReader';
 import truffleProvider from '@truffle/provider';
 import Web3 from 'web3';
-import {ConfigurationReader} from './configurationReader';
 
 export class Web3Wrapper extends Web3 {
   private _networkId: number | undefined;
-  private _options: ConfigurationReader.INetworkOption;
+  private _options: INetworkOption;
   private _cachedProvider: any;
 
-  public constructor(options: ConfigurationReader.INetworkOption) {
+  public constructor(options: INetworkOption) {
     const innerProvider = getWeb3InnerProvider(options);
     super(innerProvider);
     this._options = options;
@@ -87,7 +87,7 @@ function PromiseBatch(batch: Web3.IBatchRequest) {
   };
 }
 
-function getProviderUrl(options: ConfigurationReader.INetworkOption): string {
+function getProviderUrl(options: INetworkOption): string {
   if (options.host && options.port) {
     const protocol = options.websockets ? 'ws' : 'http';
     return `${protocol}://${options.host}:${options.port}`;
@@ -100,7 +100,7 @@ function getProviderUrl(options: ConfigurationReader.INetworkOption): string {
   throw new Error('Undefined network options.');
 }
 
-function getWeb3InnerProvider(options: ConfigurationReader.INetworkOption): Web3.IProvider {
+function getWeb3InnerProvider(options: INetworkOption): Web3.IProvider {
   const providerUrl = getProviderUrl(options);
   let provider;
   if (providerUrl.startsWith('ws')) {

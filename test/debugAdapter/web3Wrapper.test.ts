@@ -4,8 +4,8 @@
 import truffleProvider from '@truffle/provider';
 import assert from 'assert';
 import {restore, stub} from 'sinon';
-import {ConfigurationReader} from '../../src/debugAdapter/configurationReader';
-import {Web3Wrapper} from '../../src/debugAdapter/web3Wrapper';
+import {INetworkOption} from '@/helpers/ConfigurationReader';
+import {Web3Wrapper} from '@/debugAdapter/web3Wrapper';
 
 describe('Web3Wrapper unit tests', () => {
   afterEach(() => {
@@ -14,7 +14,7 @@ describe('Web3Wrapper unit tests', () => {
 
   it('getProvider should call truffleProvider.create', () => {
     // Arrange
-    const networkOptionsMock: ConfigurationReader.INetworkOption = {
+    const networkOptionsMock: INetworkOption = {
       host: '127.0.0.1',
       network_id: '*',
       port: 8545,

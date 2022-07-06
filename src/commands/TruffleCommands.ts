@@ -1,31 +1,25 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {INetwork} from '@/helpers/ConfigurationReader';
+import {getTruffleConfigUri, TruffleConfig, TruffleConstants} from '@/helpers/TruffleConfiguration';
 import {mnemonicToSeed} from 'bip39';
 import fs from 'fs-extra';
-// @ts-ignore
 import hdkey from 'hdkey';
 import path from 'path';
 import {QuickPickItem, Uri, window, commands} from 'vscode';
-import {Constants, RequiredApps} from '../Constants';
-import {
-  getWorkspace,
-  outputCommandHelper,
-  telemetryHelper,
-  TruffleConfig,
-  TruffleConfiguration,
-  vscodeEnvironment,
-} from '../helpers';
-import {required} from '../helpers/required';
+import {Constants, ext, RequiredApps} from '@/Constants';
+import {getWorkspace, outputCommandHelper, telemetryHelper, vscodeEnvironment} from '../helpers';
+import {required} from '@/helpers/required';
 
-import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from '../helpers/userInteraction';
-import {getPathByPlataform} from '../helpers/workspace';
+import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from '@/helpers/userInteraction';
+import {getPathByPlatform} from '@/helpers/workspace';
 
-import {IDeployDestination, ItemType} from '../Models';
-import {NetworkForContractItem} from '../Models/QuickPickItems';
-import {InfuraProject, LocalProject, LocalService} from '../Models/TreeItems';
-import {Project} from '../Models/TreeItems';
-import {Output} from '../Output';
+import {IDeployDestination, ItemType} from '@/Models';
+import {NetworkForContractItem} from '@/Models/QuickPickItems';
+import {InfuraProject, LocalProject, LocalService} from '@/Models/TreeItems';
+import {Project} from '@/Models/TreeItems';
+import {Output} from '@/Output';
 import {
   ContractDB,
   ContractInstanceWithMetadata,
@@ -33,9 +27,9 @@ import {
   GanacheService,
   MnemonicRepository,
   TreeManager,
-} from '../services';
-import {Telemetry} from '../TelemetryClient';
-import {NetworkNodeView} from '../ViewItems';
+} from '@/services';
+import {Telemetry} from '@/TelemetryClient';
+import {NetworkNodeView} from '@/ViewItems';
 import {ServiceCommands} from './ServiceCommands';
 
 interface IDeployDestinationItem {
@@ -68,7 +62,7 @@ export namespace TruffleCommands {
     }
 
     const workspace = await getWorkspace(uri);
-    const contractDirectory = getPathByPlataform(workspace);
+    const contractDirectory = getPathByPlatform(workspace);
 
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
       await outputCommandHelper.executeCommand(contractDirectory, 'npx', RequiredApps.truffle, 'compile');
@@ -80,9 +74,9 @@ export namespace TruffleCommands {
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandStarted');
 
     const workspace = await getWorkspace(uri);
-    TruffleConfiguration.truffleConfigUri = getPathByPlataform(workspace);
+    TruffleConstants.truffleConfigUri = Uri.parse(getPathByPlatform(workspace));
 
-    const truffleConfigsUri = TruffleConfiguration.getTruffleConfigUri();
+    const truffleConfigsUri = getTruffleConfigUri();
     const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri);
     const truffleDeployDestinations = await getTruffleDeployDestinations(truffleConfigsUri);
     const treeDeployDestinations = await getTreeDeployDestinations(truffleConfigsUri);
@@ -103,8 +97,17 @@ export namespace TruffleCommands {
       url: Telemetry.obfuscate(command.description || ''),
     });
     await command.cmd();
-    // notify our deployment view
-    commands.executeCommand('truffle-vscode.views.deployments.refresh');
+    // notify our deployment view - WHY IS THIS CRASHING
+    commands.executeCommand('truffle-vscode.views.deployments.refresh').then(
+      () => {
+        // do nothing
+      },
+      (reason) => {
+        // ignore
+        const outputStr = `Error refreshing view: ${reason}`;
+        ext.outputChannel ? ext.outputChannel.append(outputStr) : console.log(outputStr);
+      }
+    );
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandFinished');
   }
 
@@ -277,7 +280,7 @@ async function getTruffleDeployDestinations(truffleConfigPath: string): Promise<
   const truffleConfig = new TruffleConfig(truffleConfigPath);
   const networksFromConfig = truffleConfig.getNetworks();
 
-  networksFromConfig.forEach(async (network: TruffleConfiguration.INetwork) => {
+  for (const network of networksFromConfig) {
     const options = network.options;
     const url =
       `${options.provider ? options.provider.url : ''}` ||
@@ -291,7 +294,7 @@ async function getTruffleDeployDestinations(truffleConfigPath: string): Promise<
       label: network.name,
       networkId: options.network_id,
     });
-  });
+  }
 
   return deployDestination;
 }
@@ -374,7 +377,7 @@ async function getTreeProjectNames(): Promise<string[]> {
 
 function getServiceCreateFunction(
   type: ItemType,
-  getTruffleNetwork: () => Promise<TruffleConfiguration.INetwork>,
+  getTruffleNetwork: () => Promise<INetwork>,
   truffleConfigPath: string,
   port?: number
 ): () => Promise<void> {
@@ -406,7 +409,7 @@ async function createNewDeploymentService(truffleConfigPath: string): Promise<vo
 }
 
 async function createLocalGanacheNetwork(
-  getTruffleNetwork: () => Promise<TruffleConfiguration.INetwork>,
+  getTruffleNetwork: () => Promise<INetwork>,
   truffleConfigPath: string,
   port: number
 ): Promise<void> {
@@ -414,10 +417,7 @@ async function createLocalGanacheNetwork(
   await createNetwork(getTruffleNetwork, truffleConfigPath);
 }
 
-async function createNetwork(
-  getTruffleNetwork: () => Promise<TruffleConfiguration.INetwork>,
-  truffleConfigPath: string
-): Promise<void> {
+async function createNetwork(getTruffleNetwork: () => Promise<INetwork>, truffleConfigPath: string): Promise<void> {
   const network = await getTruffleNetwork();
   const truffleConfig = new TruffleConfig(truffleConfigPath);
   truffleConfig.setNetworks(network);

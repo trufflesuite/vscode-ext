@@ -1,14 +1,15 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {Constants, RequiredApps} from '@/Constants';
+import {required} from '@/helpers/required';
+import {checkTruffleConfigNaming} from '@/helpers/TruffleConfiguration';
+import {showIgnorableNotification, showInputBox, showOpenFolderDialog, showQuickPick} from '@/helpers/userInteraction';
+import {CancellationEvent} from '@/Models';
+import {Telemetry} from '@/TelemetryClient';
 import fs from 'fs-extra';
 import {Uri, window, workspace} from 'vscode';
-import {Constants, RequiredApps} from '../Constants';
-import {gitHelper, outputCommandHelper, TruffleConfiguration} from '../helpers';
-import {required} from '../helpers/required';
-import {showIgnorableNotification, showInputBox, showOpenFolderDialog, showQuickPick} from '../helpers/userInteraction';
-import {CancellationEvent} from '../Models';
-import {Telemetry} from '../TelemetryClient';
+import {gitHelper, outputCommandHelper} from '../helpers';
 
 interface IProjectDestination {
   cmd: (projectPath: string) => Promise<void>;
@@ -95,7 +96,7 @@ async function createProject(projectPath: string, truffleBoxName: string): Promi
       Telemetry.sendEvent('ProjectCommands.createProject.unbox', {truffleBoxName});
       await outputCommandHelper.executeCommand(projectPath, 'npx', RequiredApps.truffle, 'unbox', truffleBoxName);
 
-      TruffleConfiguration.checkTruffleConfigNaming(projectPath);
+      checkTruffleConfigNaming(projectPath);
       workspace.updateWorkspaceFolders(0, workspace.workspaceFolders ? workspace.workspaceFolders.length : null, {
         uri: Uri.file(projectPath),
       });
