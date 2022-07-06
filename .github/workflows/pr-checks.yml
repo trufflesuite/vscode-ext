@@ -20,13 +20,13 @@ jobs:
           cache: 'yarn'
 
       - name: clean install dependencies. Fail on lockfile Changes.
-        run: yarn install --immutable --immutable-cache --check-cache
-
-      - name: run eslint
-        run: yarn eslint
+        run: yarn install --immutable --immutable-cache --check-cache --ignore-scripts --non-interactive
 
       - name: run prettier
         run: yarn prettier
+
+      - name: run eslint
+        run: yarn eslint
 
       - name: run tests
         run: yarn test
