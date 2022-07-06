@@ -43,6 +43,8 @@ jobs:
           echo "::PreRelease: ${{ steps.gitversion.outputs.preReleaseTag }}::"
           echo "::SemVer: ${{ steps.gitversion.outputs.semVer }}::"
           echo "::PackageName: ${{steps.packageJson.outputs.packageName}} ::"
+          echo "::github.ref: ${{github.ref}} ::"
+          echo "::github.ref_name: ${{github.ref_name}} ::"
 
       - name: setup node
         uses: actions/setup-node@v2
@@ -78,25 +80,28 @@ jobs:
           echo "VSCE_FLAGS=--pre-release --yarn " | Out-File -FilePath $env:GITHUB_ENV -Append
           echo "flags_set=true" | Out-File -FilePath $env:GITHUB_ENV -Append
 
+      - name: set vsix path
+        run: |
+          echo "vsix_path_old=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}" | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{github.ref}}" | Out-File -FilePath $env:GITHUB_ENV -Append
+
       - name: compile and create vsix MASTER Release
-        if: github.ref == 'refs/heads/master'
+        if: github.ref_name == 'refs/heads/master'
         run: |
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} ::"
           yarn package
-          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo "vsix_type=-RELEASE" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: compile and create vsix Develop PreRelease
-        if: github.ref == 'refs/heads/develop'
+        if: github.ref_name == 'refs/heads/develop'
         run: |
-          echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} :: $GITHUB_ENV"
+          echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }}::"
           yarn package ${{ env.VSCE_FLAGS }}
-          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo "vsix_type=-PRE_RELEASE" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: print vsix path
         run: |
-          echo "::VSIX Path: ${{ env.vsix_path }}:: TYPE: ${{ env.vsix_type }}"
+          echo ":: VSIX Path: ${{ env.vsix_path }} TYPE: ${{ env.vsix_type }} OLD: ${{ env.vsix_path_old }} ::"
 
       - name: upload vsix as artifact
         uses: actions/upload-artifact@v1
