@@ -19,7 +19,7 @@ module.exports = {
     sourceType: 'module',
     project: ['./tsconfig.json'],
   },
-  plugins: ['@typescript-eslint', 'prettier'],
+  plugins: ['@typescript-eslint'],
   rules: {
     'dot-notation': 'off',
     '@typescript-eslint/dot-notation': ['error'],
