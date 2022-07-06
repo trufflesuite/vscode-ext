@@ -4,7 +4,7 @@
 const path = require('path');
 
 try {
-  const hdwalletNodeModulePath = path.join(process.cwd(), 'node_modules', 'truffle-hdwallet-provider');
+  const hdwalletNodeModulePath = path.join(process.cwd(), 'node_modules', '@truffle/hdwallet-provider');
   require(hdwalletNodeModulePath);
   require.cache[require.resolve(hdwalletNodeModulePath)].exports = function HDWallet(...args) {
     this.mnemonic = args[0];
