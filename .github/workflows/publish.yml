@@ -1,12 +1,22 @@
 name: Build the VSIX Package
 
 on:
-  release:
-    branches:
-      - develop
-      - master
-    paths-ignore: # dont run when changes made to these folders
-      - '.vscode/**'
+  #  release:
+  #    branches:
+  #      - develop
+  #      - master
+  #    paths-ignore: # dont run when changes made to these folders
+  #      - '.vscode/**'
+  workflow_dispatch:
+    inputs:
+      releaseType:
+        description: 'What type of release are you wanting?'
+        required: true
+        default: 'pre-release'
+        type: choice
+        options:
+          - 'pre-release'
+          - 'release'
 
 jobs:
   build-vsix:
@@ -45,6 +55,7 @@ jobs:
           echo "::PackageName: ${{steps.packageJson.outputs.packageName}} ::"
           echo "::github.ref: ${{github.ref}} ::"
           echo "::github.ref_name: ${{github.ref_name}} ::"
+          echo "::release type: ${{inputs.releaseType}} ::"
 
       - name: setup node
         uses: actions/setup-node@v2
@@ -85,14 +96,14 @@ jobs:
           echo "flags_set=true" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: package - pre-release
-        if: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
+        if: ${{ inputs.releaseType == 'pre-release' }}
         run: |
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }}::"
           yarn package ${{ env.VSCE_FLAGS }}
           echo "vsix_type=-PRE_RELEASE" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: package - release
-        if: ${{ steps.gitversion.outputs.preReleaseTag == '' }}
+        if: ${{ inputs.releaseType == 'release' }}
         run: |
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} ::"
           yarn package
@@ -107,15 +118,16 @@ jobs:
         with:
           path: ${{ github.workspace }}/${{ env.vsix_path }}.vsix
           name: ${{ env.vsix_path }}${{ env.vsix_type }}.vsix
-#      - name: publish to marketplace
-#        if: github.ref == 'refs/heads/master'
-#        run: npm run deploy ${{ env.PAT }}
-#
-#      - name: create a release
-#        if: github.ref == 'refs/heads/master'
-#        uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-#        with:
-#          tag_name: v${{ steps.gitversion.outputs.semVer }}
-#          release_name: v${{ steps.gitversion.outputs.semVer }}
+
+      #      - name: publish to marketplace
+      #        if: github.ref == 'refs/heads/master'
+      #        run: npm run deploy ${{ env.PAT }}
+
+      - name: create a release
+        #        if: github.ref == 'refs/heads/master'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: v${{ steps.gitversion.outputs.semVer }}
+          release_name: v${{ steps.gitversion.outputs.semVer }}
