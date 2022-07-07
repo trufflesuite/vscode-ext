@@ -85,7 +85,6 @@ jobs:
           echo "flags_set=true" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: package - pre-release
-        id: package_prerelease
         if: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
         run: |
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }}::"
@@ -93,7 +92,6 @@ jobs:
           echo "vsix_type=-PRE_RELEASE" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: package - release
-        id: package_prerelease
         if: ${{ steps.gitversion.outputs.preReleaseTag == '' }}
         run: |
           echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} ::"
