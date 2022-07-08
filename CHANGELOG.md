@@ -2,6 +2,12 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
+## 2.3.5
+
+This release has some fixes around internal optimisations for our CI/Linting and cleanup of code.
+
+- chore: fixing eslint config and refactoring config code. [PR](https://github.com/trufflesuite/vscode-ext/pull/119)
+
 ## 2.3.4
 
 This release is a fix to the windows path issues that were reported.

@@ -1,16 +1,16 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
 import {commands, ProgressLocation, window} from 'vscode';
-import {Constants, RequiredApps} from '../Constants';
+import {Constants, RequiredApps} from '@/Constants';
 import {getWorkspaceRoot} from '../helpers';
-import {Output} from '../Output';
-import {Telemetry} from '../TelemetryClient';
+import {Output} from '@/Output';
+import {Telemetry} from '@/TelemetryClient';
 import {executeCommand, tryExecuteCommand} from './command';
-import {TruffleConfiguration} from './truffleConfig';
 
 export namespace required {
   export interface IRequiredVersion {
@@ -255,8 +255,8 @@ export namespace required {
         Constants.requiredVersions[RequiredApps.hdwalletProvider],
         Scope.locally
       );
-      const truffleConfigPath = await TruffleConfiguration.getTruffleConfigUri();
-      const config = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
+      const truffleConfigPath = getTruffleConfigUri();
+      const config = new TruffleConfig(truffleConfigPath);
       await config.importPackage(Constants.truffleConfigRequireNames.hdwalletProvider, RequiredApps.hdwalletProvider);
     } catch (error) {
       Telemetry.sendException(error as Error);
@@ -265,8 +265,8 @@ export namespace required {
 
   export async function isHdWalletProviderRequired(): Promise<boolean> {
     try {
-      const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
-      const config = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
+      const truffleConfigPath = getTruffleConfigUri();
+      const config = new TruffleConfig(truffleConfigPath);
       return config.isHdWalletProviderDeclared();
     } catch (error) {
       Telemetry.sendException(error as Error);

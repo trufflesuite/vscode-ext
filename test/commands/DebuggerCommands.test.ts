@@ -6,9 +6,9 @@ import path from 'path';
 import sinon from 'sinon';
 import {debug, QuickPickItem, Uri, workspace} from 'vscode';
 
-import {DebugNetwork} from '../../src/debugAdapter/debugNetwork';
-import {ITransactionResponse} from '../../src/debugAdapter/models/ITransactionResponse';
-import {TransactionProvider} from '../../src/debugAdapter/transaction/transactionProvider';
+import {DebugNetwork} from '@/debugAdapter/debugNetwork';
+import {ITransactionResponse} from '@/debugAdapter/models/ITransactionResponse';
+import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvider';
 
 import * as userInteraction from '../../src/helpers/userInteraction';
 import {TestConstants} from '../TestConstants';

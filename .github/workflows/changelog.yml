@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+
+jobs:
+  build:
+    name: '✏️ Changelog generation'
+    runs-on: ubuntu-18.04
+    steps:
+      - name: '📥 Check-out'
+        uses: actions/checkout@v2
+        # explicitly specify ${{ github.head_ref }} in the checkout Action.
+        # This is required in order to work with the pull_request event (or any other non-push event).
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: '✏️ Generate full changelog'
+        id: generate-full-changelog
+        # https://github.com/heinrichreimer/action-github-changelog-generator
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          headerLabel: '# 📑 Changelog'
+          breakingLabel: '### 💥 Breaking'
+          enhancementLabel: '### 🚀 Enhancements'
+          bugsLabel: '### 🐛 Bug fixes'
+          deprecatedLabel: '### ⚠️ Deprecations'
+          removedLabel: '### 🔥 Removals'
+          securityLabel: '### 🛡️ Security'
+          issuesLabel: '### 📁 Other issues'
+          prLabel: '### 📁 Other pull requests'
+          addSections: '{"documentation":{"prefix":"### 📖 Documentation","labels":["documentation"]},"tests":{"prefix":"### ✅ Testing","labels":["tests"]}}'
+          issues: true
+          issuesWoLabels: true
+          pullRequests: true
+          prWoLabels: true
+          author: true
+          unreleased: true
+          compareLink: true
+          stripGeneratorNotice: true
+          verbose: true
+      - name: '🖨️ Print changelog to console'
+        run: cat CHANGELOG.md
+
+      # TODO - look at using autocommit here:
+      #      - name: Commit updated CHANGELOG
+      #        uses: stefanzweifel/git-auto-commit-action@v4
+      #        with:
+      #          branch: ${{ github.event.release.target_commitish }}
+      #          commit_message: Update CHANGELOG
+      #          commit_options: '--no-verify'
+      #          file_pattern: CHANGELOG.md
+
+      - name: '📤 Upload changelog'
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          name: 'Changelog'
+          path: CHANGELOG.md

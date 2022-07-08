@@ -3,10 +3,10 @@
 
 import fs from 'fs';
 import {InputBoxOptions, ProgressLocation, QuickPickItem, QuickPickOptions, Uri, window, workspace} from 'vscode';
-import {Constants, NotificationOptions} from '../Constants';
-import {CancellationEvent} from '../Models';
-import {Telemetry} from '../TelemetryClient';
-import {DialogResultValidator} from '../validators/DialogResultValidator';
+import {Constants, NotificationOptions} from '@/Constants';
+import {CancellationEvent} from '@/Models';
+import {Telemetry} from '@/TelemetryClient';
+import {DialogResultValidator} from '@/validators/DialogResultValidator';
 
 export async function showInputBox(options: InputBoxOptions): Promise<string> {
   const result = await window.showInputBox(options);
