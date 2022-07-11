@@ -8,6 +8,7 @@ import fs from 'fs-extra';
 import hdkey from 'hdkey';
 import path from 'path';
 import {QuickPickItem, Uri, window, commands} from 'vscode';
+
 import {Constants, ext, RequiredApps} from '@/Constants';
 import {getWorkspace, outputCommandHelper, telemetryHelper, vscodeEnvironment} from '../helpers';
 import {required} from '@/helpers/required';
@@ -168,6 +169,15 @@ export namespace TruffleCommands {
     }
 
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
+  }
+
+  export async function createContract(uri: Uri): Promise<void> {
+    const workspace = await getWorkspace(uri);
+    const contractDirectory = getPathByPlatform(workspace);
+
+    await fs.createFile(path.join(contractDirectory, 'contracts', 'NewContract.sol'));
+
+    await commands.executeCommand('truffle-vscode.views.explorer.refreshExplorer');
   }
 
   export async function writeRPCEndpointAddressToBuffer(networkNodeView: NetworkNodeView): Promise<void> {

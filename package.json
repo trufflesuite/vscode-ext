@@ -47,6 +47,7 @@
     "onCommand:truffle-vscode.newSolidityProject",
     "onCommand:truffle-vscode.buildContracts",
     "onCommand:truffle-vscode.deployContracts",
+    "onCommand:truffle-vscode.createContract",
     "onCommand:truffle-vscode.connectProject",
     "onCommand:truffle-vscode.copyRPCEndpointAddress",
     "onCommand:truffle-vscode.createProject",
@@ -124,6 +125,11 @@
       {
         "command": "truffle-vscode.deployContracts",
         "title": "Deploy Contracts",
+        "category": "Blockchain"
+      },
+      {
+        "command": "truffle-vscode.createContract",
+        "title": "Create Contract",
         "category": "Blockchain"
       },
       {
@@ -228,6 +234,12 @@
         "title": "Deploy Contracts",
         "category": "Truffle",
         "icon": "$(radio-tower)"
+      },
+      {
+        "command": "truffle-vscode.createContract",
+        "title": "Create Contract",
+        "category": "Truffle",
+        "icon": "$(add)"
       },
       {
         "command": "truffle-vscode.connectProject",
@@ -378,6 +390,11 @@
           "group": "navigation"
         },
         {
+          "command": "truffle-vscode.createContract",
+          "when": "view == truffle-vscode.views.explorer",
+          "group": "navigation"
+        },
+        {
           "command": "truffle-vscode.views.deployments.refresh",
           "when": "view == truffle-vscode.views.deployments",
           "group": "navigation"
@@ -435,9 +452,14 @@
           "group": "truffle-0@1"
         },
         {
-          "command": "truffle-vscode.debugTransaction",
+          "command": "truffle-vscode.createContract",
           "when": "view == truffle-vscode.views.explorer",
           "group": "truffle-0@2"
+        },
+        {
+          "command": "truffle-vscode.debugTransaction",
+          "when": "view == truffle-vscode.views.explorer",
+          "group": "truffle-0@3"
         },
         {
           "command": "truffle-vscode.disconnectProject",
