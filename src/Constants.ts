@@ -17,6 +17,7 @@ export enum RequiredApps {
   truffle = 'truffle',
   ganache = 'ganache',
   hdwalletProvider = '@truffle/hdwallet-provider',
+  dashboard = 'dashboard',
 }
 
 export enum NotificationOptions {
@@ -36,6 +37,7 @@ export class Constants {
     executeCommand: 'Truffle: Execute command',
     ganacheCommands: 'Truffle: Ganache Server',
     genericCommands: 'Truffle: Generic Server',
+    dashboardCommands: 'Truffle: Dashboard Server',
     requirements: 'Truffle: Requirements',
     telemetryClient: 'Truffle: Telemetry Client',
     treeManager: 'Truffle: Service Tree Manager',
@@ -67,6 +69,10 @@ export class Constants {
   public static ganacheRetryAttempts = 5;
   public static latestBlock = 'latest';
 
+  public static dashboardPort = 24012;
+  public static dashboardRetryTimeout = 2000; // milliseconds
+  public static dashboardRetryAttempts = 5;
+
   // Values are quite brittle and don't map directly to the requirements.html screen.
   public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
     [RequiredApps.ganache]: {
@@ -89,6 +95,10 @@ export class Constants {
     [RequiredApps.truffle]: {
       max: '6.0.0',
       min: '5.0.0',
+    },
+    [RequiredApps.dashboard]: {
+      max: '',
+      min: '5.5.0',
     },
   };
 
@@ -216,6 +226,12 @@ export class Constants {
   };
 
   public static treeItemData = {
+    dashboard: {
+      contextValue: 'dashboard',
+      iconPath: {dark: '', light: ''},
+      label: 'Truffle Dashboard',
+      prefix: 'dsh',
+    },
     network: {
       default: {
         contextValue: 'network',
@@ -430,6 +446,8 @@ export class Constants {
     setupMnemonic: 'Setup mnemonic',
     enterBlockNumber: 'Leave blank for latest block',
     enterNetworkUrl: 'Enter a valid url',
+    buttonTruffleUpdate: 'Update Truffle',
+    buttonClose: 'Close',
   };
 
   // More information see here
@@ -513,10 +531,29 @@ export class Constants {
     serverNotFound: 'Not found',
   };
 
+  public static dashboardCommandStrings = {
+    cannotStartServer: 'Cannot start dashboard server',
+    invalidDashboardPort: 'Cannot start Dashboard server. Invalid port',
+    dashboardPortIsBusy: 'Cannot start dashboard server, port is busy',
+    serverAlreadyRunning: 'Dashboard server already running',
+    serverSuccessfullyStarted: 'Dashboard server successfully started',
+    serverSuccessfullyStopped: 'Dashboard server successfully stopped',
+    serverCanNotStop: 'Dashboard stop server was failed because is not dashboard application',
+    connectingDashboardServer: 'Connecting to Dashboard server',
+  };
+
   public static uiCommandStrings = {
     createInfuraProject: '$(plus) Create Infura Project',
     createProject: '$(plus) Create a new network',
+    createProjectDetail: 'Create a new network choosing Ganache, Infura and others',
     createTransactionNode: '$(plus) Create Transaction Node',
+    deployViaTruffleDashboard: '$(arrow-up) Deploy via Truffle Dashboard',
+    deployViaTruffleDashboardDetail: 'Deploy your contracts via Truffle Dashboard',
+  };
+
+  public static uiCommandSeparators = {
+    optionSeparator: 'Options',
+    networkSeparator: 'Networks',
   };
 
   public static errorMessageStrings = {
@@ -556,6 +593,7 @@ export class Constants {
     TruffleConfigIsNotExist: 'Truffle configuration file not found',
     VariableShouldBeDefined: Constants.getMessageVariableShouldBeDefined,
     WorkspaceShouldBeOpened: 'Workspace should be opened',
+    DashboardVersionError: 'Please upgrade to the latest version of Truffle to use this feature',
   };
 
   public static informationMessage = {
@@ -696,6 +734,11 @@ export class Constants {
     this.treeItemData.service.generic.iconPath = {
       dark: context.asAbsolutePath(path.join('resources/dark', 'GenericService.svg')),
       light: context.asAbsolutePath(path.join('resources/light', 'GenericService.svg')),
+    };
+
+    this.treeItemData.dashboard.iconPath = {
+      dark: context.asAbsolutePath(path.join('resources/dark', 'DashboardService.svg')),
+      light: context.asAbsolutePath(path.join('resources/light', 'DashboardService.svg')),
     };
   }
 

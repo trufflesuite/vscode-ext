@@ -59,6 +59,11 @@
     "onCommand:truffle-vscode.stopGanacheServer",
     "onCommand:truffle-vscode.views.explorer.refreshExplorer",
     "onCommand:truffle-vscode.views.deployments.refresh",
+    "onCommand:truffle-vscode.views.dashboard.startDashboardServer",
+    "onCommand:truffle-vscode.views.dashboard.stopDashboardServer",
+    "onCommand:truffle-vscode.views.dashboard.restartDashboardServer",
+    "onCommand:truffle-vscode.views.dashboard.openDashboard",
+    "onCommand:truffle-vscode.views.dashboard.copyRPCEndpointAddress",
     "onDebug"
   ],
   "contributes": {
@@ -311,6 +316,31 @@
         "title": "Refresh Deployments",
         "category": "Truffle",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "truffle-vscode.views.dashboard.startDashboardServer",
+        "title": "Start Dashboard",
+        "category": "Truffle"
+      },
+      {
+        "command": "truffle-vscode.views.dashboard.stopDashboardServer",
+        "title": "Stop Dashboard",
+        "category": "Truffle"
+      },
+      {
+        "command": "truffle-vscode.views.dashboard.restartDashboardServer",
+        "title": "Restart Dashboard",
+        "category": "Truffle"
+      },
+      {
+        "command": "truffle-vscode.views.dashboard.openDashboard",
+        "title": "Open Dashboard in Web Browser",
+        "category": "Truffle"
+      },
+      {
+        "command": "truffle-vscode.views.dashboard.copyRPCEndpointAddress",
+        "title": "Copy RPC Endpoint Address",
+        "category": "Truffle"
       }
     ],
     "breakpoints": [
@@ -470,6 +500,31 @@
           "command": "truffle-vscode.checkForConnection",
           "when": "view == truffle-vscode.truffle && viewItem == genericproject",
           "group": "truffle-1@0"
+        },
+        {
+          "command": "truffle-vscode.views.dashboard.startDashboardServer",
+          "when": "view == truffle-vscode.views.dashboard",
+          "group": "truffle-0@0"
+        },
+        {
+          "command": "truffle-vscode.views.dashboard.stopDashboardServer",
+          "when": "view == truffle-vscode.views.dashboard",
+          "group": "truffle-0@1"
+        },
+        {
+          "command": "truffle-vscode.views.dashboard.restartDashboardServer",
+          "when": "view == truffle-vscode.views.dashboard",
+          "group": "truffle-0@2"
+        },
+        {
+          "command": "truffle-vscode.views.dashboard.openDashboard",
+          "when": "view == truffle-vscode.views.dashboard",
+          "group": "truffle-1@0"
+        },
+        {
+          "command": "truffle-vscode.views.dashboard.copyRPCEndpointAddress",
+          "when": "view == truffle-vscode.views.dashboard",
+          "group": "truffle-1@1"
         }
       ],
       "explorer/context": [
@@ -520,6 +575,10 @@
         {
           "id": "truffle-vscode.views.explorer",
           "name": "Contract Explorer"
+        },
+        {
+          "id": "truffle-vscode.views.dashboard",
+          "name": "Dashboard"
         },
         {
           "id": "truffle-vscode.truffle",

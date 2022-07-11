@@ -29,9 +29,11 @@ import {
   MnemonicRepository,
   TreeManager,
   TreeService,
+  DashboardService,
 } from './services';
 import {Telemetry} from './TelemetryClient';
 import {NetworkNodeView, ProjectView} from './ViewItems';
+import {registerDashboardView} from './views/DashboardView';
 import {registerDeploymentView} from './views/DeploymentsView';
 import {registerFileExplorerView} from './views/fileExplorer';
 import {registerHelpView} from './views/HelpView';
@@ -208,6 +210,7 @@ export async function activate(context: ExtensionContext) {
   const helpView = registerHelpView();
 
   const deploymentView = registerDeploymentView();
+  const dashboardView = registerDashboardView();
 
   // #endregion
 
@@ -239,6 +242,7 @@ export async function activate(context: ExtensionContext) {
     fileExplorerView,
     helpView,
     deploymentView,
+    dashboardView,
     checkForConnection,
   ];
   context.subscriptions.push(...subscriptions);
@@ -252,6 +256,7 @@ export async function deactivate(): Promise<void> {
   // Therefore, please, call important dispose functions first and don't use await
   // For more information see https://github.com/Microsoft/vscode/issues/47881
   GanacheService.dispose();
+  DashboardService.dispose();
   ContractDB.dispose();
   Telemetry.dispose();
   TreeManager.dispose();

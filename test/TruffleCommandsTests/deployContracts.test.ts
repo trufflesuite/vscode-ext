@@ -26,7 +26,7 @@ import {
   Service,
   TLocalProjectOptions,
 } from '@/Models/TreeItems';
-import {GanacheService, TreeManager} from '@/services';
+import {DashboardService, GanacheService, TreeManager} from '@/services';
 import {TestConstants} from '../TestConstants';
 const {service} = Constants.treeItemData;
 const description = '';
@@ -59,6 +59,9 @@ describe('TruffleCommands', () => {
       let ganacheServiceMock: sinon.SinonMock;
       let startGanacheServerMock: sinon.SinonExpectation;
 
+      let dashboardServiceMock: sinon.SinonMock;
+      let startDashboardServerMock: sinon.SinonExpectation;
+
       let getItemsMock: sinon.SinonStub<[], IExtensionItem[]>;
       let loadStateMock: sinon.SinonStub<[], IExtensionItem[]>;
       let servicesItems: Service[];
@@ -90,6 +93,9 @@ describe('TruffleCommands', () => {
 
         ganacheServiceMock = sinon.mock(GanacheService);
         startGanacheServerMock = ganacheServiceMock.expects('startGanacheServer');
+
+        dashboardServiceMock = sinon.mock(DashboardService);
+        startDashboardServerMock = dashboardServiceMock.expects('startDashboardServer');
 
         getItemsMock = sinon.stub(TreeManager, 'getItems');
         loadStateMock = sinon.stub(TreeManager, 'loadState');
@@ -156,6 +162,7 @@ describe('TruffleCommands', () => {
         assert.strictEqual(getWorkspacesMock.called, true, 'getWorkspacesMock should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
         assert.strictEqual(startGanacheServerMock.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(startDashboardServerMock.called, false, 'startDashboardServer should not be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
         assert.strictEqual(
           isHdWalletProviderRequiredMock.calledOnce,
@@ -196,6 +203,7 @@ describe('TruffleCommands', () => {
         assert.strictEqual(getWorkspacesMock.called, true, 'getWorkspacesMock should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
         assert.strictEqual(startGanacheServerMock.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(startDashboardServerMock.called, false, 'startDashboardServer should not be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
         assert.strictEqual(
           isHdWalletProviderRequiredMock.calledOnce,
@@ -233,6 +241,7 @@ describe('TruffleCommands', () => {
         assert.strictEqual(getWorkspacesMock.called, true, 'getWorkspacesMock should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
         assert.strictEqual(startGanacheServerMock.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(startDashboardServerMock.called, false, 'startDashboardServer should not be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
         assert.strictEqual(
           isHdWalletProviderRequiredMock.calledOnce,
@@ -271,6 +280,7 @@ describe('TruffleCommands', () => {
         assert.strictEqual(getWorkspacesMock.called, true, 'getWorkspacesMock should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
         assert.strictEqual(startGanacheServerMock.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(startDashboardServerMock.called, false, 'startDashboardServer should not be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
         assert.strictEqual(
           isHdWalletProviderRequiredMock.calledOnce,
@@ -307,6 +317,7 @@ describe('TruffleCommands', () => {
         assert.strictEqual(getWorkspacesMock.called, true, 'getWorkspacesMock should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
         assert.strictEqual(startGanacheServerMock.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(startDashboardServerMock.called, false, 'startDashboardServer should not be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
         assert.strictEqual(
           isHdWalletProviderRequiredMock.calledOnce,
@@ -348,6 +359,7 @@ describe('TruffleCommands', () => {
         assert.strictEqual(getWorkspacesMock.called, true, 'getWorkspacesMock should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
         assert.strictEqual(startGanacheServerMock.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(startDashboardServerMock.called, false, 'startDashboardServer should not be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
         assert.strictEqual(
           isHdWalletProviderRequiredMock.calledOnce,
@@ -387,7 +399,84 @@ describe('TruffleCommands', () => {
         assert.strictEqual(getWorkspacesMock.called, true, 'getWorkspacesMock should be called');
         assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
         assert.strictEqual(startGanacheServerMock.called, true, 'startGanacheServer should be called');
+        assert.strictEqual(startDashboardServerMock.called, false, 'startDashboardServer should not be called');
         assert.strictEqual(truffleConfigSetNetworkMock.called, true, 'truffleConfig.setNetwork should be called');
+        assert.strictEqual(
+          isHdWalletProviderRequiredMock.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called'
+        );
+        assert.strictEqual(
+          checkHdWalletProviderVersionMock.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called'
+        );
+        assert.strictEqual(
+          installTruffleHdWalletProviderMock.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called'
+        );
+      });
+
+      it('to dashboard should complete successfully', async () => {
+        // Arrange
+        checkAppsSilentMock.returns(true);
+        executeCommandMock.returns(uuid.v4());
+
+        showQuickPickMock.onCall(0).callsFake((items: any) => {
+          return items.find((item: any) => item.label === Constants.uiCommandStrings.deployViaTruffleDashboard);
+        });
+
+        // Act
+        await TruffleCommands.deployContracts();
+
+        // Assert
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
+        assert.strictEqual(checkAppsSilentMock.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffleMock.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspacesMock.called, true, 'getWorkspacesMock should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServerMock.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(startDashboardServerMock.called, true, 'startDashboardServer should be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
+        assert.strictEqual(
+          isHdWalletProviderRequiredMock.calledOnce,
+          true,
+          'isHdWalletProviderRequired should be called'
+        );
+        assert.strictEqual(
+          checkHdWalletProviderVersionMock.calledOnce,
+          false,
+          'checkHdWalletProviderVersion should not be called'
+        );
+        assert.strictEqual(
+          installTruffleHdWalletProviderMock.calledOnce,
+          false,
+          'installTruffleHdWalletProvider should not be called'
+        );
+      });
+
+      it('to dashboard should throw exception when there is an error on command execution', async () => {
+        // Arrange
+        checkAppsSilentMock.returns(true);
+        executeCommandMock.throws(TestConstants.testError);
+
+        showQuickPickMock.onCall(0).callsFake((items: any) => {
+          return items.find((item: any) => item.label === Constants.uiCommandStrings.deployViaTruffleDashboard);
+        });
+
+        // Act and assert
+        await assert.rejects(TruffleCommands.deployContracts());
+        assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+        assert.strictEqual(showInputBoxMock.called, false, 'showInputBox should not be called');
+        assert.strictEqual(checkAppsSilentMock.calledOnce, true, 'checkAppsSilent should be called once');
+        assert.strictEqual(installTruffleMock.called, false, 'installTruffle should not be called');
+        assert.strictEqual(getWorkspacesMock.called, true, 'getWorkspacesMock should be called');
+        assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
+        assert.strictEqual(startGanacheServerMock.called, false, 'startGanacheServer should not be called');
+        assert.strictEqual(startDashboardServerMock.called, true, 'startDashboardServer should be called');
+        assert.strictEqual(truffleConfigSetNetworkMock.called, false, 'truffleConfig.setNetwork should not be called');
         assert.strictEqual(
           isHdWalletProviderRequiredMock.calledOnce,
           true,

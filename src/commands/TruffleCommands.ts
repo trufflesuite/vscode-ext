@@ -7,8 +7,7 @@ import {mnemonicToSeed} from 'bip39';
 import fs from 'fs-extra';
 import hdkey from 'hdkey';
 import path from 'path';
-import {QuickPickItem, Uri, window, commands} from 'vscode';
-
+import {QuickPickItem, Uri, window, commands, QuickPickItemKind} from 'vscode';
 import {Constants, ext, RequiredApps} from '@/Constants';
 import {getWorkspace, outputCommandHelper, telemetryHelper, vscodeEnvironment} from '../helpers';
 import {required} from '@/helpers/required';
@@ -25,6 +24,7 @@ import {
   ContractDB,
   ContractInstanceWithMetadata,
   ContractService,
+  DashboardService,
   GanacheService,
   MnemonicRepository,
   TreeManager,
@@ -38,6 +38,7 @@ interface IDeployDestinationItem {
   cwd?: string;
   description?: string;
   detail?: string;
+  kind?: QuickPickItemKind;
   label: string;
   networkId: string | number;
 }
@@ -278,9 +279,32 @@ async function installRequiredDependencies(): Promise<void> {
 function getDefaultDeployDestinations(truffleConfigPath: string): IDeployDestinationItem[] {
   return [
     {
+      cmd: async () => {
+        return;
+      },
+      kind: QuickPickItemKind.Separator,
+      label: Constants.uiCommandSeparators.optionSeparator,
+      networkId: '',
+    },
+    {
       cmd: createNewDeploymentService.bind(undefined, truffleConfigPath),
       label: Constants.uiCommandStrings.createProject,
+      detail: Constants.uiCommandStrings.createProjectDetail,
       networkId: '*',
+    },
+    {
+      cmd: deployToDashboard.bind(undefined, truffleConfigPath),
+      label: Constants.uiCommandStrings.deployViaTruffleDashboard,
+      detail: Constants.uiCommandStrings.deployViaTruffleDashboardDetail,
+      networkId: '*',
+    },
+    {
+      cmd: async () => {
+        return;
+      },
+      kind: QuickPickItemKind.Separator,
+      label: Constants.uiCommandSeparators.networkSeparator,
+      networkId: '',
     },
   ];
 }
@@ -438,8 +462,9 @@ async function createNetwork(getTruffleNetwork: () => Promise<INetwork>, truffle
 async function deployToNetwork(networkName: string, truffleConfigPath: string): Promise<void> {
   await showIgnorableNotification(Constants.statusBarMessages.deployingContracts(networkName), async () => {
     const workspaceRoot = path.dirname(truffleConfigPath);
-
     await fs.ensureDir(workspaceRoot);
+
+    Output.show();
 
     try {
       await installRequiredDependencies();
@@ -453,6 +478,7 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
         '--network',
         networkName
       );
+
       Output.outputLine(Constants.outputChannel.truffleForVSCode, Constants.informationMessage.deploySucceeded);
       Telemetry.sendEvent('TruffleCommands.deployToNetwork.deployedSuccessfully', {
         destination: telemetryHelper.mapNetworkName(networkName),
@@ -476,8 +502,12 @@ async function deployToLocalGanache(networkName: string, truffleConfigPath: stri
 
 async function deployToMainNetwork(networkName: string, truffleConfigPath: string): Promise<void> {
   await showConfirmPaidOperationDialog();
-
   await deployToNetwork(networkName, truffleConfigPath);
+}
+
+async function deployToDashboard(truffleConfigPath: string): Promise<void> {
+  await DashboardService.startDashboardServer(Constants.dashboardPort);
+  await deployToNetwork(RequiredApps.dashboard, truffleConfigPath);
 }
 
 async function readCompiledContract(uri: Uri): Promise<any> {

@@ -95,9 +95,9 @@ export namespace ServiceCommands {
 
     return project;
   }
-
   export async function disconnectProject(viewItem: ProjectView): Promise<void> {
     Telemetry.sendEvent('ServiceCommands.disconnectProject.commandStarted');
+
     if (viewItem.extensionItem instanceof LocalProject) {
       Telemetry.sendEvent('ServiceCommands.disconnectProject.LocalNetworkSelected');
       const port = viewItem.extensionItem.port;
@@ -189,6 +189,13 @@ async function connectLocalProject(service: LocalService): Promise<LocalProject>
   return localResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service), options);
 }
 
+// ------------ GENERIC ------------ //
+async function connectGenericProject(service: GenericService): Promise<GenericProject> {
+  const genericResourceExplorer = new GenericResourceExplorer();
+  return genericResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
+}
+
+// ------------ COMMON ------------ //
 async function getExistingNames(service: LocalService): Promise<string[]> {
   const localProjects = service.getChildren() as LocalProject[];
   return localProjects.map((item) => item.label);
@@ -290,11 +297,6 @@ async function loadServiceType(): Promise<TServiceType[]> {
   ];
 
   return networks;
-}
-// ------------ GENERIC ------------ //
-async function connectGenericProject(service: GenericService): Promise<GenericProject> {
-  const genericResourceExplorer = new GenericResourceExplorer();
-  return genericResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
 }
 
 async function addChild(service: Service, child: Project): Promise<void> {
