@@ -9,5 +9,5 @@ on:
 jobs:
   pr-checks:
     name: Core CI Checks - Workflow Call
-    uses: ./core-ci-checks.yml
+    uses: ./.github/workflows/core-ci-checks.yml
     secrets: inherit
