@@ -1,4 +1,4 @@
-name: CI
+name: Changelog Test
 
 on:
   push:

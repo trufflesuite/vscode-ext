@@ -1,0 +1,15 @@
+name: Main Branch Checks
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+    paths-ignore: # dont run when changes made to these folders
+      - '.vscode/**'
+
+jobs:
+  checks:
+    name: Core Checks - Workflow Call
+    uses: ./core-ci-checks.yml
+    secrets: inherit

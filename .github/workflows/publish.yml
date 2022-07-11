@@ -1,12 +1,6 @@
-name: Build the VSIX Package
+name: Build VSIX Package
 
 on:
-  #  release:
-  #    branches:
-  #      - develop
-  #      - master
-  #    paths-ignore: # dont run when changes made to these folders
-  #      - '.vscode/**'
   workflow_dispatch:
     inputs:
       releaseType:
@@ -60,7 +54,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: lts/*
           cache: 'yarn'
 
       - name: clean install dependencies. Fail on lockfile Changes.
@@ -122,12 +116,12 @@ jobs:
       #      - name: publish to marketplace
       #        if: github.ref == 'refs/heads/master'
       #        run: npm run deploy ${{ env.PAT }}
-
-      - name: create a release
-        #        if: github.ref == 'refs/heads/master'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: v${{ steps.gitversion.outputs.semVer }}
-          release_name: v${{ steps.gitversion.outputs.semVer }}
+# TODO: Look at a release plugin that could create and upload the VSIX for us to a release page.concurrency:
+#      - name: create a release
+#        #        if: github.ref == 'refs/heads/master'
+#        uses: actions/create-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+#        with:
+#          tag_name: v${{ steps.gitversion.outputs.semVer }}
+#          release_name: v${{ steps.gitversion.outputs.semVer }}
