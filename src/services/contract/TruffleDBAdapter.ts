@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {AbstractAdapter} from './AbstractAdapter';
-import {ContractInstance} from './ContractInstance';
+import {ContractInstance} from '@/services';
 
 export class TruffleDBAdapter extends AbstractAdapter {
   public async initialize(): Promise<void> {

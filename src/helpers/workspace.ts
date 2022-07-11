@@ -2,13 +2,13 @@
 // Licensed under the MIT license.
 
 import {QuickPickItem, Uri, workspace} from 'vscode';
-import {Constants} from '../Constants';
-import {Telemetry} from '../TelemetryClient';
+import {Constants} from '@/Constants';
+import {Telemetry} from '@/TelemetryClient';
 import fs from 'fs-extra';
 import * as path from 'path';
 import glob from 'glob';
 import {showQuickPick} from './userInteraction';
-import {Entry} from '../views/fileExplorer';
+import {Entry} from '@/views/FileExplorer';
 
 export interface TruffleWorkspace {
   dirName: string;
@@ -49,9 +49,8 @@ export function isWorkspaceOpen(): boolean {
   return !!(workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath);
 }
 
-export function getPathByPlatform(workspace: Uri): string {
-  return process.platform === 'win32' ? `${workspace.scheme}:${workspace.path}` : workspace.fsPath;
-}
+export const getPathByPlatform = (workspace: Uri): string =>
+  process.platform === 'win32' ? `${workspace.scheme}:${workspace.path}` : workspace.fsPath;
 
 async function getWorkspacesFolders(): Promise<TruffleWorkspace[]> {
   const workspaces: TruffleWorkspace[] = [];

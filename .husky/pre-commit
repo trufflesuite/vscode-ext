@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
+# exit early if we are on a CI server.
+[ -n "$CI" ] && exit 0
+
 . "$(dirname -- "$0")/_/husky.sh"
 
 yarn test

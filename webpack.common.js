@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 //@ts-check
 /** @typedef {import('webpack').Configuration} WebpackConfig **/
@@ -31,6 +32,11 @@ module.exports = {
   resolve: {
     // .json is added to prevent import error from /node_modules/got/index.js
     extensions: ['.ts', '.js', '.json'],
+    plugins: [
+      new TsconfigPathsPlugin({
+        logInfoToStdOut: true,
+      }),
+    ],
   },
   module: {
     rules: [

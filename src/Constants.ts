@@ -16,7 +16,7 @@ export enum RequiredApps {
   python = 'python',
   truffle = 'truffle',
   ganache = 'ganache',
-  hdwalletProvider = 'truffle-hdwallet-provider',
+  hdwalletProvider = '@truffle/hdwallet-provider',
 }
 
 export enum NotificationOptions {
@@ -48,6 +48,7 @@ export class Constants {
   };
 
   public static truffleConfigDefaultDirectory = {
+    build_directory: path.join('./', 'build'),
     contracts_build_directory: path.join('./', 'build', 'contracts'),
     contracts_directory: path.join('./', 'contracts'),
     migrations_directory: path.join('./', 'migrations'),
@@ -574,7 +575,7 @@ export class Constants {
     networkIsNotReady: Constants.getNetworkIsNotReadyMessage,
     openButton: 'Open',
     privateKeyWasCopiedToClipboard: 'Private key was copied to clipboard',
-    requiresDependency: 'This project deployment requires the truffle-hdwallet-provider.',
+    requiresDependency: 'This project deployment requires the @truffle/hdwallet-provider.',
     rpcEndpointCopiedToClipboard: 'RPCEndpointAddress copied to clipboard',
     seeDetailsRequirementsPage: 'Please see details on the Requirements Page',
     signInButton: 'Sign In',

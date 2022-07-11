@@ -5,12 +5,12 @@ import assert from 'assert';
 import {SinonMock, SinonExpectation, SinonStub, mock, stub, restore} from 'sinon';
 import uuid from 'uuid';
 import {CancellationToken, Progress, ProgressOptions, Uri, window} from 'vscode';
-import {TruffleCommands} from '../../src/commands/TruffleCommands';
+import {TruffleCommands} from '@/commands';
 import * as helpers from '../../src/helpers';
 import * as commands from '../../src/helpers/command';
-import {required} from '../../src/helpers/required';
+import {required} from '@/helpers/required';
 import {TestConstants} from '../TestConstants';
-import {TruffleWorkspace} from '../../src/helpers/workspace';
+import {TruffleWorkspace} from '@/helpers/workspace';
 
 describe('BuildContracts Command', () => {
   describe('Integration test', async () => {
