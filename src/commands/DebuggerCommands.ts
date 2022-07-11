@@ -3,6 +3,7 @@
 
 import path from 'path';
 import {debug, DebugConfiguration, QuickPickItem, workspace} from 'vscode';
+
 import {DEBUG_TYPE} from '@/debugAdapter/constants/debugAdapter';
 import {DebugNetwork} from '@/debugAdapter/debugNetwork';
 import {shortenHash} from '@/debugAdapter/functions';
