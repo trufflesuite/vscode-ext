@@ -13,7 +13,6 @@ export enum RequiredApps {
   node = 'node',
   npm = 'npm',
   git = 'git',
-  python = 'python',
   truffle = 'truffle',
   ganache = 'ganache',
   hdwalletProvider = '@truffle/hdwallet-provider',

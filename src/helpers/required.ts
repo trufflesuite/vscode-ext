@@ -28,7 +28,7 @@ export namespace required {
   const currentState: {[key: string]: IRequiredVersion} = {};
 
   const requiredApps = [RequiredApps.node, RequiredApps.npm, RequiredApps.git];
-  const auxiliaryApps = [RequiredApps.python, RequiredApps.truffle, RequiredApps.ganache];
+  const auxiliaryApps = [RequiredApps.truffle, RequiredApps.ganache];
 
   export function isValid(version: string, minVersion: string, maxVersion?: string): boolean {
     return (
@@ -37,7 +37,11 @@ export namespace required {
   }
 
   /**
-   * Function check all apps: Node.js, npm, git, truffle, ganache-cli, python
+   * Checks whether the required and auxiliary apps are installed in the developer's machine, _i.e._,
+   * `Node.js`, `npm`, `git`, `truffle` and `ganache-cli`.
+   *
+   * Whenever an app is not installed, it pop ups an error message to inform the user.
+   *
    * Show Requirements Page with checking showOnStartup flag
    */
   export async function checkAllApps(): Promise<boolean> {
@@ -182,10 +186,6 @@ export namespace required {
 
   export async function getGitVersion(): Promise<string> {
     return await getVersion(RequiredApps.git, '--version', / (\d+.\d+.\d+)/);
-  }
-
-  export async function getPythonVersion(): Promise<string> {
-    return await getVersion(RequiredApps.python, '--version', / (\d+.\d+.\d+)/);
   }
 
   export async function getTruffleVersion(): Promise<string> {
