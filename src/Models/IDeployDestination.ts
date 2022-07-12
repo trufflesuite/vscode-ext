@@ -3,6 +3,7 @@
 
 import {INetwork} from '@/helpers/ConfigurationReader';
 import {ItemType} from './ItemType';
+import {TLocalProjectOptions} from './TreeItems';
 
 export interface IDeployDestination {
   description?: string;
@@ -12,4 +13,5 @@ export interface IDeployDestination {
   port?: number;
   getTruffleNetwork: () => Promise<INetwork>;
   networkId: number;
+  options?: TLocalProjectOptions;
 }
