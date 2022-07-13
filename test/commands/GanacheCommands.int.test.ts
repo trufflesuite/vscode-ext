@@ -79,9 +79,11 @@ describe('Integration tests GanacheCommands', () => {
     sinon.stub(rp, 'post').resolves(response);
 
     // Act
-    await GanacheCommands.startGanacheCmd(projectView).catch((r) => {
-      assert.fail(r);
-    });
+    await GanacheCommands.startGanacheCmd(() => Promise.resolve(projectView.extensionItem as LocalProject)).catch(
+      (r) => {
+        assert.fail(r);
+      }
+    );
 
     // Assert
     assert.strictEqual(spawnStub.called, true, 'should execute external command ');
