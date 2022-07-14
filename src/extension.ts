@@ -97,7 +97,9 @@ export async function activate(context: ExtensionContext) {
   const startGanacheServer = commands.registerCommand(
     'truffle-vscode.startGanacheServer',
     async (viewItem?: ProjectView) => {
-      await tryExecute(() => GanacheCommands.startGanacheCmd(viewItem));
+      await tryExecute(() =>
+        GanacheCommands.startGanacheCmd(() => GanacheCommands.selectGanachePortAndOptions(viewItem))
+      );
     }
   );
 
@@ -111,9 +113,10 @@ export async function activate(context: ExtensionContext) {
   const resartGanacheServer = commands.registerCommand(
     'truffle-vscode.restartGanacheServer',
     async (viewItem?: ProjectView) => {
-      await tryExecute(() => GanacheCommands.stopGanacheCmd(viewItem)).then(() =>
-        tryExecute(() => GanacheCommands.startGanacheCmd(viewItem))
-      );
+      await tryExecute(async function () {
+        const portAndOptions = await GanacheCommands.stopGanacheCmd(viewItem);
+        await GanacheCommands.startGanacheCmd(() => Promise.resolve(portAndOptions));
+      });
     }
   );
   //#endregion

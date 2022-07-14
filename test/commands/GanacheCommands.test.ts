@@ -51,10 +51,10 @@ describe('Unit tests GanacheCommands', () => {
     // Arrange
     checkAppsStub = sinon.stub(required, 'checkApps').returns(Promise.resolve(false));
     const executeCommandStub = sinon.stub(commands, 'executeCommand');
-    sinon.replace(GanacheCommands, 'getGanachePort', async () => 99);
+    // sinon.replace(GanacheCommands, 'selectGanachePortAndOptions', async () => { return { port: 99, options } });
 
     // Act
-    await GanacheCommands.startGanacheCmd(projectView);
+    await GanacheCommands.startGanacheCmd(() => Promise.resolve(projectView.extensionItem as LocalProject));
 
     // Assert
     assert.strictEqual(checkAppsStub.called, true, 'should check installed apps');
@@ -71,7 +71,7 @@ describe('Unit tests GanacheCommands', () => {
     const showInformationMessageStub = sinon.stub(window, 'showInformationMessage');
 
     // Act
-    await GanacheCommands.startGanacheCmd(projectView);
+    await GanacheCommands.startGanacheCmd(() => Promise.resolve(projectView.extensionItem as LocalProject));
 
     // Assert
     assert.strictEqual(checkAppsStub.called, true, 'should check installed apps');
@@ -104,7 +104,7 @@ describe('Unit tests GanacheCommands', () => {
       .returns(Promise.resolve(ganacheProcess));
 
     // Act
-    await GanacheCommands.startGanacheCmd(projectView);
+    await GanacheCommands.startGanacheCmd(() => Promise.resolve(projectView.extensionItem as LocalProject));
 
     // Assert
     assert.strictEqual(checkAppsStub.called, true, 'should check installed apps');
@@ -164,23 +164,23 @@ describe('Unit tests GanacheCommands', () => {
     assert.strictEqual(stopGanacheServerStub.getCall(0).args[0], testPort, 'should stop server on current port');
   });
 
-  it('getGanachePort LocalProject item passed', async () => {
+  it('`selectGanachePortAndOptions` ProjectView item passed', async () => {
     // Act
-    const result = await GanacheCommands.getGanachePort(projectView);
+    const result = await GanacheCommands.selectGanachePortAndOptions(projectView);
 
     // Assert
-    assert.strictEqual(result, testPort, 'should execute correct port');
+    assert.deepEqual(result, {port: testPort, options}, 'should return correct port and options');
   });
 
-  it('getGanachePort tree manager contains LOCAL_SERVICE item with children', async () => {
+  it('`selectGanachePortAndOptions` tree manager contains LOCAL_SERVICE item with children', async () => {
     // Arrange
     sinon.stub(TreeManager, 'getItem').returns(new LocalService());
     sinon.stub(userInteraction, 'showQuickPick').returns(Promise.resolve(localProject as QuickPickItem));
     // Act
-    const result = await GanacheCommands.getGanachePort();
+    const result = await GanacheCommands.selectGanachePortAndOptions();
 
     // Assert
-    assert.strictEqual(result, testPort, 'should execute correct port');
+    assert.deepEqual(result, {port: testPort, options}, 'should return correct port and options');
   });
 });
 
