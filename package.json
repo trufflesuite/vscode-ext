@@ -666,7 +666,7 @@
           {
             "id": "truffle-walkthrough.new-solidity-project",
             "title": "Create a new Solidity project",
-            "description": "This step will run a command and check off once it has been run.\n[Create Project](command:truffle-vscode.newSolidityProject)",
+            "description": "You can create a new Solidity project right from VS Code, you just need to select __Truffle: New Solidity Project__ from the Command Palette.\n[Create Project](command:truffle-vscode.newSolidityProject)",
             "media": {
               "markdown": "resources/walkthrough/create-project.md"
             },
@@ -677,7 +677,7 @@
           {
             "id": "truffle-walkthrough.connect-ganache",
             "title": "Connect to Ganache local Blockchain",
-            "description": "The VS Code extension allows you to start, stop, and deploy smart contracts to the Ganache local blockchain without leaving the VS Code.\n\nSimply create a new Ganache network under the **Networks** view, and right-click to see the start/stop menu.\n\n[Start Ganache](command:truffle-vscode.startGanacheServer)",
+            "description": "The VS Code extension allows you to start, stop, and deploy smart contracts to the Ganache local blockchain without leaving the VS Code.\nSimply create a new Ganache network under the **Networks** view, and right-click to see the start/stop menu.\n[Start Ganache](command:truffle-vscode.startGanacheServer)",
             "media": {
               "markdown": "resources/walkthrough/connect-ganache.md"
             },
@@ -688,7 +688,7 @@
           {
             "id": "truffle-walkthrough.debug",
             "title": "Debug Transactions",
-            "description": "The Truffle Debugger uses the native VS Code debugging feature, allowing user to debug transactions in the ways they are familiar with: visually stepping through the code to understand how it behaves.\n\n[Debug Transaction](command:truffle-vscode.debugTransaction)",
+            "description": "The Truffle Debugger uses the native VS Code debugging feature, allowing user to debug transactions in the ways they are familiar with: visually stepping through the code to understand how it behaves.\n[Debug Transaction](command:truffle-vscode.debugTransaction)",
             "media": {
               "markdown": "resources/walkthrough/debug-transactions.md"
             },
@@ -699,7 +699,7 @@
           {
             "id": "truffle-walkthrough.sign-in-to-infura",
             "title": "Sign in to your Infura account and deploy contracts",
-            "description": "With this extension, you no longer need to leave the VS Code application to create a new Infura project or deploy to an existing Infura project.\n\nInstead, you can sign in to your Infura account from VS Code by simply clicking a button. This would list all your Infura projects and their corresponding network RPC endpoints.",
+            "description": "With this extension, you no longer need to leave the VS Code application to create a new Infura project or deploy to an existing Infura project.\nInstead, you can sign in to your Infura account from VS Code by simply clicking a button. This would list all your Infura projects and their corresponding network RPC endpoints.",
             "media": {
               "markdown": "resources/walkthrough/infura-sign-in.md"
             }
