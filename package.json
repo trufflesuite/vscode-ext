@@ -661,8 +661,17 @@
       {
         "id": "truffle-walkthrough",
         "title": "Build on Web3 with Truffle for VS Code",
-        "description": "Enhance your web3 experience and discover how you can code, debug, and deploy your smart contracts directly from VS Code.",
+        "description": "Discover how you can code, debug, and deploy your smart contracts directly from VS Code.",
         "steps": [
+          {
+            "id": "truffle-walkthrough.explore-commands",
+            "title": "Explore Truffle Commands",
+            "description": "Use the Command Palette to search for the available Truffle commands\n[Explore Truffle Commands](command:workbench.action.quickOpen?%22>%20Truffle:%20%22)",
+            "media": {
+              "image": "resources/walkthrough/explore-commands.png",
+              "altText": "explore commands"
+            }
+          },
           {
             "id": "truffle-walkthrough.new-solidity-project",
             "title": "Create a new Solidity project",
@@ -702,6 +711,14 @@
             "description": "With this extension, you no longer need to leave the VS Code application to create a new Infura project or deploy to an existing Infura project.\nInstead, you can sign in to your Infura account from VS Code by simply clicking a button. This would list all your Infura projects and their corresponding network RPC endpoints.",
             "media": {
               "markdown": "resources/walkthrough/infura-sign-in.md"
+            }
+          },
+          {
+            "id": "truffle-walkthrough.resources",
+            "title": "Resources",
+            "description": "",
+            "media": {
+              "markdown": "resources/walkthrough/resources.md"
             }
           }
         ]
