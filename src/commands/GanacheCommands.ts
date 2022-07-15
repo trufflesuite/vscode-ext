@@ -12,8 +12,32 @@ import {Telemetry} from '../TelemetryClient';
 import {ProjectView} from '../ViewItems';
 
 export namespace GanacheCommands {
-  // Command to bind to UI commands
-  export async function startGanacheCmd(projectView?: ProjectView): Promise<void> {
+  /**
+   * Represents the configuration options to spawn a new Ganache server.
+   */
+  export type GanachePortAndOptions = {
+    /**
+     * The `port` where the Ganache process will be listening to.
+     */
+    port: number;
+
+    /**
+     * Additional `options` such as forking information used by the Ganache process.
+     */
+    options: TLocalProjectOptions;
+  };
+
+  /**
+   * Starts a new Ganache server using the `ganacheConfigSelector`.
+   * The `ganacheConfigSelector` resolves to the `port` and `options`
+   * used to start a new Ganache process.
+   * The selector must be lazy since `startGanacheCmd` needs to first check
+   * whether some required apps are installed.
+   *
+   * @param ganacheConfigSelector the selector that resolves to a `port` and `options`.
+   * @returns
+   */
+  export async function startGanacheCmd(ganacheConfigSelector: () => Promise<GanachePortAndOptions>): Promise<void> {
     Telemetry.sendEvent('GanacheCommands.startGanacheCmd.commandStarted');
 
     if (!(await required.checkApps(RequiredApps.node))) {
@@ -22,8 +46,7 @@ export namespace GanacheCommands {
       return;
     }
 
-    const port = await getGanachePort(projectView);
-    const options = await getGanacheProjectOptions(projectView);
+    const {port, options} = await ganacheConfigSelector();
 
     const ganacheProcess = await GanacheService.startGanacheServer(port, options);
 
@@ -37,10 +60,21 @@ export namespace GanacheCommands {
     window.showInformationMessage(Constants.ganacheCommandStrings.serverSuccessfullyStarted);
   }
 
-  // Command to bind to UI commands
-  export async function stopGanacheCmd(projectView?: ProjectView): Promise<void> {
+  /**
+   * Stops a Ganache process.
+   * If `projectView` is present, it uses the `port` and `options` from that `projectView`.
+   * Otherwise, it displays a `window.showQuickPick` to allow the user
+   * to select a Ganache server to stop.
+   *
+   * @param projectView the tree item from the _Networks_ view to get `port` and `options`, if any.
+   * @returns the `port` and `options` used to stop the Ganache process,
+   * either from the `projectView` or from the `window.showQuickPick` selection.
+   * This is used in the `truffle-vscode.restartGanacheServer` command
+   * to display the `window.showQuickPick` only once.
+   */
+  export async function stopGanacheCmd(projectView?: ProjectView): Promise<GanachePortAndOptions> {
     Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.commandStarted');
-    const port = await getGanachePort(projectView);
+    const {port, options} = await selectGanachePortAndOptions(projectView);
     const portStatus = await GanacheService.getPortStatus(port);
 
     if (portStatus === GanacheService.PortStatus.GANACHE) {
@@ -56,11 +90,23 @@ export namespace GanacheCommands {
     }
 
     Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.commandFinished');
+
+    return {port, options};
   }
 
-  export async function getGanachePort(projectView?: ProjectView): Promise<number | string> {
+  /**
+   * Gets or selects the Ganache port and options that can be used to start or stop a Ganache process.
+   * If `projectView` is present, it returns the `port` and `options` from that `projectView`.
+   * Otherwise, it displays a `window.showQuickPick` to allow the user
+   * to select a Ganache server to start or stop.
+   *
+   * @param projectView the tree item from the _Networks_ view to get `port` and `options`, if any.
+   * @returns a promise that resolves to a `port` and `options`.
+   */
+  export async function selectGanachePortAndOptions(projectView?: ProjectView): Promise<GanachePortAndOptions> {
     if (projectView && projectView.extensionItem instanceof LocalProject) {
-      return projectView.extensionItem.port;
+      const {port, options} = projectView.extensionItem;
+      return {port, options};
     }
 
     const hosts = TreeManager.getItem(ItemType.LOCAL_SERVICE);
@@ -71,22 +117,13 @@ export namespace GanacheCommands {
       throw error;
     }
 
-    const options = hosts.getChildren();
-    const pick = await showQuickPick(options as QuickPickItem[], {
+    const items = hosts.getChildren();
+    const pick = await showQuickPick(items as QuickPickItem[], {
       placeHolder: Constants.placeholders.selectGanacheServer,
       ignoreFocusOut: true,
     });
-    return (pick as LocalProject).port;
-  }
 
-  export async function getGanacheProjectOptions(projectView?: ProjectView): Promise<TLocalProjectOptions> {
-    if (!projectView) {
-      const error = new Error(Constants.ganacheCommandStrings.cannotStartServer);
-      Telemetry.sendException(error);
-      throw error;
-    }
-
-    const project: LocalProject = projectView?.extensionItem as LocalProject;
-    return project.options;
+    const {port, options} = pick as LocalProject;
+    return {port, options};
   }
 }
