@@ -47,6 +47,7 @@
     "onCommand:truffle-vscode.newSolidityProject",
     "onCommand:truffle-vscode.buildContracts",
     "onCommand:truffle-vscode.deployContracts",
+    "onCommand:truffle-vscode.createContract",
     "onCommand:truffle-vscode.connectProject",
     "onCommand:truffle-vscode.copyRPCEndpointAddress",
     "onCommand:truffle-vscode.createProject",
@@ -58,6 +59,11 @@
     "onCommand:truffle-vscode.stopGanacheServer",
     "onCommand:truffle-vscode.views.explorer.refreshExplorer",
     "onCommand:truffle-vscode.views.deployments.refresh",
+    "onCommand:truffle-vscode.views.dashboard.startDashboardServer",
+    "onCommand:truffle-vscode.views.dashboard.stopDashboardServer",
+    "onCommand:truffle-vscode.views.dashboard.restartDashboardServer",
+    "onCommand:truffle-vscode.views.dashboard.openDashboard",
+    "onCommand:truffle-vscode.views.dashboard.copyRPCEndpointAddress",
     "onDebug"
   ],
   "contributes": {
