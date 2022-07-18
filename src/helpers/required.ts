@@ -189,30 +189,11 @@ export namespace required {
   }
 
   export async function getTruffleVersion(): Promise<string> {
-    const requiredVersion = Constants.requiredVersions[RequiredApps.truffle];
-    const minRequiredVersion = typeof requiredVersion === 'string' ? requiredVersion : requiredVersion.min;
-    const majorVersion = minRequiredVersion.split('.')[0];
-
-    const localVersion = (
-      await tryExecuteCommand(getWorkspaceRoot(true), `npm list --depth 0 truffle@${majorVersion}`)
-    ).cmdOutput.match(/truffle@(\d+.\d+.\d+)/);
-
-    return (
-      (localVersion && localVersion[1]) ||
-      (await getVersion(RequiredApps.truffle, 'version', /(?<=Truffle v)(\d+.\d+.\d+)/))
-    );
+    return await getVersion(RequiredApps.truffle, 'version', /(?<=Truffle v)(\d+.\d+.\d+)/);
   }
 
   export async function getGanacheVersion(): Promise<string> {
-    const requiredVersion = Constants.requiredVersions[RequiredApps.ganache];
-    const minRequiredVersion = typeof requiredVersion === 'string' ? requiredVersion : requiredVersion.min;
-    const majorVersion = minRequiredVersion.split('.')[0];
-
-    const localVersion = (
-      await tryExecuteCommand(getWorkspaceRoot(true), `npm list --depth 0 ganache-cli@${majorVersion}`)
-    ).cmdOutput.match(/ganache-cli@(\d+.\d+.\d+)/);
-
-    return (localVersion && localVersion[1]) || (await getVersion(RequiredApps.ganache, '--version', /v(\d+.\d+.\d+)/));
+    return await getVersion(RequiredApps.ganache, '--version', /v(\d+.\d+.\d+)/);
   }
 
   export async function installNpm(): Promise<void> {
