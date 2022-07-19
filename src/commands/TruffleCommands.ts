@@ -17,7 +17,7 @@ import {getPathByPlatform} from '@/helpers/workspace';
 
 import {IDeployDestination, ItemType} from '@/Models';
 import {NetworkForContractItem} from '@/Models/QuickPickItems';
-import {InfuraProject, LocalProject, LocalService} from '@/Models/TreeItems';
+import {InfuraProject, LocalProject, LocalService, TLocalProjectOptions} from '@/Models/TreeItems';
 import {Project} from '@/Models/TreeItems';
 import {Output} from '@/Output';
 import {
@@ -378,10 +378,12 @@ async function getTruffleDeployFunction(
   networkId: number | string,
   port?: number
 ): Promise<() => Promise<void>> {
-  const treeProjectNames = await getTreeProjectNames();
-  if (port !== undefined && (treeProjectNames.includes(name) || name === Constants.localhostName)) {
+  const projects = await getTreeProjects();
+  const project = projects.find((project) => project.label === name);
+
+  if (port !== undefined && (project !== undefined || name === Constants.localhostName)) {
     Telemetry.sendEvent('TruffleCommands.getTruffleDeployFunction.returnDeployToLocalGanache');
-    return deployToLocalGanache.bind(undefined, name, truffleConfigPath, port);
+    return deployToLocalGanache.bind(undefined, name, truffleConfigPath, port, project?.options);
   }
   // 1 - is the marker of main network
   if (networkId === 1 || networkId === '1') {
@@ -393,20 +395,20 @@ async function getTruffleDeployFunction(
   return deployToNetwork.bind(undefined, name, truffleConfigPath);
 }
 
-async function getTreeProjectNames(): Promise<string[]> {
+async function getTreeProjects(): Promise<IDeployDestination[]> {
   const services = TreeManager.getItems();
 
   const localService = services.find((service) => service instanceof LocalService);
-  const projects = (localService ? localService.getChildren() : []) as Project[];
+  const projects = (localService ? localService.getChildren() : []) as LocalProject[];
 
-  const projectNames = [];
+  const deployDestinations: IDeployDestination[] = [];
 
   for (const project of projects) {
     const projectDestinations = await project.getDeployDestinations();
-    projectNames.push(...projectDestinations);
+    deployDestinations.push(...projectDestinations);
   }
 
-  return projectNames.map((destination) => destination.label);
+  return deployDestinations;
 }
 
 function getServiceCreateFunction(
@@ -495,8 +497,13 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
   });
 }
 
-async function deployToLocalGanache(networkName: string, truffleConfigPath: string, port: number): Promise<void> {
-  await GanacheService.startGanacheServer(port);
+async function deployToLocalGanache(
+  networkName: string,
+  truffleConfigPath: string,
+  port: number,
+  options?: TLocalProjectOptions
+): Promise<void> {
+  await GanacheService.startGanacheServer(port, options);
   await deployToNetwork(networkName, truffleConfigPath);
 }
 
