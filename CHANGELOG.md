@@ -2,7 +2,7 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
-## 2.3.5 - _Goblins_ 😈
+## 2.4.0 - _Goblins_ 😈
 
 This release has some fixes around internal optimisations for our CI/Linting and cleanup of code where we were seeing issues with building contracts in mono repos etc.
 
@@ -30,7 +30,7 @@ We also added some new Truffle Dashboard integration/view. Give it a try and let
 
 - @acuarica made their first contribution in https://github.com/trufflesuite/vscode-ext/pull/139
 
-**Full Changelog**: https://github.com/trufflesuite/vscode-ext/compare/v2.3.4...V2.3.5-beta.1
+**Full Changelog**: https://github.com/trufflesuite/vscode-ext/compare/v2.3.4...V2.3.5
 
 ## 2.3.4
 
