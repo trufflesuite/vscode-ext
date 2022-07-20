@@ -2,11 +2,35 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
-## 2.3.5
+## 2.3.5 - _Goblins_ 😈
 
-This release has some fixes around internal optimisations for our CI/Linting and cleanup of code.
+This release has some fixes around internal optimisations for our CI/Linting and cleanup of code where we were seeing issues with building contracts in mono repos etc.
 
-- chore: fixing eslint config and refactoring config code. [PR](https://github.com/trufflesuite/vscode-ext/pull/119)
+We also added some new Truffle Dashboard integration/view. Give it a try and let us know what you think!
+
+### What's Changed
+
+- Fix/debug workspace by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/116
+- Feature/eslint config changes by @michaeljohnbennett in https://github.com/trufflesuite/vscode-ext/pull/118
+- issue #121, renamed "explorer - truffle "to "contract explorer" by @NikolaiSch in https://github.com/trufflesuite/vscode-ext/pull/122
+- Edit the required apps page to display the version range of all apps by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/120
+- Feature/eslint fixes - Part2 - Config cleanup for truffle configuration by @michaeljohnbennett in https://github.com/trufflesuite/vscode-ext/pull/119
+- fix: added new PR checks by @michaeljohnbennett in https://github.com/trufflesuite/vscode-ext/pull/126
+- fix: hdwallet npm package has updated to truffle/hdwallet-provider by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/127
+- feat(explorer): added createContract by @NikolaiSch in https://github.com/trufflesuite/vscode-ext/pull/123
+- Improve Truffle Dashboard deployment integration by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/114
+- fix: auto load has implemented by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/136
+- refactor: remove unused code that checks whether Python is installed by @acuarica in https://github.com/trufflesuite/vscode-ext/pull/139
+- fix: start ganache command when invoked from the command palette by @acuarica in https://github.com/trufflesuite/vscode-ext/pull/142
+- fix: activationEvents list commands has reverted by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/167
+- fix: contract deployment is not forking networks by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/146
+- Draft: Required app was validating NPM local packages by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/164
+
+### New Contributors
+
+- @acuarica made their first contribution in https://github.com/trufflesuite/vscode-ext/pull/139
+
+**Full Changelog**: https://github.com/trufflesuite/vscode-ext/compare/v2.3.4...V2.3.5-beta.1
 
 ## 2.3.4
 
