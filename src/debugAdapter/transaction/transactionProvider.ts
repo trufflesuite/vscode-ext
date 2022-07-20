@@ -1,6 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {Constants} from '@/Constants';
 import {TRANSACTION_NUMBER_TO_SHOW} from '../constants/transaction';
 import {ContractJsonsProvider} from '../contracts/contractJsonsProvider';
 import {groupBy} from '../helpers';
@@ -25,7 +26,14 @@ export class TransactionProvider {
   }
 
   public async getLastTransactionHashes(take: number = TRANSACTION_NUMBER_TO_SHOW): Promise<string[]> {
-    const latestBlockNumber = await this._web3.eth.getBlockNumber();
+    let latestBlockNumber: any;
+
+    try {
+      latestBlockNumber = await this._web3.eth.getBlockNumber();
+    } catch {
+      throw new Error(Constants.informationMessage.transactionNotFound);
+    }
+
     const latestBlock = await this._web3.eth.getBlock(latestBlockNumber);
     const txHashes: string[] = [];
     let block = latestBlock;

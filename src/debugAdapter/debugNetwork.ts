@@ -1,11 +1,18 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {executeCommand} from '@/helpers/command';
 import path from 'path';
-import {IConfiguration, INetwork} from '@/helpers/ConfigurationReader';
+import {IConfiguration, INetwork, INetworkOption} from '@/helpers/ConfigurationReader';
 import {TruffleConfig} from '@/helpers/TruffleConfiguration';
-import {TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE, TRUFFLE_CONFIG_NAME} from './constants/truffleConfig';
+import {TRUFFLE_CONFIG_NAME} from './constants/truffleConfig';
+import {TreeManager} from '@/services/tree/TreeManager';
+import {ItemType} from '@/Models/ItemType';
+import {Constants} from '@/Constants';
+import {Telemetry} from '@/TelemetryClient';
+import {showQuickPick} from '@/helpers/userInteraction';
+import {QuickPickItem} from 'vscode';
+import {LocalProject} from '@/Models/TreeItems/LocalProject';
+import {LocalNetworkNode} from '@/Models/TreeItems';
 
 export class DebugNetwork {
   public workingDirectory: string;
@@ -16,10 +23,10 @@ export class DebugNetwork {
     this.workingDirectory = truffleConfigDirectory;
   }
 
-  public async load(): Promise<void> {
+  public async load(providerUrl?: string): Promise<void> {
     this._basedConfig = new TruffleConfig(path.join(this.workingDirectory, TRUFFLE_CONFIG_NAME));
     this._truffleConfiguration = await this.loadConfiguration();
-    this._networkForDebug = await this.loadNetworkForDebug();
+    this._networkForDebug = await this.loadNetworkForDebug(providerUrl);
   }
 
   public getTruffleConfiguration() {
@@ -50,44 +57,31 @@ export class DebugNetwork {
     };
   }
 
-  private async loadNetworkForDebug(): Promise<INetwork> {
-    const networks = this._basedConfig!.getNetworks();
-    const networkForDebug = networks.find((n) => n.name === TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE);
-    if (!DebugNetwork.isNetworkForDebugValid(networkForDebug)) {
-      const provider = await this.getProviderByResolvingConfig(TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE);
-      if (provider.url) {
-        networkForDebug!.options.provider = {
-          url: provider.url,
-        };
-      } else {
-        throw new Error(`Truffle config is not properly defined.
-                Please create ${TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE} network,
-                set host+port, or hdwallet/http/websocket provider.`);
-      }
-    }
+  /**
+   * Create the `INetwork` interface from a `LocalNetworkNode` for debugging.
+   * If the `providerUrl` is present, it returns the `LocalNetworkNode` from that `provideUrl`
+   * Otherwise, it displays a `window.showQuickPick` to allow the user
+   * to select a `LocalNetworkNode` to start debugging.
+   *
+   * @param providerUrl the network host url where the transaction has deployed, if any.
+   * @returns a promise that resolves to a `INetwork` interface.
+   */
+  private async loadNetworkForDebug(providerUrl?: string): Promise<INetwork> {
+    const projects = this.getProjects();
+    const host = await this.getHost(projects, providerUrl);
+
+    const networkOptionsForDebug: INetworkOption = {
+      host: host.url.hostname,
+      network_id: host.networkId,
+      port: host.port,
+    };
+
+    const networkForDebug: INetwork = {
+      name: host.label,
+      options: networkOptionsForDebug,
+    };
 
     return networkForDebug!;
-  }
-
-  private static isNetworkForDebugValid(networkForDebug: INetwork | undefined): boolean {
-    if (!networkForDebug || !networkForDebug.options) {
-      throw new Error(`No ${TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE} network in the truffle config`);
-    }
-
-    if (networkForDebug.options.host && networkForDebug.options.port) {
-      return true;
-    }
-    // truffle-config helper can read only hdwallet provider
-    return !!networkForDebug.options.provider;
-  }
-
-  private async getProviderByResolvingConfig(network: string) {
-    // use truffle exec web3ProviderResolver.js to solve http- or websocket- web3 provider
-    const truffleConfigReaderPath = path.join(__dirname, 'web3ProviderResolver.js');
-    const args = ['truffle', 'exec', truffleConfigReaderPath, '--network', network];
-    const result = await executeCommand(this.workingDirectory, 'npx', ...args);
-    const providerJson = result.split('provider%=')[1];
-    return JSON.parse(providerJson);
   }
 
   private relativeToAbsolutePath(directory: string) {
@@ -96,5 +90,65 @@ export class DebugNetwork {
     }
 
     return path.join(this.workingDirectory, directory);
+  }
+
+  /**
+   * Gets all `LocalProject` from the `ItemType.LOCAL_SERVICE`.
+   *
+   * @returns an Array of `LocalProject` from the _Networks_ view.
+   */
+  private getProjects(): LocalProject[] {
+    const services = TreeManager.getItem(ItemType.LOCAL_SERVICE);
+
+    if (!services || !services.getChildren()) {
+      const error = new Error(Constants.ganacheCommandStrings.serverNoGanacheAvailable);
+      Telemetry.sendException(error);
+      throw error;
+    }
+
+    return services.getChildren() as LocalProject[];
+  }
+
+  /**
+   * Gets the `LocalNetworkNode` from a local project.
+   * If the `providerUrl` is present, it returns the `LocalNetworkNode` from that `provideUrl`
+   * Otherwise, it displays a `window.showQuickPick` to allow the user
+   * to select a `LocalNetworkNode` to start debugging.
+   *
+   * @param projects the tree items from the _Networks_ view to get `LocalNetworkNode`.
+   * @param providerUrl the network host url where the transaction has deployed, if any.
+   * @returns a promise that resolves to a `LocalNetworkNode`.
+   */
+  private async getHost(projects: LocalProject[], providerUrl?: string): Promise<LocalNetworkNode> {
+    if (providerUrl) {
+      const project = projects.find((project) => {
+        const network = project.getChildren().at(0) as LocalNetworkNode;
+        const url = `${network.url.protocol}//${network.url.host}`;
+        return url === providerUrl ? project : undefined;
+      });
+
+      if (!project) {
+        const error = new Error(Constants.ganacheCommandStrings.serverNoGanacheAvailable);
+        Telemetry.sendException(error);
+        throw error;
+      }
+
+      return project.getChildren().at(0) as LocalNetworkNode;
+    } else {
+      const items = projects.map((project) => {
+        return {
+          label: `$(callstack-view-session) ${project.label}`,
+          detail: project.description,
+        } as QuickPickItem;
+      });
+
+      const pick = await showQuickPick(items as QuickPickItem[], {
+        placeHolder: Constants.placeholders.selectGanacheServer,
+        ignoreFocusOut: true,
+      });
+
+      const project = projects.find((project) => project.description === pick.detail) as LocalProject;
+      return project.getChildren().at(0) as LocalNetworkNode;
+    }
   }
 }
