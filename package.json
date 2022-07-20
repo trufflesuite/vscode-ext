@@ -39,6 +39,7 @@
     "onView:truffle-vscode.truffle",
     "onView:truffle-vscode.explorer-view",
     "onCommand:truffle-vscode.showWelcomePage",
+    "onCommand:truffle-vscode.showRequirementsPage",
     "onCommand:truffle-vscode.refresh",
     "onCommand:truffle-contract.copyByteCode",
     "onCommand:truffle-contract.copyDeployedByteCode",
@@ -189,6 +190,11 @@
       {
         "command": "truffle-vscode.showWelcomePage",
         "title": "Show Welcome Page",
+        "category": "Truffle"
+      },
+      {
+        "command": "truffle-vscode.showRequirementsPage",
+        "title": "Show Requirements Page",
         "category": "Truffle"
       },
       {
