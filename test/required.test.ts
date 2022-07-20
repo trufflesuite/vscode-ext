@@ -204,13 +204,24 @@ describe('Required helper', () => {
     });
 
     describe('getTruffleVersion', () => {
-      it('should return local version', async () => {
+      it('should return empty string when tryExecuteCommand throw an error', async () => {
         // Arrange
-        getWorkspaceRootMock.returns(uuid.v4());
+        tryExecuteCommandMock.throws(TestConstants.testError);
+
+        // Act
+        const result = await requiredRewire.required.getTruffleVersion();
+
+        // Assert
+        assert.strictEqual(result, '', 'returned result should be empty');
+        assert.strictEqual(tryExecuteCommandMock.calledOnce, true, 'tryExecuteCommand should be called once');
+      });
+
+      it('should return empty string when tryExecuteCommand return not zero code', async () => {
+        // Arrange
         const executionResult: commands.ICommandResult = {
-          cmdOutput: 'truffle@11.0.0',
+          cmdOutput: 'Truffle v11.0.0',
           cmdOutputIncludingStderr: '',
-          code: 0,
+          code: 1,
         };
         tryExecuteCommandMock.returns(executionResult);
 
@@ -218,78 +229,62 @@ describe('Required helper', () => {
         const result = await requiredRewire.required.getTruffleVersion();
 
         // Assert
-        assert.strictEqual(result, '11.0.0', 'returned result should be defined');
+        assert.strictEqual(result, '', 'returned result should be empty');
         assert.strictEqual(tryExecuteCommandMock.calledOnce, true, 'tryExecuteCommand should be called once');
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true, 'getWorkspaceRoot should be called once');
       });
 
-      it('should return global version', async () => {
+      it('should return version', async () => {
         // Arrange
-        getWorkspaceRootMock.returns(uuid.v4());
-        const executionResult1: commands.ICommandResult = {
-          cmdOutput: '',
-          cmdOutputIncludingStderr: '',
-          code: 0,
-        };
-
-        const executionResult2: commands.ICommandResult = {
+        const executionResult: commands.ICommandResult = {
           cmdOutput: 'Truffle v11.0.0',
           cmdOutputIncludingStderr: '',
           code: 0,
         };
-
-        tryExecuteCommandMock.onCall(0).returns(executionResult1);
-        tryExecuteCommandMock.onCall(1).returns(executionResult2);
+        tryExecuteCommandMock.returns(executionResult);
 
         // Act
         const result = await requiredRewire.required.getTruffleVersion();
 
         // Assert
         assert.strictEqual(result, '11.0.0', 'returned result should be defined');
-        assert.strictEqual(tryExecuteCommandMock.callCount, 2, 'tryExecuteCommand should be called twice');
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true, 'getWorkspaceRoot should be called once');
-      });
-
-      it('should throw an error when tryExecuteCommand throws an error on first call', async () => {
-        // Arrange
-        getWorkspaceRootMock.returns(uuid.v4());
-
-        tryExecuteCommandMock.onCall(0).throws(TestConstants.testError);
-
-        // Act and assert
-        await assert.rejects(requiredRewire.required.getTruffleVersion(), Error, TestConstants.testError);
         assert.strictEqual(tryExecuteCommandMock.calledOnce, true, 'tryExecuteCommand should be called once');
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true, 'getWorkspaceRoot should be called once');
-      });
-
-      it('should return empty string when tryExecuteCommand throws an error on second call', async () => {
-        // Arrange
-        getWorkspaceRootMock.returns(uuid.v4());
-        const executionResult1: commands.ICommandResult = {
-          cmdOutput: '',
-          cmdOutputIncludingStderr: '',
-          code: 0,
-        };
-
-        tryExecuteCommandMock.onCall(0).returns(executionResult1);
-        tryExecuteCommandMock.onCall(1).throws(TestConstants.testError);
-
-        // Act
-        const result = await requiredRewire.required.getTruffleVersion();
-
-        // Assert
-        assert.strictEqual(result, '', 'returned result should be empty');
-        assert.strictEqual(tryExecuteCommandMock.callCount, 2, 'tryExecuteCommand should be called twice');
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true, 'getWorkspaceRoot should be called once');
       });
     });
 
     describe('getGanacheVersion', () => {
-      it('should return local version', async () => {
+      it('should return empty string when tryExecuteCommand throw an error', async () => {
         // Arrange
-        getWorkspaceRootMock.returns(uuid.v4());
+        tryExecuteCommandMock.throws(TestConstants.testError);
+
+        // Act
+        const result = await requiredRewire.required.getGanacheVersion();
+
+        // Assert
+        assert.strictEqual(result, '', 'returned result should be empty');
+        assert.strictEqual(tryExecuteCommandMock.calledOnce, true, 'tryExecuteCommand should be called once');
+      });
+
+      it('should return empty string when tryExecuteCommand return not zero code', async () => {
+        // Arrange
         const executionResult: commands.ICommandResult = {
-          cmdOutput: 'ganache-cli@11.0.0',
+          cmdOutput: 'v11.0.0',
+          cmdOutputIncludingStderr: '',
+          code: 1,
+        };
+        tryExecuteCommandMock.returns(executionResult);
+
+        // Act
+        const result = await requiredRewire.required.getGanacheVersion();
+
+        // Assert
+        assert.strictEqual(result, '', 'returned result should be empty');
+        assert.strictEqual(tryExecuteCommandMock.calledOnce, true, 'tryExecuteCommand should be called once');
+      });
+
+      it('should return version', async () => {
+        // Arrange
+        const executionResult: commands.ICommandResult = {
+          cmdOutput: 'v11.0.0',
           cmdOutputIncludingStderr: '',
           code: 0,
         };
@@ -301,67 +296,6 @@ describe('Required helper', () => {
         // Assert
         assert.strictEqual(result, '11.0.0', 'returned result should be defined');
         assert.strictEqual(tryExecuteCommandMock.calledOnce, true, 'tryExecuteCommand should be called once');
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true, 'getWorkspaceRoot should be called once');
-      });
-
-      it('should return global version', async () => {
-        // Arrange
-        getWorkspaceRootMock.returns(uuid.v4());
-        const executionResult1: commands.ICommandResult = {
-          cmdOutput: '',
-          cmdOutputIncludingStderr: '',
-          code: 0,
-        };
-
-        const executionResult2: commands.ICommandResult = {
-          cmdOutput: 'v11.0.0',
-          cmdOutputIncludingStderr: '',
-          code: 0,
-        };
-
-        tryExecuteCommandMock.onCall(0).returns(executionResult1);
-        tryExecuteCommandMock.onCall(1).returns(executionResult2);
-
-        // Act
-        const result = await requiredRewire.required.getGanacheVersion();
-
-        // Assert
-        assert.strictEqual(result, '11.0.0', 'returned result should be defined');
-        assert.strictEqual(tryExecuteCommandMock.callCount, 2, 'tryExecuteCommand should be called twice');
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true, 'getWorkspaceRoot should be called once');
-      });
-
-      it('should throw an error when tryExecuteCommand throw an error on first call', async () => {
-        // Arrange
-        getWorkspaceRootMock.returns(uuid.v4());
-
-        tryExecuteCommandMock.onCall(0).throws(TestConstants.testError);
-
-        // Act and assert
-        await assert.rejects(requiredRewire.required.getGanacheVersion(), Error, TestConstants.testError);
-        assert.strictEqual(tryExecuteCommandMock.calledOnce, true, 'tryExecuteCommand should be called once');
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true, 'getWorkspaceRoot should be called once');
-      });
-
-      it('should return empty string when tryExecuteCommand throw an error on second call', async () => {
-        // Arrange
-        getWorkspaceRootMock.returns(uuid.v4());
-        const executionResult1: commands.ICommandResult = {
-          cmdOutput: '',
-          cmdOutputIncludingStderr: '',
-          code: 0,
-        };
-
-        tryExecuteCommandMock.onCall(0).returns(executionResult1);
-        tryExecuteCommandMock.onCall(1).throws(TestConstants.testError);
-
-        // Act
-        const result = await requiredRewire.required.getGanacheVersion();
-
-        // Assert
-        assert.strictEqual(result, '', 'returned result should be empty');
-        assert.strictEqual(tryExecuteCommandMock.callCount, 2, 'tryExecuteCommand should be called twice');
-        assert.strictEqual(getWorkspaceRootMock.calledOnce, true, 'getWorkspaceRoot should be called once');
       });
     });
 
