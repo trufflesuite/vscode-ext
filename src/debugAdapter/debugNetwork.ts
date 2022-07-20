@@ -121,19 +121,14 @@ export class DebugNetwork {
    */
   private async getHost(projects: LocalProject[], providerUrl?: string): Promise<LocalNetworkNode> {
     if (providerUrl) {
-      const project = projects.find((project) => {
-        const network = project.getChildren().at(0) as LocalNetworkNode;
-        const url = `${network.url.protocol}//${network.url.host}`;
-        return url === providerUrl ? project : undefined;
-      });
-
-      if (!project) {
-        const error = new Error(Constants.ganacheCommandStrings.serverNoGanacheAvailable);
-        Telemetry.sendException(error);
-        throw error;
-      }
-
-      return project.getChildren().at(0) as LocalNetworkNode;
+      return projects
+        .find((project) => {
+          const network = project.getChildren().at(0) as LocalNetworkNode;
+          const url = `${network.url.protocol}//${network.url.host}`;
+          return url === providerUrl;
+        })!
+        .getChildren()
+        .at(0) as LocalNetworkNode;
     } else {
       const items = projects.map((project) => {
         return {
