@@ -1,16 +1,16 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Memento, window, Uri} from 'vscode';
 import {Constants} from '@/Constants';
+import {HardHatExtensionAdapter, IExtensionAdapter, TruffleExtensionAdapter} from '@/services/extensionAdapter';
+import {Memento, Uri, window} from 'vscode';
 import {userSettings} from '../helpers';
-import {IExtensionAdapter, TruffleExtensionAdapter} from '@/services/extensionAdapter';
 
 class SdkCoreCommands {
   private extensionAdapter!: IExtensionAdapter;
 
   public async initialize(_globalState: Memento): Promise<void> {
-    const sdk = await this.getCoreSdk();
+    const sdk = userSettings.getConfiguration(Constants.userSettings.coreSdkSettingsKey);
     this.extensionAdapter = this.getExtensionAdapter(sdk.userValue ? sdk.userValue : sdk.defaultValue);
     this.extensionAdapter.validateExtension().catch((error) => {
       window.showErrorMessage(error.message);
@@ -28,12 +28,12 @@ class SdkCoreCommands {
     return this.extensionAdapter.deploy(uri);
   }
 
-  private async getCoreSdk() {
-    return userSettings.getConfigurationAsync(Constants.userSettings.coreSdkSettingsKey);
-  }
-
   private getExtensionAdapter(sdk: string): IExtensionAdapter {
     switch (sdk) {
+      case Constants.coreSdk.hardhat:
+        return new HardHatExtensionAdapter();
+      case Constants.coreSdk.truffle:
+        return new TruffleExtensionAdapter();
       default:
         return new TruffleExtensionAdapter();
     }

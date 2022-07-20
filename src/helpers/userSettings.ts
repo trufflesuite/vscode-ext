@@ -1,7 +1,10 @@
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
+// Licensed under the MIT license.
+
 import {ConfigurationTarget, workspace} from 'vscode';
 
-export async function getConfigurationAsync(key: string): Promise<{defaultValue: string; userValue: string}> {
-  const config = await workspace.getConfiguration().inspect(key);
+export function getConfiguration(key: string): {defaultValue: string; userValue: string} {
+  const config = workspace.getConfiguration().inspect<string>(key);
 
   const defaultValue = config!.defaultValue as string;
   const userValue = config!.globalValue as string;

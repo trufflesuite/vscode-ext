@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import assert from 'assert';
@@ -7,12 +7,12 @@ import rp from 'request-promise';
 import sinon from 'sinon';
 import stream from 'stream';
 import vscode from 'vscode';
-import {GanacheCommands} from '../../src/commands';
+import {GanacheCommands} from '@/commands';
 import * as commands from '../../src/helpers/command';
 import * as shell from '../../src/helpers/shell';
-import {IExtensionItem, LocalProject, LocalService, Service, TLocalProjectOptions} from '../../src/Models/TreeItems';
-import {TreeManager} from '../../src/services';
-import {ProjectView} from '../../src/ViewItems';
+import {IExtensionItem, LocalProject, LocalService, Service, TLocalProjectOptions} from '@/Models/TreeItems';
+import {TreeManager} from '@/services';
+import {ProjectView} from '@/ViewItems';
 
 describe('Integration tests GanacheCommands', () => {
   const defaultPort = 8545;

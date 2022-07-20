@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {IAzExtOutputChannel} from '@microsoft/vscode-azext-utils';
@@ -668,6 +668,7 @@ export class Constants {
 
   public static coreSdk = {
     truffle: 'Truffle',
+    hardhat: 'HardHat',
   };
 
   public static initialize(context: ExtensionContext) {
