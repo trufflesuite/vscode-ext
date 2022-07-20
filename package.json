@@ -36,7 +36,36 @@
   "aiKey": "INSERTAIKEY",
   "main": "./out/src/extension.js",
   "activationEvents": [
-    "*"
+    "onView:truffle-vscode.truffle",
+    "onView:truffle-vscode.explorer-view",
+    "onCommand:truffle-vscode.showWelcomePage",
+    "onCommand:truffle-vscode.showRequirementsPage",
+    "onCommand:truffle-vscode.refresh",
+    "onCommand:truffle-contract.copyByteCode",
+    "onCommand:truffle-contract.copyDeployedByteCode",
+    "onCommand:truffle-contract.copyABI",
+    "onCommand:truffle-vscode.createLocalUI",
+    "onCommand:truffle-vscode.newSolidityProject",
+    "onCommand:truffle-vscode.buildContracts",
+    "onCommand:truffle-vscode.deployContracts",
+    "onCommand:truffle-vscode.createContract",
+    "onCommand:truffle-vscode.connectProject",
+    "onCommand:truffle-vscode.copyRPCEndpointAddress",
+    "onCommand:truffle-vscode.createProject",
+    "onCommand:truffle-vscode.disconnectProject",
+    "onCommand:truffle-vscode.debugTransaction",
+    "onCommand:truffle-vscode.signInToInfuraAccount",
+    "onCommand:truffle-vscode.signOutOfInfuraAccount",
+    "onCommand:truffle-vscode.startGanacheServer",
+    "onCommand:truffle-vscode.stopGanacheServer",
+    "onCommand:truffle-vscode.views.explorer.refreshExplorer",
+    "onCommand:truffle-vscode.views.deployments.refresh",
+    "onCommand:truffle-vscode.views.dashboard.startDashboardServer",
+    "onCommand:truffle-vscode.views.dashboard.stopDashboardServer",
+    "onCommand:truffle-vscode.views.dashboard.restartDashboardServer",
+    "onCommand:truffle-vscode.views.dashboard.openDashboard",
+    "onCommand:truffle-vscode.views.dashboard.copyRPCEndpointAddress",
+    "onDebug"
   ],
   "contributes": {
     "configuration": {
@@ -167,6 +196,11 @@
       {
         "command": "truffle-vscode.showWelcomePage",
         "title": "Show Welcome Page",
+        "category": "Truffle"
+      },
+      {
+        "command": "truffle-vscode.showRequirementsPage",
+        "title": "Show Requirements Page",
         "category": "Truffle"
       },
       {
@@ -769,6 +803,6 @@
     "id": "6b46df02-0a05-4fe7-a214-48530cdace4e",
     "publisherDisplayName": "ConsenSys Software Inc.",
     "publisherId": "0e0a6137-fd21-4312-b0f5-ff30c8d7a457",
-    "isPreReleaseVersion": false
+    "isPreReleaseVersion": true
   }
 }
