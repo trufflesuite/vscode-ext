@@ -47,6 +47,7 @@ export class LocalProject extends Project {
           networkId: node.networkId,
           networkType: node.itemType,
           port: node.port,
+          options: this.options,
         } as IDeployDestination;
       })
     );
