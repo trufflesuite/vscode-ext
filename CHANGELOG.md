@@ -30,7 +30,7 @@ We also added some new Truffle Dashboard integration/view. Give it a try and let
 
 - @acuarica made their first contribution in https://github.com/trufflesuite/vscode-ext/pull/139
 
-**Full Changelog**: https://github.com/trufflesuite/vscode-ext/compare/v2.3.4...V2.3.5
+**Full Changelog**: https://github.com/trufflesuite/vscode-ext/compare/v2.3.4...V2.4.0
 
 ## 2.3.4
 
