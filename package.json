@@ -803,6 +803,6 @@
     "id": "6b46df02-0a05-4fe7-a214-48530cdace4e",
     "publisherDisplayName": "ConsenSys Software Inc.",
     "publisherId": "0e0a6137-fd21-4312-b0f5-ff30c8d7a457",
-    "isPreReleaseVersion": false
+    "isPreReleaseVersion": true
   }
 }
