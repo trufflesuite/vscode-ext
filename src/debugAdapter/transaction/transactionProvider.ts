@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {TRANSACTION_NUMBER_TO_SHOW} from '../constants/transaction';
+import {MAX_BLOCK_TO_READ, TRANSACTION_NUMBER_TO_SHOW} from '../constants/transaction';
 import {ContractJsonsProvider} from '../contracts/contractJsonsProvider';
 import {groupBy} from '../helpers';
 import {IContractJsonModel} from '../models/IContractJsonModel';
@@ -28,8 +28,11 @@ export class TransactionProvider {
     const latestBlockNumber = await this._web3.eth.getBlockNumber();
     const latestBlock = await this._web3.eth.getBlock(latestBlockNumber);
     const txHashes: string[] = [];
+    const maxBlocksToRead: number =
+      latestBlock.number - MAX_BLOCK_TO_READ > 0 ? latestBlock.number - MAX_BLOCK_TO_READ : 0;
     let block = latestBlock;
-    while (txHashes.length <= take && block.number > 0) {
+
+    while (txHashes.length <= take && block.number > maxBlocksToRead) {
       for (let i = 0; i < block.transactions.length && txHashes.length < TRANSACTION_NUMBER_TO_SHOW; i++) {
         txHashes.push(block.transactions[i]);
       }
