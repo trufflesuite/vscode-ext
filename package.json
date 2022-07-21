@@ -341,7 +341,8 @@
       {
         "command": "truffle-vscode.views.dashboard.openDashboard",
         "title": "Open Dashboard in Web Browser",
-        "category": "Truffle"
+        "category": "Truffle",
+        "icon": "$(link-external)"
       },
       {
         "command": "truffle-vscode.views.dashboard.copyRPCEndpointAddress",
@@ -433,6 +434,11 @@
         {
           "command": "truffle-vscode.views.deployments.refresh",
           "when": "view == truffle-vscode.views.deployments",
+          "group": "navigation"
+        },
+        {
+          "command": "truffle-vscode.views.dashboard.openDashboard",
+          "when": "view == truffle-vscode.views.dashboard",
           "group": "navigation"
         }
       ],
