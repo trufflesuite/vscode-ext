@@ -132,7 +132,7 @@ export class DebugNetwork {
     } else {
       const items = projects.map((project) => {
         return {
-          label: `$(callstack-view-session) ${project.label}`,
+          label: `$(debug-alt) ${project.label}`,
           detail: project.description,
         } as QuickPickItem;
       });
