@@ -4,13 +4,14 @@
 import path from 'path';
 import {executeCommand} from './cmdCommandExecutor';
 import {ConfigurationReader} from './configurationReader';
+import {IConfiguration, INetwork} from '@/helpers/ConfigurationReader';
 import {TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE, TRUFFLE_CONFIG_NAME} from './constants/truffleConfig';
 
 export class DebugNetwork {
   public workingDirectory: string;
   private _basedConfig: ConfigurationReader.TruffleConfig | undefined;
-  private _truffleConfiguration: ConfigurationReader.IConfiguration | undefined;
-  private _networkForDebug: ConfigurationReader.INetwork | undefined;
+  private _truffleConfiguration: IConfiguration | undefined;
+  private _networkForDebug: INetwork | undefined;
   constructor(truffleConfigDirectory: string) {
     this.workingDirectory = truffleConfigDirectory;
   }
@@ -38,7 +39,7 @@ export class DebugNetwork {
     return !!(options.host && options.port);
   }
 
-  private async loadConfiguration(): Promise<ConfigurationReader.IConfiguration> {
+  private async loadConfiguration(): Promise<IConfiguration> {
     const configuration = await this._basedConfig!.getConfiguration(this.workingDirectory);
 
     return {
@@ -49,7 +50,7 @@ export class DebugNetwork {
     };
   }
 
-  private async loadNetworkForDebug(): Promise<ConfigurationReader.INetwork> {
+  private async loadNetworkForDebug(): Promise<INetwork> {
     const networks = this._basedConfig!.getNetworks();
     const networkForDebug = networks.find((n) => n.name === TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE);
     if (!DebugNetwork.isNetworkForDebugValid(networkForDebug)) {
@@ -68,7 +69,7 @@ export class DebugNetwork {
     return networkForDebug!;
   }
 
-  private static isNetworkForDebugValid(networkForDebug: ConfigurationReader.INetwork | undefined): boolean {
+  private static isNetworkForDebugValid(networkForDebug: INetwork | undefined): boolean {
     if (!networkForDebug || !networkForDebug.options) {
       throw new Error(`No ${TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE} network in the truffle config`);
     }
