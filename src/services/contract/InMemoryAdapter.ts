@@ -1,14 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from "../../Constants";
-import {Output} from "../../Output";
-import {Telemetry} from "../../TelemetryClient";
-import {NetworkService} from "../NetworkService";
-import {AbstractAdapter} from "./AbstractAdapter";
-import {Contract} from "./Contract";
-import {ContractInstanceWithMetadata} from "./ContractInstanceWithMetadata";
-import {ContractService} from "./ContractService";
+import {Constants} from '../../Constants';
+import {Output} from '../../Output';
+import {Telemetry} from '../../TelemetryClient';
+import {NetworkService} from '../NetworkService';
+import {AbstractAdapter} from './AbstractAdapter';
+import {Contract} from './Contract';
+import {ContractInstanceWithMetadata} from './ContractInstanceWithMetadata';
+import {ContractService} from './ContractService';
 import NetworkMap = NetworkService.NetworkMap;
 
 // This class works only with workspace

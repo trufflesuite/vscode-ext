@@ -1,19 +1,19 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {QuickPickItem, window} from "vscode";
-import {Constants} from "../Constants";
-import {showInputBox, showQuickPick} from "../helpers/userInteraction";
-import {InfuraProjectItem} from "../Models/QuickPickItems";
-import {InfuraNetworkNode, InfuraProject} from "../Models/TreeItems";
-import {InfuraLayer} from "../Models/TreeItems/InfuraLayer";
-import {IInfuraEndpointDto, IInfuraProjectDto, IInfuraProjectQuickPick} from "../services/infuraService/InfuraDto";
-import {InfuraServiceClient} from "../services/infuraService/InfuraServiceClient";
-import {Telemetry} from "../TelemetryClient";
+import {QuickPickItem, window} from 'vscode';
+import {Constants} from '../Constants';
+import {showInputBox, showQuickPick} from '../helpers/userInteraction';
+import {InfuraProjectItem} from '../Models/QuickPickItems';
+import {InfuraNetworkNode, InfuraProject} from '../Models/TreeItems';
+import {InfuraLayer} from '../Models/TreeItems/InfuraLayer';
+import {IInfuraEndpointDto, IInfuraProjectDto, IInfuraProjectQuickPick} from '../services/infuraService/InfuraDto';
+import {InfuraServiceClient} from '../services/infuraService/InfuraServiceClient';
+import {Telemetry} from '../TelemetryClient';
 
 export class InfuraResourceExplorer {
   public async createProject(existingProjects: string[] = []): Promise<InfuraProject> {
-    Telemetry.sendEvent("InfuraResourceExplorer.createProject");
+    Telemetry.sendEvent('InfuraResourceExplorer.createProject');
     await this.waitForLogin();
 
     return this.createInfuraProject(existingProjects);
@@ -23,7 +23,7 @@ export class InfuraResourceExplorer {
     existingProjects: string[] = [],
     existingProjectIds: string[] = []
   ): Promise<InfuraProject> {
-    Telemetry.sendEvent("InfuraResourceExplorer.selectProject");
+    Telemetry.sendEvent('InfuraResourceExplorer.selectProject');
     await this.waitForLogin();
 
     const projectDestination = await showQuickPick(this.getProjectDestinations(existingProjectIds), {
@@ -32,14 +32,14 @@ export class InfuraResourceExplorer {
     });
 
     if (projectDestination instanceof InfuraProjectItem) {
-      Telemetry.sendEvent("InfuraResourceExplorer.selectProject.selectInfuraProject");
+      Telemetry.sendEvent('InfuraResourceExplorer.selectProject.selectInfuraProject');
       return this.getInfuraProject(
         projectDestination.label,
         projectDestination.projectId,
         projectDestination.endpoints
       );
     } else {
-      Telemetry.sendEvent("InfuraResourceExplorer.selectProject.creatInfuraProject");
+      Telemetry.sendEvent('InfuraResourceExplorer.selectProject.creatInfuraProject');
       return this.createInfuraProject(existingProjects);
     }
   }
@@ -94,7 +94,7 @@ export class InfuraResourceExplorer {
       ignoreFocusOut: true,
       prompt: Constants.paletteLabels.enterInfuraProjectName,
       validateInput: async (value: string) => {
-        if (value === "") {
+        if (value === '') {
           return Constants.validationMessages.valueCannotBeEmpty;
         }
 

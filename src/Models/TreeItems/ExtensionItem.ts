@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {commands, TreeItem, TreeItemCollapsibleState, Uri} from "vscode";
-import {Constants} from "../../Constants";
-import {Telemetry} from "../../TelemetryClient";
-import {ItemType} from "../ItemType";
-import {IExtensionItem} from "./IExtensionItem";
+import {commands, TreeItem, TreeItemCollapsibleState, Uri} from 'vscode';
+import {Constants} from '../../Constants';
+import {Telemetry} from '../../TelemetryClient';
+import {ItemType} from '../ItemType';
+import {IExtensionItem} from './IExtensionItem';
 import Timeout = NodeJS.Timeout;
 
 export interface ExtensionItemData {
@@ -52,11 +52,11 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
       Telemetry.sendException(
         new Error(
           Constants.errorMessageStrings.GetMessageChildAlreadyConnected(
-            Telemetry.obfuscate(child.label?.toString() || "")
+            Telemetry.obfuscate(child.label?.toString() || '')
           )
         )
       );
-      throw new Error(Constants.errorMessageStrings.GetMessageChildAlreadyConnected(child.label?.toString() || ""));
+      throw new Error(Constants.errorMessageStrings.GetMessageChildAlreadyConnected(child.label?.toString() || ''));
     }
 
     child.addParent(this);
@@ -92,7 +92,7 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
 
   private collapse(): void {
     if (this.children.length > 0) {
-      Telemetry.sendEvent("ExtensionItem.collapse.childrenLengthGreaterThanZero");
+      Telemetry.sendEvent('ExtensionItem.collapse.childrenLengthGreaterThanZero');
       this.collapsibleState = TreeItemCollapsibleState.Collapsed;
     } else {
       this.collapsibleState = TreeItemCollapsibleState.None;
@@ -103,7 +103,7 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
     clearTimeout(ExtensionItem.timeoutID as Timeout);
     ExtensionItem.timeoutID = setTimeout(async () => {
       try {
-        await commands.executeCommand("truffle-vscode.refresh");
+        await commands.executeCommand('truffle-vscode.refresh');
       } catch (error) {
         Telemetry.sendException(error as Error);
       }

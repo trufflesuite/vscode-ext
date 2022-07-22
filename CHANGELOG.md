@@ -2,6 +2,36 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
+## 2.4.0 - _Goblins_ 😈
+
+This release has some fixes around internal optimisations for our CI/Linting and cleanup of code where we were seeing issues with building contracts in mono repos etc.
+
+We also added some new Truffle Dashboard integration/view. Give it a try and let us know what you think!
+
+### What's Changed
+
+- Fix/debug workspace by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/116
+- Feature/eslint config changes by @michaeljohnbennett in https://github.com/trufflesuite/vscode-ext/pull/118
+- issue #121, renamed "explorer - truffle "to "contract explorer" by @NikolaiSch in https://github.com/trufflesuite/vscode-ext/pull/122
+- Edit the required apps page to display the version range of all apps by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/120
+- Feature/eslint fixes - Part2 - Config cleanup for truffle configuration by @michaeljohnbennett in https://github.com/trufflesuite/vscode-ext/pull/119
+- fix: added new PR checks by @michaeljohnbennett in https://github.com/trufflesuite/vscode-ext/pull/126
+- fix: hdwallet npm package has updated to truffle/hdwallet-provider by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/127
+- feat(explorer): added createContract by @NikolaiSch in https://github.com/trufflesuite/vscode-ext/pull/123
+- Improve Truffle Dashboard deployment integration by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/114
+- fix: auto load has implemented by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/136
+- refactor: remove unused code that checks whether Python is installed by @acuarica in https://github.com/trufflesuite/vscode-ext/pull/139
+- fix: start ganache command when invoked from the command palette by @acuarica in https://github.com/trufflesuite/vscode-ext/pull/142
+- fix: activationEvents list commands has reverted by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/167
+- fix: contract deployment is not forking networks by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/146
+- Draft: Required app was validating NPM local packages by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/164
+
+### New Contributors
+
+- @acuarica made their first contribution in https://github.com/trufflesuite/vscode-ext/pull/139
+
+**Full Changelog**: https://github.com/trufflesuite/vscode-ext/compare/v2.3.4...V2.4.0
+
 ## 2.3.4
 
 This release is a fix to the windows path issues that were reported.
@@ -25,7 +55,6 @@ Welcome to the new look Changelog. We will add more info against each release wh
 - fix: Build/Deploy commands were not working with mapping volumes on Windows 11 [PR](https://github.com/trufflesuite/vscode-ext/pull/110). The issue was found on windows 11 platform only. It was related to volume mapping. If the user open a project in root (C:), the build/deploy commands are working fine. But, if the project is opened in a mapping volume, the problem occurred. A fix was made and applied for windows platforms only.
 
 Most of these are great enhancements to our codebase and thank you to all the contributors!
-
 
 ## 2.2.3
 

@@ -1,0 +1,29 @@
+name: Core CI Checks
+
+on:
+  workflow_call:
+
+jobs:
+  core-checks:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: lts/*
+          cache: 'yarn'
+
+      - name: Clean install dependencies. Fail on lockfile Changes.
+        run: yarn install --immutable --immutable-cache --check-cache --non-interactive
+
+      - name: Prettier
+        run: yarn prettier
+
+      - name: ESLint
+        run: yarn eslint
+
+      - name: Tests
+        run: yarn test

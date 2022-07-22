@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {ChildProcess} from "child_process";
-import {OutputChannel} from "vscode";
-import {Constants} from "../../Constants";
-import {shell} from "../../helpers";
-import {Telemetry} from "../../TelemetryClient";
-import {UrlValidator} from "../../validators/UrlValidator";
-import {isGenericServer, getWeb3ClientVersion} from "./GenericServiceClient";
+import {ChildProcess} from 'child_process';
+import {OutputChannel} from 'vscode';
+import {Constants} from '../../Constants';
+import {shell} from '../../helpers';
+import {Telemetry} from '../../TelemetryClient';
+import {UrlValidator} from '../../validators/UrlValidator';
+import {isGenericServer, getWeb3ClientVersion} from './GenericServiceClient';
 
 export namespace GenericService {
   export interface IGenericProcess {
@@ -28,20 +28,20 @@ export namespace GenericService {
   export async function getPortStatus(port: number | string): Promise<PortStatus> {
     if (!isNaN(await shell.findPid(port))) {
       if (await isGenericServer(port)) {
-        Telemetry.sendEvent("GanacheService.isGenericServerRunning.isGenericServer", {port: "" + port});
+        Telemetry.sendEvent('GanacheService.isGenericServerRunning.isGenericServer', {port: '' + port});
         return PortStatus.RUNNING;
       } else {
-        Telemetry.sendEvent("GanacheService.isGenericServerRunning.portIsBusy", {port: "" + port});
+        Telemetry.sendEvent('GanacheService.isGenericServerRunning.portIsBusy', {port: '' + port});
         return PortStatus.BUSY;
       }
     }
 
-    Telemetry.sendEvent("GanacheService.isGenericServerRunning.portIsFree", {port: "" + port});
+    Telemetry.sendEvent('GanacheService.isGenericServerRunning.portIsFree', {port: '' + port});
     return PortStatus.FREE;
   }
 
   export async function getClientVersion(port: number | string): Promise<string> {
-    Telemetry.sendEvent("GenericService.checkForConnection");
+    Telemetry.sendEvent('GenericService.checkForConnection');
 
     if (UrlValidator.validatePort(port)) {
       Telemetry.sendException(new Error(Constants.genericCommandStrings.invalidPort));
@@ -59,6 +59,6 @@ export namespace GenericService {
       return await getWeb3ClientVersion(port);
     }
 
-    return "";
+    return '';
   }
 }

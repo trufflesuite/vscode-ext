@@ -5,14 +5,14 @@
 // https://github.com/trufflesuite/truffle-contract-schema
 
 export class Contract {
-  public readonly abi: Array<{ [key: string]: any }>;
-  public readonly ast: { [key: string]: any };
+  public readonly abi: Array<{[key: string]: any}>;
+  public readonly ast: {[key: string]: any};
   public readonly bytecode: string;
-  public readonly compiler: { [key: string]: any };
+  public readonly compiler: {[key: string]: any};
   public readonly contractName: string;
   public readonly deployedBytecode: string;
   public readonly metadata: string;
-  public readonly networks: { [key: string]: any };
+  public readonly networks: {[key: string]: any};
   public readonly schemaVersion: string;
   public readonly source: string;
   public readonly sourcePath: string;
@@ -20,7 +20,7 @@ export class Contract {
 
   // This keys were ignored sourceMap, deployedSourceMap, legacyAST, devdoc, userdoc
 
-  constructor(contract: { [key: string]: any }) {
+  constructor(contract: {[key: string]: any}) {
     this.abi = contract.abi;
     this.ast = contract.ast;
     this.bytecode = contract.bytecode;

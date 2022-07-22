@@ -1,14 +1,15 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {DebugNetwork} from "../debugNetwork";
-import {sortFilePaths} from "../helpers";
-import {IContractJsonModel} from "../models/IContractJsonModel";
-import {IContractModel} from "../models/IContractModel";
-import {Web3Wrapper} from "../web3Wrapper";
-import {ContractJsonsProvider} from "./contractJsonsProvider";
-import path from "path";
-import fs from "fs";
+import {DebugNetwork} from '../debugNetwork';
+import {sortFilePaths} from '../helpers';
+import {IContractJsonModel} from '../models/IContractJsonModel';
+import {IContractModel} from '../models/IContractModel';
+import {Web3Wrapper} from '../web3Wrapper';
+import {ContractJsonsProvider} from './contractJsonsProvider';
+import path from 'path';
+import fs from 'fs';
+
 export type ContractData = {
   contracts: Array<any>;
   files: Array<string>;
@@ -78,6 +79,7 @@ export interface SourceResolution {
   filePath: string | undefined;
   absPath: string | undefined;
 }
+
 export class NPMExtendedResolver {
   workingDirectory: string;
 
@@ -114,23 +116,23 @@ export class NPMExtendedResolver {
 
   async resolve(import_path: string, _imported_from: string): Promise<SourceResolution> {
     // If nothing's found, body returns `undefined`
-    var body: string | undefined;
-    var modulesDir = this.workingDirectory;
-    var expected_path: string | undefined;
+    let body: string | undefined;
+    let modulesDir = this.workingDirectory;
+    let expected_path: string | undefined;
 
     while (true) {
-      expected_path = path.join(modulesDir, "node_modules", import_path);
+      expected_path = path.join(modulesDir, 'node_modules', import_path);
 
       try {
-        body = fs.readFileSync(expected_path, {encoding: "utf8"});
+        body = fs.readFileSync(expected_path, {encoding: 'utf8'});
         break;
       } catch (err) {
         // do nothing I guess...
       }
 
       // Recurse outwards until impossible
-      var oldModulesDir = modulesDir;
-      modulesDir = path.join(modulesDir, "..");
+      const oldModulesDir = modulesDir;
+      modulesDir = path.join(modulesDir, '..');
       if (modulesDir === oldModulesDir) {
         break;
       }

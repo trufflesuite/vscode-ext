@@ -1,12 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import fs from "fs-extra";
-import semver from "semver";
-import {commands, ExtensionContext} from "vscode";
-import {Constants} from "../Constants";
-import {Telemetry} from "../TelemetryClient";
-import {BasicWebView, IWebViewConfig} from "./BasicWebView";
+import fs from 'fs-extra';
+import semver from 'semver';
+import {commands, ExtensionContext} from 'vscode';
+import {Constants} from '../Constants';
+import {Telemetry} from '../TelemetryClient';
+import {BasicWebView, IWebViewConfig} from './BasicWebView';
 
 export class ChangelogPage extends BasicWebView {
   protected readonly config: IWebViewConfig;
@@ -25,7 +25,7 @@ export class ChangelogPage extends BasicWebView {
     this.context.globalState.update(Constants.globalStateKeys.truffleExtensionVersion, Constants.extensionVersion);
 
     Telemetry.sendEvent(Constants.telemetryEvents.webPages.showWebPage, {
-      trigger: "auto",
+      trigger: 'auto',
       viewType: this.config.viewType,
     });
 
@@ -39,12 +39,12 @@ export class ChangelogPage extends BasicWebView {
   protected async getHtmlForWebview(): Promise<string> {
     if (this.panel) {
       const resourcePath = this.panel.webview.asWebviewUri(this.rootPath).toString();
-      const html = await fs.readFile(this.config.path, "utf8");
-      const content = await fs.readFile(Constants.webViewPages.changelog.changelogPath, "utf8");
-      const htmlContent = (await commands.executeCommand("markdown.api.render", content)) as string;
+      const html = await fs.readFile(this.config.path, 'utf8');
+      const content = await fs.readFile(Constants.webViewPages.changelog.changelogPath, 'utf8');
+      const htmlContent = (await commands.executeCommand('markdown.api.render', content)) as string;
 
       return html.replace(/{{root}}/g, resourcePath).replace(/{{content}}/g, htmlContent);
     }
-    return "";
+    return '';
   }
 }

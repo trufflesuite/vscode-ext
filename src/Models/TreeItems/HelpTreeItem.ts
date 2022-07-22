@@ -1,10 +1,10 @@
-import {AzExtParentTreeItem, AzExtTreeItem, IActionContext} from "@microsoft/vscode-azext-utils";
-import {ThemeIcon} from "vscode";
-import {OpenUrlTreeItem} from "./OpenUrlTreeItem";
+import {AzExtParentTreeItem, AzExtTreeItem, IActionContext} from '@microsoft/vscode-azext-utils';
+import {ThemeIcon} from 'vscode';
+import {OpenUrlTreeItem} from './OpenUrlTreeItem';
 
 export class HelpTreeItem extends AzExtParentTreeItem {
-  public label: string = "help";
-  public contextValue: string = "help";
+  public label = 'help';
+  public contextValue = 'help';
 
   private values: AzExtTreeItem[];
 
@@ -34,47 +34,47 @@ export class HelpTreeItem extends AzExtParentTreeItem {
   private get readGettingStartedGuidTreeItem(): AzExtTreeItem {
     return new OpenUrlTreeItem(
       this,
-      "0",
-      "Getting Started Guide",
-      "https://trufflesuite.com/blog/build-on-web3-with-truffle-vs-code-extension/",
-      new ThemeIcon("star-full")
+      '0',
+      'Getting Started Guide',
+      'https://trufflesuite.com/blog/build-on-web3-with-truffle-vs-code-extension/',
+      new ThemeIcon('star-full')
     );
   }
   private get readDocumentationTreeItem(): AzExtTreeItem {
     return new OpenUrlTreeItem(
       this,
-      "10",
-      "Extension Docs",
-      "https://trufflesuite.com/docs/vscode-ext/",
-      new ThemeIcon("book")
+      '10',
+      'Extension Docs',
+      'https://trufflesuite.com/docs/vscode-ext/',
+      new ThemeIcon('book')
     );
   }
 
   private get getCodeSamplesExamplesTreeItem(): AzExtTreeItem {
     return new OpenUrlTreeItem(
       this,
-      "20",
-      "Get Code Samples & Example Projects",
-      "https://trufflesuite.com/boxes/",
-      new ThemeIcon("package")
+      '20',
+      'Get Code Samples & Example Projects',
+      'https://trufflesuite.com/boxes/',
+      new ThemeIcon('package')
     );
   }
   private get reportAnIssueTreeItem(): AzExtTreeItem {
     return new OpenUrlTreeItem(
       this,
-      "30",
-      "Report an Issue",
-      "https://github.com/trufflesuite/vscode-ext/issues/new",
-      new ThemeIcon("report")
+      '30',
+      'Report an Issue',
+      'https://github.com/trufflesuite/vscode-ext/issues/new',
+      new ThemeIcon('report')
     );
   }
   private get communityAndSupportTreeItem(): AzExtTreeItem {
     return new OpenUrlTreeItem(
       this,
-      "40",
-      "Community and Support",
-      "https://trufflesuite.com/community/",
-      new ThemeIcon("organization")
+      '40',
+      'Community and Support',
+      'https://trufflesuite.com/community/',
+      new ThemeIcon('organization')
     );
   }
 }

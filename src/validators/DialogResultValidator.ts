@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from "../Constants";
-import { Validator } from "./validator";
+import {Constants} from '../Constants';
+import {Validator} from './validator';
 
 export namespace DialogResultValidator {
   export function validateConfirmationResult(result: string): string | null {

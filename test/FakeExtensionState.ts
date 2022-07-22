@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Memento} from "vscode";
+import {Memento} from 'vscode';
 
 export class FakeExtensionState implements Memento {
   constructor(private dict: {[id: string]: any} = {}) {}

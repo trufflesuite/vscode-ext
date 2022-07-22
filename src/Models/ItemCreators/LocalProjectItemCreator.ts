@@ -1,16 +1,16 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {TLocalProjectOptions, LocalProject} from "../TreeItems";
-import {ItemCreator} from "./ItemCreator";
+import {TLocalProjectOptions, LocalProject} from '../TreeItems';
+import {ItemCreator} from './ItemCreator';
 
 export class LocalProjectItemCreator extends ItemCreator {
   protected getRequiredFields(): Array<{fieldName: string; type: string}> {
     const requiredFields = super.getRequiredFields();
     requiredFields.push(
       ...[
-        {fieldName: "label", type: "string"},
-        {fieldName: "port", type: "number"},
+        {fieldName: 'label', type: 'string'},
+        {fieldName: 'port', type: 'number'},
       ]
     );
 

@@ -1,12 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from "../../Constants";
-import {IDeployDestination} from "../IDeployDestination";
-import {ItemType} from "../ItemType";
-import {InfuraNetworkNode} from "./InfuraNetworkNode";
-import {Layer} from "./Layer";
-import {Project} from "./Project";
+import {Constants} from '../../Constants';
+import {IDeployDestination} from '../IDeployDestination';
+import {ItemType} from '../ItemType';
+import {InfuraNetworkNode} from './InfuraNetworkNode';
+import {Layer} from './Layer';
+import {Project} from './Project';
 
 export class InfuraProject extends Project {
   public readonly projectId: string;
@@ -28,7 +28,7 @@ export class InfuraProject extends Project {
   public async getDeployDestinations(): Promise<IDeployDestination[]> {
     const {infura} = Constants.treeItemData.service;
 
-    const getDeployName = (labelNode: string) => [infura.prefix, this.label, labelNode].join("_");
+    const getDeployName = (labelNode: string) => [infura.prefix, this.label, labelNode].join('_');
 
     const destinations: IDeployDestination[] = [];
 

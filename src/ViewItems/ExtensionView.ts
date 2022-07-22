@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { ProviderResult } from "vscode";
-import { IExtensionItem } from "../Models/TreeItems";
-import { IExtensionView } from "./IExtensionView";
-import { ViewItemFactory } from "./ViewItemFactory";
+import {ProviderResult} from 'vscode';
+import {IExtensionItem} from '../Models/TreeItems';
+import {IExtensionView} from './IExtensionView';
+import {ViewItemFactory} from './ViewItemFactory';
 
 export abstract class ExtensionView<T extends IExtensionItem> implements IExtensionView {
   protected constructor(public readonly extensionItem: T, protected parent?: IExtensionView | undefined | null) {}

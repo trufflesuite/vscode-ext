@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Event, EventEmitter, ProviderResult, TreeDataProvider, TreeItem, TreeItemCollapsibleState} from "vscode";
-import {IInstruction} from "../models/IInstruction";
-import InstructionDataManager from "./instructionDataManager";
-import InstructionTreeNode from "./instructionTreeNode";
+import {Event, EventEmitter, ProviderResult, TreeDataProvider, TreeItem, TreeItemCollapsibleState} from 'vscode';
+import {IInstruction} from '../models/IInstruction';
+import InstructionDataManager from './instructionDataManager';
+import InstructionTreeNode from './instructionTreeNode';
 
 export default class InstructionDataProvider implements TreeDataProvider<InstructionTreeNode> {
   public _onDidChangeTreeData: EventEmitter<InstructionTreeNode> = new EventEmitter<InstructionTreeNode>();
@@ -50,6 +50,6 @@ export default class InstructionDataProvider implements TreeDataProvider<Instruc
 
   // TODO: refactroign - same method in variablesHandler
   private isSpecificObjectValueType(item: any) {
-    return !Array.isArray(item) && item !== null && item !== undefined && typeof item === "object";
+    return !Array.isArray(item) && item !== null && item !== undefined && typeof item === 'object';
   }
 }

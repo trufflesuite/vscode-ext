@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from "../Constants";
-import {showInputBox} from "../helpers/userInteraction";
-import {LocalNetworkNode, LocalProject, TLocalProjectOptions} from "../Models/TreeItems";
-import {GanacheService} from "../services";
-import {Telemetry} from "../TelemetryClient";
-import {DialogResultValidator} from "../validators/DialogResultValidator";
-import {UrlValidator} from "../validators/UrlValidator";
+import {Constants} from '../Constants';
+import {showInputBox} from '../helpers/userInteraction';
+import {LocalNetworkNode, LocalProject, TLocalProjectOptions} from '../Models/TreeItems';
+import {GanacheService} from '../services';
+import {Telemetry} from '../TelemetryClient';
+import {DialogResultValidator} from '../validators/DialogResultValidator';
+import {UrlValidator} from '../validators/UrlValidator';
 
 export class LocalResourceExplorer {
   public async createProject(
@@ -15,7 +15,7 @@ export class LocalResourceExplorer {
     existingPorts: number[] = [],
     options: TLocalProjectOptions
   ): Promise<LocalProject> {
-    Telemetry.sendEvent("LocalResourceExplorer.createProject");
+    Telemetry.sendEvent('LocalResourceExplorer.createProject');
 
     return this.getOrCreateLocalProject(
       existingProjects,
@@ -31,7 +31,7 @@ export class LocalResourceExplorer {
     existingPorts: number[] = [],
     options: TLocalProjectOptions
   ): Promise<LocalProject> {
-    Telemetry.sendEvent("LocalResourceExplorer.selectProject");
+    Telemetry.sendEvent('LocalResourceExplorer.selectProject');
 
     const localProject = await this.getOrCreateLocalProject(
       existingProjects,
@@ -68,7 +68,7 @@ export class LocalResourceExplorer {
   ): Promise<LocalProject> {
     const localProject = new LocalProject(label, port, options, description);
     const url = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
-    const networkNode = new LocalNetworkNode(label, url, "*");
+    const networkNode = new LocalNetworkNode(label, url, '*');
 
     localProject.addChild(networkNode);
 
@@ -91,7 +91,7 @@ export class LocalResourceExplorer {
 
         return null;
       },
-      value: existingProjects.includes(Constants.localhostName) ? "" : Constants.localhostName,
+      value: existingProjects.includes(Constants.localhostName) ? '' : Constants.localhostName,
     });
   }
 
@@ -109,7 +109,7 @@ export class LocalResourceExplorer {
           return validationError;
         }
 
-        if (existingPorts.some((existPort) => existPort + "" === value)) {
+        if (existingPorts.some((existPort) => existPort + '' === value)) {
           return Constants.validationMessages.projectAlreadyExists;
         }
 
@@ -119,7 +119,7 @@ export class LocalResourceExplorer {
 
         return null;
       },
-      value: existingPorts.includes(Constants.defaultLocalhostPort) ? "" : Constants.defaultLocalhostPort.toString(),
+      value: existingPorts.includes(Constants.defaultLocalhostPort) ? '' : Constants.defaultLocalhostPort.toString(),
     });
 
     return parseInt(port, 10);
@@ -127,7 +127,7 @@ export class LocalResourceExplorer {
 
   private async getDescription(port: number, options: TLocalProjectOptions) {
     const blockNumber: string = options.blockNumber === 0 ? Constants.latestBlock : options.blockNumber.toString();
-    const forkedNetwork: string = options.url === "" ? options.forkedNetwork : options.url;
+    const forkedNetwork: string = options.url === '' ? options.forkedNetwork : options.url;
 
     let formattedDescription: string;
 

@@ -21,6 +21,7 @@
           "init": {
             "type": "CallExpression",
             "start": 25,
+            "optional": false,
             "end": 61,
             "callee": {
               "type": "Identifier",
@@ -61,6 +62,7 @@
             "end": 68,
             "name": "module"
           },
+          "optional": false,
           "property": {
             "type": "Identifier",
             "start": 69,
@@ -335,10 +337,12 @@
                             "arguments": [
                               {
                                 "type": "CallExpression",
+                                "optional": false,
                                 "start": 363,
                                 "end": 398,
                                 "callee": {
                                   "type": "MemberExpression",
+                                  "optional": false,
                                   "start": 363,
                                   "end": 378,
                                   "object": {

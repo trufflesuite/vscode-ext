@@ -8,7 +8,7 @@ const VARIABLE_REFERANCE = {
 
 export const SCOPES = {
   all: {
-    name: "All",
+    name: 'All',
     ref: VARIABLE_REFERANCE.all,
   },
   dynamicVariables: {
@@ -16,4 +16,4 @@ export const SCOPES = {
   },
 };
 
-export const OBJECT_VARIABLE_DISPLAY_NAME = "Object";
+export const OBJECT_VARIABLE_DISPLAY_NAME = 'Object';

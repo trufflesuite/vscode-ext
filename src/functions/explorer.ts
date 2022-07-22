@@ -1,9 +1,9 @@
-import {ChainId} from "../Constants";
+import {ChainId} from '../Constants';
 
 const explorers = {
-  etherscan: (link: string, data: string, type: "transaction" | "token" | "address" | "block") => {
+  etherscan: (link: string, data: string, type: 'transaction' | 'token' | 'address' | 'block') => {
     switch (type) {
-      case "transaction":
+      case 'transaction':
         return `${link}/tx/${data}`;
       default:
         return `${link}/${type}/${data}`;
@@ -14,7 +14,7 @@ const explorers = {
 interface ChainObject {
   name: string;
   link: string;
-  builder: (chainName: string, data: string, type: "transaction" | "token" | "address" | "block") => string;
+  builder: (chainName: string, data: string, type: 'transaction' | 'token' | 'address' | 'block') => string;
 }
 
 interface Chains {
@@ -22,60 +22,60 @@ interface Chains {
 }
 
 const UnknownChain: ChainObject = {
-  name: "Unknown/Truffle",
-  link: "",
-  builder: (_) => "",
+  name: 'Unknown/Truffle',
+  link: '',
+  builder: (_) => '',
 };
 
 const chains: Chains = {
   [ChainId.ETHEREUM]: {
-    name: "Mainnet",
-    link: "https://etherscan.io",
+    name: 'Mainnet',
+    link: 'https://etherscan.io',
     builder: explorers.etherscan,
   },
   [ChainId.ROPSTEN]: {
-    name: "Ropsten",
-    link: "https://ropsten.etherscan.io",
+    name: 'Ropsten',
+    link: 'https://ropsten.etherscan.io',
     builder: explorers.etherscan,
   },
   [ChainId.RINKEBY]: {
-    name: "Rinkeby",
-    link: "https://rinkeby.etherscan.io",
+    name: 'Rinkeby',
+    link: 'https://rinkeby.etherscan.io',
     builder: explorers.etherscan,
   },
   [ChainId.GÖRLI]: {
-    name: "Goerli",
-    link: "https://goerli.etherscan.io",
+    name: 'Goerli',
+    link: 'https://goerli.etherscan.io',
     builder: explorers.etherscan,
   },
   [ChainId.KOVAN]: {
-    name: "Kovan",
-    link: "https://kovan.etherscan.io",
+    name: 'Kovan',
+    link: 'https://kovan.etherscan.io',
     builder: explorers.etherscan,
   },
   [ChainId.MATIC]: {
-    name: "Matic",
-    link: "https://polygonscan.com",
+    name: 'Matic',
+    link: 'https://polygonscan.com',
     builder: explorers.etherscan,
   },
   [ChainId.MATIC_TESTNET]: {
-    name: "Matic Testnet",
-    link: "https://mumbai.polygonscan.com",
+    name: 'Matic Testnet',
+    link: 'https://mumbai.polygonscan.com',
     builder: explorers.etherscan,
   },
   [ChainId.FANTOM]: {
-    name: "Fantom",
-    link: "https://ftmscan.com",
+    name: 'Fantom',
+    link: 'https://ftmscan.com',
     builder: explorers.etherscan,
   },
   [ChainId.FANTOM_TESTNET]: {
-    name: "Fantom Testnet",
-    link: "https://testnet.ftmscan.com",
+    name: 'Fantom Testnet',
+    link: 'https://testnet.ftmscan.com',
     builder: explorers.etherscan,
   },
   [ChainId.KILN]: {
-    name: "Kiln",
-    link: "https://explorer.kiln.themerge.dev/",
+    name: 'Kiln',
+    link: 'https://explorer.kiln.themerge.dev/',
     builder: explorers.etherscan,
   },
   //   [ChainId.BSC]: {
@@ -109,9 +109,9 @@ const chains: Chains = {
 export function getExplorerLink(
   chainId: number | undefined,
   data: string,
-  type: "transaction" | "token" | "address" | "block"
+  type: 'transaction' | 'token' | 'address' | 'block'
 ): string | undefined {
-  if (!chainId) return "";
+  if (!chainId) return '';
   const chain = chains[chainId];
   return chain ? chain.builder(chain.link, data, type) : undefined;
 }

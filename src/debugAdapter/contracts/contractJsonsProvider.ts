@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import fs from "fs-extra";
-import path from "path";
-import {CONTRACT_JSON_ENCODING} from "../constants/contractJson";
-import {IContractJsonModel} from "../models/IContractJsonModel";
+import fs from 'fs-extra';
+import path from 'path';
+import {CONTRACT_JSON_ENCODING} from '../constants/contractJson';
+import {IContractJsonModel} from '../models/IContractJsonModel';
 
 export class ContractJsonsProvider {
   private contractBuildDirectory: string;

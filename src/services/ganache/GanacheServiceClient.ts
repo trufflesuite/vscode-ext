@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from "../../Constants";
-import {Telemetry} from "../../TelemetryClient";
-import {HttpService} from "../HttpService";
+import {Constants} from '../../Constants';
+import {Telemetry} from '../../TelemetryClient';
+import {HttpService} from '../HttpService';
 
 export async function isGanacheServer(port: number | string): Promise<boolean> {
   try {
@@ -18,7 +18,7 @@ export async function isGanacheServer(port: number | string): Promise<boolean> {
   }
 }
 
-export async function waitGanacheStarted(port: number | string, maxRetries: number = 1): Promise<void> {
+export async function waitGanacheStarted(port: number | string, maxRetries = 1): Promise<void> {
   const retry = async (retries: number) => {
     if (retries < maxRetries) {
       if (await isGanacheServer(port)) {

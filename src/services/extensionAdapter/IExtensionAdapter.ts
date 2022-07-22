@@ -1,6 +1,6 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
-import {Uri} from "vscode";
+import {Uri} from 'vscode';
 
 export interface IExtensionAdapter {
   validateExtension: () => Promise<void>;
