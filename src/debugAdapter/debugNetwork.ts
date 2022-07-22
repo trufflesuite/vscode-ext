@@ -3,7 +3,6 @@
 
 import path from 'path';
 import {IConfiguration, INetwork, INetworkOption} from '@/helpers/ConfigurationReader';
-import {TruffleConfig} from '@/helpers/TruffleConfiguration';
 import {TRUFFLE_CONFIG_NAME} from './constants/truffleConfig';
 import {TreeManager} from '@/services/tree/TreeManager';
 import {ItemType} from '@/Models/ItemType';
@@ -13,10 +12,11 @@ import {showQuickPick} from '@/helpers/userInteraction';
 import {QuickPickItem} from 'vscode';
 import {LocalProject} from '@/Models/TreeItems/LocalProject';
 import {LocalNetworkNode} from '@/Models/TreeItems';
+import {ConfigurationReader} from './configurationReader';
 
 export class DebugNetwork {
   public workingDirectory: string;
-  private _basedConfig: TruffleConfig | undefined;
+  private _basedConfig: ConfigurationReader.TruffleConfig | undefined;
   private _truffleConfiguration: IConfiguration | undefined;
   private _networkForDebug: INetwork | undefined;
   constructor(truffleConfigDirectory: string) {
@@ -24,7 +24,7 @@ export class DebugNetwork {
   }
 
   public async load(providerUrl?: string): Promise<void> {
-    this._basedConfig = new TruffleConfig(path.join(this.workingDirectory, TRUFFLE_CONFIG_NAME));
+    this._basedConfig = new ConfigurationReader.TruffleConfig(path.join(this.workingDirectory, TRUFFLE_CONFIG_NAME));
     this._truffleConfiguration = await this.loadConfiguration();
     this._networkForDebug = await this.loadNetworkForDebug(providerUrl);
   }
