@@ -1,15 +1,15 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {executeCommand} from '@/helpers/command';
 import path from 'path';
+import {executeCommand} from './cmdCommandExecutor';
+import {ConfigurationReader} from './configurationReader';
 import {IConfiguration, INetwork} from '@/helpers/ConfigurationReader';
-import {TruffleConfig} from '@/helpers/TruffleConfiguration';
 import {TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE, TRUFFLE_CONFIG_NAME} from './constants/truffleConfig';
 
 export class DebugNetwork {
   public workingDirectory: string;
-  private _basedConfig: TruffleConfig | undefined;
+  private _basedConfig: ConfigurationReader.TruffleConfig | undefined;
   private _truffleConfiguration: IConfiguration | undefined;
   private _networkForDebug: INetwork | undefined;
   constructor(truffleConfigDirectory: string) {
@@ -17,7 +17,7 @@ export class DebugNetwork {
   }
 
   public async load(): Promise<void> {
-    this._basedConfig = new TruffleConfig(path.join(this.workingDirectory, TRUFFLE_CONFIG_NAME));
+    this._basedConfig = new ConfigurationReader.TruffleConfig(path.join(this.workingDirectory, TRUFFLE_CONFIG_NAME));
     this._truffleConfiguration = await this.loadConfiguration();
     this._networkForDebug = await this.loadNetworkForDebug();
   }
