@@ -149,8 +149,8 @@ export default class RuntimeInterface extends EventEmitter {
    * @param txHash
    * @param workingDirectory
    */
-  public async attach(txHash: string, workingDirectory: string): Promise<void> {
-    const result = await prepareContracts(workingDirectory);
+  public async attach(txHash: string, workingDirectory: string, providerUrl: string): Promise<void> {
+    const result = await prepareContracts(workingDirectory, providerUrl);
 
     this._deployedContracts = filterContractsWithAddress(result.contracts);
 

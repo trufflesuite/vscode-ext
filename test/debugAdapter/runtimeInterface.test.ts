@@ -99,7 +99,7 @@ const baseSessionMock: truffleDebugger.Session = {
 
 async function initMockRuntime() {
   const runtimeInterface = new RuntimeInterface();
-  await runtimeInterface.attach('', '');
+  await runtimeInterface.attach('', '', '');
   return runtimeInterface;
 }
 
