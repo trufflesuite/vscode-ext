@@ -52,6 +52,22 @@ export function isWorkspaceOpen(): boolean {
 export const getPathByPlatform = (workspace: Uri): string =>
   process.platform === 'win32' ? `${workspace.scheme}:${workspace.path}` : workspace.fsPath;
 
+/**
+ * Convert entry objects into uri objects
+ * The Truffle View panel is being sent by the Truffle View panel. The goal
+ * here is to deal with it and return a uri object.
+ * @param uri the input parameter that will be handle.
+ * @returns
+ */
+export const convertEntryToUri = (uri: Uri): Uri => {
+  if (uri.fsPath) {
+    return uri;
+  } else {
+    const entry: Entry = JSON.parse(JSON.stringify(uri));
+    return Uri.parse(entry.uri.path);
+  }
+};
+
 async function getWorkspacesFolders(): Promise<TruffleWorkspace[]> {
   const workspaces: TruffleWorkspace[] = [];
 
@@ -98,15 +114,6 @@ async function getWorkspaceFromQuickPick(workspaces: TruffleWorkspace[]): Promis
   });
 
   return Uri.parse(command.detail!);
-}
-
-function convertEntryToUri(uri: Uri): Uri {
-  if (uri.fsPath) {
-    return uri;
-  } else {
-    const entry: Entry = JSON.parse(JSON.stringify(uri));
-    return Uri.parse(entry.uri.path);
-  }
 }
 
 function getRootDirectoryFromWorkspace(uri: Uri): Uri {

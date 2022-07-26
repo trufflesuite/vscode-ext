@@ -47,6 +47,7 @@
     "onCommand:truffle-vscode.createLocalUI",
     "onCommand:truffle-vscode.newSolidityProject",
     "onCommand:truffle-vscode.buildContracts",
+    "onCommand:truffle-vscode.buildSingleContract",
     "onCommand:truffle-vscode.deployContracts",
     "onCommand:truffle-vscode.createContract",
     "onCommand:truffle-vscode.connectProject",
@@ -236,9 +237,14 @@
       },
       {
         "command": "truffle-vscode.buildContracts",
-        "title": "Build Contracts",
+        "title": "Build All Contracts",
         "category": "Truffle",
         "icon": "$(run-all)"
+      },
+      {
+        "command": "truffle-vscode.buildSingleContract",
+        "title": "Build This Contract",
+        "category": "Truffle"
       },
       {
         "command": "truffle-vscode.deployContracts",
@@ -390,6 +396,10 @@
         {
           "when": "truffle-vscode:isWorkspaceOpen",
           "command": "truffle-vscode.deployContracts"
+        },
+        {
+          "when": "false",
+          "command": "truffle-vscode.buildSingleContract"
         }
       ],
       "view/title": [
@@ -479,7 +489,12 @@
         },
         {
           "command": "truffle-vscode.buildContracts",
-          "when": "view == truffle-vscode.views.explorer",
+          "when": "view == truffle-vscode.views.explorer && viewItem != file",
+          "group": "truffle-0@0"
+        },
+        {
+          "command": "truffle-vscode.buildSingleContract",
+          "when": "view == truffle-vscode.views.explorer && viewItem == file",
           "group": "truffle-0@0"
         },
         {

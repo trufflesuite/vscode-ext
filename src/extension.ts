@@ -137,6 +137,9 @@ export async function activate(context: ExtensionContext) {
   const buildContracts = commands.registerCommand('truffle-vscode.buildContracts', async (uri: Uri) => {
     await tryExecute(() => sdkCoreCommands.build(uri));
   });
+  const buildSingleContract = commands.registerCommand('truffle-vscode.buildSingleContract', async (uri: Uri) => {
+    await tryExecute(() => sdkCoreCommands.build(uri));
+  });
   const deployContracts = commands.registerCommand('truffle-vscode.deployContracts', async (uri: Uri) => {
     await tryExecute(() => sdkCoreCommands.deploy(uri));
   });
@@ -223,6 +226,7 @@ export async function activate(context: ExtensionContext) {
     refresh,
     newSolidityProject,
     buildContracts,
+    buildSingleContract,
     deployContracts,
     createContract,
     createProject,
