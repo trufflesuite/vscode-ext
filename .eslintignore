@@ -37,5 +37,3 @@ resources/drizzle/
 
 ui-test/
 
-### We ignore the config file to stop issues.
-#  .eslintrc.js

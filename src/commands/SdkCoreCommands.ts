@@ -6,12 +6,12 @@ import {HardHatExtensionAdapter, IExtensionAdapter, TruffleExtensionAdapter} fro
 import {Memento, Uri, window} from 'vscode';
 import {userSettings} from '../helpers';
 
-class SdkCoreCommands {
-  private extensionAdapter!: IExtensionAdapter;
+export class SdkCoreCommands {
+  public extensionAdapter!: IExtensionAdapter;
 
   public async initialize(_globalState: Memento): Promise<void> {
     const sdk = userSettings.getConfiguration(Constants.userSettings.coreSdkSettingsKey);
-    this.extensionAdapter = this.getExtensionAdapter(sdk.userValue ? sdk.userValue : sdk.defaultValue);
+    this.extensionAdapter = SdkCoreCommands.getExtensionAdapter(sdk.userValue ? sdk.userValue : sdk.defaultValue);
     this.extensionAdapter.validateExtension().catch((error) => {
       window.showErrorMessage(error.message);
     });
@@ -28,7 +28,7 @@ class SdkCoreCommands {
     return this.extensionAdapter.deploy(uri);
   }
 
-  private getExtensionAdapter(sdk: string): IExtensionAdapter {
+  private static getExtensionAdapter(sdk: string): IExtensionAdapter {
     switch (sdk) {
       case Constants.coreSdk.hardhat:
         return new HardHatExtensionAdapter();

@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {INetwork} from '@/helpers/ConfigurationReader';
@@ -524,7 +524,7 @@ async function readCompiledContract(uri: Uri): Promise<any> {
   return JSON.parse(data.toString());
 }
 
-function ensureFileIsContractJson(filePath: string) {
+function ensureFileIsContractJson(filePath: string): void {
   if (path.extname(filePath) !== Constants.contractExtension.json) {
     const error = new Error(Constants.errorMessageStrings.InvalidContract);
     Telemetry.sendException(error);

@@ -37,7 +37,8 @@
     "allowJs": true,
     "checkJs": false,
     "skipLibCheck": true,
-    "typeRoots": ["./node_modules/@types", "./node_modules/@machinomy", "./src/debugger/types"]
+    "typeRoots": ["./node_modules/@types", "./node_modules/@machinomy", "./src/debugger/types", "./typings/"],
+    "types": ["mocha", "chai", "node", "global"]
   },
   "include": [
     ".eslintrc.js",
