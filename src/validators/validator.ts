@@ -13,7 +13,7 @@ import {
   IsNotEmpty,
   IsUrl,
   LengthRange,
-} from "./validationFunctions";
+} from './validationFunctions';
 
 export interface IRule {
   validate(value: string): string | null | Promise<string | null>;
@@ -25,7 +25,7 @@ export class Validator {
   constructor(private readonly value: string) {}
 
   public getErrors(): string | null {
-    return Array.from(this.errors).join("\r\n") || null;
+    return Array.from(this.errors).join('\r\n') || null;
   }
 
   public hasLowerCase(): Validator {

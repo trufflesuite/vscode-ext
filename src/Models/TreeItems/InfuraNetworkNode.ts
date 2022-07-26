@@ -1,19 +1,19 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {URL} from "url";
-import {Constants} from "../../Constants";
-import {TruffleConfiguration} from "../../helpers";
-import {showInputBox} from "../../helpers/userInteraction";
-import {ItemType} from "../ItemType";
-import {MnemonicNetworkNode} from "./MnemonicNetworkNode";
+import {INetwork} from '@/helpers/ConfigurationReader';
+import {URL} from 'url';
+import {Constants} from '@/Constants';
+import {showInputBox} from '@/helpers/userInteraction';
+import {ItemType} from '@/Models';
+import {MnemonicNetworkNode} from './MnemonicNetworkNode';
 
 export class InfuraNetworkNode extends MnemonicNetworkNode {
   constructor(label: string, url: URL | string, networkId: number | string, description?: string) {
     super(ItemType.INFURA_NETWORK_NODE, label, Constants.treeItemData.network.infura, url, networkId, description);
   }
 
-  public async getTruffleNetwork(): Promise<TruffleConfiguration.INetwork> {
+  public async getTruffleNetwork(): Promise<INetwork> {
     return await super.getTruffleNetwork();
   }
 

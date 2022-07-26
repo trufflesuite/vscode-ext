@@ -1,8 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { TruffleConfiguration } from "../helpers/truffleConfig";
-import { ItemType } from "./ItemType";
+import {INetwork} from '@/helpers/ConfigurationReader';
+import {ItemType} from './ItemType';
+import {TLocalProjectOptions} from './TreeItems';
 
 export interface IDeployDestination {
   description?: string;
@@ -10,6 +11,7 @@ export interface IDeployDestination {
   label: string;
   networkType: ItemType;
   port?: number;
-  getTruffleNetwork: () => Promise<TruffleConfiguration.INetwork>;
+  getTruffleNetwork: () => Promise<INetwork>;
   networkId: number;
+  options?: TLocalProjectOptions;
 }

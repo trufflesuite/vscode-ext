@@ -2,7 +2,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Format} from "@truffle/codec";
+import {Format} from '@truffle/codec';
 import {
   AddressValue,
   BoolValue,
@@ -14,11 +14,11 @@ import {
   StringValueInfoMalformed,
   StringValueInfoValid,
   UintValue,
-} from "@truffle/codec/dist/lib/format/elementary";
-import {ArrayValue, Result} from "@truffle/codec/dist/lib/format/values";
-import * as Exception from "@truffle/codec/dist/lib/format/utils/exception";
-import {relative as pathRelative, sep as pathSep} from "path";
-import _ from "lodash";
+} from '@truffle/codec/dist/lib/format/elementary';
+import * as Exception from '@truffle/codec/dist/lib/format/utils/exception';
+import {ArrayValue, Result} from '@truffle/codec/dist/lib/format/values';
+import _ from 'lodash';
+import {relative as pathRelative, sep as pathSep} from 'path';
 
 export function sortFilePaths(filePaths: string[]): string[] {
   return filePaths.sort(comparePaths);
@@ -52,13 +52,11 @@ function getPathsDiff(source: string, diffBy: string) {
 }
 
 export function groupBy(array: any[], key: any) {
-  const groupedArray = array.reduce((acc, curr) => {
+  return array.reduce((acc, curr) => {
     (acc[curr[key]] = acc[curr[key]] || []).push(curr);
 
     return acc;
   }, {});
-
-  return groupedArray;
 }
 
 /**
@@ -86,14 +84,14 @@ function formatCircular(loopLength: number): string {
 }
 
 function enumTypeName(enumType: Format.Types.EnumType): string {
-  return (enumType.kind === "local" ? enumType.definingContractName + "." : "") + enumType.typeName;
+  return (enumType.kind === 'local' ? enumType.definingContractName + '.' : '') + enumType.typeName;
 }
 
 function enumFullName(value: Format.Values.EnumValue): string {
   switch (value.type.kind) {
-    case "local":
+    case 'local':
       return `${value.type.definingContractName}.${value.type.typeName}.${value.value.name}`;
-    case "global":
+    case 'global':
       return `${value.type.typeName}.${value.value.name}`;
   }
 }
@@ -109,9 +107,9 @@ export type TranslatedResult = {
 
 function translateContractValue(value: Format.Values.ContractValueInfo): string {
   switch (value.kind) {
-    case "known":
+    case 'known':
       return `${value.address} (${value.class.typeName})`;
-    case "unknown":
+    case 'unknown':
       return `${value.address} of unknown class`;
   }
 }
@@ -131,33 +129,34 @@ function createResult(
 /**
  *
  * @param variable Parse a debug variable and return the formatted value.
+ * @param breaklength Set the length at which the line breaks.
  *
  * If the value can't be transformed then the raw version is returned.
  * @returns the formatted value.
  */
-export function translate(variable: Format.Values.Result, breaklength: number = 20): TranslatedResult {
+export function translate(variable: Format.Values.Result, breaklength = 20): TranslatedResult {
   switch (variable.kind) {
-    case "value":
-      if (!_.has(variable, "type.typeClass")) {
-        console.error("Debug Variable of unknown type received: ", {variable});
-        return createResult(variable, createResult(variable, `variable: ${variable}`, "unknown"));
+    case 'value':
+      if (!_.has(variable, 'type.typeClass')) {
+        console.error('Debug Variable of unknown type received: ', {variable});
+        return createResult(variable, createResult(variable, `variable: ${variable}`, 'unknown'));
       }
       switch (variable.type.typeClass) {
-        case "uint":
-        case "int":
+        case 'uint':
+        case 'int':
           return createResult(variable, (<UintValue>variable).value.asBN.toString(), variable.type.typeHint);
-        case "fixed":
-        case "ufixed":
+        case 'fixed':
+        case 'ufixed':
           //note: because this is just for display, we don't bother adjusting the magic values Big.NE or Big.PE;
           //we'll trust those to their defaults
           return createResult(variable, (<FixedValue>variable).value.asBig.toString(), variable.type.typeHint);
-        case "bool":
+        case 'bool':
           return createResult(variable, (<BoolValue>variable).value.asBoolean, variable.type.typeHint);
-        case "bytes":
+        case 'bytes':
           switch (variable.type.kind) {
-            case "static":
+            case 'static':
               return createResult(variable, (<BytesStaticValue>variable).value.asHex, variable.type.typeHint);
-            case "dynamic":
+            case 'dynamic':
               return createResult(
                 variable,
                 `hex: ${(<BytesDynamicValue>variable).value.asHex.slice(2)}`,
@@ -166,25 +165,25 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
             default:
               return createResult(variable, (<BytesValue>variable).value.asHex, (<BytesValue>variable).type.typeHint);
           }
-        case "address":
+        case 'address':
           return createResult(variable, (<AddressValue>variable).value.asAddress);
-        case "string": {
+        case 'string': {
           switch ((<StringValue>variable).value.kind) {
-            case "valid":
+            case 'valid':
               return createResult(variable, (<StringValueInfoValid>variable.value).asString, variable.type.typeHint);
-            case "malformed":
+            case 'malformed':
               //note: this will turn malformed utf-8 into replacement characters (U+FFFD)
               //note we need to cut off the 0x prefix
               return createResult(
                 variable,
-                Buffer.from((<StringValueInfoMalformed>variable.value).asHex.slice(2), "hex").toString(),
+                Buffer.from((<StringValueInfoMalformed>variable.value).asHex.slice(2), 'hex').toString(),
                 variable.type.typeHint
               );
             default:
               return createResult(variable, variable.value);
           }
         }
-        case "array": {
+        case 'array': {
           const coercedResult = <ArrayValue>variable;
           if (coercedResult.reference !== undefined) {
             return createResult(variable, formatCircular(coercedResult.reference), variable.type.typeHint);
@@ -195,7 +194,7 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
             variable.type.typeHint
           );
         }
-        case "mapping":
+        case 'mapping':
           // maybe the mapping type here can be fixed a bit?
           return createResult(
             variable,
@@ -203,7 +202,7 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
               (<Format.Values.MappingValue>variable).value.map(({key, value}) => [translate(key), translate(value)])
             )
           );
-        case "struct": {
+        case 'struct': {
           const coercedResult = <Format.Values.StructValue>variable;
           if (coercedResult.reference !== undefined) {
             return createResult(variable, formatCircular(coercedResult.reference));
@@ -218,13 +217,13 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
             )
           );
         }
-        case "userDefinedValueType": {
+        case 'userDefinedValueType': {
           const typeName = Format.Types.typeStringWithoutLocation(variable.type);
           const coercedResult = <Format.Values.UserDefinedValueTypeValue>variable;
           const inspectOfUnderlying = translate(coercedResult.value);
           return createResult(variable, `${typeName}.wrap(${inspectOfUnderlying})`, coercedResult.type.typeName); //note only the underlying part is stylized
         }
-        case "tuple": {
+        case 'tuple': {
           const coercedResult = <Format.Values.TupleValue>variable;
           //if everything is named, do same as with struct.
           //if not, just do an array.
@@ -248,9 +247,9 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
             );
           }
         }
-        case "type": {
+        case 'type': {
           switch (variable.type.type.typeClass) {
-            case "contract":
+            case 'contract':
               //same as struct case but w/o circularity check
               return createResult(
                 variable,
@@ -263,13 +262,13 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
                   (<Format.Values.TypeValueContract>variable).type.type.typeName
                 )
               );
-            case "enum":
+            case 'enum':
             default: {
               return createResult(variable, enumTypeName(variable.type.type));
             }
           }
         }
-        case "magic":
+        case 'magic':
           return createResult(
             variable,
             Object.assign(
@@ -279,34 +278,34 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
               }))
             )
           );
-        case "enum":
+        case 'enum':
           return createResult(variable, enumFullName(<Format.Values.EnumValue>variable)); //not stylized
-        case "contract":
+        case 'contract':
           return createResult(variable, translateContractValue((<Format.Values.ContractValue>variable).value));
-        case "function":
+        case 'function':
           switch (variable.type.visibility) {
-            case "external": {
+            case 'external': {
               const coercedResult = <Format.Values.FunctionExternalValue>variable;
               const contractString = translateContractValue(coercedResult.value.contract);
               let firstLine: string;
               switch (coercedResult.value.kind) {
-                case "known":
+                case 'known':
                   firstLine = `[Function: ${coercedResult.value.abi.name} of`;
                   break;
-                case "invalid":
-                case "unknown":
+                case 'invalid':
+                case 'unknown':
                   firstLine = `[Function: Unknown selector ${coercedResult.value.selector} of`;
                   break;
               }
               const secondLine = `${contractString}]`;
-              const breakingSpace = firstLine.length + secondLine.length + 1 > breaklength ? "\n" : " ";
+              const breakingSpace = firstLine.length + secondLine.length + 1 > breaklength ? '\n' : ' ';
               //now, put it together
               return createResult(variable, firstLine + breakingSpace + secondLine);
             }
-            case "internal": {
+            case 'internal': {
               const coercedResult = <Format.Values.FunctionInternalValue>variable;
               switch (coercedResult.value.kind) {
-                case "function":
+                case 'function':
                   if (coercedResult.value.definedIn) {
                     return createResult(
                       variable,
@@ -315,30 +314,30 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
                   } else {
                     return createResult(variable, `[Function: ${coercedResult.value.name}]`);
                   }
-                case "exception":
+                case 'exception':
                   return createResult(
                     variable,
                     coercedResult.value.deployedProgramCounter === 0
                       ? `[Function: <zero>]`
                       : `[Function: <uninitialized>]`
                   );
-                case "unknown":
+                case 'unknown':
                   const firstLine = `[Function: decoding not supported (raw info:`;
                   const secondLine = `deployed PC=${coercedResult.value.deployedProgramCounter}, constructor PC=${coercedResult.value.constructorProgramCounter})]`;
-                  const breakingSpace = firstLine.length + secondLine.length + 1 > breaklength ? "\n" : " ";
+                  const breakingSpace = firstLine.length + secondLine.length + 1 > breaklength ? '\n' : ' ';
                   //now, put it together
                   return createResult(variable, firstLine + breakingSpace + secondLine);
                 default:
-                  return createResult(variable, "DEFAULT:" + variable.value);
+                  return createResult(variable, 'DEFAULT:' + variable.value);
               }
             }
             default:
-              return createResult(variable, "DEFAULT:" + variable.value);
+              return createResult(variable, 'DEFAULT:' + variable.value);
           }
         default:
-          return createResult(variable, "DEFAULT:" + variable.value);
+          return createResult(variable, 'DEFAULT:' + variable.value);
       }
-    case "error": {
+    case 'error': {
       return createResult(variable, getErrorResult(variable, breaklength));
     }
   }
@@ -347,65 +346,65 @@ export function translate(variable: Format.Values.Result, breaklength: number = 
 function getErrorResult(variable: Result, breaklength: number): any {
   const errorResult = <Format.Errors.ErrorResult | Format.Errors.AbiErrorResult>variable; //the hell?? why couldn't it make this inference??
   switch (errorResult.error.kind) {
-    case "WrappedError":
+    case 'WrappedError':
       return translate(errorResult.error.error);
-    case "UintPaddingError":
+    case 'UintPaddingError':
       return `Uint has incorrect padding (expected padding: ${errorResult.error.paddingType}) (raw value ${errorResult.error.raw})`;
-    case "IntPaddingError":
+    case 'IntPaddingError':
       return `Int has incorrect padding (expected padding: ${errorResult.error.paddingType}) (raw value ${errorResult.error.raw})`;
-    case "UfixedPaddingError":
+    case 'UfixedPaddingError':
       return `Ufixed has (expected padding: ${errorResult.error.paddingType}) (raw value ${errorResult.error.raw})`;
-    case "FixedPaddingError":
+    case 'FixedPaddingError':
       return `Fixed has incorrect padding (expected padding: ${errorResult.error.paddingType}) (raw value ${errorResult.error.raw})`;
-    case "BoolOutOfRangeError":
+    case 'BoolOutOfRangeError':
       return `Invalid boolean (numeric value ${errorResult.error.rawAsBN.toString()})`;
-    case "BoolPaddingError":
+    case 'BoolPaddingError':
       return `Boolean has incorrect padding (expected padding: ${errorResult.error.paddingType}) (raw value ${errorResult.error.raw})`;
-    case "BytesPaddingError":
+    case 'BytesPaddingError':
       return `Bytestring has extra trailing bytes (padding error) (raw value ${errorResult.error.raw})`;
-    case "AddressPaddingError":
+    case 'AddressPaddingError':
       return `Address has incorrect padding (expected padding: ${errorResult.error.paddingType}) (raw value ${errorResult.error.raw})`;
-    case "EnumOutOfRangeError":
+    case 'EnumOutOfRangeError':
       return `Invalid ${enumTypeName(errorResult.error.type)} (numeric value ${errorResult.error.rawAsBN.toString()})`;
-    case "EnumPaddingError":
+    case 'EnumPaddingError':
       return `Enum ${enumTypeName(errorResult.error.type)} has incorrect padding (expected padding: ${
         errorResult.error.paddingType
       }) (raw value ${errorResult.error.raw})`;
-    case "EnumNotFoundDecodingError":
+    case 'EnumNotFoundDecodingError':
       return `Unknown enum type ${enumTypeName(errorResult.error.type)} of id ${
         errorResult.error.type.id
       } (numeric value ${errorResult.error.rawAsBN.toString()})`;
-    case "ContractPaddingError":
+    case 'ContractPaddingError':
       return `Contract address has incorrect padding (expected padding: ${errorResult.error.paddingType}) (raw value ${errorResult.error.raw})`;
-    case "FunctionExternalNonStackPaddingError":
+    case 'FunctionExternalNonStackPaddingError':
       return `External function has incorrect padding (expected padding: ${errorResult.error.paddingType}) (raw value ${errorResult.error.raw})`;
-    case "FunctionExternalStackPaddingError":
+    case 'FunctionExternalStackPaddingError':
       return `External function address or selector has extra leading bytes (padding error) (raw address ${errorResult.error.rawAddress}, raw selector ${errorResult.error.rawSelector})`;
-    case "FunctionInternalPaddingError":
+    case 'FunctionInternalPaddingError':
       return `Internal function has incorrect padding (expected padding: ${errorResult.error.paddingType}) (raw value ${errorResult.error.raw})`;
-    case "NoSuchInternalFunctionError":
+    case 'NoSuchInternalFunctionError':
       return `Invalid function (Deployed PC=${errorResult.error.deployedProgramCounter}, constructor PC=${errorResult.error.constructorProgramCounter}) of contract ${errorResult.error.context.typeName}`;
-    case "DeployedFunctionInConstructorError":
+    case 'DeployedFunctionInConstructorError':
       return `Deployed-style function (PC=${errorResult.error.deployedProgramCounter}) in constructor`;
-    case "MalformedInternalFunctionError":
+    case 'MalformedInternalFunctionError':
       return `Malformed internal function w/constructor PC only (value: ${errorResult.error.constructorProgramCounter})`;
-    case "IndexedReferenceTypeError": //for this one we'll bother with some line-wrapping
+    case 'IndexedReferenceTypeError': //for this one we'll bother with some line-wrapping
       const firstLine = `Cannot decode indexed parameter of reference type ${errorResult.error.type.typeClass}`;
       const secondLine = `(raw value ${errorResult.error.raw})`;
-      const breakingSpace = firstLine.length + secondLine.length + 1 > breaklength ? "\n" : " ";
+      const breakingSpace = firstLine.length + secondLine.length + 1 > breaklength ? '\n' : ' ';
       return firstLine + breakingSpace + secondLine;
-    case "OverlongArraysAndStringsNotImplementedError":
+    case 'OverlongArraysAndStringsNotImplementedError':
       return `Array or string is too long (length ${errorResult.error.lengthAsBN.toString()}); decoding is not supported`;
-    case "OverlargePointersNotImplementedError":
+    case 'OverlargePointersNotImplementedError':
       return `Pointer is too large (value ${errorResult.error.pointerAsBN.toString()}); decoding is not supported`;
-    case "StorageNotSuppliedError":
+    case 'StorageNotSuppliedError':
       return `Value unavailable until reached by debugger`;
-    case "UserDefinedTypeNotFoundError":
-    case "UnsupportedConstantError":
-    case "UnusedImmutableError":
-    case "ReadErrorStack":
-    case "ReadErrorStorage":
-    case "ReadErrorBytes":
+    case 'UserDefinedTypeNotFoundError':
+    case 'UnsupportedConstantError':
+    case 'UnusedImmutableError':
+    case 'ReadErrorStack':
+    case 'ReadErrorStorage':
+    case 'ReadErrorBytes':
       return Exception.message(errorResult.error); //yay, these five are already defined!
   }
 }

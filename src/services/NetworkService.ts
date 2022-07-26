@@ -1,11 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { Constants } from "../Constants";
-import { TruffleConfig, TruffleConfiguration } from "../helpers";
-import { Network } from "./contract/Network";
-import { Provider } from "./contract/Provider";
-import { HttpService } from "./HttpService";
+import {INetwork, INetworkOption} from '@/helpers/ConfigurationReader';
+import {getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
+import {Constants} from '@/Constants';
+import {Network} from './contract/Network';
+import {Provider} from './contract/Provider';
+import {HttpService} from './HttpService';
 
 export namespace NetworkService {
   interface INetworkResponse {
@@ -19,8 +20,8 @@ export namespace NetworkService {
     provider: Provider | null;
   }
 
-  export async function getNetworkMaps(ignoreUnidentifiedNetworks: boolean = true): Promise<NetworkMap[]> {
-    const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
+  export async function getNetworkMaps(ignoreUnidentifiedNetworks = true): Promise<NetworkMap[]> {
+    const truffleConfigPath = getTruffleConfigUri();
     const truffleConfig = new TruffleConfig(truffleConfigPath);
     const truffleNetworks = truffleConfig.getNetworks();
     const networkMaps: NetworkMap[] = [];
@@ -37,9 +38,9 @@ export namespace NetworkService {
 
   export async function getNetworkMapByNetworkName(
     networkName: string,
-    ignoreUnidentifiedNetworks: boolean = true
+    ignoreUnidentifiedNetworks = true
   ): Promise<NetworkMap | undefined> {
-    const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
+    const truffleConfigPath = getTruffleConfigUri();
     const truffleConfig = new TruffleConfig(truffleConfigPath);
     const truffleNetworks = truffleConfig.getNetworks();
     const truffleNetwork = truffleNetworks.find((item) => item.name === networkName);
@@ -61,27 +62,27 @@ export namespace NetworkService {
   }
 
   async function getNetworkMap(
-    truffleNetwork: TruffleConfiguration.INetwork,
+    truffleNetwork: INetwork,
     ignoreUnidentifiedNetworks: boolean
   ): Promise<NetworkMap | undefined> {
     const options = truffleNetwork.options;
     const host = getTruffleNetworkHost(options);
-    const networkId = options.network_id !== "*" ? options.network_id + "" : await getNetworkIdByHost(host);
+    const networkId = options.network_id !== '*' ? options.network_id + '' : await getNetworkIdByHost(host);
 
     if (ignoreUnidentifiedNetworks && networkId === undefined) {
       return;
     }
 
     return {
-      network: { id: networkId || "*", name: truffleNetwork.name },
-      provider: host ? { host, options: { mnemonic: options.provider && options.provider.mnemonic } } : null,
+      network: {id: networkId || '*', name: truffleNetwork.name},
+      provider: host ? {host, options: {mnemonic: options.provider && options.provider.mnemonic}} : null,
     };
   }
 
-  function getTruffleNetworkHost(networkOptions: TruffleConfiguration.INetworkOption): string {
+  function getTruffleNetworkHost(networkOptions: INetworkOption): string {
     return (
-      `${networkOptions.provider ? networkOptions.provider.url : ""}` ||
-      `${networkOptions.host ? networkOptions.host : ""}${networkOptions.port ? ":" + networkOptions.port : ""}`
+      `${networkOptions.provider ? networkOptions.provider.url : ''}` ||
+      `${networkOptions.host ? networkOptions.host : ''}${networkOptions.port ? ':' + networkOptions.port : ''}`
     );
   }
 }

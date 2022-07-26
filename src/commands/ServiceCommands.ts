@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {QuickPickItem} from "vscode";
-import {Constants} from "../Constants";
-import {telemetryHelper} from "../helpers";
-import {showInputBox, showQuickPick} from "../helpers/userInteraction";
-import {ItemType} from "../Models";
+import {QuickPickItem} from 'vscode';
+import {Constants} from '../Constants';
+import {telemetryHelper} from '../helpers';
+import {showInputBox, showQuickPick} from '../helpers/userInteraction';
+import {ItemType} from '../Models';
 import {
   InfuraProject,
   InfuraService,
@@ -17,11 +17,11 @@ import {
   TLocalProjectOptions,
   GenericProject,
   GenericService,
-} from "../Models/TreeItems";
-import {InfuraResourceExplorer, LocalResourceExplorer, GenericResourceExplorer} from "../resourceExplorers";
-import {GanacheService, TreeManager} from "../services";
-import {Telemetry} from "../TelemetryClient";
-import {ProjectView} from "../ViewItems";
+} from '../Models/TreeItems';
+import {InfuraResourceExplorer, LocalResourceExplorer, GenericResourceExplorer} from '../resourceExplorers';
+import {GanacheService, TreeManager} from '../services';
+import {Telemetry} from '../TelemetryClient';
+import {ProjectView} from '../ViewItems';
 
 interface IServiceDestination {
   cmd: (service: Service) => Promise<Project>;
@@ -43,7 +43,7 @@ type TServiceType = {
 
 export namespace ServiceCommands {
   export async function createProject(): Promise<Project> {
-    Telemetry.sendEvent("ServiceCommands.createProject.commandStarted");
+    Telemetry.sendEvent('ServiceCommands.createProject.commandStarted');
 
     const serviceDestinations: IServiceDestination[] = [
       {
@@ -60,7 +60,7 @@ export namespace ServiceCommands {
 
     const project = await execute(serviceDestinations);
 
-    Telemetry.sendEvent("ServiceCommands.createProject.commandFinished", {
+    Telemetry.sendEvent('ServiceCommands.createProject.commandFinished', {
       itemType: telemetryHelper.mapItemType(project.itemType),
     });
 
@@ -68,7 +68,7 @@ export namespace ServiceCommands {
   }
 
   export async function connectProject(): Promise<Project> {
-    Telemetry.sendEvent("ServiceCommands.connectProject.commandStarted");
+    Telemetry.sendEvent('ServiceCommands.connectProject.commandStarted');
     const serviceDestinations: IServiceDestination[] = [
       {
         cmd: connectLocalProject,
@@ -89,27 +89,27 @@ export namespace ServiceCommands {
 
     const project = await execute(serviceDestinations);
 
-    Telemetry.sendEvent("ServiceCommands.connectProject.commandFinished", {
+    Telemetry.sendEvent('ServiceCommands.connectProject.commandFinished', {
       itemType: telemetryHelper.mapItemType(project.itemType),
     });
 
     return project;
   }
-
   export async function disconnectProject(viewItem: ProjectView): Promise<void> {
-    Telemetry.sendEvent("ServiceCommands.disconnectProject.commandStarted");
+    Telemetry.sendEvent('ServiceCommands.disconnectProject.commandStarted');
+
     if (viewItem.extensionItem instanceof LocalProject) {
-      Telemetry.sendEvent("ServiceCommands.disconnectProject.LocalNetworkSelected");
+      Telemetry.sendEvent('ServiceCommands.disconnectProject.LocalNetworkSelected');
       const port = viewItem.extensionItem.port;
 
       if (port) {
-        Telemetry.sendEvent("ServiceCommands.disconnectProject.stopGanacheServer");
+        Telemetry.sendEvent('ServiceCommands.disconnectProject.stopGanacheServer');
         await GanacheService.stopGanacheServer(port);
       }
     }
 
     TreeManager.removeItem(viewItem.extensionItem);
-    Telemetry.sendEvent("ServiceCommands.disconnectProject.commandFinished");
+    Telemetry.sendEvent('ServiceCommands.disconnectProject.commandFinished');
   }
 }
 
@@ -159,8 +159,8 @@ async function createLocalProject(service: LocalService): Promise<LocalProject> 
 
   const options: TLocalProjectOptions = {
     isForked: serviceType.isForked,
-    forkedNetwork: "",
-    url: "",
+    forkedNetwork: '',
+    url: '',
     blockNumber: 0,
   };
 
@@ -181,14 +181,21 @@ async function connectLocalProject(service: LocalService): Promise<LocalProject>
   const options: TLocalProjectOptions = {
     isForked: false,
     blockNumber: 0,
-    forkedNetwork: "",
-    url: "",
+    forkedNetwork: '',
+    url: '',
   };
 
   const localResourceExplorer = new LocalResourceExplorer();
   return localResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service), options);
 }
 
+// ------------ GENERIC ------------ //
+async function connectGenericProject(service: GenericService): Promise<GenericProject> {
+  const genericResourceExplorer = new GenericResourceExplorer();
+  return genericResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
+}
+
+// ------------ COMMON ------------ //
 async function getExistingNames(service: LocalService): Promise<string[]> {
   const localProjects = service.getChildren() as LocalProject[];
   return localProjects.map((item) => item.label);
@@ -291,17 +298,12 @@ async function loadServiceType(): Promise<TServiceType[]> {
 
   return networks;
 }
-// ------------ GENERIC ------------ //
-async function connectGenericProject(service: GenericService): Promise<GenericProject> {
-  const genericResourceExplorer = new GenericResourceExplorer();
-  return genericResourceExplorer.selectProject(await getExistingNames(service), await getExistingPorts(service));
-}
 
 async function addChild(service: Service, child: Project): Promise<void> {
   service.addChild(child);
 
-  Telemetry.sendEvent("ServiceCommands.execute.newServiceItem", {
-    ruri: Telemetry.obfuscate((child.resourceUri || "").toString()),
+  Telemetry.sendEvent('ServiceCommands.execute.newServiceItem', {
+    ruri: Telemetry.obfuscate((child.resourceUri || '').toString()),
     type: Telemetry.obfuscate(child.itemType.toString()),
     url: Telemetry.obfuscate(JSON.stringify(await child.getRPCAddress())),
   });

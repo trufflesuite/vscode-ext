@@ -1,13 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import fs from "fs-extra";
-import path from "path";
-import {HttpService} from "..";
-import {Constants} from "../../Constants";
-import {getWorkspaceRoot, TruffleConfiguration} from "../../helpers";
-import {Telemetry} from "../../TelemetryClient";
-import {Contract} from "./Contract";
+import {getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
+import fs from 'fs-extra';
+import path from 'path';
+import {HttpService} from '..';
+import {Constants} from '@/Constants';
+import {getWorkspaceRoot} from '@/helpers';
+import {Telemetry} from '@/TelemetryClient';
+import {Contract} from './Contract';
 
 export namespace ContractService {
   export function getContractNameBySolidityFile(solidityFilePath: string): string {
@@ -24,33 +25,33 @@ export namespace ContractService {
   }
 
   export async function getSolidityContractsFolderPath(): Promise<string> {
-    return getPathDirectory("contracts_directory");
+    return getPathDirectory('contracts_directory');
   }
 
   export async function getMigrationFolderPath(): Promise<string> {
-    return getPathDirectory("migrations_directory");
+    return getPathDirectory('migrations_directory');
   }
 
   export async function getBuildFolderPath(): Promise<string> {
-    return getPathDirectory("contracts_build_directory");
+    return getPathDirectory('contracts_build_directory');
   }
 
   export async function getDeployedBytecodeByAddress(host: string, address: string): Promise<string> {
-    const defaultBlock = "latest";
+    const defaultBlock = 'latest';
     const response = await HttpService.sendRPCRequest(host, Constants.rpcMethods.getCode, [address, defaultBlock]);
 
     if (!response || (response && response.error)) {
-      const errorMessage = response && response.error ? response.error.message : "";
+      const errorMessage = response && response.error ? response.error.message : '';
       throw new Error(`getDeployedBytecodeByAddress failed. ${errorMessage}`);
     }
 
-    return (response && (response.result as string)) || "";
+    return (response && (response.result as string)) || '';
   }
 
   function getCompiledContractMetadataByPath(contractPath: string): Promise<Contract | null> {
     if (fs.pathExistsSync(contractPath)) {
       return new Promise((resolve, reject) => {
-        fs.readFile(contractPath, "utf-8", (error, fileData) => {
+        fs.readFile(contractPath, 'utf-8', (error, fileData) => {
           if (error) {
             reject(error);
           } else {
@@ -84,8 +85,8 @@ export namespace ContractService {
   }
 
   async function getPathDirectory(directory: string): Promise<string> {
-    const truffleConfigPath = TruffleConfiguration.getTruffleConfigUri();
-    const truffleConfig = new TruffleConfiguration.TruffleConfig(truffleConfigPath);
+    const truffleConfigPath = getTruffleConfigUri();
+    const truffleConfig = new TruffleConfig(truffleConfigPath);
     const configuration = await truffleConfig.getConfiguration();
 
     const dir = (configuration as any)[directory];

@@ -1,16 +1,17 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import path from "path";
-import {executeCommand} from "./cmdCommandExecutor";
-import {ConfigurationReader} from "./configurationReader";
-import {TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE, TRUFFLE_CONFIG_NAME} from "./constants/truffleConfig";
+import path from 'path';
+import {executeCommand} from './cmdCommandExecutor';
+import {ConfigurationReader} from './configurationReader';
+import {IConfiguration, INetwork} from '@/helpers/ConfigurationReader';
+import {TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE, TRUFFLE_CONFIG_NAME} from './constants/truffleConfig';
 
 export class DebugNetwork {
   public workingDirectory: string;
   private _basedConfig: ConfigurationReader.TruffleConfig | undefined;
-  private _truffleConfiguration: ConfigurationReader.IConfiguration | undefined;
-  private _networkForDebug: ConfigurationReader.INetwork | undefined;
+  private _truffleConfiguration: IConfiguration | undefined;
+  private _networkForDebug: INetwork | undefined;
   constructor(truffleConfigDirectory: string) {
     this.workingDirectory = truffleConfigDirectory;
   }
@@ -32,13 +33,13 @@ export class DebugNetwork {
   // Port and host are defined
   public isLocalNetwork() {
     if (!this._networkForDebug || !this._networkForDebug.options) {
-      throw new Error("Network is not defined. Try to call this.load()");
+      throw new Error('Network is not defined. Try to call this.load()');
     }
     const options = this._networkForDebug.options;
     return !!(options.host && options.port);
   }
 
-  private async loadConfiguration(): Promise<ConfigurationReader.IConfiguration> {
+  private async loadConfiguration(): Promise<IConfiguration> {
     const configuration = await this._basedConfig!.getConfiguration(this.workingDirectory);
 
     return {
@@ -49,10 +50,10 @@ export class DebugNetwork {
     };
   }
 
-  private async loadNetworkForDebug(): Promise<ConfigurationReader.INetwork> {
+  private async loadNetworkForDebug(): Promise<INetwork> {
     const networks = this._basedConfig!.getNetworks();
     const networkForDebug = networks.find((n) => n.name === TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE);
-    if (!this.isNetworkForDebugValid(networkForDebug)) {
+    if (!DebugNetwork.isNetworkForDebugValid(networkForDebug)) {
       const provider = await this.getProviderByResolvingConfig(TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE);
       if (provider.url) {
         networkForDebug!.options.provider = {
@@ -68,7 +69,7 @@ export class DebugNetwork {
     return networkForDebug!;
   }
 
-  private isNetworkForDebugValid(networkForDebug: ConfigurationReader.INetwork | undefined): boolean {
+  private static isNetworkForDebugValid(networkForDebug: INetwork | undefined): boolean {
     if (!networkForDebug || !networkForDebug.options) {
       throw new Error(`No ${TRUFFLE_CONFIG_DEBUG_NETWORK_TYPE} network in the truffle config`);
     }
@@ -77,20 +78,15 @@ export class DebugNetwork {
       return true;
     }
     // truffle-config helper can read only hdwallet provider
-    const isHdWalletProvider = !!networkForDebug.options.provider;
-    if (isHdWalletProvider) {
-      return true;
-    }
-
-    return false;
+    return !!networkForDebug.options.provider;
   }
 
   private async getProviderByResolvingConfig(network: string) {
     // use truffle exec web3ProviderResolver.js to solve http- or websocket- web3 provider
-    const truffleConfigReaderPath = path.join(__dirname, "web3ProviderResolver.js");
-    const args = ["truffle", "exec", truffleConfigReaderPath, "--network", network];
-    const result = await executeCommand(this.workingDirectory, "npx", ...args);
-    const providerJson = result.split("provider%=")[1];
+    const truffleConfigReaderPath = path.join(__dirname, 'web3ProviderResolver.js');
+    const args = ['truffle', 'exec', truffleConfigReaderPath, '--network', network];
+    const result = await executeCommand(this.workingDirectory, 'npx', ...args);
+    const providerJson = result.split('provider%=')[1];
     return JSON.parse(providerJson);
   }
 

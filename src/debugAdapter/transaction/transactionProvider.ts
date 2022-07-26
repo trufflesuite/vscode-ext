@@ -1,14 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { TRANSACTION_NUMBER_TO_SHOW } from "../constants/transaction";
-import { ContractJsonsProvider } from "../contracts/contractJsonsProvider";
-import { groupBy } from "../helpers";
-import { IContractJsonModel } from "../models/IContractJsonModel";
-import { ITransactionInputData } from "../models/ITransactionInputData";
-import { ITransactionResponse } from "../models/ITransactionResponse";
-import { Web3Wrapper } from "../web3Wrapper";
-import { TransactionInputDataDecoder } from "./transactionInputDataDecoder";
+import {TRANSACTION_NUMBER_TO_SHOW} from '../constants/transaction';
+import {ContractJsonsProvider} from '../contracts/contractJsonsProvider';
+import {groupBy} from '../helpers';
+import {IContractJsonModel} from '../models/IContractJsonModel';
+import {ITransactionInputData} from '../models/ITransactionInputData';
+import {ITransactionResponse} from '../models/ITransactionResponse';
+import {Web3Wrapper} from '../web3Wrapper';
+import {TransactionInputDataDecoder} from './transactionInputDataDecoder';
 
 export class TransactionProvider {
   private _web3: Web3Wrapper;
@@ -49,7 +49,7 @@ export class TransactionProvider {
       batchRequest.add(this._web3.eth.getTransactionReceipt, txHash);
     });
     const result: any[] = await batchRequest.execute();
-    const hashKey = "hash";
+    const hashKey = 'hash';
     result.forEach((txI) => (txI[hashKey] = txI[hashKey] || txI.transactionHash)); // fill hash property
     const groupsByHash = groupBy(result, hashKey);
     const promises = Object.keys(groupsByHash).map((hash) => {
@@ -62,7 +62,7 @@ export class TransactionProvider {
   private async buildTransactionResponse(hash: string, infos: any[]): Promise<ITransactionResponse> {
     const infoWithInput = infos.find((txInfo) => txInfo.input) || {};
     const infoWithAddress = infos.find((txInfo) => txInfo.to || txInfo.contractAddress) || {};
-    const { methodName } = await this.getDecodedTransactionInput(infoWithInput.input);
+    const {methodName} = await this.getDecodedTransactionInput(infoWithInput.input);
     const contractName = await this.getContractNameByAddress(infoWithAddress.to || infoWithAddress.contractAddress);
     return {
       contractName,
@@ -79,7 +79,7 @@ export class TransactionProvider {
   private async getContractNameByAddress(address?: string): Promise<string> {
     const contractJsons = await this.getContractJsons();
     if (!address) {
-      return "";
+      return '';
     }
     const currentNetworkId = await this._web3.getNetworkId();
     const contractNames = Object.keys(contractJsons);
@@ -93,7 +93,7 @@ export class TransactionProvider {
         }
       }
     }
-    return "";
+    return '';
   }
 
   private async prepareTransactionInputDecoder(): Promise<void> {
@@ -105,7 +105,7 @@ export class TransactionProvider {
     this._isTransactionInputDecoderReady = true;
   }
 
-  private async getContractJsons(): Promise<{ [fileName: string]: IContractJsonModel }> {
+  private async getContractJsons(): Promise<{[fileName: string]: IContractJsonModel}> {
     const filesContents = await this._contractJsonsProvider.getJsonsContents();
     if (Object.keys(filesContents).length === 0) {
       throw new Error(`No compiled contracts found in ${this._contractBuildsDirectory}`);
