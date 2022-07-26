@@ -41,9 +41,9 @@
     "onCommand:truffle-vscode.showWelcomePage",
     "onCommand:truffle-vscode.showRequirementsPage",
     "onCommand:truffle-vscode.refresh",
-    "onCommand:truffle-contract.copyByteCode",
-    "onCommand:truffle-contract.copyDeployedByteCode",
-    "onCommand:truffle-contract.copyABI",
+    "onCommand:truffle-vscode.copyByteCode",
+    "onCommand:truffle-vscode.copyDeployedByteCode",
+    "onCommand:truffle-vscode.copyABI",
     "onCommand:truffle-vscode.createLocalUI",
     "onCommand:truffle-vscode.newSolidityProject",
     "onCommand:truffle-vscode.buildContracts",
@@ -94,108 +94,6 @@
       {
         "command": "truffle-vscode.showWelcomePage",
         "title": "Show Welcome Page",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.refresh",
-        "title": "Refresh",
-        "category": "Blockchain",
-        "icon": "$(refresh)"
-      },
-      {
-        "command": "truffle-contract.copyByteCode",
-        "title": "Copy Constructor Bytecode",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-contract.copyDeployedByteCode",
-        "title": "Copy Transaction Bytecode",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-contract.copyABI",
-        "title": "Copy Contract ABI",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.newSolidityProject",
-        "title": "New Solidity Project",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.buildContracts",
-        "title": "Build Contracts",
-        "category": "Blockchain",
-        "icon": "$(run-all)"
-      },
-      {
-        "command": "truffle-vscode.deployContracts",
-        "title": "Deploy Contracts",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.createContract",
-        "title": "Create Contract",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.connectProject",
-        "title": "Connect to network",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.copyRPCEndpointAddress",
-        "title": "Copy RPC Endpoint Address",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.createProject",
-        "title": "Create a new network",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.disconnectProject",
-        "title": "Disconnect",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.startGanacheServer",
-        "title": "Start Ganache",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.stopGanacheServer",
-        "title": "Stop Ganache",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.restartGanacheServer",
-        "title": "Restart Ganache",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.signInToInfuraAccount",
-        "title": "Sign in to Infura account",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.signOutOfInfuraAccount",
-        "title": "Sign out of Infura account",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.debugTransaction",
-        "title": "Debug Transaction",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.getPrivateKey",
-        "title": "Retrieve private key",
-        "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.showWelcomePage",
-        "title": "Show Welcome Page",
         "category": "Truffle"
       },
       {
@@ -206,7 +104,7 @@
       {
         "command": "truffle-vscode.checkForConnection",
         "title": "Check network connection",
-        "category": "Blockchain"
+        "category": "Truffle"
       },
       {
         "command": "truffle-vscode.refresh",
@@ -215,17 +113,17 @@
         "icon": "$(refresh)"
       },
       {
-        "command": "truffle-contract.copyByteCode",
+        "command": "truffle-vscode.copyByteCode",
         "title": "Copy Constructor Bytecode",
         "category": "Truffle"
       },
       {
-        "command": "truffle-contract.copyDeployedByteCode",
+        "command": "truffle-vscode.copyDeployedByteCode",
         "title": "Copy Transaction Bytecode",
         "category": "Truffle"
       },
       {
-        "command": "truffle-contract.copyABI",
+        "command": "truffle-vscode.copyABI",
         "title": "Copy Contract ABI",
         "category": "Truffle"
       },
@@ -374,15 +272,15 @@
         },
         {
           "when": "false",
-          "command": "truffle-contract.copyByteCode"
+          "command": "truffle-vscode.copyByteCode"
         },
         {
           "when": "false",
-          "command": "truffle-contract.copyDeployedByteCode"
+          "command": "truffle-vscode.copyDeployedByteCode"
         },
         {
           "when": "false",
-          "command": "truffle-contract.copyABI"
+          "command": "truffle-vscode.copyABI"
         },
         {
           "when": "truffle-vscode:isWorkspaceOpen",
@@ -557,17 +455,17 @@
         },
         {
           "when": "resourceLangId == json",
-          "command": "truffle-contract.copyByteCode",
+          "command": "truffle-vscode.copyByteCode",
           "group": "9_copyFromContractGroup"
         },
         {
           "when": "resourceLangId == json",
-          "command": "truffle-contract.copyDeployedByteCode",
+          "command": "truffle-vscode.copyDeployedByteCode",
           "group": "9_copyFromContractGroup"
         },
         {
           "when": "resourceLangId == json",
-          "command": "truffle-contract.copyABI",
+          "command": "truffle-vscode.copyABI",
           "group": "9_copyFromContractGroup"
         }
       ]
