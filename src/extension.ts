@@ -212,7 +212,7 @@ export async function activate(context: ExtensionContext) {
   const fileExplorerView = registerFileExplorerView('truffle-vscode', 'views.explorer');
   const helpView = registerHelpView();
 
-  const deploymentView = registerDeploymentView();
+  const deploymentView = registerDeploymentView('truffle-vscode.views.deployments');
   const dashboardView = registerDashboardView();
 
   // #endregion

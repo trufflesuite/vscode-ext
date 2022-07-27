@@ -11,7 +11,8 @@ import vscode, {commands, ThemeIcon, Uri} from 'vscode';
 import {getChain, getExplorerLink} from '../functions/explorer';
 import {OpenFileTreeItem} from '../Models/TreeItems/OpenFileTreeItem';
 import {OpenUrlTreeItem} from '../Models/TreeItems/OpenUrlTreeItem';
-import {getWorkspaceFolder, pathExists} from './Utils';
+import {pathExists} from './Utils';
+import {ContractService} from '@/services/contract/ContractService';
 
 const JSON_FILE_SUFFIX = '.json';
 
@@ -33,7 +34,7 @@ interface ContractBuildFile {
 }
 
 // This is the view class for the trees. Maybe redundant
-export abstract class DeploymentsViewTreeItemBase extends AzExtParentTreeItem {
+abstract class DeploymentsViewTreeItemBase extends AzExtParentTreeItem {
   protected constructor(parent: AzExtParentTreeItem, protected contract: ContractBuildFile) {
     super(parent);
     this.iconPath = new ThemeIcon('briefcase');
@@ -43,43 +44,10 @@ export abstract class DeploymentsViewTreeItemBase extends AzExtParentTreeItem {
     return 'Deployments';
   }
 }
-/*
-     We want to add in some more items here I think. Or adapt the structure.
 
-     Deployments:
-      +----> [SmartContractName] (fileUrl.sol)
-        +
-        |
-        |---> [NetworkName/ID] (rinkeby - 12)
-        |      +
-        |      |
-        |      |---> [0x123123weqwdsd12312ee] - [url to etherscan/networkID]
-        |
-        |---> [NetworkName/ID] (ropsten - 11)
-               +
-               |
-               |---> [0x123123weq22312312312] - [url to etherscan/networkID]
-
-      Perhaps:
-        Deployments:
-          +----> [SmartContractName] (fileUrl.sol) (click to open build/contracts/file)
-            - Updated At: "2022-03-30T01:22:56.252Z"
-            - Network Type: ethereum,
-            - Source: [...path] (click to open file)
-            + Networks Deployed
-            |
-            |---> [NetworkName/ID] (rinkeby - 12)
-            |      +
-            |      |
-            |      |---> [0x123123weqwdsd12312ee] - [url to etherscan/networkID]
-                   |- more data
-
-
-
-*/
 // this is the root item in our tree view. We make a child list of items from our network deployment
-export class ContractDeploymentViewTreeItem extends DeploymentsViewTreeItemBase {
-  public constructor(parent: AzExtParentTreeItem, contract: ContractBuildFile) {
+class ContractDeploymentViewTreeItem extends DeploymentsViewTreeItemBase {
+  constructor(parent: AzExtParentTreeItem, contract: ContractBuildFile) {
     super(parent, contract);
     this.iconPath = new ThemeIcon('file-code');
     // setup the file opening commands.
@@ -136,7 +104,7 @@ export class ContractDeploymentViewTreeItem extends DeploymentsViewTreeItemBase 
 }
 
 // wrapper node for deployments
-export class NetworkDeploymentsTreeItem extends AzExtParentTreeItem {
+class NetworkDeploymentsTreeItem extends AzExtParentTreeItem {
   public constructor(public parent: DeploymentsViewTreeItemBase, protected deployments: NetworkDeployment[]) {
     super(parent);
     this.iconPath = new ThemeIcon('symbol-class');
@@ -165,7 +133,7 @@ export class NetworkDeploymentsTreeItem extends AzExtParentTreeItem {
 }
 
 // This has all the bits for our deployment. Network agnostic right now.
-export class NetworkDeploymentTreeItem extends AzExtParentTreeItem {
+class NetworkDeploymentTreeItem extends AzExtParentTreeItem {
   public constructor(public parent: AzExtParentTreeItem, protected deployment: NetworkDeployment) {
     super(parent);
     this.iconPath = new ThemeIcon('globe');
@@ -215,31 +183,56 @@ export class NetworkDeploymentTreeItem extends AzExtParentTreeItem {
   }
 }
 
-// This is the root of the view port.
-export class DeploymentsView extends AzExtParentTreeItem {
-  public static contextValue = 'deployments';
-  public contextValue: string = DeploymentsView.contextValue;
+/**
+ * This class provides the items for the **Deployments** [Tree View](https://code.visualstudio.com/api/extension-guides/tree-view).
+ * It displays the compiled or deployed contracts.
+ * It uses the [`contracts_build_directory`](https://trufflesuite.com/docs/truffle/reference/configuration/#contracts_build_directory)
+ * property to read the artifacts from.
+ *
+ * The view displays tree items with the following structure.
+ *
+ *    We want to add in some more items here I think. Or adapt the structure.
+ *
+ * ```
+ *    Deployments:
+ *     +----> [SmartContractName] (fileUrl.sol)
+ *       +
+ *       |
+ *       |---> [NetworkName/ID] (rinkeby - 12)
+ *       |      +
+ *       |      |
+ *       |      |---> [0x123123weqwdsd12312ee] - [url to etherscan/networkID]
+ *       |
+ *       |---> [NetworkName/ID] (ropsten - 11)
+ *              +
+ *              |
+ *              |---> [0x123123weq22312312312] - [url to etherscan/networkID]
+ * ```
+ *
+ *     Perhaps:
+ *
+ * ```
+ * Deployments
+ * +--> [SmartContractName] (fileUrl.sol) (click to open build/contracts/file)
+ *      - Updated At: "2022-03-30T01:22:56.252Z"
+ *      - Network Type: ethereum,
+ *      - Source: [...path] (click to open file)
+ *     + Networks Deployed
+ *     |
+ *     |---> [NetworkName/ID] (rinkeby - 12)
+ *     |      +
+ *     |      |
+ *     |      |---> [0x123123weqwdsd12312ee] - [url to etherscan/networkID]
+ *            |- more data
+ * ```
+ *
+ */
+class DeploymentsView extends AzExtParentTreeItem {
+  public contextValue = 'deployments';
   public label = 'Deployments';
-  private pathExists = false;
-  private buildPath: string;
 
-  public constructor(private path: string, parent?: AzExtParentTreeItem) {
-    super(parent);
-    this.buildPath = '';
-    // bit of fudging to get and validate path...
-    this.validatePathExists(path);
-  }
-
-  async refreshImpl(_: IActionContext): Promise<void> {
-    this.validatePathExists(this.path);
-  }
-
-  private validatePathExists(path: string) {
-    const workspacePath = getWorkspaceFolder();
-    if (workspacePath) {
-      this.buildPath = paths.join(workspacePath.uri.fsPath, path);
-    }
-    this.pathExists = pathExists(this.buildPath);
+  public constructor() {
+    super(undefined);
   }
 
   hasMoreChildrenImpl(): boolean {
@@ -247,8 +240,16 @@ export class DeploymentsView extends AzExtParentTreeItem {
   }
 
   public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-    if (this.pathExists) {
-      const values = buildContractDeploymentsFromFolder(this.buildPath);
+    let buildPath: string;
+
+    try {
+      buildPath = await ContractService.getBuildFolderPath();
+    } catch (err) {
+      return [];
+    }
+
+    if (pathExists(buildPath)) {
+      const values = buildContractDeploymentsFromFolder(buildPath);
       return await this.createTreeItemsWithErrorHandling(
         values,
         'invalidRegistryProvider',
@@ -261,15 +262,13 @@ export class DeploymentsView extends AzExtParentTreeItem {
           label: 'No Contract Built/Deployed.',
           contextValue: 'deployContracts',
           iconPath: new ThemeIcon('package'),
-          includeInTreeItemPicker: true,
-          commandId: 'truffle-vscode.deployContracts',
         }),
       ];
     }
   }
 }
 
-const buildContractDeploymentsFromFolder = (path: string): ContractBuildFile[] => {
+function buildContractDeploymentsFromFolder(path: string): ContractBuildFile[] {
   return fs
     .readdirSync(path)
     .filter((f) => f.includes(JSON_FILE_SUFFIX))
@@ -285,7 +284,7 @@ const buildContractDeploymentsFromFolder = (path: string): ContractBuildFile[] =
         networks: jsonFile.networks,
       };
     });
-};
+}
 
 /**
  * Register our deployments view as:
@@ -294,16 +293,13 @@ const buildContractDeploymentsFromFolder = (path: string): ContractBuildFile[] =
  *  loadMore: ""truffle-vscode.views.deployments.loadMore"
  *
  * @param viewId - the viewId - defaults to above.
- * @param baseFolder - the base folder we expect the deployments to live in. Doesn't handle mono-repos right now.
  */
-export function registerDeploymentView(
-  viewId = 'truffle-vscode.views.deployments',
-  baseFolder = 'build/contracts'
-): vscode.TreeView<AzExtTreeItem> {
-  const root = new DeploymentsView(baseFolder, undefined);
+export function registerDeploymentView(viewId: string): vscode.TreeView<AzExtTreeItem> {
+  const root = new DeploymentsView();
   const treeDataProvider = new AzExtTreeDataProvider(root, `${viewId}.loadMore`);
   commands.registerCommand(`${viewId}.refresh`, async (context: IActionContext, node?: AzExtTreeItem) => {
     await treeDataProvider.refresh(context, node);
   });
+
   return vscode.window.createTreeView(viewId, {treeDataProvider, canSelectMany: true});
 }
