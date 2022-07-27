@@ -132,7 +132,6 @@ class ContractDeploymentTreeItem extends TreeItem implements TreeParentItem {
     const values = ContractDeploymentTreeItem.getNetworkObjects(this.contract);
     // TODO: once we have multiple networks we might need/want to adapt this to a factory method.
     return [
-      new NetworkDeploymentsTreeItem(values),
       {
         label: `Contract: ${this.contract.sourcePath}`,
         command: treeViewCommand('truffle-vscode.openFile', [Uri.file(this.contract.sourcePath)]),
@@ -147,6 +146,7 @@ class ContractDeploymentTreeItem extends TreeItem implements TreeParentItem {
         label: `UpdatedAt: ${this.contract.updatedAt}`,
         iconPath: new ThemeIcon('clock'),
       },
+      new NetworkDeploymentsTreeItem(values),
     ];
   }
 
