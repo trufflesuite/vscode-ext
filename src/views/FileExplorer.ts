@@ -3,7 +3,7 @@ import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as vscode from 'vscode';
-import {ext} from '../Constants';
+import {Constants, ext} from '../Constants';
 import {getWorkspaceFolder} from './Utils';
 
 //#region Utilities
@@ -160,11 +160,18 @@ export interface Entry {
   type: vscode.FileType;
 }
 
+export type TElementTypes = {
+  contextValue: string;
+  type: vscode.FileType;
+  isWorkspace: boolean;
+};
+
 //#endregion
 
 export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscode.FileSystemProvider {
   private _onDidChangeFile: vscode.EventEmitter<vscode.FileChangeEvent[]>;
   private _onDidChangeTree: vscode.EventEmitter<Entry[] | void | null>;
+  private _elementTypes: TElementTypes[];
 
   /**
    * @param _openFileCommand The command name for opening files
@@ -173,6 +180,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
   constructor(private _openFileCommand: string, private _baseFolder?: string) {
     this._onDidChangeFile = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
     this._onDidChangeTree = new vscode.EventEmitter<Entry[]>();
+    this._elementTypes = this.getElementTypes();
   }
 
   // Refresh full view
@@ -191,6 +199,33 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
     }
     // fallback
     return vscode.Uri.file('.');
+  }
+
+  /**
+   * Sets the TreeItem element types.
+   * These components are divided into three categories: root, folder, and file.
+   * They are in charge of releasing action choices in TreeItem based on element type.
+   *
+   * @returns An Array of TElementTypes with its properties: ContextValue, Type and IsWorkspace.
+   */
+  getElementTypes(): TElementTypes[] {
+    return [
+      {
+        contextValue: Constants.fileExplorerConfig.contextValue.root,
+        type: vscode.FileType.Directory,
+        isWorkspace: true,
+      },
+      {
+        contextValue: Constants.fileExplorerConfig.contextValue.folder,
+        type: vscode.FileType.Directory,
+        isWorkspace: false,
+      },
+      {
+        contextValue: Constants.fileExplorerConfig.contextValue.file,
+        type: vscode.FileType.File,
+        isWorkspace: false,
+      },
+    ];
   }
 
   get onDidChangeFile(): vscode.Event<vscode.FileChangeEvent[]> {
@@ -375,11 +410,24 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
         ? vscode.TreeItemCollapsibleState.Collapsed
         : vscode.TreeItemCollapsibleState.None
     );
-    if (element.type === vscode.FileType.File) {
+    if (element.type === vscode.FileType.File)
       treeItem.command = {command: this._openFileCommand, title: 'Open File', arguments: [element.uri]};
-      treeItem.contextValue = 'file';
-    }
+
+    treeItem.contextValue = this.getTreeItemContextValue(element);
     return treeItem;
+  }
+
+  /**
+   * Gets the context value from element according on the type: root, folder, or file.
+   * The `context Value` offers a filter on the file explorer menu that filters action alternatives such as:
+   * `Create Contract`, `Build Contracts`, `Build This Contract`, `Deploy Contracts` and `Debug Transaction`.
+   *
+   * @param element The element from TreeItem.
+   * @returns A string containing the contextValue property.
+   */
+  getTreeItemContextValue(element: Entry): string {
+    const isWorkspace = path.basename(element.uri.path) === Constants.fileExplorerConfig.contractFolder ? true : false;
+    return this._elementTypes.find((ft) => ft.type === element.type && ft.isWorkspace === isWorkspace)!.contextValue;
   }
 }
 
@@ -393,7 +441,7 @@ export function registerFileExplorerView(
 ): vscode.TreeView<Entry> {
   const openFileCommand = `${commandPrefix}.openFile`;
   const refreshExplorerCommand = `${commandPrefix}.${viewName}.refreshExplorer`;
-  const treeDataProvider = new FileSystemProvider(openFileCommand, 'contracts');
+  const treeDataProvider = new FileSystemProvider(openFileCommand, Constants.fileExplorerConfig.contractFolder);
   vscode.commands.registerCommand(openFileCommand, (resource) => openResource(resource));
   vscode.commands.registerCommand(refreshExplorerCommand, (_) => treeDataProvider.refresh());
   return vscode.window.createTreeView(`${commandPrefix}.${viewName}`, {treeDataProvider});
