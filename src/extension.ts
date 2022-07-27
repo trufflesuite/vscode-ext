@@ -54,6 +54,8 @@ export async function activate(context: ExtensionContext) {
   /**
    * Wrapper around `registerCommand` that pushes the resulting `Disposable`
    * into the `context`'s `subscriptions`.
+   *
+   * See `subscriptions` property in https://code.visualstudio.com/api/references/vscode-api#ExtensionContext.
    */
   function registerCommand(commandId: string, action: (...args: any[]) => any) {
     context.subscriptions.push(commands.registerCommand(commandId, action));

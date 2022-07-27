@@ -1,6 +1,9 @@
 import {Event, ProviderResult, TreeDataProvider, TreeView, TreeItem, window} from 'vscode';
 import {OpenUrlTreeItem} from './lib/OpenUrlTreeItem';
 
+/**
+ * Provides the links for the **Help & Feedback** Tree View.
+ */
 class HelpView implements TreeDataProvider<TreeItem> {
   private values: TreeItem[];
 

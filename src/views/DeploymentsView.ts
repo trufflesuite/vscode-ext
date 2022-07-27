@@ -108,14 +108,20 @@ interface NetworkDeployment {
 }
 
 /**
- *
+ * Represents a `TreeItem` that contains children.
  */
 interface TreeParentItem {
+  /**
+   * Loads the children of this `TreeItem`.
+   */
   loadChildren(): TreeItem[];
 }
 
-// this is the root item in our tree view. We make a child list of items from our network deployment
-export class ContractDeploymentTreeItem extends TreeItem implements TreeParentItem {
+/**
+ * This is the root item in our tree view.
+ * We make a child list of items from our network deployment.
+ */
+class ContractDeploymentTreeItem extends TreeItem implements TreeParentItem {
   constructor(readonly contract: ContractBuildFile) {
     super(contract.contractName);
     this.iconPath = new ThemeIcon('file-code');
@@ -153,14 +159,11 @@ export class ContractDeploymentTreeItem extends TreeItem implements TreeParentIt
       networkId: Number(value[0]),
     }));
   }
-
-  // TODO fix the ordering here...
-  // compareChildrenImpl(item1: AzExtTreeItem, item2: AzExtTreeItem): number {
-  //   return super.compareChildrenImpl(item1, item2);
-  // }
 }
 
-// wrapper node for deployments
+/**
+ * Wrapper node for deployments.
+ */
 class NetworkDeploymentsTreeItem extends TreeItem implements TreeParentItem {
   public constructor(protected deployments: NetworkDeployment[]) {
     super(`Network Deployments: [${deployments.length}]`);
@@ -173,7 +176,10 @@ class NetworkDeploymentsTreeItem extends TreeItem implements TreeParentItem {
   }
 }
 
-// This has all the bits for our deployment. Network agnostic right now.
+/**
+ * This has all the bits for our deployment.
+ * Network agnostic right now.
+ */
 class NetworkDeploymentTreeItem extends TreeItem implements TreeParentItem {
   public constructor(protected deployment: NetworkDeployment) {
     super(`${deployment.networkId} [${getChain(deployment.networkId).name}]`);
@@ -323,10 +329,10 @@ function buildContractDeploymentsFromFolder(path: string): ContractBuildFile[] {
 }
 
 /**
- * Determines whether `p` exists.
+ * Determines whether `path` exists.
  *
  * @param path the path to test.
- * @returns
+ * @returns `true` if the `path` exists. Otherwise, `false`.
  */
 function pathExists(path: string): boolean {
   try {
@@ -335,6 +341,18 @@ function pathExists(path: string): boolean {
   } catch (_err) {
     return false;
   }
+}
+
+/**
+ * Creates a `Command` with an empty `title`.
+ * This is useful for `Command`s triggered from `TreeItem`s.
+ */
+function treeViewCommand(commandId: string, commandArgs: any[]): Command {
+  return {
+    title: '',
+    command: commandId,
+    arguments: commandArgs,
+  };
 }
 
 /**
@@ -352,18 +370,4 @@ export function registerDeploymentView(viewId: string): TreeView<TreeItem> {
   });
 
   return window.createTreeView(viewId, {treeDataProvider, canSelectMany: true});
-}
-
-/**
- *
- * @param commandId
- * @param commandArgs
- * @returns
- */
-function treeViewCommand(commandId: string, commandArgs: any[]): Command {
-  return {
-    title: '',
-    command: commandId,
-    arguments: commandArgs,
-  };
 }
