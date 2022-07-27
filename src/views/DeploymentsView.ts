@@ -1,88 +1,149 @@
-import {
-  AzExtParentTreeItem,
-  AzExtTreeDataProvider,
-  AzExtTreeItem,
-  GenericTreeItem,
-  IActionContext,
-} from '@microsoft/vscode-azext-utils';
 import fs from 'fs';
 import paths from 'path';
-import vscode, {commands, ThemeIcon, Uri} from 'vscode';
+import {
+  ThemeIcon,
+  TreeDataProvider,
+  TreeItem,
+  Uri,
+  Event,
+  TreeView,
+  window,
+  EventEmitter,
+  commands,
+  TreeItemCollapsibleState,
+  Command,
+} from 'vscode';
 import {getChain, getExplorerLink} from '../functions/explorer';
-import {OpenFileTreeItem} from '../Models/TreeItems/OpenFileTreeItem';
-import {OpenUrlTreeItem} from '../Models/TreeItems/OpenUrlTreeItem';
-import {pathExists} from './Utils';
+import {OpenUrlTreeItem} from './lib/OpenUrlTreeItem';
 import {ContractService} from '@/services/contract/ContractService';
 
-const JSON_FILE_SUFFIX = '.json';
-
-interface NetworkDeployment {
-  networkId: number;
-  events: Record<any, any>;
-  links: Record<any, any>;
-  address: string;
-  transactionHash: string;
-}
-
+/**
+ * Represents a compiled or deployed contract.
+ *
+ * See https://github.com/trufflesuite/truffle/tree/master/packages/contract-schema
+ */
 interface ContractBuildFile {
+  /**
+   * The original path where the `json` file was read from.
+   */
   readonly path: string;
+
+  /**
+   * File path for uncompiled source code.
+   *
+   * See https://github.com/trufflesuite/truffle/tree/master/packages/contract-schema#sourcepath.
+   */
   readonly sourcePath: string;
+
+  /**
+   * Name used to identify the contract.
+   *
+   * See https://github.com/trufflesuite/truffle/tree/master/packages/contract-schema#contractname.
+   */
   readonly contractName: string;
+
+  /**
+   * Time at which contract object representation was generated/most recently updated.
+   *
+   * See https://github.com/trufflesuite/truffle/tree/master/packages/contract-schema#updatedat.
+   */
   readonly updatedAt: string;
+
+  /**
+   * Specific blockchain network type targeted.
+   *
+   * See https://github.com/trufflesuite/truffle/tree/master/packages/contract-schema#networktype.
+   */
   readonly networkType: string;
+
+  /**
+   * Listing of contract instances.
+   * Object mapping network ID keys to network object values.
+   * Includes address information, links to other contract instances, and/or contract event logs.
+   *
+   * See https://github.com/trufflesuite/truffle/tree/master/packages/contract-schema#networks.
+   */
   readonly networks: Record<string, NetworkDeployment>;
 }
 
-// This is the view class for the trees. Maybe redundant
-abstract class DeploymentsViewTreeItemBase extends AzExtParentTreeItem {
-  protected constructor(parent: AzExtParentTreeItem, protected contract: ContractBuildFile) {
-    super(parent);
-    this.iconPath = new ThemeIcon('briefcase');
-  }
+/**
+ * Represents a contract instance deployment.
+ *
+ * See https://github.com/trufflesuite/truffle/blob/master/packages/contract-schema/network-object.spec.md.
+ */
+interface NetworkDeployment {
+  /**
+   * The network ID where this contract was deployed to.
+   */
+  networkId: number;
 
-  public get contextValue(): string {
-    return 'Deployments';
-  }
+  /**
+   * Ethereum Contract JSON ABI item representing an EVM output log event for a contract.
+   * Matches objects with "type": "event" in the JSON ABI.
+   *
+   * See https://github.com/trufflesuite/truffle/blob/master/packages/contract-schema/network-object.spec.md#events.
+   */
+  events: Record<any, any>;
+
+  /**
+   * Listing of dependent contract instances and their events.
+   * Facilitates the resolution of link references for a particular contract to instances of other contracts.
+   * Object mapping linked contract names to objects representing an individual link.
+   *
+   * See https://github.com/trufflesuite/truffle/blob/master/packages/contract-schema/network-object.spec.md#links.
+   */
+  links: Record<any, any>;
+
+  /**
+   * The contract instance's primary identifier on the network. 40 character long hexadecimal string, prefixed by 0x.
+   *
+   * See https://github.com/trufflesuite/truffle/blob/master/packages/contract-schema/network-object.spec.md#address.
+   */
+  address: string;
+
+  /**
+   * The transaction hash where this contract was deployed.
+   */
+  transactionHash: string;
+}
+
+/**
+ *
+ */
+interface TreeParentItem {
+  loadChildren(): TreeItem[];
 }
 
 // this is the root item in our tree view. We make a child list of items from our network deployment
-class ContractDeploymentViewTreeItem extends DeploymentsViewTreeItemBase {
-  constructor(parent: AzExtParentTreeItem, contract: ContractBuildFile) {
-    super(parent, contract);
+export class ContractDeploymentTreeItem extends TreeItem implements TreeParentItem {
+  constructor(readonly contract: ContractBuildFile) {
+    super(contract.contractName);
     this.iconPath = new ThemeIcon('file-code');
-    // setup the file opening commands.
-    this.commandId = 'truffle-vscode.openFile';
-    this.commandArgs = [Uri.file(contract.sourcePath)];
+    this.collapsibleState = TreeItemCollapsibleState.Collapsed;
   }
 
-  public get label(): string {
-    return this.contract.contractName;
-  }
-
-  public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-    const values = ContractDeploymentViewTreeItem.getNetworkObjects(this.contract);
+  public loadChildren(): TreeItem[] {
+    const values = ContractDeploymentTreeItem.getNetworkObjects(this.contract);
     // TODO: once we have multiple networks we might need/want to adapt this to a factory method.
     return [
-      new NetworkDeploymentsTreeItem(this, values),
-      new OpenFileTreeItem(this, {
+      new NetworkDeploymentsTreeItem(values),
+      {
         label: `Contract: ${this.contract.sourcePath}`,
-        commandId: 'truffle-vscode.openFile',
-        commandArgs: [Uri.file(this.contract.sourcePath)],
+        command: treeViewCommand('truffle-vscode.openFile', [Uri.file(this.contract.sourcePath)]),
         contextValue: 'sourcePath',
         iconPath: new ThemeIcon('link-external'),
-      }),
-      new OpenFileTreeItem(this, {
+      },
+      {
         label: `Deployment JSON: ${this.contract.path}`,
-        commandId: 'truffle-vscode.openFile',
-        commandArgs: [Uri.file(this.contract.path)],
+        command: treeViewCommand('truffle-vscode.openFile', [Uri.file(this.contract.path)]),
         contextValue: 'contractBuildPath',
         iconPath: new ThemeIcon('json'),
-      }),
-      new GenericTreeItem(this, {
+      },
+      {
         label: `UpdatedAt: ${this.contract.updatedAt}`,
         contextValue: 'updatedAt',
         iconPath: new ThemeIcon('clock'),
-      }),
+      },
     ];
   }
 
@@ -94,79 +155,46 @@ class ContractDeploymentViewTreeItem extends DeploymentsViewTreeItemBase {
   }
 
   // TODO fix the ordering here...
-  compareChildrenImpl(item1: AzExtTreeItem, item2: AzExtTreeItem): number {
-    return super.compareChildrenImpl(item1, item2);
-  }
-
-  public hasMoreChildrenImpl(): boolean {
-    return false;
-  }
+  // compareChildrenImpl(item1: AzExtTreeItem, item2: AzExtTreeItem): number {
+  //   return super.compareChildrenImpl(item1, item2);
+  // }
 }
 
 // wrapper node for deployments
-class NetworkDeploymentsTreeItem extends AzExtParentTreeItem {
-  public constructor(public parent: DeploymentsViewTreeItemBase, protected deployments: NetworkDeployment[]) {
-    super(parent);
+class NetworkDeploymentsTreeItem extends TreeItem implements TreeParentItem {
+  public constructor(protected deployments: NetworkDeployment[]) {
+    super(`Network Deployments: [${deployments.length}]`);
     this.iconPath = new ThemeIcon('symbol-class');
+    this.collapsibleState = TreeItemCollapsibleState.Collapsed;
   }
 
-  public get label(): string {
-    return `Network Deployments: [${this.deployments.length}]`;
-  }
-
-  public get contextValue(): string {
-    return 'NetworkDeploymentsContext';
-  }
-
-  hasMoreChildrenImpl(): boolean {
-    return false;
-  }
-
-  async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
-    return await this.createTreeItemsWithErrorHandling(
-      this.deployments,
-      'invalidDeployments',
-      (source) => new NetworkDeploymentTreeItem(this, source),
-      (source) => '' + source?.networkId
-    );
+  loadChildren(): TreeItem[] {
+    return this.deployments.map((deployment) => new NetworkDeploymentTreeItem(deployment));
   }
 }
 
 // This has all the bits for our deployment. Network agnostic right now.
-class NetworkDeploymentTreeItem extends AzExtParentTreeItem {
-  public constructor(public parent: AzExtParentTreeItem, protected deployment: NetworkDeployment) {
-    super(parent);
+class NetworkDeploymentTreeItem extends TreeItem implements TreeParentItem {
+  public constructor(protected deployment: NetworkDeployment) {
+    super(`${deployment.networkId} [${getChain(deployment.networkId).name}]`);
     this.iconPath = new ThemeIcon('globe');
+    this.collapsibleState = TreeItemCollapsibleState.Collapsed;
   }
 
-  public get label(): string {
-    return `${this.deployment.networkId} [${getChain(this.deployment.networkId).name}]`;
-  }
-
-  public get contextValue(): string {
-    return 'NetworkDeploymentContext';
-  }
-
-  hasMoreChildrenImpl(): boolean {
-    return false;
-  }
-
-  async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
+  loadChildren(): TreeItem[] {
     const chainId: number = this.deployment.networkId;
     return [
       new OpenUrlTreeItem(
-        this,
-        this.deployment.address,
+        // this.deployment.address,
         `Address: ${this.deployment.address}`,
         getExplorerLink(chainId, this.deployment.address, 'address'),
-        new ThemeIcon('output')
+        'output'
       ),
       new OpenUrlTreeItem(
-        this,
-        this.deployment.transactionHash,
+        // this.deployment.transactionHash,
         `txHash: ${this.deployment.transactionHash}`,
         getExplorerLink(chainId, this.deployment.transactionHash, 'transaction'),
-        new ThemeIcon('broadcast')
+        'broadcast'
       ),
       // TODO: these need to be something else eventually
       // new GenericTreeItem(this, {
@@ -227,19 +255,26 @@ class NetworkDeploymentTreeItem extends AzExtParentTreeItem {
  * ```
  *
  */
-class DeploymentsView extends AzExtParentTreeItem {
-  public contextValue = 'deployments';
-  public label = 'Deployments';
+class DeploymentsView implements TreeDataProvider<TreeItem> {
+  readonly _onDidChangeTree = new EventEmitter<TreeItem[] | void>();
 
-  public constructor() {
-    super(undefined);
+  get onDidChangeTreeData(): Event<TreeItem[] | void | null> {
+    return this._onDidChangeTree.event;
   }
 
-  hasMoreChildrenImpl(): boolean {
-    return false;
+  refresh() {
+    this._onDidChangeTree.fire();
   }
 
-  public async loadMoreChildrenImpl(_clearCache: boolean, _context: IActionContext): Promise<AzExtTreeItem[]> {
+  getTreeItem(element: TreeItem): TreeItem | Thenable<TreeItem> {
+    return element;
+  }
+
+  async getChildren(element?: TreeItem | undefined): Promise<TreeItem[]> {
+    if (element) {
+      return (element as TreeParentItem).loadChildren();
+    }
+
     let buildPath: string;
 
     try {
@@ -250,29 +285,30 @@ class DeploymentsView extends AzExtParentTreeItem {
 
     if (pathExists(buildPath)) {
       const values = buildContractDeploymentsFromFolder(buildPath);
-      return await this.createTreeItemsWithErrorHandling(
-        values,
-        'invalidRegistryProvider',
-        async (item) => new ContractDeploymentViewTreeItem(this, item),
-        (cachedInfo) => cachedInfo.contractName
-      );
+      return values.map((item) => new ContractDeploymentTreeItem(item));
     } else {
       return [
-        new GenericTreeItem(this, {
+        {
           label: 'No Contract Built/Deployed.',
-          contextValue: 'deployContracts',
           iconPath: new ThemeIcon('package'),
-        }),
+        },
       ];
     }
   }
 }
 
+/**
+ * Loads all `json` files from `path`,
+ * and transforms each one into a `ContractBuildFile`.
+ *
+ * @param path where to load `json` files from.
+ * @returns
+ */
 function buildContractDeploymentsFromFolder(path: string): ContractBuildFile[] {
   return fs
     .readdirSync(path)
-    .filter((f) => f.includes(JSON_FILE_SUFFIX))
-    .map<ContractBuildFile>((f: string) => {
+    .filter((f) => f.includes('.json'))
+    .map<ContractBuildFile>((f) => {
       const fullPath = paths.join(path, f);
       const jsonFile = JSON.parse(fs.readFileSync(fullPath, {encoding: 'utf-8'}));
       return {
@@ -287,6 +323,21 @@ function buildContractDeploymentsFromFolder(path: string): ContractBuildFile[] {
 }
 
 /**
+ * Determines whether `p` exists.
+ *
+ * @param path the path to test.
+ * @returns
+ */
+function pathExists(path: string): boolean {
+  try {
+    fs.accessSync(path);
+    return true;
+  } catch (_err) {
+    return false;
+  }
+}
+
+/**
  * Register our deployments view as:
  *  viewID: "truffle-vscode.views.deployments"
  *  refresh: "truffle-vscode.views.deployments.refresh"
@@ -294,12 +345,25 @@ function buildContractDeploymentsFromFolder(path: string): ContractBuildFile[] {
  *
  * @param viewId - the viewId - defaults to above.
  */
-export function registerDeploymentView(viewId: string): vscode.TreeView<AzExtTreeItem> {
-  const root = new DeploymentsView();
-  const treeDataProvider = new AzExtTreeDataProvider(root, `${viewId}.loadMore`);
-  commands.registerCommand(`${viewId}.refresh`, async (context: IActionContext, node?: AzExtTreeItem) => {
-    await treeDataProvider.refresh(context, node);
+export function registerDeploymentView(viewId: string): TreeView<TreeItem> {
+  const treeDataProvider = new DeploymentsView();
+  commands.registerCommand(`${viewId}.refresh`, () => {
+    treeDataProvider.refresh();
   });
 
-  return vscode.window.createTreeView(viewId, {treeDataProvider, canSelectMany: true});
+  return window.createTreeView(viewId, {treeDataProvider, canSelectMany: true});
+}
+
+/**
+ *
+ * @param commandId
+ * @param commandArgs
+ * @returns
+ */
+function treeViewCommand(commandId: string, commandArgs: any[]): Command {
+  return {
+    title: '',
+    command: commandId,
+    arguments: commandArgs,
+  };
 }

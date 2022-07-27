@@ -37,6 +37,7 @@ import {registerDashboardView} from './views/DashboardView';
 import {registerDeploymentView} from './views/DeploymentsView';
 import {registerFileExplorerView} from './views/fileExplorer';
 import {registerHelpView} from './views/HelpView';
+import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 
 /**
  * This function registers variables similar to docker plugin, going forward this seems a better method of doing things.
@@ -50,6 +51,14 @@ function initializeExtensionVariables(ctx: ExtensionContext): void {
 }
 
 export async function activate(context: ExtensionContext) {
+  /**
+   * Wrapper around `registerCommand` that pushes the resulting `Disposable`
+   * into the `context`'s `subscriptions`.
+   */
+  function registerCommand(commandId: string, action: (...args: any[]) => any) {
+    context.subscriptions.push(commands.registerCommand(commandId, action));
+  }
+
   if (process.env.CODE_TEST) {
     return;
   }
@@ -77,6 +86,8 @@ export async function activate(context: ExtensionContext) {
 
   await welcomePage.checkAndShow();
   await changelogPage.checkAndShow();
+
+  registerCommand('truffle-vscode.openUrl', (node: OpenUrlTreeItem) => node.openUrl());
 
   //#region trufflesuite extension commands
   const refresh = commands.registerCommand('truffle-vscode.refresh', (element) => {
@@ -210,7 +221,7 @@ export async function activate(context: ExtensionContext) {
   // #region truffle views
 
   const fileExplorerView = registerFileExplorerView('truffle-vscode', 'views.explorer');
-  const helpView = registerHelpView();
+  const helpView = registerHelpView('truffle-vscode.views.help');
 
   const deploymentView = registerDeploymentView('truffle-vscode.views.deployments');
   const dashboardView = registerDashboardView();
