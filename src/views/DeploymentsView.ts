@@ -136,18 +136,15 @@ class ContractDeploymentTreeItem extends TreeItem implements TreeParentItem {
       {
         label: `Contract: ${this.contract.sourcePath}`,
         command: treeViewCommand('truffle-vscode.openFile', [Uri.file(this.contract.sourcePath)]),
-        contextValue: 'sourcePath',
         iconPath: new ThemeIcon('link-external'),
       },
       {
         label: `Deployment JSON: ${this.contract.path}`,
         command: treeViewCommand('truffle-vscode.openFile', [Uri.file(this.contract.path)]),
-        contextValue: 'contractBuildPath',
         iconPath: new ThemeIcon('json'),
       },
       {
         label: `UpdatedAt: ${this.contract.updatedAt}`,
-        contextValue: 'updatedAt',
         iconPath: new ThemeIcon('clock'),
       },
     ];
@@ -191,13 +188,11 @@ class NetworkDeploymentTreeItem extends TreeItem implements TreeParentItem {
     const chainId: number = this.deployment.networkId;
     return [
       new OpenUrlTreeItem(
-        // this.deployment.address,
         `Address: ${this.deployment.address}`,
         getExplorerLink(chainId, this.deployment.address, 'address'),
         'output'
       ),
       new OpenUrlTreeItem(
-        // this.deployment.transactionHash,
         `txHash: ${this.deployment.transactionHash}`,
         getExplorerLink(chainId, this.deployment.transactionHash, 'transaction'),
         'broadcast'
@@ -205,12 +200,10 @@ class NetworkDeploymentTreeItem extends TreeItem implements TreeParentItem {
       // TODO: these need to be something else eventually
       // new GenericTreeItem(this, {
       //   label: `Events: ${JSON.stringify(this.deployment.events)}`,
-      //   contextValue: "events",
       //   iconPath: new ThemeIcon("files"),
       // }),
       // new GenericTreeItem(this, {
       //   label: `Links: ${JSON.stringify(this.deployment.links)}`,
-      //   contextValue: "links",
       //   iconPath: new ThemeIcon("references"),
       // }),
     ];
