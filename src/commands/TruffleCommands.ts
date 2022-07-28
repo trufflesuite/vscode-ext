@@ -76,6 +76,8 @@ export namespace TruffleCommands {
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
       Output.show();
       await outputCommandHelper.executeCommand(contractDirectory, 'npx', args.join(' '));
+      commands.executeCommand('truffle-vscode.views.deployments.refresh');
+
       Telemetry.sendEvent('TruffleCommands.buildContracts.commandFinished');
     });
   }

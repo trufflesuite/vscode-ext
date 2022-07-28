@@ -627,6 +627,7 @@ export class Constants {
     signInButton: 'Sign In',
     transactionBytecodeWasCopiedToClipboard: 'Transaction Bytecode was copied to clipboard',
     transactionNodeNameValidating: 'Transaction Node name validating...',
+    transactionNotFound: 'No transactions deployed to this network',
     unsupportedVersionOfExternalExtension: (name: string, currentVersion: string, supportedVersion: string) =>
       `You try to use "${name}" extension of version ${currentVersion}, but current supported vesrion is ${supportedVersion}.`,
   };
