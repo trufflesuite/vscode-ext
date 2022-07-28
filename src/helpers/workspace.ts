@@ -11,6 +11,12 @@ import {showQuickPick} from './userInteraction';
 import {Entry} from '@/views/FileExplorer';
 
 export interface TruffleWorkspace {
+  /**
+   * Represents the `basename`, _i.e._, the file name portion,
+   * of the Truffle Config path of this workspace.
+   */
+  truffleConfigName: string;
+
   dirName: string;
   workspace: Uri;
   truffleConfig: Uri;
@@ -86,13 +92,19 @@ async function getWorkspacesFolders(): Promise<TruffleWorkspace[]> {
   return workspaces;
 }
 
+/**
+ *
+ * @param dirPath
+ * @returns
+ */
 async function getTruffleWorkspaces(dirPath: string): Promise<TruffleWorkspace[]> {
-  const files = glob.sync(`${dirPath}/**/${Constants.defaultTruffleConfigFileName}`, {
+  const files = glob.sync(`${dirPath}/**/truffle-config{,.*}.js`, {
     ignore: Constants.workspaceIgnoredFolders,
   });
 
   return files.map((file) => {
     return {
+      truffleConfigName: path.basename(file),
       dirName: path.dirname(file).split(path.sep).pop()!.toString(),
       workspace: Uri.parse(path.dirname(file)),
       truffleConfig: Uri.parse(file),
@@ -104,6 +116,7 @@ async function getWorkspaceFromQuickPick(workspaces: TruffleWorkspace[]): Promis
   const folders: QuickPickItem[] = Array.from(workspaces).map((element) => {
     return {
       label: element.dirName,
+      description: element.truffleConfigName,
       detail: process.platform === 'win32' ? element.dirName : element.workspace.fsPath,
     };
   });

@@ -25,6 +25,7 @@ describe('BuildContracts Command', () => {
     const root: Uri = Uri.parse(__dirname);
     const truffleWorkspace: TruffleWorkspace[] = [
       {
+        truffleConfigName: 'truffle-config.js',
         dirName: 'xpto',
         workspace: root,
         truffleConfig: Uri.parse(`${root.fsPath}/truffle-config.js`),
