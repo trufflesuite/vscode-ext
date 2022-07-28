@@ -47,6 +47,7 @@
     "onCommand:truffle-vscode.createLocalUI",
     "onCommand:truffle-vscode.newSolidityProject",
     "onCommand:truffle-vscode.buildContracts",
+    "onCommand:truffle-vscode.buildSingleContract",
     "onCommand:truffle-vscode.deployContracts",
     "onCommand:truffle-vscode.createContract",
     "onCommand:truffle-vscode.connectProject",
@@ -137,6 +138,11 @@
         "title": "Build Contracts",
         "category": "Truffle",
         "icon": "$(run-all)"
+      },
+      {
+        "command": "truffle-vscode.buildSingleContract",
+        "title": "Build This Contract",
+        "category": "Truffle"
       },
       {
         "command": "truffle-vscode.deployContracts",
@@ -289,6 +295,10 @@
         {
           "when": "truffle-vscode:isWorkspaceOpen",
           "command": "truffle-vscode.deployContracts"
+        },
+        {
+          "when": "false",
+          "command": "truffle-vscode.buildSingleContract"
         }
       ],
       "view/title": [
@@ -382,24 +392,29 @@
           "group": "truffle-0@0"
         },
         {
-          "command": "truffle-vscode.buildContracts",
-          "when": "view == truffle-vscode.views.explorer",
+          "command": "truffle-vscode.createContract",
+          "when": "view == truffle-vscode.views.explorer && viewItem != file",
           "group": "truffle-0@0"
         },
         {
-          "command": "truffle-vscode.deployContracts",
-          "when": "view == truffle-vscode.views.explorer",
+          "command": "truffle-vscode.buildContracts",
+          "when": "view == truffle-vscode.views.explorer && viewItem == root",
           "group": "truffle-0@1"
         },
         {
-          "command": "truffle-vscode.createContract",
-          "when": "view == truffle-vscode.views.explorer",
+          "command": "truffle-vscode.buildSingleContract",
+          "when": "view == truffle-vscode.views.explorer && viewItem == file",
+          "group": "truffle-0@1"
+        },
+        {
+          "command": "truffle-vscode.deployContracts",
+          "when": "view == truffle-vscode.views.explorer && viewItem == root",
           "group": "truffle-0@2"
         },
         {
           "command": "truffle-vscode.debugTransaction",
-          "when": "view == truffle-vscode.views.explorer",
-          "group": "truffle-0@3"
+          "when": "view == truffle-vscode.views.explorer && viewItem == root",
+          "group": "truffle-1@0"
         },
         {
           "command": "truffle-vscode.disconnectProject",

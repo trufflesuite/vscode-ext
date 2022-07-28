@@ -9,7 +9,7 @@ import hdkey from 'hdkey';
 import path from 'path';
 import {QuickPickItem, Uri, window, commands, QuickPickItemKind} from 'vscode';
 import {Constants, ext, RequiredApps} from '@/Constants';
-import {getWorkspace, outputCommandHelper, telemetryHelper, vscodeEnvironment} from '../helpers';
+import {getWorkspace, outputCommandHelper, telemetryHelper, vscodeEnvironment, convertEntryToUri} from '../helpers';
 import {required} from '@/helpers/required';
 
 import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from '@/helpers/userInteraction';
@@ -65,10 +65,17 @@ export namespace TruffleCommands {
 
     const workspace = await getWorkspace(uri);
     const contractDirectory = getPathByPlatform(workspace);
+    const args: string[] = [RequiredApps.truffle, 'compile'];
+
+    if (uri) {
+      const file = convertEntryToUri(uri);
+
+      if (fs.lstatSync(file.fsPath).isFile()) args.push(path.basename(file.fsPath));
+    }
 
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
-      await outputCommandHelper.executeCommand(contractDirectory, 'npx', RequiredApps.truffle, 'compile');
-
+      Output.show();
+      await outputCommandHelper.executeCommand(contractDirectory, 'npx', args.join(' '));
       commands.executeCommand('truffle-vscode.views.deployments.refresh');
 
       Telemetry.sendEvent('TruffleCommands.buildContracts.commandFinished');

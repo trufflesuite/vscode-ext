@@ -72,6 +72,15 @@ export class Constants {
   public static dashboardRetryTimeout = 2000; // milliseconds
   public static dashboardRetryAttempts = 5;
 
+  public static fileExplorerConfig = {
+    contractFolder: 'contracts',
+    contextValue: {
+      root: 'root',
+      folder: 'folder',
+      file: 'file',
+    },
+  };
+
   // Values are quite brittle and don't map directly to the requirements.html screen.
   public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
     [RequiredApps.ganache]: {
