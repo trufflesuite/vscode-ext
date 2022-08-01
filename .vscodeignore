@@ -22,5 +22,11 @@ ui-test/**
 **/tslint.json
 **/*.map
 **/*.ts
-**/webpack.config.js
+**/webpack.*.js
 **/coverconfig.json
+.husky/**
+**/GitVersion.yml
+**/commitlint.config.js
+**/.nvmrc
+**/.eslintignore
+**/.prettierignore

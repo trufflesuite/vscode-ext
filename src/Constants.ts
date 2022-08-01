@@ -72,6 +72,15 @@ export class Constants {
   public static dashboardRetryTimeout = 2000; // milliseconds
   public static dashboardRetryAttempts = 5;
 
+  public static fileExplorerConfig = {
+    contractFolder: 'contracts',
+    contextValue: {
+      root: 'root',
+      folder: 'folder',
+      file: 'file',
+    },
+  };
+
   // Values are quite brittle and don't map directly to the requirements.html screen.
   public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
     [RequiredApps.ganache]: {
@@ -618,6 +627,7 @@ export class Constants {
     signInButton: 'Sign In',
     transactionBytecodeWasCopiedToClipboard: 'Transaction Bytecode was copied to clipboard',
     transactionNodeNameValidating: 'Transaction Node name validating...',
+    transactionNotFound: 'No transactions deployed to this network',
     unsupportedVersionOfExternalExtension: (name: string, currentVersion: string, supportedVersion: string) =>
       `You try to use "${name}" extension of version ${currentVersion}, but current supported vesrion is ${supportedVersion}.`,
   };

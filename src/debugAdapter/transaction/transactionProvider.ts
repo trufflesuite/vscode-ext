@@ -1,7 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {MAX_BLOCK_TO_READ, TRANSACTION_NUMBER_TO_SHOW} from '../constants/transaction';
+import {Constants} from '@/Constants';
+import {TRANSACTION_NUMBER_TO_SHOW} from '../constants/transaction';
 import {ContractJsonsProvider} from '../contracts/contractJsonsProvider';
 import {groupBy} from '../helpers';
 import {IContractJsonModel} from '../models/IContractJsonModel';
@@ -9,6 +10,7 @@ import {ITransactionInputData} from '../models/ITransactionInputData';
 import {ITransactionResponse} from '../models/ITransactionResponse';
 import {Web3Wrapper} from '../web3Wrapper';
 import {TransactionInputDataDecoder} from './transactionInputDataDecoder';
+import _ from 'lodash';
 
 export class TransactionProvider {
   private _web3: Web3Wrapper;
@@ -25,21 +27,41 @@ export class TransactionProvider {
   }
 
   public async getLastTransactionHashes(take: number = TRANSACTION_NUMBER_TO_SHOW): Promise<string[]> {
-    const latestBlockNumber = await this._web3.eth.getBlockNumber();
-    const latestBlock = await this._web3.eth.getBlock(latestBlockNumber);
-    const txHashes: string[] = [];
-    const maxBlocksToRead: number =
-      latestBlock.number - MAX_BLOCK_TO_READ > 0 ? latestBlock.number - MAX_BLOCK_TO_READ : 0;
-    let block = latestBlock;
+    let latestBlock: any;
 
-    while (txHashes.length <= take && block.number > maxBlocksToRead) {
-      for (let i = 0; i < block.transactions.length && txHashes.length < TRANSACTION_NUMBER_TO_SHOW; i++) {
-        txHashes.push(block.transactions[i]);
-      }
-      block = await this._web3.eth.getBlock(block.number - 1);
+    try {
+      latestBlock = await this._web3.eth.getBlockNumber();
+    } catch {
+      throw new Error(Constants.informationMessage.transactionNotFound);
     }
 
-    return txHashes;
+    const initialBlock = latestBlock - take > 0 ? latestBlock - take : 0;
+    const blockNumbers = _.range(initialBlock + 1, latestBlock + 1, 1);
+    const batchRequest = this._web3.createBatchRequest();
+
+    _.chain(blockNumbers)
+      .reverse()
+      .compact()
+      .value()
+      .forEach((block) => {
+        batchRequest.add(this._web3.eth.getBlock, block, true);
+      });
+
+    const accounts: string[] = await this._web3.eth.getAccounts();
+    const blocks: any[] = await batchRequest.execute();
+    const transactions: string[] = [];
+
+    blocks.forEach((block) => {
+      const txs: any = Object.values(block.transactions)
+        .filter((tx: any) => {
+          return accounts.includes(tx.from);
+        })
+        .map((tx: any) => tx.hash);
+
+      transactions.push(...txs);
+    });
+
+    return transactions;
   }
 
   public async getTransactionsInfo(txHashes: string[]): Promise<ITransactionResponse[]> {
