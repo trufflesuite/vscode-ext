@@ -17,6 +17,7 @@ const getWorkspace = workspaceHelpers.getWorkspace;
 const isWorkspaceOpen = workspaceHelpers.isWorkspaceOpen;
 const CommandContext = commandContext.CommandContext;
 const setCommandContext = commandContext.setCommandContext;
+const convertEntryToUri = workspaceHelpers.convertEntryToUri;
 
 export {
   CommandContext,
@@ -33,4 +34,5 @@ export {
   telemetryHelper,
   userSettings,
   vscodeEnvironment,
+  convertEntryToUri,
 };
