@@ -673,7 +673,6 @@ export class Constants {
   };
   public static userSettings = {
     coreSdkSettingsKey: 'truffle-vscode.coreSDK',
-    storageAccountUserSettingsKey: 'truffle-vscode.storageAccount.name',
   };
 
   public static coreSdk = {

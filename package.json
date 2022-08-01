@@ -77,16 +77,13 @@
           "default": false,
           "description": "Disable notification on long running tasks."
         },
-        "truffle-vscode.storageAccount.name": {
-          "type": "string",
-          "scope": "Storage Account name"
-        },
         "truffle-vscode.coreSDK": {
           "type": "string",
           "scope": "Core SDK for extensions backend",
           "default": "Truffle",
           "enum": [
-            "Truffle"
+            "Truffle",
+            "Hardhat"
           ]
         }
       }
