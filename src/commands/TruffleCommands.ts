@@ -53,7 +53,10 @@ interface IExtendedQuickPickItem extends QuickPickItem {
 
 export namespace TruffleCommands {
   /**
-   * Call the truffle command line compiler
+   * Triggers the Truffle command line compiler using `npx`.
+   *
+   * @param contractUri if provided, compiles only `contractUri`.
+   * @returns
    */
   export async function buildContracts(contractUri?: Uri): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.buildContracts.commandStarted');
@@ -70,8 +73,6 @@ export namespace TruffleCommands {
     const args: string[] = [RequiredApps.truffle, 'compile', '--config', truffleWorkspace.truffleConfigName];
 
     if (contractUri) {
-      // const file = convertEntryToUri(uri);
-
       if (fs.lstatSync(contractUri.fsPath).isFile()) args.push(path.basename(contractUri.fsPath));
     }
 
@@ -84,7 +85,13 @@ export namespace TruffleCommands {
     });
   }
 
-  export async function deployContracts(contractUri?: Uri): Promise<void> {
+  /**
+   * Triggers the `migrate` option of the Truffle command line interface
+   * using `npx`.
+   *
+   * @param contractUri FIXME: Is this used?
+   */
+  export async function deployContracts(contractUri?: Uri) {
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandStarted');
 
     const truffleWorkspace = await getTruffleWorkspace(contractUri);

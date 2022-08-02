@@ -11,6 +11,15 @@ import {showQuickPick} from '@/helpers/userInteraction';
 
 /**
  * A Truffle workspace is defined by the presence of a Truffle config file.
+ * It represents the `--config` option of Truffle CLI:
+ *
+ * ```txt
+ * --config <file>
+ *   Specify configuration file to be used. The default is truffle-config.js
+ * ```
+ *
+ * For more information,
+ * see https://trufflesuite.com/docs/truffle/reference/configuration/.
  */
 export class TruffleWorkspace {
   constructor(truffleConfigPath: string) {
@@ -24,22 +33,22 @@ export class TruffleWorkspace {
    * Represents the `basename`, _i.e._, the file name portion,
    * of the Truffle Config path of this workspace.
    * In most cases, this is `truffle-config.js`.
-   *
-   * ```txt
-   * --config <file>
-   *   Specify configuration file to be used. The default is truffle-config.js
-   * ```
-   *
-   * For more information,
-   * see https://trufflesuite.com/docs/truffle/reference/configuration/.
    */
   truffleConfigName: string;
 
   /**
-   * Represents
+   * The last directory name where this Truffle config file is located.
    */
   dirName: string;
+
+  /**
+   * The `Uri` path where this Truffle config file is located.
+   */
   workspace: Uri;
+
+  /**
+   * The full `Uri` path where this Truffle config file is located.
+   */
   truffleConfig: Uri;
 }
 
@@ -110,9 +119,10 @@ async function getWorkspacesFolders(): Promise<TruffleWorkspace[]> {
 }
 
 /**
+ * Searches for Truffle config files in `workspaceRootPath` recursively.
  *
- * @param workspaceRootPath
- * @returns
+ * @param workspaceRootPath the root path where to look for Truffle config files.
+ * @returns all Truffle config files found wrapped in `TruffleWorkspace`.
  */
 async function getTruffleWorkspaces(workspaceRootPath: string): Promise<TruffleWorkspace[]> {
   const files = glob.sync(`${workspaceRootPath}/**/truffle-config{,.*}.js`, {
