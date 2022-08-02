@@ -67,10 +67,10 @@ function PromiseBatch(batch: Web3.IBatchRequest) {
   const _batch = batch;
   const _requests: Array<Promise<any>> = [];
   return {
-    add(method: any, param?: any, param1?: any) {
+    add(method: any, ...args: any[]) {
       const promise = new Promise<any>((accept, reject) => {
         _batch.add(
-          method.request(param, param1, (error: any, result: any) => {
+          method.request(...args, (error: any, result: any) => {
             if (error) {
               reject(error);
             }

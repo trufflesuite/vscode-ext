@@ -47,15 +47,13 @@ export class TransactionProvider {
         batchRequest.add(this._web3.eth.getBlock, block, true);
       });
 
-    const accounts: string[] = await this._web3.eth.getAccounts();
     const blocks: any[] = await batchRequest.execute();
+    const accounts: string[] = await this._web3.eth.getAccounts();
     const transactions: string[] = [];
 
     blocks.forEach((block) => {
       const txs: any = Object.values(block.transactions)
-        .filter((tx: any) => {
-          return accounts.includes(tx.from);
-        })
+        .filter((tx: any) => accounts.includes(tx.from))
         .map((tx: any) => tx.hash);
 
       transactions.push(...txs);
