@@ -297,6 +297,10 @@
           "command": "truffle-vscode.deployContracts"
         },
         {
+          "when": "truffle-vscode:isWorkspaceOpen",
+          "command": "truffle-vscode.createContract"
+        },
+        {
           "when": "false",
           "command": "truffle-vscode.buildSingleContract"
         }
