@@ -13,8 +13,7 @@ import path from 'path';
 import {Uri} from 'vscode';
 import {ICommandResult, tryExecuteCommandInFork} from './command';
 import {IConfiguration, INetwork, INetworkOption, IProvider, notAllowedSymbols} from './ConfigurationReader';
-import {getWorkspaceRoot} from './index';
-import {getPathByPlatform} from './workspace';
+import {getPathByPlatform, getWorkspaceRoot} from './workspace';
 
 //region Internal Functions
 const isHdWalletProviderDeclaration = (nodeType: string, node: Node): boolean => {
@@ -550,14 +549,17 @@ export class TruffleConfig {
   }
 }
 
-export class TruffleConstants {
-  static truffleConfigUri: Uri;
-}
-
-export function getTruffleConfigUri(): string {
-  const workspaceRoot = TruffleConstants.truffleConfigUri
-    ? getPathByPlatform(TruffleConstants.truffleConfigUri)
-    : getWorkspaceRoot()!;
+/**
+ * **TODO: Uses hardcoded `truffle-config.js` default.**
+ *
+ * Gets the path of the Truffle Config file from either
+ * `truffleWorkspaceUri` when present, or the first open workspace.
+ *
+ * @param truffleWorkspaceUri the root of the Truffle config file, is any.
+ * @returns the full path of the Truffle Config file.
+ */
+export function getTruffleConfigUri(truffleWorkspaceUri?: Uri): string {
+  const workspaceRoot = truffleWorkspaceUri ? getPathByPlatform(truffleWorkspaceUri) : getWorkspaceRoot()!;
   const configFilePath = path.join(workspaceRoot, Constants.defaultTruffleConfigFileName);
   if (!fs.pathExistsSync(configFilePath)) {
     const error = new Error(Constants.errorMessageStrings.TruffleConfigIsNotExist);

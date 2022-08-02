@@ -1,22 +1,43 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {QuickPickItem, Uri, workspace} from 'vscode';
+import {Uri, workspace} from 'vscode';
 import {Constants} from '@/Constants';
 import {Telemetry} from '@/TelemetryClient';
-import fs from 'fs-extra';
 import * as path from 'path';
 import glob from 'glob';
-import {showQuickPick} from './userInteraction';
-import {Entry} from '@/views/FileExplorer';
+import {showQuickPick} from '@/helpers/userInteraction';
+// import {Entry} from '@/views/FileExplorer';
 
-export interface TruffleWorkspace {
+/**
+ * A Truffle workspace is defined by the presence of a Truffle config file.
+ */
+export class TruffleWorkspace {
+  constructor(truffleConfigPath: string) {
+    this.truffleConfigName = path.basename(truffleConfigPath);
+    this.dirName = path.dirname(truffleConfigPath).split(path.sep).pop()!.toString();
+    this.workspace = Uri.parse(path.dirname(truffleConfigPath));
+    this.truffleConfig = Uri.parse(truffleConfigPath);
+  }
+
   /**
    * Represents the `basename`, _i.e._, the file name portion,
    * of the Truffle Config path of this workspace.
+   * In most cases, this is `truffle-config.js`.
+   *
+   * ```txt
+   * --config <file>
+   *   Specify configuration file to be used. The default is truffle-config.js
+   * ```
+   *
+   * For more information,
+   * see https://trufflesuite.com/docs/truffle/reference/configuration/.
    */
   truffleConfigName: string;
 
+  /**
+   * Represents
+   */
   dirName: string;
   workspace: Uri;
   truffleConfig: Uri;
@@ -34,45 +55,41 @@ export function getWorkspaceRoot(ignoreException = false): string | undefined {
   return workspaceRoot;
 }
 
-export async function getWorkspace(uri?: Uri): Promise<Uri> {
-  // Workaround for non URI types. In the future, better to use only Uri as pattern
-  uri = uri ? convertEntryToUri(uri) : undefined;
+/**
+ * Gets or selects the Truffle config file to be used in subsequent commands.
+ * Many commands can be invoked either from the _Command Palette_,
+ * contextual menus, or programatically.
+ * If the `contractUri` was provided, _e.g._,
+ * invoked from contextual menu or programatically, returns the root directory.
+ * Otherwise, If the URI wasn't provided, retrieves all truffle projects
+ *
+ * If more than one Truffle config files are found,
+ * it displays a quick pick to allow the user to select the appropiate one.
+ *
+ * @param contractUri when present, only look for Truffle config file in the workspace where it belongs.
+ * @returns the `TruffleWorkspace` representing the selected Truffle config file.
+ */
+export async function getTruffleWorkspace(contractUri?: Uri): Promise<TruffleWorkspace> {
+  const workspaces = await (contractUri
+    ? getTruffleWorkspaces(workspace.getWorkspaceFolder(contractUri)!.uri.fsPath)
+    : getWorkspacesFolders());
 
-  // If the URI was provided, return the root directory
-  if (uri) return getRootDirectoryFromWorkspace(uri);
-
-  // If the URI wasn't provided, retrieves all truffle projects
-  const workspaces = await getWorkspacesFolders();
-
-  if (workspaces.length === 1)
+  if (workspaces.length === 1) {
     // If there is only one truffle project, return the root directory
-    return workspaces[0].workspace;
-  // If there is more than one truffle project, a QuickPick is opened with them
-  else return await getWorkspaceFromQuickPick(workspaces);
+    return workspaces[0];
+  } else {
+    // If there is more than one truffle project, a QuickPick is opened with them
+    return await getTruffleConfigFromQuickPick(workspaces);
+  }
 }
 
 export function isWorkspaceOpen(): boolean {
   return !!(workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath);
 }
 
-export const getPathByPlatform = (workspace: Uri): string =>
-  process.platform === 'win32' ? `${workspace.scheme}:${workspace.path}` : workspace.fsPath;
-
-/**
- * Convert entry objects into uri objects
- * The Truffle View panel is being sent by the Truffle View panel. The goal
- * here is to deal with it and return a uri object.
- * @param uri the input parameter that will be handle.
- * @returns
- */
-export const convertEntryToUri = (uri: Uri): Uri => {
-  if (uri.fsPath) {
-    return uri;
-  } else {
-    const entry: Entry = JSON.parse(JSON.stringify(uri));
-    return Uri.parse(entry.uri.path);
-  }
-};
+export function getPathByPlatform(workspace: Uri): string {
+  return process.platform === 'win32' ? `${workspace.scheme}:${workspace.path}` : workspace.fsPath;
+}
 
 async function getWorkspacesFolders(): Promise<TruffleWorkspace[]> {
   const workspaces: TruffleWorkspace[] = [];
@@ -94,42 +111,38 @@ async function getWorkspacesFolders(): Promise<TruffleWorkspace[]> {
 
 /**
  *
- * @param dirPath
+ * @param workspaceRootPath
  * @returns
  */
-async function getTruffleWorkspaces(dirPath: string): Promise<TruffleWorkspace[]> {
-  const files = glob.sync(`${dirPath}/**/truffle-config{,.*}.js`, {
+async function getTruffleWorkspaces(workspaceRootPath: string): Promise<TruffleWorkspace[]> {
+  const files = glob.sync(`${workspaceRootPath}/**/truffle-config{,.*}.js`, {
     ignore: Constants.workspaceIgnoredFolders,
   });
 
-  return files.map((file) => {
-    return {
-      truffleConfigName: path.basename(file),
-      dirName: path.dirname(file).split(path.sep).pop()!.toString(),
-      workspace: Uri.parse(path.dirname(file)),
-      truffleConfig: Uri.parse(file),
-    };
-  });
+  return files.map((file) => new TruffleWorkspace(file));
 }
 
-async function getWorkspaceFromQuickPick(workspaces: TruffleWorkspace[]): Promise<Uri> {
-  const folders: QuickPickItem[] = Array.from(workspaces).map((element) => {
+/**
+ * Shows the list of `workspaces` in a quick pick so the user can select
+ * the Truffle config file.
+ *
+ * @param workspaces
+ * @returns the Truffle config file URI of the selected Truffle workspace.
+ */
+async function getTruffleConfigFromQuickPick(workspaces: TruffleWorkspace[]): Promise<TruffleWorkspace> {
+  const folders = Array.from(workspaces).map((element) => {
     return {
       label: element.dirName,
       description: element.truffleConfigName,
       detail: process.platform === 'win32' ? element.dirName : element.workspace.fsPath,
+      truffleWorkspace: element,
     };
   });
 
-  const command = await showQuickPick(folders, {
+  const result = await showQuickPick(folders, {
     ignoreFocusOut: true,
     placeHolder: Constants.placeholders.selectContract,
   });
 
-  return Uri.parse(command.detail!);
-}
-
-function getRootDirectoryFromWorkspace(uri: Uri): Uri {
-  if (fs.lstatSync(uri.fsPath).isDirectory()) return Uri.parse(path.resolve(path.join(uri.fsPath, '../')));
-  else return Uri.parse(path.resolve(path.join(uri.fsPath, '../..')));
+  return result.truffleWorkspace;
 }

@@ -7,7 +7,7 @@ import path from 'path';
 import semver from 'semver';
 import {commands, ProgressLocation, window} from 'vscode';
 import {Constants, RequiredApps} from '@/Constants';
-import {getWorkspaceRoot} from '../helpers';
+import {getWorkspaceRoot} from '@/helpers/workspace';
 import {Output} from '@/Output';
 import {Telemetry} from '@/TelemetryClient';
 import {executeCommand, tryExecuteCommand} from './command';

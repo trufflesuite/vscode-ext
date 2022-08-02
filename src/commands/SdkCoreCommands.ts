@@ -20,12 +20,12 @@ class SdkCoreCommands {
   /**
    * Calls build on an extension
    */
-  public async build(uri: Uri): Promise<void> {
-    return this.extensionAdapter.build(uri);
+  public async build(contractUri?: Uri): Promise<void> {
+    return this.extensionAdapter.build(contractUri);
   }
 
-  public async deploy(uri: Uri): Promise<void> {
-    return this.extensionAdapter.deploy(uri);
+  public async deploy(contractUri?: Uri): Promise<void> {
+    return this.extensionAdapter.deploy(contractUri);
   }
 
   private async getCoreSdk() {

@@ -7,10 +7,10 @@ import fs from 'fs-extra';
 import path from 'path';
 import sinon from 'sinon';
 import {Constants} from '@/Constants';
-import * as helpers from '../src/helpers';
+import * as helpers from '@/helpers/workspace';
 import * as commands from '../src/helpers/command';
 import {ICommandResult} from '@/helpers/command';
-import {getTruffleConfigUri, TruffleConfig, TruffleConstants} from '@/helpers/TruffleConfiguration';
+import {getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
 import * as testData from './testData/truffleConfigTestdata';
 
 describe('TruffleConfiguration helper', () => {
@@ -35,8 +35,7 @@ describe('TruffleConfiguration helper', () => {
     const pathExistsStub = sinon.stub(fs, 'pathExistsSync').returns(true);
 
     // Act
-    TruffleConstants.truffleConfigUri = null as any;
-    const result = getTruffleConfigUri();
+    const result = getTruffleConfigUri(null as any);
 
     // Assert
     assert.strictEqual(result, referencePath, 'result should be correct uri');
