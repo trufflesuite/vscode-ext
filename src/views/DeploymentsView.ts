@@ -16,6 +16,7 @@ import {
 import {getChain, getExplorerLink} from '../functions/explorer';
 import {OpenUrlTreeItem} from './lib/OpenUrlTreeItem';
 import {ContractService} from '@/services/contract/ContractService';
+import {getAllTruffleWorkspaces, getPathByPlatform, TruffleWorkspace} from '@/helpers/workspace';
 
 /**
  * Represents a compiled or deployed contract.
@@ -115,6 +116,26 @@ interface TreeParentItem {
    * Loads the children of this `TreeItem`.
    */
   loadChildren(): TreeItem[];
+}
+
+/**
+ * Represents a top-level `TreeItem` when more than one Truffle config files
+ * are found in the workbench.
+ *
+ * It uses the `dirName` and `truffleConfigName` from `truffleWorkspace`
+ * as `label` and `description` for the `TreeItem` respectively.
+ */
+class TruffleWorkspaceTreeItem extends TreeItem implements TreeParentItem {
+  constructor(truffleWorkspace: TruffleWorkspace, private readonly items: TreeItem[]) {
+    super(truffleWorkspace.dirName);
+    this.iconPath = new ThemeIcon('target');
+    this.description = truffleWorkspace.truffleConfigName;
+    this.collapsibleState = TreeItemCollapsibleState.Expanded;
+  }
+
+  loadChildren(): TreeItem[] {
+    return this.items;
+  }
 }
 
 /**
@@ -274,25 +295,42 @@ class DeploymentsView implements TreeDataProvider<TreeItem> {
       return (element as TreeParentItem).loadChildren();
     }
 
-    let buildPath: string;
-
-    try {
-      buildPath = await ContractService.getBuildFolderPath();
-    } catch (err) {
+    const truffleWorkspaces = await getAllTruffleWorkspaces();
+    if (truffleWorkspaces.length === 0) {
       return [];
-    }
-
-    if (pathExists(buildPath)) {
-      const values = buildContractDeploymentsFromFolder(buildPath);
-      return values.map((item) => new ContractDeploymentTreeItem(item));
+    } else if (truffleWorkspaces.length === 1) {
+      return await getContractDeployments(truffleWorkspaces[0]);
     } else {
-      return [
-        {
-          label: 'No Contract Built/Deployed.',
-          iconPath: new ThemeIcon('package'),
-        },
-      ];
+      return await Promise.all(
+        truffleWorkspaces.map(async (ws) => new TruffleWorkspaceTreeItem(ws, await getContractDeployments(ws)))
+      );
     }
+  }
+}
+
+async function getContractDeployments(truffleWorkspace: TruffleWorkspace): Promise<TreeItem[]> {
+  let buildPath: string;
+
+  try {
+    buildPath = await ContractService.getPathDirectory(
+      'contracts_build_directory',
+      getPathByPlatform(truffleWorkspace.workspace),
+      truffleWorkspace.truffleConfigName
+    );
+  } catch (err) {
+    return [];
+  }
+
+  if (pathExists(buildPath)) {
+    const values = buildContractDeploymentsFromFolder(buildPath);
+    return values.map((item) => new ContractDeploymentTreeItem(item));
+  } else {
+    return [
+      {
+        label: 'No Contract Built/Deployed.',
+        iconPath: new ThemeIcon('package'),
+      },
+    ];
   }
 }
 

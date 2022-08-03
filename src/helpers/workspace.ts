@@ -125,20 +125,18 @@ export function getPathByPlatform(workspace: Uri): string {
  *
  * @returns all Truffle config files found wrapped in {@link TruffleWorkspace}.
  */
-async function getAllTruffleWorkspaces(): Promise<TruffleWorkspace[]> {
+export async function getAllTruffleWorkspaces(): Promise<TruffleWorkspace[]> {
+  if (workspace.workspaceFolders === undefined) {
+    return [];
+  }
+
   const workspaces: TruffleWorkspace[] = [];
 
   await Promise.all(
-    workspace.workspaceFolders!.map(async (ws) => {
+    workspace.workspaceFolders.map(async (ws) => {
       workspaces.push(...(await findTruffleWorkspaces(ws.uri.fsPath)));
     })
   );
-
-  if (workspaces.length === 0) {
-    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root'));
-    Telemetry.sendException(error);
-    throw error;
-  }
 
   return workspaces;
 }

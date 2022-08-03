@@ -10,7 +10,7 @@ import {Constants} from '@/Constants';
 import * as helpers from '@/helpers/workspace';
 import * as commands from '../src/helpers/command';
 import {ICommandResult} from '@/helpers/command';
-import {getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
+import {getTruffleConfiguration, getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
 import * as testData from './testData/truffleConfigTestdata';
 
 describe('TruffleConfiguration helper', () => {
@@ -185,7 +185,6 @@ describe('class TruffleConfig', () => {
 });
 
 describe('getConfiguration() in class TruffleConfig', () => {
-  const configPathStub = path.normalize('w:/temp/truffle-config.js');
   let readFileStub: sinon.SinonStub<any, any>;
 
   beforeEach(() => {
@@ -214,10 +213,9 @@ describe('getConfiguration() in class TruffleConfig', () => {
 
     sinon.stub(commands, 'tryExecuteCommandInFork').returns(Promise.resolve(commandResult));
     readFileStub.returns('');
-    const truffleConfig = new TruffleConfig(configPathStub);
 
     // Act
-    const result = await truffleConfig.getConfiguration();
+    const result = await getTruffleConfiguration();
 
     // Assert
     assert.strictEqual(
@@ -257,10 +255,9 @@ describe('getConfiguration() in class TruffleConfig', () => {
 
     sinon.stub(commands, 'tryExecuteCommandInFork').returns(Promise.resolve(commandResult));
     readFileStub.returns('');
-    const truffleConfig = new TruffleConfig(configPathStub);
 
     // Act
-    const result = await truffleConfig.getConfiguration();
+    const result = await getTruffleConfiguration();
     // Assert
     assert.strictEqual(
       result.contracts_build_directory,
@@ -295,10 +292,9 @@ describe('getConfiguration() in class TruffleConfig', () => {
 
     sinon.stub(commands, 'tryExecuteCommandInFork').returns(Promise.resolve(commandResult));
     readFileStub.returns('');
-    const truffleConfig = new TruffleConfig(configPathStub);
 
     // Act
-    const result = await truffleConfig.getConfiguration();
+    const result = await getTruffleConfiguration();
 
     // Assert
     const networkKey = Object.keys(parseTestNetworkOptions)[0];
@@ -322,11 +318,10 @@ describe('getConfiguration() in class TruffleConfig', () => {
 
     sinon.stub(commands, 'tryExecuteCommandInFork').returns(Promise.resolve(commandResult));
     readFileStub.returns('');
-    const truffleConfig = new TruffleConfig(configPathStub);
 
     // Act, Assert
     try {
-      await truffleConfig.getConfiguration();
+      await getTruffleConfiguration();
     } catch (error) {
       assert.strictEqual(
         (error as Error).message,

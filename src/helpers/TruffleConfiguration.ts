@@ -63,11 +63,6 @@ const jsonToConfiguration = (truffleConfig: {[key: string]: any}): IConfiguratio
   return truffleConfig as IConfiguration;
 };
 
-// Facade to swap between implementations.
-const getTruffleMetadata = async (workingDirectory?: string): Promise<IConfiguration> => {
-  return workingDirectory ? getTruffleMetadataFs(workingDirectory) : getTruffleMetadataVSCode();
-};
-
 // refactor out the core parser between the two functions.
 const parseTruffleConfig = function (result: ICommandResult) {
   const truffleConfigObject = result.messages!.find((message) => message.command === 'truffleConfig');
@@ -80,30 +75,15 @@ const parseTruffleConfig = function (result: ICommandResult) {
 };
 
 /**
- * This is the node specific one using the paths.
- * @param workingDirectory
- */
-const getTruffleMetadataFs = async (workingDirectory: string): Promise<IConfiguration> => {
-  const truffleConfigTemplatePath =
-    typeof IS_BUNDLE_TIME === 'undefined' || !IS_BUNDLE_TIME
-      ? path.join(__dirname, '..', 'helpers', 'checkTruffleConfigTemplate.js')
-      : path.join(__dirname, 'checkTruffleConfigTemplate.js');
-  const truffleConfigPath = path.relative(
-    path.dirname(truffleConfigTemplatePath),
-    path.join(workingDirectory, 'truffle-config.js')
-  );
-  const result = await tryExecuteCommandInFork(workingDirectory, truffleConfigTemplatePath, truffleConfigPath);
-  return parseTruffleConfig(result);
-};
-
-/**
  * This version uses the workspace root
  */
-const getTruffleMetadataVSCode = async (): Promise<IConfiguration> => {
+async function getTruffleMetadata(workingDirectory?: string, truffleConfigName?: string): Promise<IConfiguration> {
+  const workspaceRoot = workingDirectory ?? getWorkspaceRoot()!;
+  truffleConfigName = truffleConfigName ?? 'truffle-config.js';
   const truffleConfigTemplatePath = path.join(__dirname, 'checkTruffleConfigTemplate.js');
-  const result = await tryExecuteCommandInFork(getWorkspaceRoot()!, truffleConfigTemplatePath);
+  const result = await tryExecuteCommandInFork(workspaceRoot, truffleConfigTemplatePath, truffleConfigName);
   return parseTruffleConfig(result);
-};
+}
 
 const generateVariableDeclaration = (
   varName: string,
@@ -528,16 +508,6 @@ export class TruffleConfig {
     }
   }
 
-  public async getConfiguration(workingDirectory?: string): Promise<IConfiguration> {
-    const truffleConfig = await getTruffleMetadata(workingDirectory);
-
-    if (truffleConfig) {
-      return jsonToConfiguration(truffleConfig);
-    }
-
-    return Constants.truffleConfigDefaultDirectory;
-  }
-
   public isHdWalletProviderDeclared(): boolean {
     try {
       const moduleExports = walk.findNodeAt(this.ast, undefined, undefined, isHdWalletProviderDeclaration);
@@ -547,6 +517,19 @@ export class TruffleConfig {
     }
     return false;
   }
+}
+
+export async function getTruffleConfiguration(
+  workingDirectory?: string,
+  truffleConfigName?: string
+): Promise<IConfiguration> {
+  const truffleConfig = await getTruffleMetadata(workingDirectory, truffleConfigName);
+
+  if (truffleConfig) {
+    return jsonToConfiguration(truffleConfig);
+  }
+
+  return Constants.truffleConfigDefaultDirectory;
 }
 
 /**

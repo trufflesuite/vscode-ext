@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
+import {getTruffleConfiguration} from '@/helpers/TruffleConfiguration';
 import fs from 'fs-extra';
 import path from 'path';
 import {HttpService} from '..';
@@ -84,10 +84,9 @@ export namespace ContractService {
       .filter((file) => fs.lstatSync(file).isFile());
   }
 
-  async function getPathDirectory(directory: string): Promise<string> {
-    const truffleConfigPath = getTruffleConfigUri();
-    const truffleConfig = new TruffleConfig(truffleConfigPath);
-    const configuration = await truffleConfig.getConfiguration();
+  export async function getPathDirectory(directory: string, workDir?: string, name?: string): Promise<string> {
+    workDir = workDir ?? getWorkspaceRoot()!;
+    const configuration = await getTruffleConfiguration(workDir, name);
 
     const dir = (configuration as any)[directory];
 
@@ -95,6 +94,6 @@ export namespace ContractService {
       return dir;
     }
 
-    return path.join(getWorkspaceRoot()!, dir);
+    return path.join(workDir, dir);
   }
 }
