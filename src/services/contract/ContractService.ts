@@ -11,6 +11,8 @@ import {Telemetry} from '@/TelemetryClient';
 import {Contract} from './Contract';
 
 export namespace ContractService {
+  type PathDirectoryKey = 'contracts_directory' | 'migrations_directory' | 'contracts_build_directory';
+
   export function getContractNameBySolidityFile(solidityFilePath: string): string {
     return path.basename(solidityFilePath, Constants.contractExtension.sol);
   }
@@ -84,7 +86,11 @@ export namespace ContractService {
       .filter((file) => fs.lstatSync(file).isFile());
   }
 
-  export async function getPathDirectory(directory: string, workDir?: string, name?: string): Promise<string> {
+  export async function getPathDirectory(
+    directory: PathDirectoryKey,
+    workDir?: string,
+    name?: string
+  ): Promise<string> {
     workDir = workDir ?? getWorkspaceRoot()!;
     const configuration = await getTruffleConfiguration(workDir, name);
 
