@@ -10,7 +10,6 @@ import {ITransactionInputData} from '../models/ITransactionInputData';
 import {ITransactionResponse} from '../models/ITransactionResponse';
 import {Web3Wrapper} from '../web3Wrapper';
 import {TransactionInputDataDecoder} from './transactionInputDataDecoder';
-import _ from 'lodash';
 
 export class TransactionProvider {
   private _web3: Web3Wrapper;
@@ -27,39 +26,36 @@ export class TransactionProvider {
   }
 
   public async getLastTransactionHashes(take: number = TRANSACTION_NUMBER_TO_SHOW): Promise<string[]> {
-    let latestBlock: any;
+    let latestBlockNumber: number;
 
     try {
-      latestBlock = await this._web3.eth.getBlockNumber();
+      latestBlockNumber = await this._web3.eth.getBlockNumber();
     } catch {
       throw new Error(Constants.informationMessage.transactionNotFound);
     }
 
-    const initialBlock = latestBlock - take > 0 ? latestBlock - take : 0;
-    const blockNumbers = _.range(initialBlock + 1, latestBlock + 1, 1);
+    const totalBlocks = latestBlockNumber - take > 0 ? take : latestBlockNumber;
+    const startingBlockNumber = latestBlockNumber - take > 0 ? latestBlockNumber - take : 0;
+    const blockNumbers = Array.from({length: totalBlocks}, (_, i) => i + 1 + startingBlockNumber).reverse();
     const batchRequest = this._web3.createBatchRequest();
 
-    _.chain(blockNumbers)
-      .reverse()
-      .compact()
-      .value()
-      .forEach((block) => {
-        batchRequest.add(this._web3.eth.getBlock, block, true);
-      });
+    blockNumbers.forEach((block) => {
+      batchRequest.add(this._web3.eth.getBlock, block, true);
+    });
 
     const blocks: any[] = await batchRequest.execute();
     const accounts: string[] = await this._web3.eth.getAccounts();
-    const transactions: string[] = [];
+    const txHashes: string[] = [];
 
     blocks.forEach((block) => {
       const txs: any = Object.values(block.transactions)
         .filter((tx: any) => accounts.includes(tx.from))
         .map((tx: any) => tx.hash);
 
-      transactions.push(...txs);
+      txHashes.push(...txs);
     });
 
-    return transactions;
+    return txHashes;
   }
 
   public async getTransactionsInfo(txHashes: string[]): Promise<ITransactionResponse[]> {
