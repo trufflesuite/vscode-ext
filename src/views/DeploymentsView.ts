@@ -139,8 +139,10 @@ class TruffleWorkspaceTreeItem extends TreeItem implements TreeParentItem {
 }
 
 /**
- * This is the root item in our tree view.
- * We make a child list of items from our network deployment.
+ * Represents a compiled, and maybe deployed contract.
+ * It adds the contract's network deployments as child tree items.
+ * Moreover, it includes links to open both the source and the compiled contract.
+ * Finally, it includes its last updated timestamp.
  */
 class ContractDeploymentTreeItem extends TreeItem implements TreeParentItem {
   constructor(readonly contract: ContractBuildFile) {
@@ -308,6 +310,14 @@ class DeploymentsView implements TreeDataProvider<TreeItem> {
   }
 }
 
+/**
+ * Gets the compiled contracts for the given `truffleWorkspace`.
+ * It follows the `contracts_build_directory` property in the Truffle config file
+ * to look for compiled artifacts.
+ *
+ * @param truffleWorkspace the Truffle config file where to look for compiled contracts.
+ * @returns an array of `TreeItem` that represents the compiled contracts.
+ */
 async function getContractDeployments(truffleWorkspace: TruffleWorkspace): Promise<TreeItem[]> {
   let buildPath: string;
 
