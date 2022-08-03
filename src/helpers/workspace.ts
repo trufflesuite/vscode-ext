@@ -7,11 +7,10 @@ import {Telemetry} from '@/TelemetryClient';
 import * as path from 'path';
 import glob from 'glob';
 import {showQuickPick} from '@/helpers/userInteraction';
-// import {Entry} from '@/views/FileExplorer';
 
 /**
  * A Truffle workspace is defined by the presence of a Truffle config file.
- * It represents the `--config` option of Truffle CLI:
+ * It represents the `--config` option of the Truffle CLI:
  *
  * ```txt
  * --config <file>
@@ -22,6 +21,11 @@ import {showQuickPick} from '@/helpers/userInteraction';
  * see https://trufflesuite.com/docs/truffle/reference/configuration/.
  */
 export class TruffleWorkspace {
+  /**
+   * Creates a `TruffleWorkspace`.
+   *
+   * @param truffleConfigPath the full path of the Truffle config file.
+   */
   constructor(truffleConfigPath: string) {
     this.truffleConfigName = path.basename(truffleConfigPath);
     this.dirName = path.dirname(truffleConfigPath).split(path.sep).pop()!.toString();
@@ -31,7 +35,7 @@ export class TruffleWorkspace {
 
   /**
    * Represents the `basename`, _i.e._, the file name portion,
-   * of the Truffle Config path of this workspace.
+   * of the Truffle config file of this workspace.
    * In most cases, this is `truffle-config.js`.
    */
   truffleConfigName: string;
@@ -42,7 +46,7 @@ export class TruffleWorkspace {
   dirName: string;
 
   /**
-   * The `Uri` path where this Truffle config file is located.
+   * The `Uri` path of the directory where this Truffle config file is located.
    */
   workspace: Uri;
 
@@ -52,6 +56,11 @@ export class TruffleWorkspace {
   truffleConfig: Uri;
 }
 
+/**
+ * ! We need to remove this because it does not support multiple Truffle config files.
+ * @param ignoreException
+ * @returns
+ */
 export function getWorkspaceRoot(ignoreException = false): string | undefined {
   const workspaceRoot = workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
 
@@ -65,33 +74,38 @@ export function getWorkspaceRoot(ignoreException = false): string | undefined {
 }
 
 /**
- * Gets or selects the Truffle config file to be used in subsequent commands.
- * Many commands can be invoked either from the _Command Palette_,
- * contextual menus, or programatically.
- * If the `contractUri` was provided, _e.g._,
- * invoked from contextual menu or programatically, returns the root directory.
- * Otherwise, If the URI wasn't provided, retrieves all truffle projects
+ * Gets or selects the Truffle config file to be used in subsequent operations.
  *
- * If more than one Truffle config files are found,
+ * Many commands can be invoked either from the _Command Palette_,
+ * a context menu, or programatically.
+ * If `contractUri` was provided, _e.g._, invoked from a context menu or programatically,
+ * it looks for Truffle config files in the Workspace where `contractUri` belongs.
+ * Otherwise, if `contractURi` is not present,
+ * it looks for Truffle config files in all Workspace folders.
+ * It uses {@link findTruffleWorkspaces} to find Truffle config files within a single Workspace folder.
+ *
+ * If only one Truffle config file is found, it returns that config file.
+ * However, if more than one Truffle config files are found,
  * it displays a quick pick to allow the user to select the appropiate one.
  *
- * @param contractUri when present, only look for Truffle config file in the workspace where it belongs.
- * @returns the `TruffleWorkspace` representing the selected Truffle config file.
+ * @param contractUri when present, only look for Truffle config files in the workspace where it belongs.
+ * @returns the {@link TruffleWorkspace} representing the selected Truffle config file.
  */
 export async function getTruffleWorkspace(contractUri?: Uri): Promise<TruffleWorkspace> {
   const workspaces = await (contractUri
-    ? getTruffleWorkspaces(workspace.getWorkspaceFolder(contractUri)!.uri.fsPath)
-    : getWorkspacesFolders());
+    ? findTruffleWorkspaces(workspace.getWorkspaceFolder(contractUri)!.uri.fsPath)
+    : getAllTruffleWorkspaces());
 
   if (workspaces.length === 1) {
-    // If there is only one truffle project, return the root directory
     return workspaces[0];
   } else {
-    // If there is more than one truffle project, a QuickPick is opened with them
-    return await getTruffleConfigFromQuickPick(workspaces);
+    return await selectTruffleConfigFromQuickPick(workspaces);
   }
 }
 
+/**
+ * ! To be deleted when #187 and #188 are fixed.
+ */
 export function isWorkspaceOpen(): boolean {
   return !!(workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath);
 }
@@ -100,12 +114,18 @@ export function getPathByPlatform(workspace: Uri): string {
   return process.platform === 'win32' ? `${workspace.scheme}:${workspace.path}` : workspace.fsPath;
 }
 
-async function getWorkspacesFolders(): Promise<TruffleWorkspace[]> {
+/**
+ * Finds _all_ Truffle config files within the open folders in the workbench.
+ * It uses {@link findTruffleWorkspaces} to find Truffle config files within a single Workspace folder.
+ *
+ * @returns all Truffle config files found wrapped in {@link TruffleWorkspace}.
+ */
+async function getAllTruffleWorkspaces(): Promise<TruffleWorkspace[]> {
   const workspaces: TruffleWorkspace[] = [];
 
   await Promise.all(
     workspace.workspaceFolders!.map(async (ws) => {
-      workspaces.push(...(await getTruffleWorkspaces(ws.uri.fsPath)));
+      workspaces.push(...(await findTruffleWorkspaces(ws.uri.fsPath)));
     })
   );
 
@@ -121,10 +141,15 @@ async function getWorkspacesFolders(): Promise<TruffleWorkspace[]> {
 /**
  * Searches for Truffle config files in `workspaceRootPath` recursively.
  *
+ * Since any `.js` file can be a Truffle config file,
+ * we only look for files matching the glob pattern `truffle-config{,.*}.js`.
+ * This pattern matches the default `truffle-config.js` name.
+ * Truffle config files like `truffle-config.ovm.js` are also matched by this pattern.
+ *
  * @param workspaceRootPath the root path where to look for Truffle config files.
  * @returns all Truffle config files found wrapped in `TruffleWorkspace`.
  */
-async function getTruffleWorkspaces(workspaceRootPath: string): Promise<TruffleWorkspace[]> {
+async function findTruffleWorkspaces(workspaceRootPath: string): Promise<TruffleWorkspace[]> {
   const files = glob.sync(`${workspaceRootPath}/**/truffle-config{,.*}.js`, {
     ignore: Constants.workspaceIgnoredFolders,
   });
@@ -134,13 +159,13 @@ async function getTruffleWorkspaces(workspaceRootPath: string): Promise<TruffleW
 
 /**
  * Shows the list of `workspaces` in a quick pick so the user can select
- * the Truffle config file.
+ * the Truffle config file to use.
  *
- * @param workspaces
- * @returns the Truffle config file URI of the selected Truffle workspace.
+ * @param workspaces list of workspace folders to display to the user.
+ * @returns the Truffle config file of the selected Truffle Workspace.
  */
-async function getTruffleConfigFromQuickPick(workspaces: TruffleWorkspace[]): Promise<TruffleWorkspace> {
-  const folders = Array.from(workspaces).map((element) => {
+async function selectTruffleConfigFromQuickPick(workspaces: TruffleWorkspace[]): Promise<TruffleWorkspace> {
+  const folders = workspaces.map((element) => {
     return {
       label: element.dirName,
       description: element.truffleConfigName,
