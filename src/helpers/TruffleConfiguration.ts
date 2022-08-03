@@ -15,6 +15,12 @@ import {ICommandResult, tryExecuteCommandInFork} from './command';
 import {IConfiguration, INetwork, INetworkOption, IProvider, notAllowedSymbols} from './ConfigurationReader';
 import {getPathByPlatform, getWorkspaceRoot} from './workspace';
 
+export class EvalTruffleConfigError extends Error {
+  constructor(message: string, readonly reason: string) {
+    super(message);
+  }
+}
+
 //region Internal Functions
 const isHdWalletProviderDeclaration = (nodeType: string, node: Node): boolean => {
   let xNode: ESTree.Node;
@@ -64,15 +70,15 @@ const jsonToConfiguration = (truffleConfig: {[key: string]: any}): IConfiguratio
 };
 
 // refactor out the core parser between the two functions.
-const parseTruffleConfig = function (result: ICommandResult) {
+function parseTruffleConfig(result: ICommandResult, truffleConfigName: string) {
   const truffleConfigObject = result.messages!.find((message) => message.command === 'truffleConfig');
 
   if (!truffleConfigObject || !truffleConfigObject.message) {
-    throw new Error(Constants.errorMessageStrings.TruffleConfigHasIncorrectFormat);
+    throw new EvalTruffleConfigError(`"${truffleConfigName}" has incorrect format`, result.cmdOutputIncludingStderr);
   }
 
   return JSON.parse(truffleConfigObject.message);
-};
+}
 
 /**
  * This version uses the workspace root
@@ -82,7 +88,7 @@ async function getTruffleMetadata(workingDirectory?: string, truffleConfigName?:
   truffleConfigName = truffleConfigName ?? 'truffle-config.js';
   const truffleConfigTemplatePath = path.join(__dirname, 'checkTruffleConfigTemplate.js');
   const result = await tryExecuteCommandInFork(workspaceRoot, truffleConfigTemplatePath, truffleConfigName);
-  return parseTruffleConfig(result);
+  return parseTruffleConfig(result, truffleConfigName);
 }
 
 const generateVariableDeclaration = (

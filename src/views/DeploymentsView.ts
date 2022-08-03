@@ -12,11 +12,15 @@ import {
   commands,
   TreeItemCollapsibleState,
   Command,
+  ThemeColor,
 } from 'vscode';
 import {getChain, getExplorerLink} from '../functions/explorer';
 import {OpenUrlTreeItem} from './lib/OpenUrlTreeItem';
 import {ContractService} from '@/services/contract/ContractService';
 import {getAllTruffleWorkspaces, getPathByPlatform, TruffleWorkspace} from '@/helpers/workspace';
+import {EvalTruffleConfigError} from '@/helpers/TruffleConfiguration';
+import {Output} from '@/Output';
+import {Constants} from '@/Constants';
 
 /**
  * Represents a compiled or deployed contract.
@@ -157,12 +161,12 @@ class ContractDeploymentTreeItem extends TreeItem implements TreeParentItem {
     return [
       {
         label: `Contract: ${this.contract.sourcePath}`,
-        command: treeViewCommand('truffle-vscode.openFile', [Uri.file(this.contract.sourcePath)]),
+        command: openFileCommand(Uri.file(this.contract.sourcePath)),
         iconPath: new ThemeIcon('link-external'),
       },
       {
         label: `Deployment JSON: ${this.contract.path}`,
-        command: treeViewCommand('truffle-vscode.openFile', [Uri.file(this.contract.path)]),
+        command: openFileCommand(Uri.file(this.contract.path)),
         iconPath: new ThemeIcon('json'),
       },
       {
@@ -328,7 +332,21 @@ async function getContractDeployments(truffleWorkspace: TruffleWorkspace): Promi
       truffleWorkspace.truffleConfigName
     );
   } catch (err) {
-    return [];
+    if (err instanceof EvalTruffleConfigError) {
+      Output.outputLine(
+        Constants.outputChannel.truffleForVSCode,
+        `Error while loading Deployments from ${truffleWorkspace.dirName}:${truffleWorkspace.truffleConfigName}. Reason:`
+      );
+      Output.outputLine(Constants.outputChannel.truffleForVSCode, err.reason);
+    }
+    const error = err as Error;
+    return [
+      {
+        label: error.message,
+        iconPath: new ThemeIcon('warning', new ThemeColor('errorForeground')),
+        command: openFileCommand(truffleWorkspace.truffleConfig),
+      },
+    ];
   }
 
   if (pathExists(buildPath)) {
@@ -385,14 +403,17 @@ function pathExists(path: string): boolean {
 }
 
 /**
- * Creates a `Command` with an empty `title`.
- * This is useful for `Command`s triggered from `TreeItem`s.
+ * Creates a `Command` that opens the given `fileUri`.
+ * The resulting command `Command` is suitable for a `TreeItem`,
+ * that is, it has an empty `title`.
+ *
+ * To open the given `fileUri`, it uses the custom `truffle-vscode.openFile` command.
  */
-function treeViewCommand(commandId: string, commandArgs: any[]): Command {
+function openFileCommand(fileUri: Uri): Command {
   return {
     title: '',
-    command: commandId,
-    arguments: commandArgs,
+    command: 'truffle-vscode.openFile',
+    arguments: [fileUri],
   };
 }
 
