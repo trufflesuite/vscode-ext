@@ -9,6 +9,11 @@ import glob from 'glob';
 import {showQuickPick} from '@/helpers/userInteraction';
 
 /**
+ * The [glob](https://github.com/isaacs/node-glob#glob-primer) pattern to match Truffle config file names.
+ */
+const TRUFFLE_CONFIG_GLOB = 'truffle-config{,.*}.js';
+
+/**
  * A Truffle workspace is defined by the presence of a Truffle config file.
  * It represents the `--config` option of the Truffle CLI:
  *
@@ -150,7 +155,7 @@ async function getAllTruffleWorkspaces(): Promise<TruffleWorkspace[]> {
  * @returns all Truffle config files found wrapped in `TruffleWorkspace`.
  */
 async function findTruffleWorkspaces(workspaceRootPath: string): Promise<TruffleWorkspace[]> {
-  const files = glob.sync(`${workspaceRootPath}/**/truffle-config{,.*}.js`, {
+  const files = glob.sync(`${workspaceRootPath}/**/${TRUFFLE_CONFIG_GLOB}`, {
     ignore: Constants.workspaceIgnoredFolders,
   });
 
@@ -176,7 +181,7 @@ async function selectTruffleConfigFromQuickPick(workspaces: TruffleWorkspace[]):
 
   const result = await showQuickPick(folders, {
     ignoreFocusOut: true,
-    placeHolder: Constants.placeholders.selectContract,
+    placeHolder: `Select a Truffle config file, filtered by ${TRUFFLE_CONFIG_GLOB}, to use`,
   });
 
   return result.truffleWorkspace;
