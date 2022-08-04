@@ -6,7 +6,7 @@ import assert from 'assert';
 import path from 'path';
 import sinon, {stub} from 'sinon';
 import uuid from 'uuid';
-import vscode, {Uri} from 'vscode';
+import * as vscode from 'vscode';
 import {TruffleCommands} from '@/commands';
 import {Constants} from '@/Constants';
 import * as helpers from '../../src/helpers';
@@ -38,7 +38,7 @@ const options: TLocalProjectOptions = {
   url: '',
 };
 
-const truffleWorkspace: Uri = Uri.parse(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
+const truffleWorkspace = vscode.Uri.parse(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
 
 describe('TruffleCommands', () => {
   describe('Integration test', async () => {

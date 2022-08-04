@@ -29,5 +29,5 @@ module.exports = {
   ],
 
   // Currently only this subset of our tests pass.
-  spec: ['test/*.test.ts'],
+  spec: ['test/**/*.test.ts'],
 };

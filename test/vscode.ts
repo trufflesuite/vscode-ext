@@ -1,4 +1,4 @@
-import type vscode from 'vscode';
+import vscode, {WorkspaceFolder} from 'vscode';
 import type {CancellationToken, Progress, ProgressOptions} from 'vscode';
 
 export enum ProgressLocation {
@@ -10,6 +10,17 @@ export enum ProgressLocation {
 export enum ExtensionKind {
   UI = 1,
   Workspace = 2,
+}
+
+export enum TreeItemCollapsibleState {
+  None = 0,
+  Collapsed = 1,
+  Expanded = 2,
+}
+
+export enum QuickPickItemKind {
+  Separator = -1,
+  Default = 0,
 }
 
 /**
@@ -30,6 +41,8 @@ export class Uri implements vscode.Uri {
     this.scheme = scheme;
     this.authority = authority || '';
     this.path = path || '';
+    this.path = Uri._referenceResolution(this.scheme, path || '');
+
     this.query = query || '';
     this.fragment = fragment || '';
   }
@@ -82,6 +95,26 @@ export class Uri implements vscode.Uri {
     // }
     return new Uri(match[2], match[4], match[5], match[7], match[9]);
   }
+
+  // implements a bit of https://tools.ietf.org/html/rfc3986#section-5
+  static _referenceResolution(scheme: string, path: string): string {
+    // the slash-character is our 'default base' as we don't
+    // support constructing URIs relative to other URIs. This
+    // also means that we alter and potentially break paths.
+    // see https://tools.ietf.org/html/rfc3986#section-5.1.4
+    switch (scheme) {
+      case 'https':
+      case 'http':
+      case 'file':
+        if (!path) {
+          path = '/';
+        } else if (path[0] !== '/') {
+          path = '/' + path;
+        }
+        break;
+    }
+    return path;
+  }
 }
 
 export class ThemeIcon implements ThemeIcon {
@@ -104,7 +137,7 @@ export class EventEmitter {
 }
 
 export const workspace = {
-  workspaceFolders: undefined,
+  workspaceFolders: undefined as WorkspaceFolder[] | undefined,
 
   getConfiguration: function (_section?: string): vscode.WorkspaceConfiguration {
     return {
@@ -113,10 +146,22 @@ export const workspace = {
       },
     } as any;
   },
+
+  getWorkspaceFolder: function (_uri: Uri): WorkspaceFolder | undefined {
+    return workspace.workspaceFolders![0];
+  },
+
+  updateWorkspaceFolders(
+    _start: number,
+    _deleteCount: number | undefined | null,
+    ..._workspaceFoldersToAdd: {readonly uri: Uri; readonly name?: string}[]
+  ): boolean {
+    return false;
+  },
 };
 
 export namespace commands {
-  export const executeCommand = () => null;
+  export const executeCommand = () => Promise.resolve();
 }
 
 export namespace extensions {
@@ -127,6 +172,15 @@ export namespace extensions {
   }
 }
 
+let clipboardContent = '';
+
+export const env = {
+  clipboard: {
+    readText: () => clipboardContent,
+    writeText: (value: string) => (clipboardContent = value),
+  },
+};
+
 export const window = {
   createOutputChannel: function (_name: string): vscode.OutputChannel {
     return {
@@ -134,6 +188,7 @@ export const window = {
         return null;
       },
       append: () => null,
+      show: () => null,
     } as any;
   },
 
@@ -143,6 +198,7 @@ export const window = {
   showOpenDialog: () => null,
   showSaveDialog: () => null,
   showErrorMessage: () => null,
+  showInformationMessage: () => null,
   withProgress: function <R>(
     _options: ProgressOptions,
     _task: (progress: Progress<{message?: string; increment?: number}>, _token: CancellationToken) => Thenable<R>
@@ -154,4 +210,8 @@ export const window = {
     //
     // }
   },
+};
+
+export const debug = {
+  startDebugging: () => null,
 };
