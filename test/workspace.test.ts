@@ -46,6 +46,28 @@ describe('workspace', () => {
     assert.throws(getWorkspaceRoot, /Workspace root should be defined/);
   });
 
+  it('`getWorkspaceRoot` should return `undefined` when no workspace opened and has `ignoreException`', () => {
+    // Arrange
+    workspaceMock.value(undefined);
+
+    // Act
+    const result = getWorkspaceRoot(true);
+
+    // Assert
+    assert.strictEqual(result, undefined);
+  });
+
+  it('`getWorkspaceRoot` should return `undefined` when workspace is empty and has `ignoreException`', () => {
+    // Arrange
+    workspaceMock.value([]);
+
+    // Act
+    const result = getWorkspaceRoot(true);
+
+    // Assert
+    assert.strictEqual(result, undefined);
+  });
+
   it('`getWorkspaceRoot` should return the first workspace root path', async () => {
     // Arrange
     workspaceMock.value(testWorkspaceFolder);
