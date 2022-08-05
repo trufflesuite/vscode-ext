@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {registerUIExtensionVariables} from '@microsoft/vscode-azext-utils';
@@ -44,7 +44,7 @@ import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
  *
  * @param ctx the context we want to work on.
  */
-function initializeExtensionVariables(ctx: ExtensionContext): void {
+export function initializeExtensionVariables(ctx: ExtensionContext): void {
   ext.context = ctx;
   ext.outputChannel = Output.subscribe();
   registerUIExtensionVariables(ext);
@@ -218,6 +218,7 @@ export async function activate(context: ExtensionContext) {
   //#region other subscriptions
   const changeCoreSdkConfigurationListener = workspace.onDidChangeConfiguration(async (event) => {
     if (event.affectsConfiguration(Constants.userSettings.coreSdkSettingsKey)) {
+      ext.outputChannel.appendLine(`Configuration changed. Amending SdkCoreProvider...`);
       await sdkCoreCommands.initialize(context.globalState);
     }
   });

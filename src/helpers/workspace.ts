@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {QuickPickItem, Uri, workspace} from 'vscode';
@@ -76,7 +76,7 @@ async function getWorkspacesFolders(): Promise<TruffleWorkspace[]> {
       workspaces.push(...(await getTruffleWorkspaces(ws.uri.fsPath)));
     })
   );
-
+  // FIXME:fix this.....
   if (workspaces.length === 0) {
     const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root'));
     Telemetry.sendException(error);

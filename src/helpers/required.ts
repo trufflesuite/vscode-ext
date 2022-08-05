@@ -1,12 +1,13 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
+import {getPathByPlatform, getWorkspace} from '@/helpers/workspace';
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
 import {commands, ProgressLocation, window} from 'vscode';
-import {Constants, RequiredApps} from '@/Constants';
+import {AppTypes, Constants, ext, OptionalApps, RequiredApps} from '@/Constants';
 import {getWorkspaceRoot} from '../helpers';
 import {Output} from '@/Output';
 import {Telemetry} from '@/TelemetryClient';
@@ -83,10 +84,10 @@ export namespace required {
     return valid;
   }
 
-  export async function checkAppsSilent(...apps: RequiredApps[]): Promise<boolean> {
+  export async function checkAppsSilent(...apps: AppTypes[]): Promise<boolean> {
     const versions = await getExactlyVersions(...apps);
     const invalid = versions
-      .filter((version) => apps.includes(version.app as RequiredApps))
+      .filter((version) => apps.includes(version.app as AppTypes))
       .some((version) => !version.isValid);
 
     Output.outputLine('checkApps', `Current state for versions: ${JSON.stringify(versions)} Invalid: ${invalid}`);
@@ -152,7 +153,7 @@ export namespace required {
     return getExactlyVersions(...requiredApps, ...auxiliaryApps);
   }
 
-  export async function getExactlyVersions(...apps: RequiredApps[]): Promise<IRequiredVersion[]> {
+  export async function getExactlyVersions(...apps: AppTypes[]): Promise<IRequiredVersion[]> {
     Output.outputLine('', `Get version for required apps: ${apps.join(',')}`);
 
     if (apps.includes(RequiredApps.node)) {
@@ -172,9 +173,30 @@ export namespace required {
       currentState.ganache =
         currentState.ganache || (await createRequiredVersion(RequiredApps.ganache, getGanacheVersion));
     }
+    if (apps.includes(OptionalApps.hardhat)) {
+      currentState.hardhat =
+        currentState.hardhat ||
+        (await createRequiredVersion(OptionalApps.hardhat, getNpmPackageVersion(OptionalApps.hardhat)));
+      ext.outputChannel.appendLine(`Got Hardhat: ${currentState.hardHat}`);
+    }
 
     return Object.values(currentState);
   }
+
+  type VersionCallback = () => Promise<string>;
+
+  const getNpmPackageVersion: (packageName: string) => VersionCallback = (packageName: string) => async () => {
+    // npm ls --json --depth=0 hardhat
+    const workspace = await getWorkspace(undefined);
+    const platformPath = getPathByPlatform(workspace);
+    ext.outputChannel.appendLine(`Workspaces: ${workspace} platform: ${platformPath}`);
+    return await getVersionWithArgs(
+      platformPath,
+      RequiredApps.npm,
+      ['ls', '--json', '--depth=0', packageName],
+      new RegExp(`${packageName}@(\\d+.\\d+.\\d+)`)
+    );
+  };
 
   export async function getNodeVersion(): Promise<string> {
     return await getVersion(RequiredApps.node, '--version', /v(\d+.\d+.\d+)/);
@@ -278,7 +300,6 @@ export namespace required {
     const minRequiredVersion = typeof requiredVersion === 'string' ? requiredVersion : requiredVersion.min;
     const maxRequiredVersion = typeof requiredVersion === 'string' ? '' : requiredVersion.max;
     const isValidApp = isValid(version, minRequiredVersion, maxRequiredVersion);
-
     return {
       app: appName,
       isValid: isValidApp,
@@ -315,13 +336,26 @@ export namespace required {
   }
 
   async function getVersion(program: string, command: string, matcher: RegExp): Promise<string> {
+    return getVersionWithArgs(undefined, program, [command], matcher);
+  }
+
+  async function getVersionWithArgs(
+    workingDirectory: string | undefined,
+    program: string,
+    commands: string[],
+    matcher: RegExp
+  ): Promise<string> {
     try {
-      const result = await tryExecuteCommand(undefined, program, command);
+      const result = await tryExecuteCommand(workingDirectory, program, ...commands);
+      ext?.outputChannel.appendLine(
+        `tryExecuteCommand: workingDirectory: ${workingDirectory} program: ${program} commands: ${commands} matcher: ${matcher} result: ${JSON.stringify(
+          result
+        )}`
+      );
       if (result.code === 0) {
         const output = result.cmdOutput || result.cmdOutputIncludingStderr;
         const installedVersion = output.match(matcher);
         const version = semver.clean(installedVersion ? installedVersion[1] : '');
-
         return version || '';
       }
     } catch (error) {

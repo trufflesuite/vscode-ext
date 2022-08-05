@@ -19,6 +19,11 @@ export enum RequiredApps {
   dashboard = 'dashboard',
 }
 
+export enum OptionalApps {
+  hardhat = 'hardhat',
+}
+export type AppTypes = RequiredApps | OptionalApps;
+
 export enum NotificationOptions {
   error = 'error',
   info = 'info',
@@ -107,6 +112,10 @@ export class Constants {
     [RequiredApps.dashboard]: {
       max: '',
       min: '5.5.0',
+    },
+    [OptionalApps.hardhat]: {
+      max: '',
+      min: '2.10.0',
     },
   };
 
@@ -677,7 +686,7 @@ export class Constants {
 
   public static coreSdk = {
     truffle: 'Truffle',
-    hardhat: 'HardHat',
+    hardhat: 'Hardhat',
   };
 
   public static initialize(context: ExtensionContext) {

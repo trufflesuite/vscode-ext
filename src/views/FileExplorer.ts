@@ -1,9 +1,12 @@
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
+// Licensed under the MIT license.
+
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as vscode from 'vscode';
-import {Constants, ext} from '../Constants';
+import {Constants, ext} from '@/Constants';
 import {getWorkspaceFolder} from './Utils';
 
 //#region Utilities
@@ -356,7 +359,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
 
   // tree data provider
   async getChildren(element?: Entry): Promise<Entry[]> {
-    ext.outputChannel.appendLog(`Getting Children of: ${element}`);
+    ext.outputChannel.appendLog(`Getting Children of: ${JSON.stringify(element)}`);
 
     if (element) {
       const children = await this.readDirectory(element.uri);
@@ -426,7 +429,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
    * @returns A string containing the contextValue property.
    */
   getTreeItemContextValue(element: Entry): string {
-    const isWorkspace = path.basename(element.uri.path) === Constants.fileExplorerConfig.contractFolder ? true : false;
+    const isWorkspace = path.basename(element.uri.path) === Constants.fileExplorerConfig.contractFolder;
     return this._elementTypes.find((ft) => ft.type === element.type && ft.isWorkspace === isWorkspace)!.contextValue;
   }
 }

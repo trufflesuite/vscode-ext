@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {ChildProcess, fork, ForkOptions, spawn, SpawnOptions} from 'child_process';
@@ -31,7 +31,7 @@ export interface ICommandExecute {
 
 export async function executeCommand(
   workingDirectory: string | undefined,
-  commands: string,
+  command: string,
   ...args: string[]
 ): Promise<string> {
   Output.outputLine(
@@ -39,47 +39,46 @@ export async function executeCommand(
     '\n' +
       `Working dir: ${workingDirectory}\n` +
       `${Constants.executeCommandMessage.runningCommand}\n` +
-      `${[commands, ...args].join(' ')}`
+      `${[command, ...args].join(' ')}`
   );
 
   Telemetry.sendEvent('command.executeCommand.tryExecuteCommandWasStarted');
-  const result: ICommandResult = await tryExecuteCommand(workingDirectory, commands, ...args);
+  const result: ICommandResult = await tryExecuteCommand(workingDirectory, command, ...args);
 
   Output.outputLine(Constants.outputChannel.executeCommand, Constants.executeCommandMessage.finishRunningCommand);
 
   if (result.code !== 0) {
     Telemetry.sendException(new Error('commands.executeCommand.resultWithIncorrectCode'));
-    throw new Error(Constants.executeCommandMessage.failedToRunCommand(commands.concat(' ', ...args.join(' '))));
+    throw new Error(Constants.executeCommandMessage.failedToRunCommand(command.concat(' ', ...args.join(' '))));
   }
 
   return result.cmdOutput;
 }
 
-export function spawnProcess(workingDirectory: string | undefined, commands: string, args: string[]): ChildProcess {
+export function spawnProcess(workingDirectory: string | undefined, command: string, args: string[]): ChildProcess {
   const options: SpawnOptions = {cwd: workingDirectory || tmpdir(), shell: true};
-  return spawn(commands, args, options);
+  return spawn(command, args, options);
 }
 
 export async function tryExecuteCommand(
   workingDirectory: string | undefined,
-  commands: string,
+  command: string,
   ...args: string[]
 ): Promise<ICommandResult> {
-  const {result} = await tryExecuteCommandAsync(workingDirectory, true, commands, ...args);
-
+  const {result} = await tryExecuteCommandAsync(workingDirectory, true, command, ...args);
   return result;
 }
 
 export async function tryExecuteCommandAsync(
   workingDirectory: string | undefined,
   writeToOutputChannel: boolean,
-  commands: string,
+  command: string,
   ...args: string[]
 ): Promise<ICommandExecute> {
   let cmdOutput = '';
   let cmdOutputIncludingStderr = '';
 
-  const childProcess = spawnProcess(workingDirectory, commands, args);
+  const childProcess = spawnProcess(workingDirectory, command, args);
   const result = new Promise((resolve: (res: any) => void, reject: (error: Error) => void): void => {
     childProcess.stdout!.on('data', (data: string | Buffer) => {
       data = data.toString();
