@@ -632,8 +632,8 @@
     "eslint": "eslint src/* test/*",
     "eslint:fix": "eslint --fix src/* test/*",
     "version": "tsc -v",
-    "test": "yarn run compile && node ./out/test/runTest",
-    "test:mock": "mocha",
+    "test": "mocha",
+    "test:int": "yarn run compile && node ./out/test/runTest",
     "clean": "npx rimraf -- ./out/*",
     "postinstall": "husky install",
     "prepare": "ts-patch install -s && husky install"
