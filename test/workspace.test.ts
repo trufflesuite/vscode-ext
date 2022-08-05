@@ -4,76 +4,56 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import * as vscode from 'vscode';
-import {Constants} from '../src/Constants';
-import * as workspaceHelper from '../src/helpers/workspace';
+import {getWorkspaceRoot} from '@/helpers/workspace';
 
-describe('Workspace', () => {
-  describe('Unit test', () => {
-    const testWorkspaceFolder: any[] = [
-      {
-        uri: {
-          fsPath: 'testPath1',
-        },
+describe('workspace', () => {
+  const testWorkspaceFolder: any[] = [
+    {
+      uri: {
+        fsPath: 'testPath1',
       },
-      {
-        uri: {
-          fsPath: 'testPath2',
-        },
+    },
+    {
+      uri: {
+        fsPath: 'testPath2',
       },
-    ];
-    let workspaceMock: sinon.SinonStub<any[], any>;
+    },
+  ];
 
-    beforeEach(() => {
-      workspaceMock = sinon.stub(vscode.workspace, 'workspaceFolders');
-    });
+  let workspaceMock: sinon.SinonStub<any[], any>;
 
-    afterEach(() => {
-      workspaceMock.restore();
-    });
+  beforeEach(() => {
+    workspaceMock = sinon.stub(vscode.workspace, 'workspaceFolders');
+  });
 
-    it('getWorkspaceRoot should throw exception when no workspace opened', () => {
-      // Arrange
-      workspaceMock.value(undefined);
+  afterEach(() => {
+    workspaceMock.restore();
+  });
 
-      // Act and assert
-      assert.throws(
-        () => workspaceHelper.getWorkspaceRoot(),
-        Error,
-        Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root')
-      );
-    });
+  it('`getWorkspaceRoot` should throw exception when no workspace opened', () => {
+    // Arrange
+    workspaceMock.value(undefined);
 
-    it('getWorkspaceRoot should return workspace root path', async () => {
-      // Arrange
-      workspaceMock.value(testWorkspaceFolder);
+    // Act and assert
+    assert.throws(getWorkspaceRoot, /Workspace root should be defined/);
+  });
 
-      // Act
-      const result = workspaceHelper.getWorkspaceRoot();
+  it('`getWorkspaceRoot` should throw exception when workspace is empty', () => {
+    // Arrange
+    workspaceMock.value([]);
 
-      // Assert
-      assert.strictEqual(result, testWorkspaceFolder[0].uri.fsPath);
-    });
+    // Act and assert
+    assert.throws(getWorkspaceRoot, /Workspace root should be defined/);
+  });
 
-    it('isWorkspaceOpen should return false when no workspace opened', () => {
-      // Arrange
-      workspaceMock.value(undefined);
+  it('`getWorkspaceRoot` should return the first workspace root path', async () => {
+    // Arrange
+    workspaceMock.value(testWorkspaceFolder);
 
-      // Act
-      const result = workspaceHelper.isWorkspaceOpen();
+    // Act
+    const result = getWorkspaceRoot();
 
-      // Assert
-      assert.strictEqual(result, false);
-    });
-
-    it('isWorkspaceOpen should return true when workspace opened', () => {
-      // Arrange
-      workspaceMock.value(testWorkspaceFolder);
-
-      // Act
-      const result = workspaceHelper.isWorkspaceOpen();
-
-      // Assert
-      assert.strictEqual(result, true);
-    });
+    // Assert
+    assert.strictEqual(result, testWorkspaceFolder[0].uri.fsPath);
   });
 });
