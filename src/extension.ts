@@ -16,8 +16,9 @@ import {
 import {Constants, ext} from './Constants';
 
 import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
-import {CommandContext, isWorkspaceOpen, setCommandContext} from './helpers';
-import {required} from './helpers/required';
+import {CommandContext, setCommandContext} from '@/helpers';
+import {required} from '@/helpers/required';
+import {isWorkspaceOpen} from '@/helpers/workspace';
 import {CancellationEvent} from './Models';
 import {Output} from './Output';
 import {ChangelogPage, RequirementsPage, WelcomePage} from './pages';
@@ -147,18 +148,20 @@ export async function activate(context: ExtensionContext) {
   const newSolidityProject = commands.registerCommand('truffle-vscode.newSolidityProject', async () => {
     await tryExecute(() => ProjectCommands.newSolidityProject());
   });
-  const buildContracts = commands.registerCommand('truffle-vscode.buildContracts', async (uri: Uri) => {
-    await tryExecute(() => sdkCoreCommands.build(uri));
+
+  registerCommand('truffle-vscode.buildSingleContract', async (contractUri: Uri) => {
+    await tryExecute(() => sdkCoreCommands.build(contractUri));
   });
-  const buildSingleContract = commands.registerCommand('truffle-vscode.buildSingleContract', async (uri: Uri) => {
-    await tryExecute(() => sdkCoreCommands.build(uri));
+  registerCommand('truffle-vscode.buildContracts', async (contractUri?: Uri) => {
+    await tryExecute(() => sdkCoreCommands.build(contractUri));
   });
-  const deployContracts = commands.registerCommand('truffle-vscode.deployContracts', async (uri: Uri) => {
-    await tryExecute(() => sdkCoreCommands.deploy(uri));
+  registerCommand('truffle-vscode.deployContracts', async (contractUri?: Uri) => {
+    await tryExecute(() => sdkCoreCommands.deploy(contractUri));
   });
-  const createContract = commands.registerCommand('truffle-vscode.createContract', async (uri: Uri) => {
-    await tryExecute(() => TruffleCommands.createContract(uri));
+  registerCommand('truffle-vscode.createContract', async (folderUri?: Uri) => {
+    await tryExecute(() => TruffleCommands.createContract(folderUri));
   });
+
   const copyByteCode = commands.registerCommand('truffle-vscode.copyByteCode', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeBytecodeToBuffer(uri));
   });
@@ -238,10 +241,6 @@ export async function activate(context: ExtensionContext) {
     showRequirementsPage,
     refresh,
     newSolidityProject,
-    buildContracts,
-    buildSingleContract,
-    deployContracts,
-    createContract,
     createProject,
     connectProject,
     disconnectProject,

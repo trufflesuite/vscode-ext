@@ -9,24 +9,16 @@ import * as shell from './shell';
 import * as telemetryHelper from './telemetry';
 import * as userSettings from './userSettings';
 import * as vscodeEnvironment from './vscodeEnvironment';
-import * as workspaceHelpers from './workspace';
 
 const spawnProcess = outputCommandHelper.spawnProcess;
-const getWorkspaceRoot = workspaceHelpers.getWorkspaceRoot;
-const getWorkspace = workspaceHelpers.getWorkspace;
-const isWorkspaceOpen = workspaceHelpers.isWorkspaceOpen;
 const CommandContext = commandContext.CommandContext;
 const setCommandContext = commandContext.setCommandContext;
-const convertEntryToUri = workspaceHelpers.convertEntryToUri;
 
 export {
   CommandContext,
   extractEnumsInfo,
   extractEnumsInfoSafe,
-  getWorkspaceRoot,
-  getWorkspace,
   gitHelper,
-  isWorkspaceOpen,
   outputCommandHelper,
   setCommandContext,
   shell,
@@ -34,5 +26,4 @@ export {
   telemetryHelper,
   userSettings,
   vscodeEnvironment,
-  convertEntryToUri,
 };

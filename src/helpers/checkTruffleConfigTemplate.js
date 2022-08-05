@@ -14,7 +14,9 @@ try {
   // ignore
 }
 
-const truffleConfig = require(path.join(process.cwd(), 'truffle-config.js'));
+const truffleConfigName = process.argv.length >= 3 ? process.argv[2] : 'truffle-config.js';
+
+const truffleConfig = require(path.join(process.cwd(), truffleConfigName));
 
 const getCircularReplacer = () => {
   const seen = new WeakSet();
