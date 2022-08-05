@@ -6,7 +6,7 @@ import assert from 'assert';
 import path from 'path';
 import sinon, {stub} from 'sinon';
 import uuid from 'uuid';
-import vscode, {Uri} from 'vscode';
+import * as vscode from 'vscode';
 import {TruffleCommands} from '@/commands';
 import {Constants} from '@/Constants';
 import * as helpers from '@/helpers/workspace';
@@ -52,7 +52,7 @@ describe('TruffleCommands', () => {
       let checkHdWalletProviderVersionMock: sinon.SinonExpectation;
       let installTruffleHdWalletProviderMock: sinon.SinonExpectation;
 
-      let getWorkspacesMock: sinon.SinonStub<[contractUri?: Uri], Promise<helpers.TruffleWorkspace>>;
+      let getWorkspacesMock: sinon.SinonStub<[contractUri?: vscode.Uri], Promise<helpers.TruffleWorkspace>>;
 
       let showQuickPickMock: sinon.SinonStub;
       let showInputBoxMock: sinon.SinonStub;

@@ -5,7 +5,7 @@ import assert from 'assert';
 import rewire from 'rewire';
 import sinon from 'sinon';
 import uuid from 'uuid';
-import vscode from 'vscode';
+import * as vscode from 'vscode';
 import {RequiredApps} from '../src/Constants';
 import * as helpers from '@/helpers/workspace';
 import * as commands from '../src/helpers/command';

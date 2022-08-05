@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 import sinon from 'sinon';
-import vscode from 'vscode';
+import * as vscode from 'vscode';
 import {Constants} from '../src/Constants';
 import * as workspaceHelper from '../src/helpers/workspace';
 
