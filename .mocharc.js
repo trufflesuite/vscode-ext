@@ -8,6 +8,13 @@
  * [1] https://mochajs.org/#configuring-mocha-nodejs
  */
 module.exports = {
+  /**
+   * From `mocha -h`
+   *
+   * ```txt
+   * --require, -r                    Require module      [array] [default: (none)]
+   * ```
+   */
   require: [
     // We use `ts-node/register`[1] to run our tests without compiling them.
     //
@@ -28,6 +35,16 @@ module.exports = {
     'test/vscode-register.ts',
   ],
 
-  // Currently only this subset of our tests pass.
-  spec: ['test/**/*.test.ts'],
+  /**
+   * From `mocha -h`
+   *
+   * ```txt
+   * spec  One or more files, directories, or globs to test
+   *                                                    [array] [default: ["test"]]
+   * ```
+   */
+  spec: [
+    // These are the same test files covered by the VS Code Host test runner.
+    'test/**/*.test.ts',
+  ],
 };
