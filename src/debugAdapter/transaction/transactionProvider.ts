@@ -26,7 +26,7 @@ export class TransactionProvider {
   }
 
   public async getLastTransactionHashes(take: number = TRANSACTION_NUMBER_TO_SHOW): Promise<string[]> {
-    let latestBlockNumber: any;
+    let latestBlockNumber: number;
 
     try {
       latestBlockNumber = await this._web3.eth.getBlockNumber();
@@ -34,15 +34,26 @@ export class TransactionProvider {
       throw new Error(Constants.informationMessage.transactionNotFound);
     }
 
-    const latestBlock = await this._web3.eth.getBlock(latestBlockNumber);
+    const totalBlocks = latestBlockNumber - take > 0 ? take : latestBlockNumber;
+    const startingBlockNumber = latestBlockNumber - take > 0 ? latestBlockNumber - take : 0;
+    const blockNumbers = Array.from({length: totalBlocks}, (_, i) => i + 1 + startingBlockNumber).reverse();
+    const batchRequest = this._web3.createBatchRequest();
+
+    blockNumbers.forEach((block) => {
+      batchRequest.add(this._web3.eth.getBlock, block, true);
+    });
+
+    const blocks: any[] = await batchRequest.execute();
+    const accounts: string[] = await this._web3.eth.getAccounts();
     const txHashes: string[] = [];
-    let block = latestBlock;
-    while (txHashes.length <= take && block.number > 0) {
-      for (let i = 0; i < block.transactions.length && txHashes.length < TRANSACTION_NUMBER_TO_SHOW; i++) {
-        txHashes.push(block.transactions[i]);
-      }
-      block = await this._web3.eth.getBlock(block.number - 1);
-    }
+
+    blocks.forEach((block) => {
+      const txs: any = Object.values(block.transactions)
+        .filter((tx: any) => accounts.includes(tx.from))
+        .map((tx: any) => tx.hash);
+
+      txHashes.push(...txs);
+    });
 
     return txHashes;
   }

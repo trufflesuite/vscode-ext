@@ -2,14 +2,15 @@
 // Licensed under the MIT license.
 
 import {INetwork} from '@/helpers/ConfigurationReader';
-import {getTruffleConfigUri, TruffleConfig, TruffleConstants} from '@/helpers/TruffleConfiguration';
+import {TruffleConfig} from '@/helpers/TruffleConfiguration';
 import {mnemonicToSeed} from 'bip39';
 import fs from 'fs-extra';
 import hdkey from 'hdkey';
 import path from 'path';
 import {QuickPickItem, Uri, window, commands, QuickPickItemKind} from 'vscode';
 import {Constants, ext, RequiredApps} from '@/Constants';
-import {getWorkspace, outputCommandHelper, telemetryHelper, vscodeEnvironment, convertEntryToUri} from '../helpers';
+import {outputCommandHelper, telemetryHelper, vscodeEnvironment} from '../helpers';
+import {getTruffleWorkspace} from '@/helpers/workspace';
 import {required} from '@/helpers/required';
 
 import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from '@/helpers/userInteraction';
@@ -52,9 +53,12 @@ interface IExtendedQuickPickItem extends QuickPickItem {
 
 export namespace TruffleCommands {
   /**
-   * Call the truffle command line compiler
+   * Triggers the Truffle command line compiler using `npx`.
+   *
+   * @param contractUri if provided, compiles only `contractUri`.
+   * @returns
    */
-  export async function buildContracts(uri?: Uri): Promise<void> {
+  export async function buildContracts(contractUri?: Uri): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.buildContracts.commandStarted');
 
     if (!(await required.checkAppsSilent(RequiredApps.truffle))) {
@@ -63,14 +67,13 @@ export namespace TruffleCommands {
       return;
     }
 
-    const workspace = await getWorkspace(uri);
+    const truffleWorkspace = await getTruffleWorkspace(contractUri);
+    const workspace = truffleWorkspace.workspace;
     const contractDirectory = getPathByPlatform(workspace);
-    const args: string[] = [RequiredApps.truffle, 'compile'];
+    const args: string[] = [RequiredApps.truffle, 'compile', '--config', truffleWorkspace.truffleConfigName];
 
-    if (uri) {
-      const file = convertEntryToUri(uri);
-
-      if (fs.lstatSync(file.fsPath).isFile()) args.push(path.basename(file.fsPath));
+    if (contractUri) {
+      if (fs.lstatSync(contractUri.fsPath).isFile()) args.push(path.basename(contractUri.fsPath));
     }
 
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
@@ -82,21 +85,24 @@ export namespace TruffleCommands {
     });
   }
 
-  export async function deployContracts(uri?: Uri): Promise<void> {
+  /**
+   * Triggers the `migrate` option of the Truffle command line interface
+   * using `npx`.
+   *
+   * @param contractUri FIXME: Is this used?
+   */
+  export async function deployContracts(contractUri?: Uri) {
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandStarted');
 
-    const workspace = await getWorkspace(uri);
-    TruffleConstants.truffleConfigUri = Uri.parse(getPathByPlatform(workspace));
+    const truffleWorkspace = await getTruffleWorkspace(contractUri);
+    const truffleConfigUri = getPathByPlatform(truffleWorkspace.truffleConfig);
 
-    const truffleConfigsUri = getTruffleConfigUri();
-    const defaultDeployDestinations = getDefaultDeployDestinations(truffleConfigsUri);
-    const truffleDeployDestinations = await getTruffleDeployDestinations(truffleConfigsUri);
-    const treeDeployDestinations = await getTreeDeployDestinations(truffleConfigsUri);
-
-    const deployDestinations: IDeployDestinationItem[] = [];
-    deployDestinations.push(...defaultDeployDestinations);
-    deployDestinations.push(...truffleDeployDestinations);
-    deployDestinations.push(...treeDeployDestinations);
+    const deployDestinations = [];
+    deployDestinations.push(...getDefaultDeployDestinations(truffleConfigUri));
+    deployDestinations.push(
+      ...(await getTruffleDeployDestinations(truffleConfigUri, truffleWorkspace.truffleConfigName))
+    );
+    deployDestinations.push(...(await getTreeDeployDestinations(truffleConfigUri)));
 
     const uniqueDestinations = removeDuplicateNetworks(deployDestinations);
 
@@ -182,8 +188,9 @@ export namespace TruffleCommands {
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
   }
 
-  export async function createContract(uri: Uri): Promise<void> {
-    const workspace = await getWorkspace(uri);
+  export async function createContract(folderUri?: Uri): Promise<void> {
+    const uri = await getTruffleWorkspace(folderUri);
+    const workspace = uri.workspace;
     const contractDirectory = getPathByPlatform(workspace);
 
     await fs.createFile(path.join(contractDirectory, 'contracts', 'NewContract.sol'));
@@ -319,7 +326,10 @@ function getDefaultDeployDestinations(truffleConfigPath: string): IDeployDestina
   ];
 }
 
-async function getTruffleDeployDestinations(truffleConfigPath: string): Promise<IDeployDestinationItem[]> {
+async function getTruffleDeployDestinations(
+  truffleConfigPath: string,
+  name: string
+): Promise<IDeployDestinationItem[]> {
   const deployDestination: IDeployDestinationItem[] = [];
   const truffleConfig = new TruffleConfig(truffleConfigPath);
   const networksFromConfig = truffleConfig.getNetworks();
@@ -334,7 +344,7 @@ async function getTruffleDeployDestinations(truffleConfigPath: string): Promise<
       cmd: await getTruffleDeployFunction(network.name, truffleConfigPath, network.options.network_id, options.port),
       cwd: path.dirname(truffleConfigPath),
       description: url,
-      detail: 'From truffle-config.js',
+      detail: `From ${name}`,
       label: network.name,
       networkId: options.network_id,
     });
@@ -474,6 +484,7 @@ async function createNetwork(getTruffleNetwork: () => Promise<INetwork>, truffle
 async function deployToNetwork(networkName: string, truffleConfigPath: string): Promise<void> {
   await showIgnorableNotification(Constants.statusBarMessages.deployingContracts(networkName), async () => {
     const workspaceRoot = path.dirname(truffleConfigPath);
+    const truffleConfigName = path.basename(truffleConfigPath);
     await fs.ensureDir(workspaceRoot);
 
     Output.show();
@@ -488,7 +499,9 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
         '--reset',
         '--compile-all',
         '--network',
-        networkName
+        networkName,
+        '--config',
+        truffleConfigName
       );
 
       Output.outputLine(Constants.outputChannel.truffleForVSCode, Constants.informationMessage.deploySucceeded);

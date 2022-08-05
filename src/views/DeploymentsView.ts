@@ -12,10 +12,15 @@ import {
   commands,
   TreeItemCollapsibleState,
   Command,
+  ThemeColor,
 } from 'vscode';
 import {getChain, getExplorerLink} from '../functions/explorer';
 import {OpenUrlTreeItem} from './lib/OpenUrlTreeItem';
 import {ContractService} from '@/services/contract/ContractService';
+import {getAllTruffleWorkspaces, getPathByPlatform, TruffleWorkspace} from '@/helpers/workspace';
+import {EvalTruffleConfigError} from '@/helpers/TruffleConfiguration';
+import {Output} from '@/Output';
+import {Constants} from '@/Constants';
 
 /**
  * Represents a compiled or deployed contract.
@@ -118,8 +123,30 @@ interface TreeParentItem {
 }
 
 /**
- * This is the root item in our tree view.
- * We make a child list of items from our network deployment.
+ * Represents a top-level `TreeItem` when more than one Truffle config files
+ * are found in the workbench.
+ *
+ * It uses the `dirName` and `truffleConfigName` from `truffleWorkspace`
+ * as `label` and `description` for the `TreeItem` respectively.
+ */
+class TruffleWorkspaceTreeItem extends TreeItem implements TreeParentItem {
+  constructor(truffleWorkspace: TruffleWorkspace, private readonly items: TreeItem[]) {
+    super(truffleWorkspace.dirName);
+    this.iconPath = new ThemeIcon('target');
+    this.description = truffleWorkspace.truffleConfigName;
+    this.collapsibleState = TreeItemCollapsibleState.Expanded;
+  }
+
+  loadChildren(): TreeItem[] {
+    return this.items;
+  }
+}
+
+/**
+ * Represents a compiled, and maybe deployed contract.
+ * It adds the contract's network deployments as child tree items.
+ * Moreover, it includes links to open both the source and the compiled contract.
+ * Finally, it includes its last updated timestamp.
  */
 class ContractDeploymentTreeItem extends TreeItem implements TreeParentItem {
   constructor(readonly contract: ContractBuildFile) {
@@ -134,12 +161,12 @@ class ContractDeploymentTreeItem extends TreeItem implements TreeParentItem {
     return [
       {
         label: `Contract: ${this.contract.sourcePath}`,
-        command: treeViewCommand('truffle-vscode.openFile', [Uri.file(this.contract.sourcePath)]),
+        command: openFileCommand(Uri.file(this.contract.sourcePath)),
         iconPath: new ThemeIcon('link-external'),
       },
       {
         label: `Deployment JSON: ${this.contract.path}`,
-        command: treeViewCommand('truffle-vscode.openFile', [Uri.file(this.contract.path)]),
+        command: openFileCommand(Uri.file(this.contract.path)),
         iconPath: new ThemeIcon('json'),
       },
       {
@@ -274,25 +301,64 @@ class DeploymentsView implements TreeDataProvider<TreeItem> {
       return (element as TreeParentItem).loadChildren();
     }
 
-    let buildPath: string;
-
-    try {
-      buildPath = await ContractService.getBuildFolderPath();
-    } catch (err) {
+    const truffleWorkspaces = await getAllTruffleWorkspaces();
+    if (truffleWorkspaces.length === 0) {
       return [];
-    }
-
-    if (pathExists(buildPath)) {
-      const values = buildContractDeploymentsFromFolder(buildPath);
-      return values.map((item) => new ContractDeploymentTreeItem(item));
+    } else if (truffleWorkspaces.length === 1) {
+      return await getContractDeployments(truffleWorkspaces[0]);
     } else {
-      return [
-        {
-          label: 'No Contract Built/Deployed.',
-          iconPath: new ThemeIcon('package'),
-        },
-      ];
+      return await Promise.all(
+        truffleWorkspaces.map(async (ws) => new TruffleWorkspaceTreeItem(ws, await getContractDeployments(ws)))
+      );
     }
+  }
+}
+
+/**
+ * Gets the compiled contracts for the given `truffleWorkspace`.
+ * It follows the `contracts_build_directory` property in the Truffle config file
+ * to look for compiled artifacts.
+ *
+ * @param truffleWorkspace the Truffle config file where to look for compiled contracts.
+ * @returns an array of `TreeItem` that represents the compiled contracts.
+ */
+async function getContractDeployments(truffleWorkspace: TruffleWorkspace): Promise<TreeItem[]> {
+  let buildPath: string;
+
+  try {
+    buildPath = await ContractService.getPathDirectory(
+      'contracts_build_directory',
+      getPathByPlatform(truffleWorkspace.workspace),
+      truffleWorkspace.truffleConfigName
+    );
+  } catch (err) {
+    if (err instanceof EvalTruffleConfigError) {
+      Output.outputLine(
+        Constants.outputChannel.truffleForVSCode,
+        `Error while loading Deployments from ${truffleWorkspace.dirName}:${truffleWorkspace.truffleConfigName}. Reason:`
+      );
+      Output.outputLine(Constants.outputChannel.truffleForVSCode, err.reason);
+    }
+    const error = err as Error;
+    return [
+      {
+        label: error.message,
+        iconPath: new ThemeIcon('warning', new ThemeColor('errorForeground')),
+        command: openFileCommand(truffleWorkspace.truffleConfig),
+      },
+    ];
+  }
+
+  if (pathExists(buildPath)) {
+    const values = buildContractDeploymentsFromFolder(buildPath);
+    return values.map((item) => new ContractDeploymentTreeItem(item));
+  } else {
+    return [
+      {
+        label: 'No Contract Built/Deployed.',
+        iconPath: new ThemeIcon('package'),
+      },
+    ];
   }
 }
 
@@ -337,14 +403,17 @@ function pathExists(path: string): boolean {
 }
 
 /**
- * Creates a `Command` with an empty `title`.
- * This is useful for `Command`s triggered from `TreeItem`s.
+ * Creates a `Command` that opens the given `fileUri`.
+ * The resulting command `Command` is suitable for a `TreeItem`,
+ * that is, it has an empty `title`.
+ *
+ * To open the given `fileUri`, it uses the custom `truffle-vscode.openFile` command.
  */
-function treeViewCommand(commandId: string, commandArgs: any[]): Command {
+function openFileCommand(fileUri: Uri): Command {
   return {
     title: '',
-    command: commandId,
-    arguments: commandArgs,
+    command: 'truffle-vscode.openFile',
+    arguments: [fileUri],
   };
 }
 
