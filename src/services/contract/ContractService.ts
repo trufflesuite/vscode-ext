@@ -6,7 +6,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import {HttpService} from '..';
 import {Constants} from '@/Constants';
-import {getWorkspaceRoot} from '@/helpers/workspace';
+import {getPathByPlatform, getWorkspaceRoot, TruffleWorkspace} from '@/helpers/workspace';
 import {Telemetry} from '@/TelemetryClient';
 import {Contract} from './Contract';
 
@@ -26,16 +26,16 @@ export namespace ContractService {
     });
   }
 
-  export async function getSolidityContractsFolderPath(): Promise<string> {
-    return getPathDirectory('contracts_directory');
+  export async function getContractsFolderPath(truffleWorkspace: TruffleWorkspace): Promise<string> {
+    return getPathDirectory('contracts_directory', truffleWorkspace);
   }
 
   export async function getMigrationFolderPath(): Promise<string> {
     return getPathDirectory('migrations_directory');
   }
 
-  export async function getBuildFolderPath(): Promise<string> {
-    return getPathDirectory('contracts_build_directory');
+  export async function getBuildFolderPath(truffleWorkspace?: TruffleWorkspace): Promise<string> {
+    return getPathDirectory('contracts_build_directory', truffleWorkspace);
   }
 
   export async function getDeployedBytecodeByAddress(host: string, address: string): Promise<string> {
@@ -86,12 +86,10 @@ export namespace ContractService {
       .filter((file) => fs.lstatSync(file).isFile());
   }
 
-  export async function getPathDirectory(
-    directory: PathDirectoryKey,
-    workDir?: string,
-    name?: string
-  ): Promise<string> {
-    workDir = workDir ?? getWorkspaceRoot()!;
+  async function getPathDirectory(directory: PathDirectoryKey, truffleWorkspace?: TruffleWorkspace): Promise<string> {
+    const [workDir, name] = truffleWorkspace
+      ? [getPathByPlatform(truffleWorkspace.workspace), truffleWorkspace.truffleConfigName]
+      : [getWorkspaceRoot()!, undefined];
     const configuration = await getTruffleConfiguration(workDir, name);
 
     const dir = (configuration as any)[directory];
