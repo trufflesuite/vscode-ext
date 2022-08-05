@@ -197,10 +197,14 @@ export namespace TruffleCommands {
    * Otherwise, it uses {@link getTruffleWorkspace} to select the
    * Truffle workspace to place the new contract.
    *
+   * Once the new contract file has been created,
+   * the _Contract Explorer_ view will be refreshed.
+   *
    * @param folderUri if provided, the `Uri` to place the newly created contract.
    */
   export async function createContract(folderUri?: Uri): Promise<void> {
-    let folderPath;
+    let folderPath: string;
+
     if (folderUri === undefined) {
       const truffleWorkspace = await getTruffleWorkspace();
       try {
