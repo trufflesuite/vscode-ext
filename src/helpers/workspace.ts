@@ -103,11 +103,17 @@ export async function getTruffleWorkspace(contractUri?: Uri): Promise<TruffleWor
     ? findTruffleWorkspaces(workspace.getWorkspaceFolder(contractUri)!.uri.fsPath)
     : getAllTruffleWorkspaces());
 
+  if (workspaces.length === 0) {
+    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root'));
+    Telemetry.sendException(error);
+    throw error;
+  }
+
   if (workspaces.length === 1) {
     return workspaces[0];
-  } else {
-    return await selectTruffleConfigFromQuickPick(workspaces);
   }
+
+  return await selectTruffleConfigFromQuickPick(workspaces);
 }
 
 export function getPathByPlatform(workspace: Uri): string {
