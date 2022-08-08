@@ -82,9 +82,6 @@ export async function activate(context: ExtensionContext) {
   const refresh = commands.registerCommand('truffle-vscode.refresh', (element) => {
     TreeService.refresh(element);
   });
-  const showWelcomePage = commands.registerCommand('truffle-vscode.showWelcomePage', async () => {
-    return welcomePage.show();
-  });
   const showRequirementsPage = commands.registerCommand(
     'truffle-vscode.showRequirementsPage',
     async (checkShowOnStartup: boolean) => {
@@ -218,7 +215,6 @@ export async function activate(context: ExtensionContext) {
   // #endregion
 
   const subscriptions = [
-    showWelcomePage,
     showRequirementsPage,
     refresh,
     newSolidityProject,

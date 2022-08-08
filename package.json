@@ -38,7 +38,6 @@
   "activationEvents": [
     "onView:truffle-vscode.truffle",
     "onView:truffle-vscode.explorer-view",
-    "onCommand:truffle-vscode.showWelcomePage",
     "onCommand:truffle-vscode.showRequirementsPage",
     "onCommand:truffle-vscode.refresh",
     "onCommand:truffle-contract.copyByteCode",
@@ -91,11 +90,6 @@
       }
     },
     "commands": [
-      {
-        "command": "truffle-vscode.showWelcomePage",
-        "title": "Show Welcome Page",
-        "category": "Blockchain"
-      },
       {
         "command": "truffle-vscode.refresh",
         "title": "Refresh",
@@ -192,11 +186,6 @@
         "command": "truffle-vscode.getPrivateKey",
         "title": "Retrieve private key",
         "category": "Blockchain"
-      },
-      {
-        "command": "truffle-vscode.showWelcomePage",
-        "title": "Show Welcome Page",
-        "category": "Truffle"
       },
       {
         "command": "truffle-vscode.showRequirementsPage",
@@ -393,10 +382,6 @@
         }
       ],
       "view/title": [
-        {
-          "command": "truffle-vscode.showWelcomePage",
-          "when": "view == truffle-vscode.truffle"
-        },
         {
           "command": "truffle-vscode.createProject",
           "when": "view == truffle-vscode.truffle"
