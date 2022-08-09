@@ -16,8 +16,7 @@ import {
 import {Constants, ext} from './Constants';
 
 import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
-import {CommandContext, isWorkspaceOpen, setCommandContext} from './helpers';
-import {required} from './helpers/required';
+import {required} from '@/helpers/required';
 import {CancellationEvent} from './Models';
 import {Output} from './Output';
 import {ChangelogPage, RequirementsPage, WelcomePage} from './pages';
@@ -37,6 +36,7 @@ import {registerDashboardView} from './views/DashboardView';
 import {registerDeploymentView} from './views/DeploymentsView';
 import {registerFileExplorerView} from './views/fileExplorer';
 import {registerHelpView} from './views/HelpView';
+import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 
 /**
  * This function registers variables similar to docker plugin, going forward this seems a better method of doing things.
@@ -50,6 +50,16 @@ function initializeExtensionVariables(ctx: ExtensionContext): void {
 }
 
 export async function activate(context: ExtensionContext) {
+  /**
+   * Wrapper around `registerCommand` that pushes the resulting `Disposable`
+   * into the `context`'s `subscriptions`.
+   *
+   * See `subscriptions` property in https://code.visualstudio.com/api/references/vscode-api#ExtensionContext.
+   */
+  function registerCommand(commandId: string, action: (...args: any[]) => any) {
+    context.subscriptions.push(commands.registerCommand(commandId, action));
+  }
+
   if (process.env.CODE_TEST) {
     return;
   }
@@ -68,15 +78,14 @@ export async function activate(context: ExtensionContext) {
   TreeService.initialize('truffle-vscode.truffle');
   await sdkCoreCommands.initialize(context.globalState);
 
-  setCommandContext(CommandContext.Enabled, true);
-  setCommandContext(CommandContext.IsWorkspaceOpen, isWorkspaceOpen());
-
   const welcomePage = new WelcomePage(context);
   const requirementsPage = new RequirementsPage(context);
   const changelogPage = new ChangelogPage(context);
 
   await welcomePage.checkAndShow();
   await changelogPage.checkAndShow();
+
+  registerCommand('truffle-vscode.openUrl', (node: OpenUrlTreeItem) => node.openUrl());
 
   //#region trufflesuite extension commands
   const refresh = commands.registerCommand('truffle-vscode.refresh', (element) => {
@@ -134,22 +143,27 @@ export async function activate(context: ExtensionContext) {
   const newSolidityProject = commands.registerCommand('truffle-vscode.newSolidityProject', async () => {
     await tryExecute(() => ProjectCommands.newSolidityProject());
   });
-  const buildContracts = commands.registerCommand('truffle-vscode.buildContracts', async (uri: Uri) => {
-    await tryExecute(() => sdkCoreCommands.build(uri));
+
+  registerCommand('truffle-vscode.buildSingleContract', async (contractUri: Uri) => {
+    await tryExecute(() => sdkCoreCommands.build(contractUri));
   });
-  const deployContracts = commands.registerCommand('truffle-vscode.deployContracts', async (uri: Uri) => {
-    await tryExecute(() => sdkCoreCommands.deploy(uri));
+  registerCommand('truffle-vscode.buildContracts', async (contractUri?: Uri) => {
+    await tryExecute(() => sdkCoreCommands.build(contractUri));
   });
-  const createContract = commands.registerCommand('truffle-vscode.createContract', async (uri: Uri) => {
-    await tryExecute(() => TruffleCommands.createContract(uri));
+  registerCommand('truffle-vscode.deployContracts', async (contractUri?: Uri) => {
+    await tryExecute(() => sdkCoreCommands.deploy(contractUri));
   });
-  const copyByteCode = commands.registerCommand('truffle-contract.copyByteCode', async (uri: Uri) => {
+  registerCommand('truffle-vscode.createContract', async (folderUri?: Uri) => {
+    await tryExecute(() => TruffleCommands.createContract(folderUri));
+  });
+
+  const copyByteCode = commands.registerCommand('truffle-vscode.copyByteCode', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeBytecodeToBuffer(uri));
   });
-  const copyDeployedByteCode = commands.registerCommand('truffle-contract.copyDeployedByteCode', async (uri: Uri) => {
+  const copyDeployedByteCode = commands.registerCommand('truffle-vscode.copyDeployedByteCode', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeDeployedBytecodeToBuffer(uri));
   });
-  const copyABI = commands.registerCommand('truffle-contract.copyABI', async (uri: Uri) => {
+  const copyABI = commands.registerCommand('truffle-vscode.copyABI', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeAbiToBuffer(uri));
   });
   const copyRPCEndpointAddress = commands.registerCommand(
@@ -210,9 +224,9 @@ export async function activate(context: ExtensionContext) {
   // #region truffle views
 
   const fileExplorerView = registerFileExplorerView('truffle-vscode', 'views.explorer');
-  const helpView = registerHelpView();
+  const helpView = registerHelpView('truffle-vscode.views.help');
 
-  const deploymentView = registerDeploymentView();
+  const deploymentView = registerDeploymentView('truffle-vscode.views.deployments');
   const dashboardView = registerDashboardView();
 
   // #endregion
@@ -222,9 +236,6 @@ export async function activate(context: ExtensionContext) {
     showRequirementsPage,
     refresh,
     newSolidityProject,
-    buildContracts,
-    deployContracts,
-    createContract,
     createProject,
     connectProject,
     disconnectProject,

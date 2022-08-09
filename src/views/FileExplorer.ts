@@ -3,7 +3,7 @@ import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as vscode from 'vscode';
-import {ext} from '../Constants';
+import {Constants, ext} from '../Constants';
 import {getWorkspaceFolder} from './Utils';
 
 //#region Utilities
@@ -155,16 +155,43 @@ export class FileStat implements vscode.FileStat {
   }
 }
 
-export interface Entry {
-  uri: vscode.Uri;
+/**
+ * Represents a tree item within our _Contract Explorer_ view.
+ * It augments `Uri` with a `type` to indicate whether this `Entry`
+ * is a file or a directory.
+ * This can used to provide different contextual menu action according to `type`.
+ *
+ * @remarks
+ *
+ * The `Entry` type is defined as an
+ * [Intersection Type](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html#intersection-types)
+ * to be _compatible_ with the
+ * [VS Code Built-in File Explorer](https://code.visualstudio.com/docs/getstarted/userinterface#_explorer).
+ *
+ * The extension declares a few commands that can be invoked from both
+ * the File Explorer's and Contract Explorer's contextual menus.
+ * The [`explorer/context`](https://code.visualstudio.com/api/references/contribution-points#contributes.menus)
+ * entry in `package.json` declares the commands
+ * that can be invoked from the File Explorer's contextual menu.
+ * When a menu is invoked through the File Explorer context menu,
+ * the corresponding `Uri` is sent as the only argument to the command.
+ * Therefore, by using a `Uri` intersection type,
+ * the same commands can be invoked from both the File Explorer and the Contract Explorer.
+ */
+export type Entry = vscode.Uri & {type: vscode.FileType};
+
+export type TElementTypes = {
+  contextValue: string;
   type: vscode.FileType;
-}
+  isWorkspace: boolean;
+};
 
 //#endregion
 
 export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscode.FileSystemProvider {
   private _onDidChangeFile: vscode.EventEmitter<vscode.FileChangeEvent[]>;
   private _onDidChangeTree: vscode.EventEmitter<Entry[] | void | null>;
+  private _elementTypes: TElementTypes[];
 
   /**
    * @param _openFileCommand The command name for opening files
@@ -173,6 +200,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
   constructor(private _openFileCommand: string, private _baseFolder?: string) {
     this._onDidChangeFile = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
     this._onDidChangeTree = new vscode.EventEmitter<Entry[]>();
+    this._elementTypes = this.getElementTypes();
   }
 
   // Refresh full view
@@ -191,6 +219,33 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
     }
     // fallback
     return vscode.Uri.file('.');
+  }
+
+  /**
+   * Sets the TreeItem element types.
+   * These components are divided into three categories: root, folder, and file.
+   * They are in charge of releasing action choices in TreeItem based on element type.
+   *
+   * @returns An Array of TElementTypes with its properties: ContextValue, Type and IsWorkspace.
+   */
+  getElementTypes(): TElementTypes[] {
+    return [
+      {
+        contextValue: Constants.fileExplorerConfig.contextValue.root,
+        type: vscode.FileType.Directory,
+        isWorkspace: true,
+      },
+      {
+        contextValue: Constants.fileExplorerConfig.contextValue.folder,
+        type: vscode.FileType.Directory,
+        isWorkspace: false,
+      },
+      {
+        contextValue: Constants.fileExplorerConfig.contextValue.file,
+        type: vscode.FileType.File,
+        isWorkspace: false,
+      },
+    ];
   }
 
   get onDidChangeFile(): vscode.Event<vscode.FileChangeEvent[]> {
@@ -324,8 +379,8 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
     ext.outputChannel.appendLog(`Getting Children of: ${element}`);
 
     if (element) {
-      const children = await this.readDirectory(element.uri);
-      return children.map(([name, type]) => ({uri: vscode.Uri.file(path.join(element.uri.fsPath, name)), type}));
+      const children = await this.readDirectory(element);
+      return children.map(([name, type]) => Object.assign(vscode.Uri.file(path.join(element.fsPath, name)), {type}));
     }
 
     const workspaceFolder = getWorkspaceFolder();
@@ -349,10 +404,9 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
         }
       }
       // return the mapped entries.
-      return children.map(([name, type]) => ({
-        uri: vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, name)),
-        type,
-      }));
+      return children.map(([name, type]) =>
+        Object.assign(vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, name)), {type})
+      );
     }
     return [];
   }
@@ -370,16 +424,29 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
 
   getTreeItem(element: Entry): vscode.TreeItem {
     const treeItem = new vscode.TreeItem(
-      element.uri,
+      element,
       element.type === vscode.FileType.Directory
         ? vscode.TreeItemCollapsibleState.Collapsed
         : vscode.TreeItemCollapsibleState.None
     );
-    if (element.type === vscode.FileType.File) {
-      treeItem.command = {command: this._openFileCommand, title: 'Open File', arguments: [element.uri]};
-      treeItem.contextValue = 'file';
-    }
+    if (element.type === vscode.FileType.File)
+      treeItem.command = {command: this._openFileCommand, title: 'Open File', arguments: [element]};
+
+    treeItem.contextValue = this.getTreeItemContextValue(element);
     return treeItem;
+  }
+
+  /**
+   * Gets the context value from element according on the type: root, folder, or file.
+   * The `context Value` offers a filter on the file explorer menu that filters action alternatives such as:
+   * `Create Contract`, `Build Contracts`, `Build This Contract`, `Deploy Contracts` and `Debug Transaction`.
+   *
+   * @param element The element from TreeItem.
+   * @returns A string containing the contextValue property.
+   */
+  getTreeItemContextValue(element: Entry): string {
+    const isWorkspace = path.basename(element.path) === Constants.fileExplorerConfig.contractFolder ? true : false;
+    return this._elementTypes.find((ft) => ft.type === element.type && ft.isWorkspace === isWorkspace)!.contextValue;
   }
 }
 
@@ -393,7 +460,7 @@ export function registerFileExplorerView(
 ): vscode.TreeView<Entry> {
   const openFileCommand = `${commandPrefix}.openFile`;
   const refreshExplorerCommand = `${commandPrefix}.${viewName}.refreshExplorer`;
-  const treeDataProvider = new FileSystemProvider(openFileCommand, 'contracts');
+  const treeDataProvider = new FileSystemProvider(openFileCommand, Constants.fileExplorerConfig.contractFolder);
   vscode.commands.registerCommand(openFileCommand, (resource) => openResource(resource));
   vscode.commands.registerCommand(refreshExplorerCommand, (_) => treeDataProvider.refresh());
   return vscode.window.createTreeView(`${commandPrefix}.${viewName}`, {treeDataProvider});

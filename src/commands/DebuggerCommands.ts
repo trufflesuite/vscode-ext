@@ -9,16 +9,15 @@ import {DebugNetwork} from '@/debugAdapter/debugNetwork';
 import {shortenHash} from '@/debugAdapter/functions';
 import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvider';
 import {Web3Wrapper} from '@/debugAdapter/web3Wrapper';
-import {getWorkspace} from '@/helpers';
+import {getTruffleWorkspace, getPathByPlatform} from '@/helpers/workspace';
 import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
-import {getPathByPlatform} from '@/helpers/workspace';
 import {Telemetry} from '@/TelemetryClient';
 
 export namespace DebuggerCommands {
   export async function startSolidityDebugger() {
     Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandStarted');
 
-    const workspaceUri = await getWorkspace();
+    const workspaceUri = (await getTruffleWorkspace()).workspace;
     const workingDirectory = getPathByPlatform(workspaceUri);
     const debugNetwork = new DebugNetwork(workingDirectory);
     await debugNetwork.load();

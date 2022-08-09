@@ -13,15 +13,17 @@ import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvide
 import * as userInteraction from '../../src/helpers/userInteraction';
 import {TestConstants} from '../TestConstants';
 
-import * as helpers from '../../src/helpers';
+import * as helpers from '@/helpers/workspace';
 
-const truffleWorkspace: Uri = Uri.parse(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
+const truffleWorkspace = new helpers.TruffleWorkspace(
+  path.join(__dirname, TestConstants.truffleCommandTestDataFolder, 'truffle-config.js')
+);
 
 describe('DebuggerCommands unit tests', () => {
   let mockGetTxHashes: sinon.SinonStub<[(number | undefined)?], Promise<string[]>>;
   let mockGetTxInfos: sinon.SinonStub<[string[]], Promise<ITransactionResponse[]>>;
   let debugCommands: any;
-  let getWorkspacesMock: any;
+  let getWorkspacesMock: sinon.SinonStub<[contractUri?: Uri], Promise<helpers.TruffleWorkspace>>;
 
   beforeEach(() => {
     mockGetTxHashes = sinon.stub(TransactionProvider.prototype, 'getLastTransactionHashes');
@@ -29,8 +31,8 @@ describe('DebuggerCommands unit tests', () => {
     mockGetTxInfos = sinon.stub(TransactionProvider.prototype, 'getTransactionsInfo');
     mockGetTxInfos.resolves([]);
 
-    getWorkspacesMock = sinon.stub(helpers, 'getWorkspace');
-    getWorkspacesMock.returns(truffleWorkspace);
+    getWorkspacesMock = sinon.stub(helpers, 'getTruffleWorkspace');
+    getWorkspacesMock.returns(Promise.resolve(truffleWorkspace));
 
     sinon.stub(debug, 'startDebugging').resolves();
     sinon.stub(workspace, 'workspaceFolders').value([{uri: {fsPath: 'workspace'}}]);
