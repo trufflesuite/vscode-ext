@@ -3,14 +3,17 @@
 
 import {createAzExtOutputChannel, IAzExtOutputChannel} from '@microsoft/vscode-azext-utils';
 import {ext, Constants} from './Constants';
+import * as vscode from 'vscode';
 
 export class Output {
   public static output(label: string, message: string): void {
     this._outputChannel.append(this.formatMessage(label, message));
+    vscode.commands.executeCommand('calicoColors.addColor', this.formatMessage(label, message));
   }
 
   public static outputLine(label: string, message: string): void {
     this._outputChannel.appendLine(this.formatMessage(label, message));
+    vscode.commands.executeCommand('calicoColors.addColor', this.formatMessage(label, message));
   }
 
   public static show(): void {

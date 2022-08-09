@@ -39,6 +39,7 @@ import {registerDeploymentView} from './views/DeploymentsView';
 import {registerFileExplorerView} from './views/fileExplorer';
 import {registerHelpView} from './views/HelpView';
 import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
+import {registerLogView} from './views/LogView';
 
 /**
  * This function registers variables similar to docker plugin, going forward this seems a better method of doing things.
@@ -68,11 +69,11 @@ export async function activate(context: ExtensionContext) {
 
   Constants.initialize(context); // still do this first.
   initializeExtensionVariables(context);
-
   DebuggerConfiguration.initialize(context);
 
-  await required.checkAllApps();
+  const logView = registerLogView(context);
 
+  await required.checkAllApps();
   await ContractDB.initialize(AdapterType.IN_MEMORY);
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
@@ -237,6 +238,7 @@ export async function activate(context: ExtensionContext) {
   // #endregion
 
   const subscriptions = [
+    logView,
     showWelcomePage,
     showRequirementsPage,
     refresh,

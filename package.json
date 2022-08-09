@@ -524,6 +524,16 @@
           "contextualTitle": "Help & Feedback section"
         }
       ],
+      "truffle-panel": [
+        {
+          "type": "webview",
+          "id": "truffle.log.panel",
+          "name": "",
+          "contextualTitle": "Truffle",
+          "icon": "images/views/history.svg",
+          "visibility": "visible"
+        }
+      ],
       "debug": [
         {
           "id": "truffle-vscode.InstructionView",
@@ -609,6 +619,13 @@
       "activitybar": [
         {
           "id": "truffle-activitybar-container",
+          "title": "Truffle",
+          "icon": "images/truffle.svg"
+        }
+      ],
+      "panel": [
+        {
+          "id": "truffle-panel",
           "title": "Truffle",
           "icon": "images/truffle.svg"
         }
