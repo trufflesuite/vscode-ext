@@ -4,10 +4,10 @@
 import crypto from 'crypto';
 import fs from 'fs-extra';
 import http from 'http';
-import open from 'open';
 import querystring from 'querystring';
 import requestPromise from 'request-promise';
 import url from 'url';
+import {env, Uri} from 'vscode';
 import {Constants} from '../../Constants';
 import {Telemetry} from '../../TelemetryClient';
 
@@ -32,7 +32,7 @@ const commonRequestParams = {
   scope: Object.values(Constants.infuraCredentials.scopes).join('+'),
 };
 
-export async function signIn() {
+export async function signIn(): Promise<IToken> {
   const {server, codePromise} = createServer();
 
   try {
@@ -43,7 +43,7 @@ export async function signIn() {
 
     authorizationUrl.search = queryString(authParams);
 
-    await open(authorizationUrl.toString());
+    await env.openExternal(Uri.parse(authorizationUrl.toString()));
 
     const code = await codePromise;
 

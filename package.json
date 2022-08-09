@@ -712,7 +712,6 @@
     "hdkey": "^1.1.1",
     "lodash": "4.17.21",
     "mkdirp": "^1.0.4",
-    "open": "^6.4.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "rimraf": "^3.0.2",
