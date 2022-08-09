@@ -1,8 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from '../../Constants';
-import {Output} from '../../Output';
+import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '../../TelemetryClient';
 import {NetworkService} from '../NetworkService';
 import {AbstractAdapter} from './AbstractAdapter';
@@ -85,7 +84,7 @@ export class InMemoryAdapter extends AbstractAdapter {
       }
     } catch (error) {
       Telemetry.sendException(error as Error);
-      Output.outputLine(Constants.outputChannel.truffleForVSCode, (error as Error).message);
+      Output.outputLine(OutputLabel.truffleForVSCode, (error as Error).message);
     }
 
     return [contracts, networkMaps];

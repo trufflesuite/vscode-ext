@@ -1,9 +1,10 @@
+import {Output, OutputLabel} from '@/Output';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as vscode from 'vscode';
-import {Constants, ext} from '../Constants';
+import {Constants} from '../Constants';
 import {getWorkspaceFolder} from './Utils';
 
 //#region Utilities
@@ -376,7 +377,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
 
   // tree data provider
   async getChildren(element?: Entry): Promise<Entry[]> {
-    ext.outputChannel.appendLog(`Getting Children of: ${element}`);
+    Output.outputLine(OutputLabel.truffleForVSCode, `Getting Children of: ${element}`);
 
     if (element) {
       const children = await this.readDirectory(element);
@@ -396,9 +397,12 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
         if (baseFolderUri && baseFolderUri.length > 0) {
           // just set this to our baseFolder.
           children = children.filter((v) => this._baseFolder?.localeCompare(v[0]) == 0);
-          ext.outputChannel.appendLog(`Setting Base Folder to: ${this._baseFolder}`);
+          Output.outputLine(OutputLabel.truffleForVSCode, `Setting Base Folder to: ${this._baseFolder}`);
         } else {
-          ext.outputChannel.appendLog(`no baseFolder: ${this._baseFolder} found in children of workspace: ${children}`);
+          Output.outputLine(
+            OutputLabel.truffleForVSCode,
+            `no baseFolder: ${this._baseFolder} found in children of workspace: ${children}`
+          );
           vscode.window.showInformationMessage(`No folder "${this._baseFolder}" found in workspace.`);
           return [];
         }
