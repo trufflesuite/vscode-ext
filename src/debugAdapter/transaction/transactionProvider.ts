@@ -25,22 +25,18 @@ export class TransactionProvider {
   }
 
   public async getLastTransactionHashes(take: number = TRANSACTION_NUMBER_TO_SHOW): Promise<string[]> {
-    try {
-      const latestBlockNumber = await this._web3.eth.getBlockNumber();
-      const latestBlock = await this._web3.eth.getBlock(latestBlockNumber);
-      const txHashes: string[] = [];
-      let block = latestBlock;
-      while (txHashes.length <= take && block.number > 0) {
-        for (let i = 0; i < block.transactions.length && txHashes.length < TRANSACTION_NUMBER_TO_SHOW; i++) {
-          txHashes.push(block.transactions[i]);
-        }
-        block = await this._web3.eth.getBlock(block.number - 1);
+    const latestBlockNumber = await this._web3.eth.getBlockNumber();
+    const latestBlock = await this._web3.eth.getBlock(latestBlockNumber);
+    const txHashes: string[] = [];
+    let block = latestBlock;
+    while (txHashes.length <= take && block.number > 0) {
+      for (let i = 0; i < block.transactions.length && txHashes.length < TRANSACTION_NUMBER_TO_SHOW; i++) {
+        txHashes.push(block.transactions[i]);
       }
-
-      return txHashes;
-    } catch (err: any) {
-      throw (err.message = 'nice');
+      block = await this._web3.eth.getBlock(block.number - 1);
     }
+
+    return txHashes;
   }
 
   public async getTransactionsInfo(txHashes: string[]): Promise<ITransactionResponse[]> {
