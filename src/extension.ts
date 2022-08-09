@@ -16,9 +16,7 @@ import {
 import {Constants, ext} from './Constants';
 
 import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
-import {CommandContext, setCommandContext} from '@/helpers';
 import {required} from '@/helpers/required';
-import {isWorkspaceOpen} from '@/helpers/workspace';
 import {CancellationEvent} from './Models';
 import {Output} from './Output';
 import {ChangelogPage, RequirementsPage, WelcomePage} from './pages';
@@ -80,9 +78,6 @@ export async function activate(context: ExtensionContext) {
   TreeManager.initialize(context.globalState);
   TreeService.initialize('truffle-vscode.truffle');
   await sdkCoreCommands.initialize(context.globalState);
-
-  setCommandContext(CommandContext.Enabled, true);
-  setCommandContext(CommandContext.IsWorkspaceOpen, isWorkspaceOpen());
 
   const welcomePage = new WelcomePage(context);
   const requirementsPage = new RequirementsPage(context);

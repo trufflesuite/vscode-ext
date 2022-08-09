@@ -188,12 +188,35 @@ export namespace TruffleCommands {
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
   }
 
+  /**
+   * Creates a new contract file named `NewContract.sol`.
+   *
+   * If `folderUri` is provided, the new contract will be created in that folder.
+   * It **must** represent a folder URI.
+   *
+   * Otherwise, it uses {@link getTruffleWorkspace} to select the
+   * Truffle workspace to place the new contract.
+   *
+   * Once the new contract file has been created,
+   * the _Contract Explorer_ view will be refreshed.
+   *
+   * @param folderUri if provided, the `Uri` to place the newly created contract.
+   */
   export async function createContract(folderUri?: Uri): Promise<void> {
-    const uri = await getTruffleWorkspace(folderUri);
-    const workspace = uri.workspace;
-    const contractDirectory = getPathByPlatform(workspace);
+    let folderPath: string;
 
-    await fs.createFile(path.join(contractDirectory, 'contracts', 'NewContract.sol'));
+    if (folderUri === undefined) {
+      const truffleWorkspace = await getTruffleWorkspace();
+      try {
+        folderPath = await ContractService.getContractsFolderPath(truffleWorkspace);
+      } catch (err) {
+        folderPath = path.join(getPathByPlatform(truffleWorkspace.workspace), 'contracts');
+      }
+    } else {
+      folderPath = getPathByPlatform(folderUri);
+    }
+
+    await fs.createFile(path.join(folderPath, 'NewContract.sol'));
 
     await commands.executeCommand('truffle-vscode.views.explorer.refreshExplorer');
   }

@@ -17,7 +17,7 @@ import {
 import {getChain, getExplorerLink} from '../functions/explorer';
 import {OpenUrlTreeItem} from './lib/OpenUrlTreeItem';
 import {ContractService} from '@/services/contract/ContractService';
-import {getAllTruffleWorkspaces, getPathByPlatform, TruffleWorkspace} from '@/helpers/workspace';
+import {getAllTruffleWorkspaces, TruffleWorkspace} from '@/helpers/workspace';
 import {EvalTruffleConfigError} from '@/helpers/TruffleConfiguration';
 import {Output} from '@/Output';
 import {Constants} from '@/Constants';
@@ -326,11 +326,7 @@ async function getContractDeployments(truffleWorkspace: TruffleWorkspace): Promi
   let buildPath: string;
 
   try {
-    buildPath = await ContractService.getPathDirectory(
-      'contracts_build_directory',
-      getPathByPlatform(truffleWorkspace.workspace),
-      truffleWorkspace.truffleConfigName
-    );
+    buildPath = await ContractService.getBuildFolderPath(truffleWorkspace);
   } catch (err) {
     if (err instanceof EvalTruffleConfigError) {
       Output.outputLine(
