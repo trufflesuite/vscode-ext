@@ -1,6 +1,6 @@
 # Sign in to your Infura account and deploy contracts
 
-![networks view infura](https://trufflesuite.com/blog/build-on-web3-with-truffle-vs-code-extension/networks-view-infura.png)
+![networks view infura](../../images/walkthrough/networks-view-infura.png)
 
 With Infura set up, you can right-click on a contract, select the "Deploy contracts" option, and pick a Project/Network combination to deploy your contract to.
 
