@@ -289,15 +289,15 @@
           "command": "truffle-vscode.copyABI"
         },
         {
-          "when": "truffle-vscode:isWorkspaceOpen",
+          "when": "workspaceFolderCount > 0",
           "command": "truffle-vscode.buildContracts"
         },
         {
-          "when": "truffle-vscode:isWorkspaceOpen",
+          "when": "workspaceFolderCount > 0",
           "command": "truffle-vscode.deployContracts"
         },
         {
-          "when": "truffle-vscode:isWorkspaceOpen",
+          "when": "workspaceFolderCount > 0",
           "command": "truffle-vscode.createContract"
         },
         {

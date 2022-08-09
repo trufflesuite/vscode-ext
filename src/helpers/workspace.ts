@@ -67,7 +67,9 @@ export class TruffleWorkspace {
  * @returns
  */
 export function getWorkspaceRoot(ignoreException = false): string | undefined {
-  const workspaceRoot = workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath;
+  const workspaceRoot =
+    workspace.workspaceFolders &&
+    (workspace.workspaceFolders.length === 0 ? undefined : workspace.workspaceFolders[0].uri.fsPath);
 
   if (workspaceRoot === undefined && !ignoreException) {
     const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root'));
@@ -101,18 +103,17 @@ export async function getTruffleWorkspace(contractUri?: Uri): Promise<TruffleWor
     ? findTruffleWorkspaces(workspace.getWorkspaceFolder(contractUri)!.uri.fsPath)
     : getAllTruffleWorkspaces());
 
+  if (workspaces.length === 0) {
+    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root'));
+    Telemetry.sendException(error);
+    throw error;
+  }
+
   if (workspaces.length === 1) {
     return workspaces[0];
-  } else {
-    return await selectTruffleConfigFromQuickPick(workspaces);
   }
-}
 
-/**
- * ! To be deleted when #187 and #188 are fixed.
- */
-export function isWorkspaceOpen(): boolean {
-  return !!(workspace.workspaceFolders && workspace.workspaceFolders[0].uri.fsPath);
+  return await selectTruffleConfigFromQuickPick(workspaces);
 }
 
 export function getPathByPlatform(workspace: Uri): string {
