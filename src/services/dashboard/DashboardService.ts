@@ -1,6 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {OutputLabel} from '@/Output';
 import {ChildProcess} from 'child_process';
 import {OutputChannel, window} from 'vscode';
 import {Constants, RequiredApps} from '../../Constants';
@@ -91,7 +92,7 @@ export namespace DashboardService {
 
   async function spawnDashboardServer(port: number | string): Promise<IDashboardProcess> {
     const process = spawnProcess(undefined, `${RequiredApps.truffle} ${RequiredApps.dashboard}`, []);
-    const output = window.createOutputChannel(`${Constants.outputChannel.dashboardCommands}:${port}`);
+    const output = window.createOutputChannel(`${OutputLabel.dashboardCommands}:${port}`);
     const dashboardProcess = {port, process, output} as IDashboardProcess;
 
     try {
