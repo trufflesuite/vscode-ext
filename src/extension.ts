@@ -1,7 +1,6 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {registerUIExtensionVariables} from '@microsoft/vscode-azext-utils';
 import {commands, ExtensionContext, Uri, window, workspace} from 'vscode';
 import {
   DebuggerCommands,
@@ -13,7 +12,7 @@ import {
   TruffleCommands,
   GenericCommands,
 } from './commands';
-import {Constants, ext} from './Constants';
+import {Constants} from './Constants';
 
 import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
 import {required} from '@/helpers/required';
@@ -39,17 +38,6 @@ import {registerHelpView} from './views/HelpView';
 import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 import {registerLogView} from './views/LogView';
 
-/**
- * This function registers variables similar to docker plugin, going forward this seems a better method of doing things.
- *
- * @param ctx the context we want to work on.
- */
-function initializeExtensionVariables(ctx: ExtensionContext): void {
-  ext.context = ctx;
-  ext.outputChannel = Output.subscribe();
-  registerUIExtensionVariables(ext);
-}
-
 export async function activate(context: ExtensionContext) {
   /**
    * Wrapper around `registerCommand` that pushes the resulting `Disposable`
@@ -66,12 +54,14 @@ export async function activate(context: ExtensionContext) {
   }
 
   Constants.initialize(context); // still do this first.
-  initializeExtensionVariables(context);
+  Output.init(context);
+
   DebuggerConfiguration.initialize(context);
 
   const logView = registerLogView(context);
 
   await required.checkAllApps();
+
   await ContractDB.initialize(AdapterType.IN_MEMORY);
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);

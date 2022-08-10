@@ -10,9 +10,9 @@
   // Handle messages sent from the extension to the webview
   window.addEventListener('message', (event) => {
     const message = event.data; // The json data that the extension sent
-    switch (message.type) {
+    switch (message.command) {
       case 'addLog': {
-        addLog(message.log, message.uri);
+        addLog(message.tool, message.log, message.options);
         break;
       }
       case 'clearState': {
@@ -22,32 +22,57 @@
     }
   });
 
-  function addLog(log, uri) {
-    const html = `<div style="width: 100%; min-height: 22px">
-        <div style="display: inline-block; float: left;">
-            <img src='${uri}/TruffleLogo.svg' width='14px' height='14px' style="margin-top: 2px" />
-        </div>
-        <div style="display: inline-block; padding-left: 4px; width: 95%; font-family: 'Courier New'; font-size: 14px;">
-            ${log}
-        </div>
-    </div>`;
+  function addLog(tool, log, options) {
+    const tab = document.getElementById(`tab-${tool}`);
 
-    const htmlContainer = document.createElement('div');
-    htmlContainer.innerHTML = html;
+    console.log('aqui');
+    // Check if the tab exists
+    if (tab === null) createTab(tool);
 
-    const logContainer = document.getElementById('log-container');
-    logContainer.appendChild(htmlContainer);
+    // Create the log record
+    const contentLine = document.createElement('div');
+    contentLine.innerHTML = log;
 
-    vscode.setState({log: logContainer.innerHTML});
+    // Add the line to the content
+    const content = document.getElementById(`content-${tool}`);
+    content.appendChild(contentLine);
+
+    // Save the log state
+    vscode.setState({log: document.getElementById('tab-container').innerHTML});
+  }
+
+  function createTab(tool) {
+    // Set the tab title
+    const html = `<img src="{{root}}/images/truffle.png" /><span>Truffle</span>`;
+
+    // Create the tab element
+    const tab = document.createElement('div');
+    tab.id = `tab-${tool}`;
+    tab.dataset.tool = tool;
+    tab.innerHTML = html;
+
+    // Add the tab element to tab container
+    const tabs = document.getElementById('tab-collection');
+    tabs.appendChild(tab);
+
+    // Create the content element
+    const content = document.createElement('div');
+    content.id = `content-${tool}`;
+    content.dataset.tool = tool;
+
+    // Add the content element to content container
+    const contents = document.getElementById('tab-content-collection');
+    contents.appendChild(content);
   }
 
   function getLog() {
-    const oldState = vscode.getState();
-    document.getElementById('log-container').innerHTML = oldState.log;
+    const state = vscode.getState() || {log: []};
+    document.getElementById('tab-container').innerHTML = state.log;
   }
 
   function clearState() {
-    document.getElementById('log-container').innerHTML = '';
+    document.getElementById('tab-collection').innerHTML = '';
+    document.getElementById('tab-content-collection').innerHTML = '';
     vscode.setState({log: ''});
   }
 })();

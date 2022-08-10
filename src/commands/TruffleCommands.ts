@@ -8,7 +8,7 @@ import fs from 'fs-extra';
 import hdkey from 'hdkey';
 import path from 'path';
 import {QuickPickItem, Uri, window, commands, QuickPickItemKind} from 'vscode';
-import {Constants, ext, RequiredApps} from '@/Constants';
+import {Constants, RequiredApps} from '@/Constants';
 import {outputCommandHelper, telemetryHelper, vscodeEnvironment} from '../helpers';
 import {getTruffleWorkspace} from '@/helpers/workspace';
 import {required} from '@/helpers/required';
@@ -20,7 +20,7 @@ import {IDeployDestination, ItemType} from '@/Models';
 import {NetworkForContractItem} from '@/Models/QuickPickItems';
 import {InfuraProject, LocalProject, LocalService, TLocalProjectOptions} from '@/Models/TreeItems';
 import {Project} from '@/Models/TreeItems';
-import {Output} from '@/Output';
+import {Output, outputChannel, OutputLabel} from '@/Output';
 import {
   ContractDB,
   ContractInstanceWithMetadata,
@@ -123,7 +123,7 @@ export namespace TruffleCommands {
       (reason) => {
         // ignore
         const outputStr = `Error refreshing view: ${reason}`;
-        ext.outputChannel ? ext.outputChannel.append(outputStr) : console.log(outputStr);
+        outputChannel ? outputChannel.append(outputStr) : console.log(outputStr);
       }
     );
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandFinished');
@@ -527,12 +527,12 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
         truffleConfigName
       );
 
-      Output.outputLine(Constants.outputChannel.truffleForVSCode, Constants.informationMessage.deploySucceeded);
+      Output.outputLine(OutputLabel.truffleForVSCode, Constants.informationMessage.deploySucceeded);
       Telemetry.sendEvent('TruffleCommands.deployToNetwork.deployedSuccessfully', {
         destination: telemetryHelper.mapNetworkName(networkName),
       });
     } catch (error) {
-      Output.outputLine(Constants.outputChannel.truffleForVSCode, Constants.informationMessage.deployFailed);
+      Output.outputLine(OutputLabel.truffleForVSCode, Constants.informationMessage.deployFailed);
       Telemetry.sendEvent('TruffleCommands.deployToNetwork.deployedFailed', {
         destination: telemetryHelper.mapNetworkName(networkName),
       });

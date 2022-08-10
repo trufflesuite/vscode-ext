@@ -1,19 +1,34 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {createAzExtOutputChannel, IAzExtOutputChannel} from '@microsoft/vscode-azext-utils';
-import {ext, Constants} from './Constants';
-import * as vscode from 'vscode';
+import {commands, ExtensionContext, OutputChannel, window} from 'vscode';
+import {Constants} from './Constants';
+
+export enum OutputLabel {
+  truffleForVSCode = 'Truffle for VSCode',
+  executeCommand = 'Truffle: Execute command',
+  ganacheCommands = 'Truffle: Ganache Server',
+  genericCommands = 'Truffle: Generic Server',
+  dashboardCommands = 'Truffle: Dashboard Server',
+  requirements = 'Truffle: Requirements',
+  telemetryClient = 'Truffle: Telemetry Client',
+  treeManager = 'Truffle: Service Tree Manager',
+}
 
 export class Output {
-  public static output(label: string, message: string): void {
+  public static output(label: OutputLabel, message: string): void {
     this._outputChannel.append(this.formatMessage(label, message));
-    vscode.commands.executeCommand('calicoColors.addColor', this.formatMessage(label, message));
+    commands.executeCommand(`${Constants.panels.log.viewType}.addLog`, label, this.formatMessage(label, message));
   }
 
-  public static outputLine(label: string, message: string): void {
+  public static outputLine(label: OutputLabel, message: string): void {
     this._outputChannel.appendLine(this.formatMessage(label, message));
-    vscode.commands.executeCommand('calicoColors.addColor', this.formatMessage(label, message));
+    commands.executeCommand(`${Constants.panels.log.viewType}.addLog`, label, this.formatMessage(label, message));
+  }
+
+  public static info(label: OutputLabel, message: string): void {
+    this.outputLine(label, message);
+    commands.executeCommand(`${Constants.panels.log.viewType}.addLog`, label, this.formatMessage(label, message));
   }
 
   public static show(): void {
@@ -28,10 +43,7 @@ export class Output {
     this._outputChannel.dispose();
   }
 
-  private static _outputChannel: IAzExtOutputChannel = createAzExtOutputChannel(
-    Constants.outputChannel.truffleForVSCode,
-    ext.prefix
-  );
+  private static _outputChannel: OutputChannel = window.createOutputChannel(OutputLabel.truffleForVSCode);
 
   private static formatMessage(label = '', message = ''): string {
     return `${label ? `[${label}] ` : ''}${message}`;
@@ -40,8 +52,10 @@ export class Output {
   /**
    * Call this only once to push the outputChannel into the list of subscriptions.
    */
-  public static subscribe(): IAzExtOutputChannel {
-    ext.context.subscriptions.push(this._outputChannel);
-    return this._outputChannel;
+  public static init(context: ExtensionContext) {
+    context.subscriptions.push(this._outputChannel);
+    outputChannel = this._outputChannel;
   }
 }
+
+export declare let outputChannel: OutputChannel;

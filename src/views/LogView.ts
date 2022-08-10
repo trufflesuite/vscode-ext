@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import fs from 'fs-extra';
 import path from 'path';
+import {Constants} from '@/Constants';
+import {OutputLabel} from '@/Output';
 
 export class LogView implements vscode.WebviewViewProvider {
-  public static readonly viewType = 'truffle.log.panel';
-
   private _extensionUri: vscode.Uri;
   private _view?: vscode.WebviewView;
 
@@ -29,19 +29,31 @@ export class LogView implements vscode.WebviewViewProvider {
     this.clearState();
   }
 
-  public addLog(log: string): void {
+  public addLog(label: OutputLabel, log: string, ...args: any[]): void {
     if (this._view) {
-      const imagePath = this._view.webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'images')).toString();
+      let tool: string;
+
+      switch (label) {
+        case OutputLabel.ganacheCommands:
+          tool = Constants.panels.log.tool.ganache;
+          break;
+        case OutputLabel.dashboardCommands:
+          tool = Constants.panels.log.tool.dashboard;
+          break;
+        default:
+          tool = Constants.panels.log.tool.truffle;
+          break;
+      }
 
       this._view.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
-      this._view.webview.postMessage({type: 'addLog', log: log, uri: imagePath});
+      this._view.webview.postMessage({command: 'addLog', tool, log, ...args});
     }
   }
 
   public clearState(): void {
     if (this._view) {
       this._view.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
-      this._view.webview.postMessage({type: 'clearState'});
+      this._view.webview.postMessage({command: 'clearState'});
     }
   }
 
@@ -51,9 +63,7 @@ export class LogView implements vscode.WebviewViewProvider {
         this._context.asAbsolutePath(path.join('resources', 'logPanel', 'index.html')),
         'utf8'
       );
-      const virtualPath = this._view.webview
-        .asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'resources', 'logPanel'))
-        .toString();
+      const virtualPath = this._view.webview.asWebviewUri(this._extensionUri).toString();
       return file.replace(/{{root}}/g, virtualPath);
     }
 
@@ -64,9 +74,12 @@ export class LogView implements vscode.WebviewViewProvider {
 export function registerLogView(context: vscode.ExtensionContext): vscode.Disposable {
   const logView = new LogView(context);
 
-  vscode.commands.registerCommand('calicoColors.addColor', (log: string) => {
-    logView.addLog(log);
-  });
+  vscode.commands.registerCommand(
+    `${Constants.panels.log.viewType}.addLog`,
+    (label: OutputLabel, log: string, ...args: any[]) => {
+      logView.addLog(label, log, ...args);
+    }
+  );
 
-  return vscode.window.registerWebviewViewProvider(LogView.viewType, logView);
+  return vscode.window.registerWebviewViewProvider(Constants.panels.log.viewType, logView);
 }

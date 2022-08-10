@@ -19,8 +19,7 @@ import {OpenUrlTreeItem} from './lib/OpenUrlTreeItem';
 import {ContractService} from '@/services/contract/ContractService';
 import {getAllTruffleWorkspaces, TruffleWorkspace} from '@/helpers/workspace';
 import {EvalTruffleConfigError} from '@/helpers/TruffleConfiguration';
-import {Output} from '@/Output';
-import {Constants} from '@/Constants';
+import {Output, OutputLabel} from '@/Output';
 
 /**
  * Represents a compiled or deployed contract.
@@ -330,10 +329,10 @@ async function getContractDeployments(truffleWorkspace: TruffleWorkspace): Promi
   } catch (err) {
     if (err instanceof EvalTruffleConfigError) {
       Output.outputLine(
-        Constants.outputChannel.truffleForVSCode,
+        OutputLabel.truffleForVSCode,
         `Error while loading Deployments from ${truffleWorkspace.dirName}:${truffleWorkspace.truffleConfigName}. Reason:`
       );
-      Output.outputLine(Constants.outputChannel.truffleForVSCode, err.reason);
+      Output.outputLine(OutputLabel.truffleForVSCode, err.reason);
     }
     const error = err as Error;
     return [

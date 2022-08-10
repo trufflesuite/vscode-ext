@@ -527,7 +527,7 @@
       "truffle-panel": [
         {
           "type": "webview",
-          "id": "truffle.log.panel",
+          "id": "truffle-vscode.panel.log",
           "name": "",
           "contextualTitle": "Truffle",
           "icon": "images/views/history.svg",
@@ -712,7 +712,6 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@microsoft/vscode-azext-utils": "^0.2.3",
     "@truffle/codec": "^0.13.1",
     "@truffle/compile-solidity": "^6.0.31",
     "@truffle/debug-utils": "^6.0.26",
