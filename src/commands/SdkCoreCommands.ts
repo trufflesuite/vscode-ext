@@ -26,14 +26,21 @@ export class SdkCoreCommands {
   }
 
   /**
-   * Calls build on an extension
+   * Triggers the build process to compile smart contracts.
+   *
+   * @param contractUri if provided, it is the `Uri` of the smart contract to be compiled.
    */
-  public async build(uri: Uri): Promise<void> {
-    return this.extensionAdapter.build(uri);
+  public async build(contractUri?: Uri): Promise<void> {
+    return this.extensionAdapter.build(contractUri);
   }
 
-  public async deploy(uri: Uri): Promise<void> {
-    return this.extensionAdapter.deploy(uri);
+  /**
+   * Deploys, _i.e._, `migrate`, smart contracts into a Network.
+   *
+   * @param contractUri FIXME: Is this used?
+   */
+  public async deploy(contractUri?: Uri): Promise<void> {
+    return this.extensionAdapter.deploy(contractUri);
   }
 
   private static getExtensionAdapter(sdk: string): IExtensionAdapter {

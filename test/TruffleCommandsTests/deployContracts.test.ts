@@ -6,10 +6,10 @@ import assert from 'assert';
 import path from 'path';
 import sinon, {stub} from 'sinon';
 import uuid from 'uuid';
-import vscode, {Uri} from 'vscode';
+import * as vscode from 'vscode';
 import {TruffleCommands} from '@/commands';
 import {Constants} from '@/Constants';
-import * as helpers from '../../src/helpers';
+import * as helpers from '@/helpers/workspace';
 import * as requiredHelpers from '../../src/helpers/required';
 import * as TruffleConfiguration from '@/helpers/TruffleConfiguration';
 import {TruffleConfig} from '@/helpers/TruffleConfiguration';
@@ -38,7 +38,9 @@ const options: TLocalProjectOptions = {
   url: '',
 };
 
-const truffleWorkspace: Uri = Uri.parse(path.join(__dirname, TestConstants.truffleCommandTestDataFolder));
+const truffleWorkspace = new helpers.TruffleWorkspace(
+  path.join(__dirname, TestConstants.truffleCommandTestDataFolder, 'truffle-config.js')
+);
 
 describe('TruffleCommands', () => {
   describe('Integration test', async () => {
@@ -50,7 +52,7 @@ describe('TruffleCommands', () => {
       let checkHdWalletProviderVersionMock: sinon.SinonExpectation;
       let installTruffleHdWalletProviderMock: sinon.SinonExpectation;
 
-      let getWorkspacesMock: any;
+      let getWorkspacesMock: sinon.SinonStub<[contractUri?: vscode.Uri], Promise<helpers.TruffleWorkspace>>;
 
       let showQuickPickMock: sinon.SinonStub;
       let showInputBoxMock: sinon.SinonStub;
@@ -74,8 +76,8 @@ describe('TruffleCommands', () => {
       let executeCommandMock: sinon.SinonExpectation;
 
       beforeEach(async () => {
-        getWorkspacesMock = stub(helpers, 'getWorkspace');
-        getWorkspacesMock.returns(truffleWorkspace);
+        getWorkspacesMock = stub(helpers, 'getTruffleWorkspace');
+        getWorkspacesMock.returns(Promise.resolve(truffleWorkspace));
 
         requiredMock = sinon.mock(requiredHelpers.required);
         checkAppsSilentMock = requiredMock.expects('checkAppsSilent');
@@ -119,7 +121,7 @@ describe('TruffleCommands', () => {
 
       it('should throw exception when config file not found', async () => {
         // Arrange
-        getWorkspacesMock.returns(__dirname);
+        getWorkspacesMock.returns(Promise.resolve(new helpers.TruffleWorkspace(__dirname)));
         executeCommandMock.returns(uuid.v4());
 
         // Act and assert

@@ -3,7 +3,7 @@
 
 import {Constants} from '../Constants';
 import {EnumStorage} from '../Models';
-import {Output} from '../Output';
+import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '../TelemetryClient';
 
 interface INode {
@@ -24,7 +24,7 @@ export function extractEnumsInfoSafe(contractName: string, ast: {[key: string]: 
     return extractEnumsInfo(contractName, ast);
   } catch (error) {
     if (error instanceof Error) {
-      Output.outputLine(Constants.outputChannel.telemetryClient, error.message);
+      Output.outputLine(OutputLabel.telemetryClient, error.message);
       Telemetry.sendException(error);
     }
   }

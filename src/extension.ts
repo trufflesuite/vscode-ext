@@ -1,7 +1,6 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {registerUIExtensionVariables} from '@microsoft/vscode-azext-utils';
 import {commands, ExtensionContext, Uri, window, workspace} from 'vscode';
 import {
   DebuggerCommands,
@@ -13,11 +12,10 @@ import {
   TruffleCommands,
   GenericCommands,
 } from './commands';
-import {Constants, ext} from './Constants';
+import {Constants} from './Constants';
 
 import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
-import {CommandContext, isWorkspaceOpen, setCommandContext} from './helpers';
-import {required} from './helpers/required';
+import {required} from '@/helpers/required';
 import {CancellationEvent} from './Models';
 import {Output} from './Output';
 import {ChangelogPage, RequirementsPage, WelcomePage} from './pages';
@@ -39,17 +37,6 @@ import {registerFileExplorerView} from './views/fileExplorer';
 import {registerHelpView} from './views/HelpView';
 import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 
-/**
- * This function registers variables similar to docker plugin, going forward this seems a better method of doing things.
- *
- * @param ctx the context we want to work on.
- */
-export function initializeExtensionVariables(ctx: ExtensionContext): void {
-  ext.context = ctx;
-  ext.outputChannel = Output.subscribe();
-  registerUIExtensionVariables(ext);
-}
-
 export async function activate(context: ExtensionContext) {
   /**
    * Wrapper around `registerCommand` that pushes the resulting `Disposable`
@@ -66,7 +53,7 @@ export async function activate(context: ExtensionContext) {
   }
 
   Constants.initialize(context); // still do this first.
-  initializeExtensionVariables(context);
+  Output.init(context);
 
   DebuggerConfiguration.initialize(context);
 
@@ -78,9 +65,6 @@ export async function activate(context: ExtensionContext) {
   TreeManager.initialize(context.globalState);
   TreeService.initialize('truffle-vscode.truffle');
   await sdkCoreCommands.initialize(context.globalState);
-
-  setCommandContext(CommandContext.Enabled, true);
-  setCommandContext(CommandContext.IsWorkspaceOpen, isWorkspaceOpen());
 
   const welcomePage = new WelcomePage(context);
   const requirementsPage = new RequirementsPage(context);
@@ -147,18 +131,20 @@ export async function activate(context: ExtensionContext) {
   const newSolidityProject = commands.registerCommand('truffle-vscode.newSolidityProject', async () => {
     await tryExecute(() => ProjectCommands.newSolidityProject());
   });
-  const buildContracts = commands.registerCommand('truffle-vscode.buildContracts', async (uri: Uri) => {
-    await tryExecute(() => sdkCoreCommands.build(uri));
+
+  registerCommand('truffle-vscode.buildSingleContract', async (contractUri: Uri) => {
+    await tryExecute(() => sdkCoreCommands.build(contractUri));
   });
-  const buildSingleContract = commands.registerCommand('truffle-vscode.buildSingleContract', async (uri: Uri) => {
-    await tryExecute(() => sdkCoreCommands.build(uri));
+  registerCommand('truffle-vscode.buildContracts', async (contractUri?: Uri) => {
+    await tryExecute(() => sdkCoreCommands.build(contractUri));
   });
-  const deployContracts = commands.registerCommand('truffle-vscode.deployContracts', async (uri: Uri) => {
-    await tryExecute(() => sdkCoreCommands.deploy(uri));
+  registerCommand('truffle-vscode.deployContracts', async (contractUri?: Uri) => {
+    await tryExecute(() => sdkCoreCommands.deploy(contractUri));
   });
-  const createContract = commands.registerCommand('truffle-vscode.createContract', async (uri: Uri) => {
-    await tryExecute(() => TruffleCommands.createContract(uri));
+  registerCommand('truffle-vscode.createContract', async (folderUri?: Uri) => {
+    await tryExecute(() => TruffleCommands.createContract(folderUri));
   });
+
   const copyByteCode = commands.registerCommand('truffle-vscode.copyByteCode', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeBytecodeToBuffer(uri));
   });
@@ -239,10 +225,6 @@ export async function activate(context: ExtensionContext) {
     showRequirementsPage,
     refresh,
     newSolidityProject,
-    buildContracts,
-    buildSingleContract,
-    deployContracts,
-    createContract,
     createProject,
     connectProject,
     disconnectProject,

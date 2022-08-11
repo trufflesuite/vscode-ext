@@ -13,8 +13,13 @@ import path from 'path';
 import {Uri} from 'vscode';
 import {ICommandResult, tryExecuteCommandInFork} from './command';
 import {IConfiguration, INetwork, INetworkOption, IProvider, notAllowedSymbols} from './ConfigurationReader';
-import {getWorkspaceRoot} from './index';
-import {getPathByPlatform} from './workspace';
+import {getPathByPlatform, getWorkspaceRoot} from './workspace';
+
+export class EvalTruffleConfigError extends Error {
+  constructor(message: string, readonly reason: string) {
+    super(message);
+  }
+}
 
 //region Internal Functions
 const isHdWalletProviderDeclaration = (nodeType: string, node: Node): boolean => {
@@ -64,47 +69,27 @@ const jsonToConfiguration = (truffleConfig: {[key: string]: any}): IConfiguratio
   return truffleConfig as IConfiguration;
 };
 
-// Facade to swap between implementations.
-const getTruffleMetadata = async (workingDirectory?: string): Promise<IConfiguration> => {
-  return workingDirectory ? getTruffleMetadataFs(workingDirectory) : getTruffleMetadataVSCode();
-};
-
 // refactor out the core parser between the two functions.
-const parseTruffleConfig = function (result: ICommandResult) {
+function parseTruffleConfig(result: ICommandResult, truffleConfigName: string) {
   const truffleConfigObject = result.messages!.find((message) => message.command === 'truffleConfig');
 
   if (!truffleConfigObject || !truffleConfigObject.message) {
-    throw new Error(Constants.errorMessageStrings.TruffleConfigHasIncorrectFormat);
+    throw new EvalTruffleConfigError(`"${truffleConfigName}" has incorrect format`, result.cmdOutputIncludingStderr);
   }
 
   return JSON.parse(truffleConfigObject.message);
-};
-
-/**
- * This is the node specific one using the paths.
- * @param workingDirectory
- */
-const getTruffleMetadataFs = async (workingDirectory: string): Promise<IConfiguration> => {
-  const truffleConfigTemplatePath =
-    typeof IS_BUNDLE_TIME === 'undefined' || !IS_BUNDLE_TIME
-      ? path.join(__dirname, '..', 'helpers', 'checkTruffleConfigTemplate.js')
-      : path.join(__dirname, 'checkTruffleConfigTemplate.js');
-  const truffleConfigPath = path.relative(
-    path.dirname(truffleConfigTemplatePath),
-    path.join(workingDirectory, 'truffle-config.js')
-  );
-  const result = await tryExecuteCommandInFork(workingDirectory, truffleConfigTemplatePath, truffleConfigPath);
-  return parseTruffleConfig(result);
-};
+}
 
 /**
  * This version uses the workspace root
  */
-const getTruffleMetadataVSCode = async (): Promise<IConfiguration> => {
+async function getTruffleMetadata(workingDirectory?: string, truffleConfigName?: string): Promise<IConfiguration> {
+  const workspaceRoot = workingDirectory ?? getWorkspaceRoot()!;
+  truffleConfigName = truffleConfigName ?? 'truffle-config.js';
   const truffleConfigTemplatePath = path.join(__dirname, 'checkTruffleConfigTemplate.js');
-  const result = await tryExecuteCommandInFork(getWorkspaceRoot()!, truffleConfigTemplatePath);
-  return parseTruffleConfig(result);
-};
+  const result = await tryExecuteCommandInFork(workspaceRoot, truffleConfigTemplatePath, truffleConfigName);
+  return parseTruffleConfig(result, truffleConfigName);
+}
 
 const generateVariableDeclaration = (
   varName: string,
@@ -529,16 +514,6 @@ export class TruffleConfig {
     }
   }
 
-  public async getConfiguration(workingDirectory?: string): Promise<IConfiguration> {
-    const truffleConfig = await getTruffleMetadata(workingDirectory);
-
-    if (truffleConfig) {
-      return jsonToConfiguration(truffleConfig);
-    }
-
-    return Constants.truffleConfigDefaultDirectory;
-  }
-
   public isHdWalletProviderDeclared(): boolean {
     try {
       const moduleExports = walk.findNodeAt(this.ast, undefined, undefined, isHdWalletProviderDeclaration);
@@ -550,14 +525,30 @@ export class TruffleConfig {
   }
 }
 
-export class TruffleConstants {
-  static truffleConfigUri: Uri;
+export async function getTruffleConfiguration(
+  workingDirectory?: string,
+  truffleConfigName?: string
+): Promise<IConfiguration> {
+  const truffleConfig = await getTruffleMetadata(workingDirectory, truffleConfigName);
+
+  if (truffleConfig) {
+    return jsonToConfiguration(truffleConfig);
+  }
+
+  return Constants.truffleConfigDefaultDirectory;
 }
 
-export function getTruffleConfigUri(): string {
-  const workspaceRoot = TruffleConstants.truffleConfigUri
-    ? getPathByPlatform(TruffleConstants.truffleConfigUri)
-    : getWorkspaceRoot()!;
+/**
+ * **TODO: Uses hardcoded `truffle-config.js` default.**
+ *
+ * Gets the path of the Truffle Config file from either
+ * `truffleWorkspaceUri` when present, or the first open workspace.
+ *
+ * @param truffleWorkspaceUri the root of the Truffle config file, is any.
+ * @returns the full path of the Truffle Config file.
+ */
+export function getTruffleConfigUri(truffleWorkspaceUri?: Uri): string {
+  const workspaceRoot = truffleWorkspaceUri ? getPathByPlatform(truffleWorkspaceUri) : getWorkspaceRoot()!;
   const configFilePath = path.join(workspaceRoot, Constants.defaultTruffleConfigFileName);
   if (!fs.pathExistsSync(configFilePath)) {
     const error = new Error(Constants.errorMessageStrings.TruffleConfigIsNotExist);

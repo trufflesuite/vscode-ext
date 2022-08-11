@@ -4,7 +4,7 @@
 import {ChildProcess, fork, ForkOptions, spawn, SpawnOptions} from 'child_process';
 import {tmpdir} from 'os';
 import {Constants} from '@/Constants';
-import {Output} from '@/Output';
+import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '@/TelemetryClient';
 
 interface IForkMessage {
@@ -35,7 +35,7 @@ export async function executeCommand(
   ...args: string[]
 ): Promise<string> {
   Output.outputLine(
-    Constants.outputChannel.executeCommand,
+    OutputLabel.executeCommand,
     '\n' +
       `Working dir: ${workingDirectory}\n` +
       `${Constants.executeCommandMessage.runningCommand}\n` +
@@ -45,7 +45,7 @@ export async function executeCommand(
   Telemetry.sendEvent('command.executeCommand.tryExecuteCommandWasStarted');
   const result: ICommandResult = await tryExecuteCommand(workingDirectory, command, ...args);
 
-  Output.outputLine(Constants.outputChannel.executeCommand, Constants.executeCommandMessage.finishRunningCommand);
+  Output.outputLine(OutputLabel.executeCommand, Constants.executeCommandMessage.finishRunningCommand);
 
   if (result.code !== 0) {
     Telemetry.sendException(new Error('commands.executeCommand.resultWithIncorrectCode'));
@@ -86,7 +86,7 @@ export async function tryExecuteCommandAsync(
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
 
       if (writeToOutputChannel) {
-        Output.output(Constants.outputChannel.executeCommand, data);
+        Output.output(OutputLabel.executeCommand, data);
       }
     });
 
@@ -94,7 +94,7 @@ export async function tryExecuteCommandAsync(
       data = data.toString();
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
       if (writeToOutputChannel) {
-        Output.output(Constants.outputChannel.executeCommand, data);
+        Output.output(OutputLabel.executeCommand, data);
       }
     });
 
@@ -116,7 +116,7 @@ export async function executeCommandInFork(
   ...args: string[]
 ): Promise<string> {
   Output.outputLine(
-    Constants.outputChannel.executeCommand,
+    OutputLabel.executeCommand,
     '\n' +
       `Working dir: ${workingDirectory}\n` +
       `${Constants.executeCommandMessage.forkingModule}\n` +
@@ -168,7 +168,7 @@ export function tryExecuteCommandInForkAsync(
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
 
       if (writeToOutputChannel) {
-        Output.output(Constants.outputChannel.executeCommand, data);
+        Output.output(OutputLabel.executeCommand, data);
       }
     });
 
@@ -177,7 +177,7 @@ export function tryExecuteCommandInForkAsync(
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
 
       if (writeToOutputChannel) {
-        Output.output(Constants.outputChannel.executeCommand, data);
+        Output.output(OutputLabel.executeCommand, data);
       }
     });
 
@@ -197,7 +197,7 @@ export function tryExecuteCommandInForkAsync(
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
 
       if (writeToOutputChannel) {
-        Output.output(Constants.outputChannel.executeCommand, data);
+        Output.output(OutputLabel.executeCommand, data);
       }
     });
 

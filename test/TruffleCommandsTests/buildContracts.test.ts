@@ -6,7 +6,7 @@ import {SinonMock, SinonExpectation, SinonStub, mock, stub, restore} from 'sinon
 import uuid from 'uuid';
 import {CancellationToken, Progress, ProgressOptions, Uri, window} from 'vscode';
 import {TruffleCommands} from '@/commands';
-import * as helpers from '../../src/helpers';
+import * as helpers from '@/helpers/workspace';
 import * as commands from '../../src/helpers/command';
 import {required} from '@/helpers/required';
 import {TestConstants} from '../TestConstants';
@@ -15,7 +15,7 @@ import {TruffleWorkspace} from '@/helpers/workspace';
 describe('BuildContracts Command', () => {
   describe('Integration test', async () => {
     let requiredMock: SinonMock;
-    let getWorkspacesMock: any;
+    let getWorkspacesMock: sinon.SinonStub<[contractUri?: Uri], Promise<helpers.TruffleWorkspace>>;
     let checkAppsSilent: SinonExpectation;
     let installTruffle: SinonExpectation;
     let commandContextMock: SinonMock;
@@ -23,19 +23,18 @@ describe('BuildContracts Command', () => {
     let withProgressStub: SinonStub<[ProgressOptions, (progress: Progress<any>, token: CancellationToken) => any], any>;
 
     const root: Uri = Uri.parse(__dirname);
-    const truffleWorkspace: TruffleWorkspace[] = [
-      {
-        dirName: 'xpto',
-        workspace: root,
-        truffleConfig: Uri.parse(`${root.fsPath}/truffle-config.js`),
-      },
-    ];
+    const truffleWorkspace: TruffleWorkspace = {
+      truffleConfigName: 'truffle-config.js',
+      dirName: 'xpto',
+      workspace: root,
+      truffleConfig: Uri.parse(`${root.fsPath}/truffle-config.js`),
+    };
 
     beforeEach(() => {
       requiredMock = mock(required);
 
-      getWorkspacesMock = stub(helpers, 'getWorkspace');
-      getWorkspacesMock.returns(truffleWorkspace);
+      getWorkspacesMock = stub(helpers, 'getTruffleWorkspace');
+      getWorkspacesMock.returns(Promise.resolve(truffleWorkspace));
 
       checkAppsSilent = requiredMock.expects('checkAppsSilent');
       installTruffle = requiredMock.expects('installTruffle');

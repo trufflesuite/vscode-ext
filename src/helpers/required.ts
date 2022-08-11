@@ -8,8 +8,8 @@ import path from 'path';
 import semver from 'semver';
 import {commands, ProgressLocation, window} from 'vscode';
 import {AppTypes, Constants, ext, OptionalApps, RequiredApps} from '@/Constants';
-import {getWorkspaceRoot} from '../helpers';
-import {Output} from '@/Output';
+import {getWorkspaceRoot} from '@/helpers/workspace';
+import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '@/TelemetryClient';
 import {executeCommand, tryExecuteCommand} from './command';
 
@@ -90,7 +90,10 @@ export namespace required {
       .filter((version) => apps.includes(version.app as AppTypes))
       .some((version) => !version.isValid);
 
-    Output.outputLine('checkApps', `Current state for versions: ${JSON.stringify(versions)} Invalid: ${invalid}`);
+    Output.outputLine(
+      OutputLabel.requirements,
+      `Current state for versions: ${JSON.stringify(versions)} Invalid: ${invalid}`
+    );
     return !invalid;
   }
 
@@ -154,7 +157,7 @@ export namespace required {
   }
 
   export async function getExactlyVersions(...apps: AppTypes[]): Promise<IRequiredVersion[]> {
-    Output.outputLine('', `Get version for required apps: ${apps.join(',')}`);
+    Output.outputLine(OutputLabel.requirements, `Get version for required apps: ${apps.join(',')}`);
 
     if (apps.includes(RequiredApps.node)) {
       currentState.node = currentState.node || (await createRequiredVersion(RequiredApps.node, getNodeVersion));
@@ -223,7 +226,7 @@ export namespace required {
       await installUsingNpm(RequiredApps.npm, Constants.requiredVersions[RequiredApps.npm]);
     } catch (error) {
       Telemetry.sendException(error as Error);
-      Output.outputLine(Constants.outputChannel.requirements, (error as Error).message);
+      Output.outputLine(OutputLabel.requirements, (error as Error).message);
     }
 
     currentState.npm = await createRequiredVersion(RequiredApps.npm, getNpmVersion);
@@ -234,7 +237,7 @@ export namespace required {
       await installUsingNpm(RequiredApps.truffle, Constants.requiredVersions[RequiredApps.truffle], scope);
     } catch (error) {
       Telemetry.sendException(error as Error);
-      Output.outputLine(Constants.outputChannel.requirements, (error as Error).message);
+      Output.outputLine(OutputLabel.requirements, (error as Error).message);
     }
 
     currentState.truffle = await createRequiredVersion(RequiredApps.truffle, getTruffleVersion);
@@ -245,7 +248,7 @@ export namespace required {
       await installUsingNpm(RequiredApps.ganache, Constants.requiredVersions[RequiredApps.ganache], scope);
     } catch (error) {
       Telemetry.sendException(error as Error);
-      Output.outputLine(Constants.outputChannel.requirements, (error as Error).message);
+      Output.outputLine(OutputLabel.requirements, (error as Error).message);
     }
 
     currentState.ganache = await createRequiredVersion(RequiredApps.ganache, getGanacheVersion);
@@ -273,7 +276,7 @@ export namespace required {
       return config.isHdWalletProviderDeclared();
     } catch (error) {
       Telemetry.sendException(error as Error);
-      Output.outputLine(Constants.outputChannel.requirements, (error as Error).message);
+      Output.outputLine(OutputLabel.requirements, (error as Error).message);
     }
 
     return false;
@@ -288,7 +291,7 @@ export namespace required {
       return packagesData.name === 'blockchain-ethereum-template';
     } catch (error) {
       Telemetry.sendException(error as Error);
-      Output.outputLine(Constants.outputChannel.requirements, (error as Error).message);
+      Output.outputLine(OutputLabel.requirements, (error as Error).message);
     }
 
     return false;
