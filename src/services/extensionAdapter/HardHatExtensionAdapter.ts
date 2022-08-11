@@ -7,12 +7,12 @@ import {IExtensionAdapter} from '@/services/extensionAdapter/IExtensionAdapter';
 import {Uri} from 'vscode';
 
 export class HardHatExtensionAdapter implements IExtensionAdapter {
-  async build(uri: Uri): Promise<void> {
+  async build(uri?: Uri): Promise<void> {
     // ext.outputChannel.appendLine(`Building: ${uri?.toString}`);
     return buildContracts(uri);
   }
 
-  async deploy(_uri: Uri): Promise<void> {
+  async deploy(_uri?: Uri): Promise<void> {
     // ext.outputChannel.appendLine(`Deploying: ${uri?.toString}`);
     return Promise.resolve(undefined);
   }

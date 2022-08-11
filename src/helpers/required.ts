@@ -2,12 +2,11 @@
 // Licensed under the MIT license.
 
 import {getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
-import {getPathByPlatform, getWorkspace} from '@/helpers/workspace';
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
 import {commands, ProgressLocation, window} from 'vscode';
-import {AppTypes, Constants, ext, OptionalApps, RequiredApps} from '@/Constants';
+import {AppTypes, Constants, OptionalApps, RequiredApps} from '@/Constants';
 import {getWorkspaceRoot} from '@/helpers/workspace';
 import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '@/TelemetryClient';
@@ -180,7 +179,6 @@ export namespace required {
       currentState.hardhat =
         currentState.hardhat ||
         (await createRequiredVersion(OptionalApps.hardhat, getNpmPackageVersion(OptionalApps.hardhat)));
-      ext.outputChannel.appendLine(`Got Hardhat: ${currentState.hardHat}`);
     }
 
     return Object.values(currentState);
@@ -188,17 +186,19 @@ export namespace required {
 
   type VersionCallback = () => Promise<string>;
 
-  const getNpmPackageVersion: (packageName: string) => VersionCallback = (packageName: string) => async () => {
+  const getNpmPackageVersion: (packageName: string) => VersionCallback = (_packageName: string) => async () => {
     // npm ls --json --depth=0 hardhat
-    const workspace = await getWorkspace(undefined);
-    const platformPath = getPathByPlatform(workspace);
-    ext.outputChannel.appendLine(`Workspaces: ${workspace} platform: ${platformPath}`);
-    return await getVersionWithArgs(
-      platformPath,
-      RequiredApps.npm,
-      ['ls', '--json', '--depth=0', packageName],
-      new RegExp(`${packageName}@(\\d+.\\d+.\\d+)`)
-    );
+    // const workspace = await getWorkspace(undefined);
+    // const platformPath = getPathByPlatform(workspace);
+    // ext.outputChannel.appendLine(`Workspaces: ${workspace} platform: ${platformPath}`);
+    // return await getVersionWithArgs(
+    //   platformPath,
+    //   RequiredApps.npm,
+    //   ['ls', '--json', '--depth=0', packageName],
+    //   new RegExp(`${packageName}@(\\d+.\\d+.\\d+)`)
+    // );
+    // FIXME: rework after merge
+    return 'FIXME:';
   };
 
   export async function getNodeVersion(): Promise<string> {
@@ -350,11 +350,12 @@ export namespace required {
   ): Promise<string> {
     try {
       const result = await tryExecuteCommand(workingDirectory, program, ...commands);
-      ext?.outputChannel.appendLine(
-        `tryExecuteCommand: workingDirectory: ${workingDirectory} program: ${program} commands: ${commands} matcher: ${matcher} result: ${JSON.stringify(
-          result
-        )}`
-      );
+      // FIXME: rework
+      // ext?.outputChannel.appendLine(
+      //   `tryExecuteCommand: workingDirectory: ${workingDirectory} program: ${program} commands: ${commands} matcher: ${matcher} result: ${JSON.stringify(
+      //     result
+      //   )}`
+      // );
       if (result.code === 0) {
         const output = result.cmdOutput || result.cmdOutputIncludingStderr;
         const installedVersion = output.match(matcher);

@@ -3,13 +3,11 @@
 
 import {sdkCoreCommands} from '@/commands';
 import {Constants} from '@/Constants';
-import {initializeExtensionVariables} from '@/extension';
 import {userSettings} from '@/helpers';
 import {HardHatExtensionAdapter, TruffleExtensionAdapter} from '@/services/extensionAdapter';
 import {expect} from 'chai'; // Using Expect style
 import sinon, {SinonMock} from 'sinon';
 import {Memento} from 'vscode';
-import {MockExtensionContext} from '../mocks/MockExtensionContext';
 import {MockMemento} from '../mocks/MockMemento';
 
 describe('Integration Tests - SDK Core Commands', () => {
@@ -21,8 +19,6 @@ describe('Integration Tests - SDK Core Commands', () => {
 
   before(async () => {
     //setup the mockery...
-    const mockCtx: any = new MockExtensionContext();
-    initializeExtensionVariables(mockCtx);
     userSettingsMock = sinon.mock(userSettings);
   });
 

@@ -1,19 +1,16 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants, ext, NotificationOptions, OptionalApps} from '@/Constants';
+import {Constants, NotificationOptions, OptionalApps} from '@/Constants';
 
-import {convertEntryToUri, getWorkspace, outputCommandHelper} from '@/helpers';
+import {outputCommandHelper} from '@/helpers';
 import {required} from '@/helpers/required';
 import {showIgnorableNotification, showNotification} from '@/helpers/userInteraction';
-import {getPathByPlatform} from '@/helpers/workspace';
 import {Output} from '@/Output';
 import {Telemetry} from '@/TelemetryClient';
-import fs from 'fs-extra';
-import path from 'path';
 import {commands, Uri} from 'vscode';
 
-export async function buildContracts(uri?: Uri): Promise<void> {
+export async function buildContracts(_uri?: Uri): Promise<void> {
   Telemetry.sendEvent('HardhatCommands.buildContracts.commandStarted');
 
   if (!(await required.checkAppsSilent(OptionalApps.hardhat))) {
@@ -26,16 +23,19 @@ export async function buildContracts(uri?: Uri): Promise<void> {
     return;
   }
 
-  const workspace = await getWorkspace(uri);
-  const contractDirectory = getPathByPlatform(workspace);
+  // FIXME: rework this
+  // const workspace = await getWorkspace(uri);
+  // const contractDirectory = getPathByPlatform(workspace);
   const args: string[] = [OptionalApps.hardhat, 'compile'];
+  //
+  // if (uri) {
+  //   const file = convertEntryToUri(uri);
+  //   if (fs.lstatSync(file.fsPath).isFile()) args.push(path.basename(file.fsPath));
+  // }
 
-  if (uri) {
-    const file = convertEntryToUri(uri);
-    if (fs.lstatSync(file.fsPath).isFile()) args.push(path.basename(file.fsPath));
-  }
+  // ext.outputChannel.appendLine(`Building: ${args} DIR: ${contractDirectory} WS: ${workspace?.toJSON} `);
 
-  ext.outputChannel.appendLine(`Building: ${args} DIR: ${contractDirectory} WS: ${workspace?.toJSON} `);
+  const contractDirectory = 'unset';
 
   await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
     Output.show();

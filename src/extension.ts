@@ -204,7 +204,6 @@ export async function activate(context: ExtensionContext) {
   //#region other subscriptions
   const changeCoreSdkConfigurationListener = workspace.onDidChangeConfiguration(async (event) => {
     if (event.affectsConfiguration(Constants.userSettings.coreSdkSettingsKey)) {
-      ext.outputChannel.appendLine(`Configuration changed. Amending SdkCoreProvider...`);
       await sdkCoreCommands.initialize(context.globalState);
     }
   });

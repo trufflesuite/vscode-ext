@@ -1,7 +1,7 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants, ext} from '@/Constants';
+import {Constants} from '@/Constants';
 import {HardHatExtensionAdapter, IExtensionAdapter, TruffleExtensionAdapter} from '@/services/extensionAdapter';
 import {Memento, Uri, window} from 'vscode';
 import {userSettings} from '../helpers';
@@ -11,13 +11,13 @@ export class SdkCoreCommands {
 
   public async initialize(_globalState: Memento): Promise<void> {
     const sdk = userSettings.getConfiguration(Constants.userSettings.coreSdkSettingsKey);
-    ext?.outputChannel.appendLine(`Using Configuration for SDK Provider: ${JSON.stringify(sdk)}`);
     this.extensionAdapter = SdkCoreCommands.getExtensionAdapter(sdk.userValue ? sdk.userValue : sdk.defaultValue);
     this.extensionAdapter.validateExtension().then(
       (_) => {
-        ext?.outputChannel.appendLine(
-          `Configuration Initialized. SdkCoreProvider: ${this.extensionAdapter.constructor.name}`
-        );
+        // FIXME: rework output?
+        // ext?.outputChannel.appendLine(
+        //   `Configuration Initialized. SdkCoreProvider: ${this.extensionAdapter.constructor.name}`
+        // );
       },
       (error) => {
         window.showErrorMessage(error.message);
@@ -50,7 +50,6 @@ export class SdkCoreCommands {
       case Constants.coreSdk.truffle:
         return new TruffleExtensionAdapter();
       default:
-        ext?.outputChannel.appendLine(`Unknown value: ${sdk}. using default TruffleAdapter.`);
         return new TruffleExtensionAdapter();
     }
   }

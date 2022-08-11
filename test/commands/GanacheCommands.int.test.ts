@@ -1,7 +1,6 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {initializeExtensionVariables} from '@/extension';
 import assert from 'assert';
 import cp, {ChildProcess} from 'child_process';
 import rp from 'request-promise';
@@ -14,7 +13,6 @@ import * as shell from '../../src/helpers/shell';
 import {IExtensionItem, LocalProject, LocalService, Service, TLocalProjectOptions} from '@/Models/TreeItems';
 import {TreeManager} from '@/services';
 import {ProjectView} from '@/ViewItems';
-import {MockExtensionContext} from '../mocks/MockExtensionContext';
 
 describe('Integration tests GanacheCommands', () => {
   const defaultPort = 8545;
@@ -54,9 +52,6 @@ describe('Integration tests GanacheCommands', () => {
   };
 
   before(async () => {
-    const mockCtx: any = new MockExtensionContext();
-    initializeExtensionVariables(mockCtx);
-
     serviceItems = await createTestServiceItems();
     getItemsMock = sinon.stub(TreeManager, 'getItems');
     getItemsMock.returns(serviceItems);
