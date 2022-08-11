@@ -4,6 +4,7 @@
 // It cannot access the main VS Code APIs directly.
 (function () {
   const vscode = acquireVsCodeApi();
+  const tabContainer = document.getElementById('tab-container').innerHTML;
 
   getLog();
 
@@ -12,7 +13,7 @@
     const message = event.data; // The json data that the extension sent
     switch (message.command) {
       case 'addLog': {
-        addLog(message.tool, message.log, message.options);
+        addLog(message.tool, message.log, message.description);
         break;
       }
       case 'clearState': {
@@ -22,57 +23,52 @@
     }
   });
 
-  function addLog(tool, log, options) {
-    const tab = document.getElementById(`tab-${tool}`);
-
-    console.log('aqui');
-    // Check if the tab exists
-    if (tab === null) createTab(tool);
+  function addLog(tool, log, description) {
+    const tab = getTab(tool, description);
 
     // Create the log record
-    const contentLine = document.createElement('div');
-    contentLine.innerHTML = log;
+    const content = document.createElement('div');
+    content.innerHTML = log;
 
-    // Add the line to the content
-    const content = document.getElementById(`content-${tool}`);
-    content.appendChild(contentLine);
+    const contantContainer = document.querySelector(`[data-content="${tab.id}"]`);
+    contantContainer.appendChild(content);
 
     // Save the log state
     vscode.setState({log: document.getElementById('tab-container').innerHTML});
   }
 
-  function createTab(tool) {
-    // Set the tab title
-    const html = `<img src="{{root}}/images/truffle.png" /><span>Truffle</span>`;
+  function getTab(tool, description) {
+    const id = description ? `${tool}:${description}` : tool;
+    const tab = document.querySelector(`[data-id="${id}"]`);
 
-    // Create the tab element
-    const tab = document.createElement('div');
-    tab.id = `tab-${tool}`;
-    tab.dataset.tool = tool;
-    tab.innerHTML = html;
+    if (tab) {
+      tab.checked = true;
+      return tab;
+    } else {
+      const availableTab = document.querySelector('[data-available="true"]');
+      availableTab.dataset.id = id;
+      availableTab.dataset.available = false;
+      availableTab.checked = true;
 
-    // Add the tab element to tab container
-    const tabs = document.getElementById('tab-collection');
-    tabs.appendChild(tab);
+      const label = document.querySelector(`[for="${availableTab.id}"]`);
+      const virtualPath = document.getElementById('virtualPath').value;
+      const icon = `<img src="${virtualPath}/images/${tool}-log.png">`;
+      const title = `<span>${description ? `${tool} :${description}` : tool}</span>`;
+      label.innerHTML = `${icon} ${title}`;
+      label.style.display = 'block';
 
-    // Create the content element
-    const content = document.createElement('div');
-    content.id = `content-${tool}`;
-    content.dataset.tool = tool;
-
-    // Add the content element to content container
-    const contents = document.getElementById('tab-content-collection');
-    contents.appendChild(content);
+      return availableTab;
+    }
   }
 
   function getLog() {
-    const state = vscode.getState() || {log: []};
-    document.getElementById('tab-container').innerHTML = state.log;
+    const state = vscode.getState();
+
+    if (state.log !== '') document.getElementById('tab-container').innerHTML = state.log;
   }
 
   function clearState() {
-    document.getElementById('tab-collection').innerHTML = '';
-    document.getElementById('tab-content-collection').innerHTML = '';
-    vscode.setState({log: ''});
+    vscode.setState({log: tabContainer});
+    getLog();
   }
 })();

@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {OutputLabel} from '@/Output';
+import {Output, OutputLabel} from '@/Output';
 import {ChildProcess} from 'child_process';
 import {OutputChannel, window} from 'vscode';
 import {Constants, RequiredApps} from '../../Constants';
@@ -145,10 +145,12 @@ export namespace GanacheService {
   function addAllListeners(output: OutputChannel, port: number | string, process: ChildProcess): void {
     process.stdout!.on('data', (data: string | Buffer) => {
       output.appendLine(data.toString());
+      Output.outputLine(OutputLabel.ganacheCommands, data.toString(), port.toString());
     });
 
     process.stderr!.on('data', (data: string | Buffer) => {
       output.appendLine(data.toString());
+      Output.outputLine(OutputLabel.ganacheCommands, data.toString(), port.toString());
     });
 
     process.on('exit', () => {

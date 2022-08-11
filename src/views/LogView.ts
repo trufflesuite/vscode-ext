@@ -29,7 +29,7 @@ export class LogView implements vscode.WebviewViewProvider {
     this.clearState();
   }
 
-  public addLog(label: OutputLabel, log: string, ...args: any[]): void {
+  public addLog(label: OutputLabel, log: string, description?: string): void {
     if (this._view) {
       let tool: string;
 
@@ -46,7 +46,7 @@ export class LogView implements vscode.WebviewViewProvider {
       }
 
       this._view.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
-      this._view.webview.postMessage({command: 'addLog', tool, log, ...args});
+      this._view.webview.postMessage({command: 'addLog', tool, log, description});
     }
   }
 

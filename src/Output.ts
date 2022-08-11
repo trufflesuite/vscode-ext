@@ -16,19 +16,34 @@ export enum OutputLabel {
 }
 
 export class Output {
-  public static output(label: OutputLabel, message: string): void {
+  public static output(label: OutputLabel, message: string, description?: string): void {
     this._outputChannel.append(this.formatMessage(label, message));
-    commands.executeCommand(`${Constants.panels.log.viewType}.addLog`, label, this.formatMessage(label, message));
+    commands.executeCommand(
+      `${Constants.panels.log.viewType}.addLog`,
+      label,
+      this.formatMessage(label, message),
+      description
+    );
   }
 
-  public static outputLine(label: OutputLabel, message: string): void {
+  public static outputLine(label: OutputLabel, message: string, description?: string): void {
     this._outputChannel.appendLine(this.formatMessage(label, message));
-    commands.executeCommand(`${Constants.panels.log.viewType}.addLog`, label, this.formatMessage(label, message));
+    commands.executeCommand(
+      `${Constants.panels.log.viewType}.addLog`,
+      label,
+      this.formatMessage(label, message),
+      description
+    );
   }
 
-  public static info(label: OutputLabel, message: string): void {
+  public static info(label: OutputLabel, message: string, description?: string): void {
     this.outputLine(label, message);
-    commands.executeCommand(`${Constants.panels.log.viewType}.addLog`, label, this.formatMessage(label, message));
+    commands.executeCommand(
+      `${Constants.panels.log.viewType}.addLog`,
+      label,
+      this.formatMessage(label, message),
+      description
+    );
   }
 
   public static show(): void {
