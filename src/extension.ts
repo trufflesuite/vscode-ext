@@ -17,7 +17,6 @@ import {Constants} from './Constants';
 import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
 import {required} from '@/helpers/required';
 import {CancellationEvent} from './Models';
-import {Output} from './Output';
 import {ChangelogPage, RequirementsPage, WelcomePage} from './pages';
 import {
   AdapterType,
@@ -54,7 +53,6 @@ export async function activate(context: ExtensionContext) {
   }
 
   Constants.initialize(context); // still do this first.
-  Output.init(context);
 
   DebuggerConfiguration.initialize(context);
 
@@ -266,7 +264,6 @@ export async function deactivate(): Promise<void> {
   ContractDB.dispose();
   Telemetry.dispose();
   TreeManager.dispose();
-  Output.dispose();
 }
 
 async function tryExecute(func: () => Promise<any>, errorMessage: string | null = null): Promise<void> {

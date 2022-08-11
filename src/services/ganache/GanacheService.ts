@@ -3,7 +3,6 @@
 
 import {Output, OutputLabel} from '@/Output';
 import {ChildProcess} from 'child_process';
-import {OutputChannel, window} from 'vscode';
 import {Constants, RequiredApps} from '../../Constants';
 import {shell, spawnProcess} from '../../helpers';
 import {findPid, killPid} from '../../helpers/shell';
@@ -14,7 +13,6 @@ import {isGanacheServer, waitGanacheStarted} from './GanacheServiceClient';
 
 export namespace GanacheService {
   export interface IGanacheProcess {
-    output?: OutputChannel;
     pid?: number;
     port: number | string;
     process?: ChildProcess;
@@ -68,7 +66,6 @@ export namespace GanacheService {
       ganacheProcesses[port] = await spawnGanacheServer(port, options);
     }
     // open the channel to show the output.
-    ganacheProcesses[port]?.output?.show(false);
     Telemetry.sendEvent('GanacheServiceClient.waitGanacheStarted.serverStarted');
     return ganacheProcesses[port];
   }
@@ -102,13 +99,10 @@ export namespace GanacheService {
     }
 
     const process = spawnProcess(undefined, 'npx', args);
-    const output = window.createOutputChannel(`${OutputLabel.ganacheCommands}:${port}`);
-    const ganacheProcess = {port, process, output} as IGanacheProcess;
-
-    output.show(true);
+    const ganacheProcess = {port, process} as IGanacheProcess;
 
     try {
-      addAllListeners(output, port, process);
+      addAllListeners(port, process);
       await waitGanacheStarted(port, Constants.ganacheRetryAttempts);
       ganacheProcess.pid = await findPid(port);
     } catch (error) {
@@ -125,7 +119,7 @@ export namespace GanacheService {
       return;
     }
 
-    const {output, pid, port, process} = ganacheProcess;
+    const {pid, port, process} = ganacheProcess;
     delete ganacheProcesses[port];
 
     if (process) {
@@ -133,23 +127,17 @@ export namespace GanacheService {
       process.kill('SIGINT');
     }
 
-    if (output) {
-      output.dispose();
-    }
-
     if (pid && (killOutOfBand ? true : !!process)) {
       return killPid(pid);
     }
   }
 
-  function addAllListeners(output: OutputChannel, port: number | string, process: ChildProcess): void {
+  function addAllListeners(port: number | string, process: ChildProcess): void {
     process.stdout!.on('data', (data: string | Buffer) => {
-      output.appendLine(data.toString());
       Output.outputLine(OutputLabel.ganacheCommands, data.toString(), port.toString());
     });
 
     process.stderr!.on('data', (data: string | Buffer) => {
-      output.appendLine(data.toString());
       Output.outputLine(OutputLabel.ganacheCommands, data.toString(), port.toString());
     });
 

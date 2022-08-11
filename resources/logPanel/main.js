@@ -32,6 +32,7 @@
 
     const contantContainer = document.querySelector(`[data-content="${tab.id}"]`);
     contantContainer.appendChild(content);
+    contantContainer.scrollTop = contantContainer.scrollHeight;
 
     // Save the log state
     vscode.setState({log: document.getElementById('tab-container').innerHTML});
@@ -42,13 +43,11 @@
     const tab = document.querySelector(`[data-id="${id}"]`);
 
     if (tab) {
-      tab.checked = true;
       return tab;
     } else {
       const availableTab = document.querySelector('[data-available="true"]');
       availableTab.dataset.id = id;
       availableTab.dataset.available = false;
-      availableTab.checked = true;
 
       const label = document.querySelector(`[for="${availableTab.id}"]`);
       const virtualPath = document.getElementById('virtualPath').value;
