@@ -18,7 +18,7 @@ export enum OutputLabel {
 export class Output {
   public static output(label: OutputLabel, message: string, description?: string): void {
     commands.executeCommand(
-      `${Constants.panels.log.viewType}.addLog`,
+      `${Constants.panels.log.viewType}.create.log`,
       label,
       this.formatMessage(label, message),
       description
@@ -27,7 +27,7 @@ export class Output {
 
   public static outputLine(label: OutputLabel, message: string, description?: string): void {
     commands.executeCommand(
-      `${Constants.panels.log.viewType}.addLog`,
+      `${Constants.panels.log.viewType}.create.log`,
       label,
       this.formatMessage(label, message),
       description
@@ -36,7 +36,7 @@ export class Output {
 
   public static info(label: OutputLabel, message: string, description?: string): void {
     commands.executeCommand(
-      `${Constants.panels.log.viewType}.addLog`,
+      `${Constants.panels.log.viewType}.create.log`,
       label,
       this.formatMessage(label, message),
       description
@@ -44,7 +44,7 @@ export class Output {
   }
 
   public static dispose(label: OutputLabel, description?: string): void {
-    commands.executeCommand(`${Constants.panels.log.viewType}.disposeTab`, label, description);
+    commands.executeCommand(`${Constants.panels.log.viewType}.dispose.tab`, label, description);
   }
 
   private static formatMessage(label = '', message = ''): string {
