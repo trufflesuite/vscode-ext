@@ -33,7 +33,7 @@ import {Telemetry} from './TelemetryClient';
 import {NetworkNodeView, ProjectView} from './ViewItems';
 import {registerDashboardView} from './views/DashboardView';
 import {registerDeploymentView} from './views/DeploymentsView';
-import {registerFileExplorerView} from './views/fileExplorer';
+import {registerFileExplorerView} from './views/FileExplorer';
 import {registerHelpView} from './views/HelpView';
 import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 
