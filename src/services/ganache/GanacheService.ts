@@ -121,6 +121,7 @@ export namespace GanacheService {
 
     const {pid, port, process} = ganacheProcess;
     delete ganacheProcesses[port];
+    Output.dispose(OutputLabel.ganacheCommands, port.toString());
 
     if (process) {
       removeAllListeners(process);

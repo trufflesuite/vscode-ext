@@ -4,9 +4,6 @@
 // It cannot access the main VS Code APIs directly.
 (function () {
   const vscode = acquireVsCodeApi();
-  const tabContainer = document.getElementById('tab-container').innerHTML;
-
-  getLog();
 
   // Handle messages sent from the extension to the webview
   window.addEventListener('message', (event) => {
@@ -16,8 +13,12 @@
         addLog(message.tool, message.log, message.description);
         break;
       }
-      case 'clearState': {
-        clearState();
+      case 'getHistory': {
+        getHistory();
+        break;
+      }
+      case 'disposeTab': {
+        disposeTab(message.tool, message.description);
         break;
       }
     }
@@ -60,14 +61,27 @@
     }
   }
 
-  function getLog() {
+  function getHistory() {
     const state = vscode.getState();
-
     if (state.log !== '') document.getElementById('tab-container').innerHTML = state.log;
   }
 
-  function clearState() {
-    vscode.setState({log: tabContainer});
-    getLog();
+  function disposeTab(tool, description) {
+    const tab = getTab(tool, description);
+    tab.dataset.id = '';
+    tab.dataset.available = true;
+
+    const label = document.querySelector(`[for="${tab.id}"]`);
+    label.innerHTML = '';
+    label.style.display = 'none';
+
+    const contentContainer = document.querySelector(`[data-content="${tab.id}"]`);
+    contentContainer.innerHTML = '';
+
+    const tabFocus = document.querySelector('[data-available="false"]');
+    tabFocus.checked = true;
+
+    // Save the log state
+    vscode.setState({log: document.getElementById('tab-container').innerHTML});
   }
 })();

@@ -38,6 +38,7 @@
   "activationEvents": [
     "onView:truffle-vscode.truffle",
     "onView:truffle-vscode.explorer-view",
+    "onView:truffle-vscode.panel.log",
     "onCommand:truffle-vscode.showWelcomePage",
     "onCommand:truffle-vscode.showRequirementsPage",
     "onCommand:truffle-vscode.refresh",
@@ -530,8 +531,7 @@
           "id": "truffle-vscode.panel.log",
           "name": "",
           "contextualTitle": "Truffle",
-          "icon": "images/views/history.svg",
-          "visibility": "visible"
+          "icon": "images/views/history.svg"
         }
       ],
       "debug": [

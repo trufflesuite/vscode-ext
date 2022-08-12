@@ -221,7 +221,6 @@ export async function activate(context: ExtensionContext) {
   // #endregion
 
   const subscriptions = [
-    logView,
     showWelcomePage,
     showRequirementsPage,
     refresh,
@@ -248,6 +247,7 @@ export async function activate(context: ExtensionContext) {
     deploymentView,
     dashboardView,
     checkForConnection,
+    logView,
   ];
   context.subscriptions.push(...subscriptions);
 

@@ -36,7 +36,7 @@ div.tab-frame input:checked + label {
 
 div.tab-frame div.tab {
   display: none;
-  padding: 5px 10px;
+  padding: 10px;
   clear: left;
   height: 85vh;
   color: #fff;

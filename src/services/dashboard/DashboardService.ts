@@ -109,6 +109,7 @@ export namespace DashboardService {
 
     const {pid, port, process} = dashboardProcess;
     delete dashboardProcesses[port];
+    Output.dispose(OutputLabel.dashboardCommands, port.toString());
 
     if (process) {
       removeAllListeners(process);

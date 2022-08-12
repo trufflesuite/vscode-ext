@@ -43,6 +43,10 @@ export class Output {
     );
   }
 
+  public static dispose(label: OutputLabel, description?: string): void {
+    commands.executeCommand(`${Constants.panels.log.viewType}.disposeTab`, label, description);
+  }
+
   private static formatMessage(label = '', message = ''): string {
     return `${label ? `[${label}] ` : ''}${message}`;
   }
