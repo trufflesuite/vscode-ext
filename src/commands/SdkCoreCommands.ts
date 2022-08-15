@@ -2,22 +2,22 @@
 // Licensed under the MIT license.
 
 import {Constants} from '@/Constants';
+import {createOutputInst, OutputLabel} from '@/Output';
+
 import {HardHatExtensionAdapter, IExtensionAdapter, TruffleExtensionAdapter} from '@/services/extensionAdapter';
 import {Memento, Uri, window} from 'vscode';
 import {userSettings} from '../helpers';
 
 export class SdkCoreCommands {
   public extensionAdapter!: IExtensionAdapter;
+  private logger = createOutputInst(OutputLabel.sdkCoreCommands);
 
   public async initialize(_globalState: Memento): Promise<void> {
     const sdk = userSettings.getConfiguration(Constants.userSettings.coreSdkSettingsKey);
     this.extensionAdapter = SdkCoreCommands.getExtensionAdapter(sdk.userValue ? sdk.userValue : sdk.defaultValue);
     this.extensionAdapter.validateExtension().then(
       (_) => {
-        // FIXME: rework output?
-        // ext?.outputChannel.appendLine(
-        //   `Configuration Initialized. SdkCoreProvider: ${this.extensionAdapter.constructor.name}`
-        // );
+        this.logger.outputLine(`Configuration Initialized. SdkCoreProvider: ${this.extensionAdapter.constructor.name}`);
       },
       (error) => {
         window.showErrorMessage(error.message);

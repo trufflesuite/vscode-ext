@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {ExtensionContext, OutputChannel, window} from 'vscode';
@@ -12,6 +12,7 @@ export enum OutputLabel {
   requirements = 'Truffle: Requirements',
   telemetryClient = 'Truffle: Telemetry Client',
   treeManager = 'Truffle: Service Tree Manager',
+  sdkCoreCommands = 'Truffle: SKD Commands',
 }
 
 export class Output {
@@ -55,3 +56,30 @@ export class Output {
 }
 
 export declare let outputChannel: OutputChannel;
+
+type OutputInstance = {
+  output(message: string): void;
+  outputLine(message: string): void;
+  info(message: string): void;
+};
+
+/**
+ * Helper to create a curried wrapper around the output channel as a
+ * convenience when logging. Save for verbose log commands in classes.
+ *
+ * @param label - The output label you wish to append to all your calls.
+ * @return OutputInstance - The convenience type wrapping this.
+ */
+export function createOutputInst(label: OutputLabel): OutputInstance {
+  return {
+    info(message: string): void {
+      Output.info(label, message);
+    },
+    output(message: string): void {
+      Output.output(label, message);
+    },
+    outputLine(message: string): void {
+      Output.outputLine(label, message);
+    },
+  };
+}
