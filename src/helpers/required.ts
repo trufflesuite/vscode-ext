@@ -1,18 +1,20 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {AppTypes, Constants, OptionalApps, RequiredApps} from '@/Constants';
 import {getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
+import {AbstractWorkspaceManager, getPathByPlatform, getWorkspaceRoot} from '@/helpers/workspace';
+import {createOutputInst, OutputLabel} from '@/Output';
+import {Telemetry} from '@/TelemetryClient';
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
 import {commands, ProgressLocation, window} from 'vscode';
-import {AppTypes, Constants, OptionalApps, RequiredApps} from '@/Constants';
-import {getWorkspaceRoot} from '@/helpers/workspace';
-import {Output, OutputLabel} from '@/Output';
-import {Telemetry} from '@/TelemetryClient';
 import {executeCommand, tryExecuteCommand} from './command';
 
 export namespace required {
+  const output = createOutputInst(OutputLabel.requirements);
+
   export interface IRequiredVersion {
     app: string;
     isValid: boolean;
@@ -24,6 +26,8 @@ export namespace required {
     locally = 1,
     global = 0,
   }
+
+  type VersionCallback = () => Promise<string>;
 
   const currentState: {[key: string]: IRequiredVersion} = {};
 
@@ -89,10 +93,7 @@ export namespace required {
       .filter((version) => apps.includes(version.app as AppTypes))
       .some((version) => !version.isValid);
 
-    Output.outputLine(
-      OutputLabel.requirements,
-      `Current state for versions: ${JSON.stringify(versions)} Invalid: ${invalid}`
-    );
+    output.outputLine(`Current state for versions: ${JSON.stringify(versions)} Invalid: ${invalid}`);
     return !invalid;
   }
 
@@ -156,7 +157,7 @@ export namespace required {
   }
 
   export async function getExactlyVersions(...apps: AppTypes[]): Promise<IRequiredVersion[]> {
-    Output.outputLine(OutputLabel.requirements, `Get version for required apps: ${apps.join(',')}`);
+    output.outputLine(`Get version for required apps: ${apps.join(',')}`);
 
     if (apps.includes(RequiredApps.node)) {
       currentState.node = currentState.node || (await createRequiredVersion(RequiredApps.node, getNodeVersion));
@@ -184,21 +185,19 @@ export namespace required {
     return Object.values(currentState);
   }
 
-  type VersionCallback = () => Promise<string>;
-
-  const getNpmPackageVersion: (packageName: string) => VersionCallback = (_packageName: string) => async () => {
-    // npm ls --json --depth=0 hardhat
-    // const workspace = await getWorkspace(undefined);
-    // const platformPath = getPathByPlatform(workspace);
-    // ext.outputChannel.appendLine(`Workspaces: ${workspace} platform: ${platformPath}`);
-    // return await getVersionWithArgs(
-    //   platformPath,
-    //   RequiredApps.npm,
-    //   ['ls', '--json', '--depth=0', packageName],
-    //   new RegExp(`${packageName}@(\\d+.\\d+.\\d+)`)
-    // );
-    // FIXME: rework after merge
-    return 'FIXME:';
+  /**
+   * Run an NPM ls command to see if a specific package is installed within the NPM system in this project.
+   * @param packageName - the npm specific name
+   */
+  const getNpmPackageVersion: (packageName: string) => VersionCallback = (packageName: string) => async () => {
+    const workspace = await AbstractWorkspaceManager.getWorkspaceForUri();
+    const platformPath = getPathByPlatform(workspace.workspace);
+    return await getVersionWithArgs(
+      platformPath,
+      RequiredApps.npm,
+      ['ls', '--pareseable', '--long', '--depth=0', packageName],
+      new RegExp(`${packageName}@(\\d+.\\d+.\\d+)`)
+    );
   };
 
   export async function getNodeVersion(): Promise<string> {
@@ -226,7 +225,7 @@ export namespace required {
       await installUsingNpm(RequiredApps.npm, Constants.requiredVersions[RequiredApps.npm]);
     } catch (error) {
       Telemetry.sendException(error as Error);
-      Output.outputLine(OutputLabel.requirements, (error as Error).message);
+      output.outputLine((error as Error).message);
     }
 
     currentState.npm = await createRequiredVersion(RequiredApps.npm, getNpmVersion);
@@ -237,7 +236,7 @@ export namespace required {
       await installUsingNpm(RequiredApps.truffle, Constants.requiredVersions[RequiredApps.truffle], scope);
     } catch (error) {
       Telemetry.sendException(error as Error);
-      Output.outputLine(OutputLabel.requirements, (error as Error).message);
+      output.outputLine((error as Error).message);
     }
 
     currentState.truffle = await createRequiredVersion(RequiredApps.truffle, getTruffleVersion);
@@ -248,7 +247,7 @@ export namespace required {
       await installUsingNpm(RequiredApps.ganache, Constants.requiredVersions[RequiredApps.ganache], scope);
     } catch (error) {
       Telemetry.sendException(error as Error);
-      Output.outputLine(OutputLabel.requirements, (error as Error).message);
+      output.outputLine((error as Error).message);
     }
 
     currentState.ganache = await createRequiredVersion(RequiredApps.ganache, getGanacheVersion);
@@ -276,7 +275,7 @@ export namespace required {
       return config.isHdWalletProviderDeclared();
     } catch (error) {
       Telemetry.sendException(error as Error);
-      Output.outputLine(OutputLabel.requirements, (error as Error).message);
+      output.outputLine((error as Error).message);
     }
 
     return false;
@@ -291,13 +290,13 @@ export namespace required {
       return packagesData.name === 'blockchain-ethereum-template';
     } catch (error) {
       Telemetry.sendException(error as Error);
-      Output.outputLine(OutputLabel.requirements, (error as Error).message);
+      output.outputLine((error as Error).message);
     }
 
     return false;
   }
 
-  async function createRequiredVersion(appName: string, versionFunc: () => Promise<string>): Promise<IRequiredVersion> {
+  async function createRequiredVersion(appName: string, versionFunc: VersionCallback): Promise<IRequiredVersion> {
     const version = await versionFunc();
     const requiredVersion = Constants.requiredVersions[appName];
     const minRequiredVersion = typeof requiredVersion === 'string' ? requiredVersion : requiredVersion.min;
@@ -350,12 +349,6 @@ export namespace required {
   ): Promise<string> {
     try {
       const result = await tryExecuteCommand(workingDirectory, program, ...commands);
-      // FIXME: rework
-      // ext?.outputChannel.appendLine(
-      //   `tryExecuteCommand: workingDirectory: ${workingDirectory} program: ${program} commands: ${commands} matcher: ${matcher} result: ${JSON.stringify(
-      //     result
-      //   )}`
-      // );
       if (result.code === 0) {
         const output = result.cmdOutput || result.cmdOutputIncludingStderr;
         const installedVersion = output.match(matcher);

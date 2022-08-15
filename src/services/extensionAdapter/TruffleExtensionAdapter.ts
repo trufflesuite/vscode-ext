@@ -1,8 +1,8 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Uri} from 'vscode';
 import {TruffleCommands} from '@/commands';
+import {Uri} from 'vscode';
 import {IExtensionAdapter} from './IExtensionAdapter';
 
 export class TruffleExtensionAdapter implements IExtensionAdapter {

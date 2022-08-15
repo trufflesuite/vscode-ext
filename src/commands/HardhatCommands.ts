@@ -6,11 +6,12 @@ import {Constants, NotificationOptions, OptionalApps} from '@/Constants';
 import {outputCommandHelper} from '@/helpers';
 import {required} from '@/helpers/required';
 import {showIgnorableNotification, showNotification} from '@/helpers/userInteraction';
-import {Output} from '@/Output';
+import {AbstractWorkspaceManager} from '@/helpers/workspace';
+import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '@/TelemetryClient';
 import {commands, Uri} from 'vscode';
 
-export async function buildContracts(_uri?: Uri): Promise<void> {
+export async function buildContracts(uri?: Uri): Promise<void> {
   Telemetry.sendEvent('HardhatCommands.buildContracts.commandStarted');
 
   if (!(await required.checkAppsSilent(OptionalApps.hardhat))) {
@@ -23,19 +24,17 @@ export async function buildContracts(_uri?: Uri): Promise<void> {
     return;
   }
 
-  // FIXME: rework this
-  // const workspace = await getWorkspace(uri);
-  // const contractDirectory = getPathByPlatform(workspace);
+  const ret = await AbstractWorkspaceManager.getWorkspaceForUri(uri);
+  Output.outputLine(OutputLabel.hardhatCommands, `found workspaces: ${JSON.stringify(ret)}`);
   const args: string[] = [OptionalApps.hardhat, 'compile'];
-  //
-  // if (uri) {
-  //   const file = convertEntryToUri(uri);
-  //   if (fs.lstatSync(file.fsPath).isFile()) args.push(path.basename(file.fsPath));
-  // }
+  const contractDirectory = ret.workspace.fsPath;
 
-  // ext.outputChannel.appendLine(`Building: ${args} DIR: ${contractDirectory} WS: ${workspace?.toJSON} `);
+  // hardhat will compile all contracts, not one specifically.
 
-  const contractDirectory = 'unset';
+  Output.outputLine(
+    OutputLabel.hardhatCommands,
+    `Building: ${args} DIR: ${contractDirectory} Workspace: ${JSON.stringify(ret)} `
+  );
 
   await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
     Output.show();

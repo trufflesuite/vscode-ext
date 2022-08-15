@@ -2,8 +2,10 @@
 // Licensed under the MIT license.
 
 import {buildContracts} from '@/commands/HardhatCommands';
-// import { ext} from '@/Constants';
+import {NotificationOptions} from '@/Constants';
+import {showNotification} from '@/helpers/userInteraction';
 import {IExtensionAdapter} from '@/services/extensionAdapter/IExtensionAdapter';
+import {Constants} from '@/constants';
 import {Uri} from 'vscode';
 
 export class HardHatExtensionAdapter implements IExtensionAdapter {
@@ -13,8 +15,10 @@ export class HardHatExtensionAdapter implements IExtensionAdapter {
   }
 
   async deploy(_uri?: Uri): Promise<void> {
-    // ext.outputChannel.appendLine(`Deploying: ${uri?.toString}`);
-    return Promise.resolve(undefined);
+    await showNotification({
+      message: Constants.errorMessageStrings.HHNoDefaultDeploy,
+      type: NotificationOptions.error,
+    });
   }
 
   async validateExtension(): Promise<void> {

@@ -599,6 +599,8 @@ export class Constants {
     VariableShouldBeDefined: Constants.getMessageVariableShouldBeDefined,
     WorkspaceShouldBeOpened: 'Workspace should be opened',
     DashboardVersionError: 'Please upgrade to the latest version of Truffle to use this feature',
+    HHNoDefaultDeploy:
+      'Hardhat has no default deploy command. Consider using the HardHat Deploy Plugin: [hardhat-deploy](https://github.com/wighawag/hardhat-deploy)',
   };
 
   public static informationMessage = {
