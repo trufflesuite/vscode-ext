@@ -1,51 +1,52 @@
-const logPanel = {
-  vscode: acquireVsCodeApi(),
-  create: {
-    log: (tool, message, description) => {
-      const tab = logPanel.get.tab(tool, description);
+const logView = {
+  config: {
+    state: acquireVsCodeApi(),
+    virtualPath: document.getElementById('virtualPath').value,
+  },
+  log: {
+    create: (tool, message, description) => {
+      // Retrieve the tab that belongs to the tool
+      const tab = logView.tab.get(tool, description);
 
-      // Create the log record
-      const content = document.createElement('div');
-      content.innerHTML = message;
-
-      const contantContainer = document.querySelector(`[data-content="${tab.id}"]`);
-      contantContainer.appendChild(content);
-      contantContainer.scrollTop = contantContainer.scrollHeight;
+      // Create the content
+      logView.content.create(tab, message);
 
       // Save the log state
-      logPanel.vscode.setState({log: document.getElementById('tab-container').innerHTML});
-    },
-  },
-  get: {
-    tab: (tool, description) => {
-      const id = description ? `${tool}:${description}` : tool;
-      const tab = document.querySelector(`[data-id="${id}"]`);
-
-      if (tab) {
-        return tab;
-      } else {
-        const availableTab = document.querySelector('[data-available="true"]');
-        availableTab.dataset.id = id;
-        availableTab.dataset.available = false;
-
-        const label = document.querySelector(`[for="${availableTab.id}"]`);
-        const virtualPath = document.getElementById('virtualPath').value;
-        const icon = `<img src="${virtualPath}/images/${tool}-log.png">`;
-        const title = `<span>${description ? `${tool} :${description}` : tool}</span>`;
-        label.innerHTML = `${icon} ${title}`;
-        label.style.display = 'block';
-
-        return availableTab;
-      }
+      logView.config.state.setState({log: document.getElementById('tab-container').innerHTML});
     },
     history: () => {
-      const state = logPanel.vscode.getState();
+      // Retrieve the history of content recorded in state
+      const state = logView.config.state.getState();
       if (state.log !== '') document.getElementById('tab-container').innerHTML = state.log;
     },
   },
-  dispose: {
-    tab: (tool, description) => {
-      const tab = logPanel.get.tab(tool, description);
+  tab: {
+    get: (tool, description) => {
+      // Retrieve the tab that belongs to the tool
+      const id = description ? `${tool}:${description}` : tool;
+      const tab = document.querySelector(`[data-id="${id}"]`);
+
+      // If the tab exists, it returns its instance, otherwise it looks for a new available tab
+      return tab ? tab : logView.tab.set(tool, id);
+    },
+    set: (tool, id) => {
+      // Retrieve the next available tab
+      const tab = document.querySelector('[data-available="true"]');
+      tab.dataset.id = id;
+      tab.dataset.available = false;
+
+      // Set the tab configuration data: icon & title
+      const label = document.querySelector(`[for="${tab.id}"]`);
+      const icon = `<img src="${logView.config.virtualPath}/images/${tool}-log.png">`;
+      const title = `<span>${id}</span>`;
+      label.innerHTML = `${icon} ${title}`;
+      label.style.display = 'block';
+
+      return tab;
+    },
+    dispose: (tool, description) => {
+      // Retrieve the tab and reset it
+      const tab = logView.tab.get(tool, description);
       tab.dataset.id = '';
       tab.dataset.available = true;
 
@@ -53,14 +54,28 @@ const logPanel = {
       label.innerHTML = '';
       label.style.display = 'none';
 
-      const contentContainer = document.querySelector(`[data-content="${tab.id}"]`);
-      contentContainer.innerHTML = '';
+      // Retrieve the content container and reset it
+      const content = document.querySelector(`[data-content="${tab.id}"]`);
+      content.innerHTML = '';
 
+      // Set the focus to the previous tab
       const tabFocus = document.querySelector('[data-available="false"]');
       tabFocus.checked = true;
 
       // Save the log state
-      logPanel.vscode.setState({log: document.getElementById('tab-container').innerHTML});
+      logView.config.state.setState({log: document.getElementById('tab-container').innerHTML});
+    },
+  },
+  content: {
+    create: (tab, message) => {
+      // Create the content node
+      const node = document.createElement('div');
+      node.innerHTML = message;
+
+      // Retrieve content container according to tab and insert the new content
+      const content = document.querySelector(`[data-content="${tab.id}"]`);
+      content.appendChild(node);
+      content.scrollTop = content.scrollHeight;
     },
   },
 };
@@ -70,15 +85,18 @@ window.addEventListener('message', (event) => {
   const data = event.data; // The json data that the extension sent
   switch (data.command) {
     case 'create.log': {
-      logPanel.create.log(data.tool, data.message, data.description);
+      // Create the new log register
+      logView.log.create(data.tool, data.message, data.description);
       break;
     }
     case 'get.history': {
-      logPanel.get.history();
+      // Retrieve the log history
+      logView.log.history();
       break;
     }
     case 'dispose.tab': {
-      logPanel.dispose.tab(data.tool, data.description);
+      // Dispose the chosen tab
+      logView.tab.dispose(data.tool, data.description);
       break;
     }
   }

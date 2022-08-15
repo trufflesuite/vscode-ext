@@ -19,6 +19,7 @@ div.tab-frame label {
   color: #f2ede7;
   text-transform: uppercase;
   font-size: 12px;
+  background-color: #33262a;
 }
 
 div.tab-frame label img {

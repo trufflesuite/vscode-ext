@@ -122,7 +122,7 @@ export namespace TruffleCommands {
       (reason) => {
         // ignore
         const outputStr = `Error refreshing view: ${reason}`;
-        Output ? Output.output(OutputLabel.truffleForVSCode, outputStr) : console.log(outputStr);
+        Output ? Output.outputLine(OutputLabel.truffleForVSCode, outputStr) : console.log(outputStr);
       }
     );
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandFinished');

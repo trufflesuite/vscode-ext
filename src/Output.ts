@@ -16,15 +16,14 @@ export enum OutputLabel {
 }
 
 export class Output {
-  public static output(label: OutputLabel, message: string, description?: string): void {
-    commands.executeCommand(
-      `${Constants.panels.log.viewType}.create.log`,
-      label,
-      this.formatMessage(label, message),
-      description
-    );
-  }
-
+  /**
+   * Append the given value and a line feed character
+   * to the log panel
+   *
+   * @param label - represents the log type
+   * @param message - represents the log text
+   * @param description - represents the log description
+   */
   public static outputLine(label: OutputLabel, message: string, description?: string): void {
     commands.executeCommand(
       `${Constants.panels.log.viewType}.create.log`,
@@ -34,19 +33,22 @@ export class Output {
     );
   }
 
-  public static info(label: OutputLabel, message: string, description?: string): void {
-    commands.executeCommand(
-      `${Constants.panels.log.viewType}.create.log`,
-      label,
-      this.formatMessage(label, message),
-      description
-    );
-  }
-
+  /**
+   * Remove the log container from the log panel
+   *
+   * @param label - represents the log type
+   * @param description - represents the log description
+   */
   public static dispose(label: OutputLabel, description?: string): void {
     commands.executeCommand(`${Constants.panels.log.viewType}.dispose.tab`, label, description);
   }
 
+  /**
+   * Format the text of the message that will be printed
+   *
+   * @param label - represents the log type
+   * @param message - represents the log text
+   */
   private static formatMessage(label = '', message = ''): string {
     return `${label ? `[${label}] ` : ''}${message}`;
   }
