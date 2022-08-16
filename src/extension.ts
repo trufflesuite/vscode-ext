@@ -56,7 +56,8 @@ export async function activate(context: ExtensionContext) {
 
   DebuggerConfiguration.initialize(context);
 
-  const logView = registerLogView(context);
+  // Registering the log view as first because it needs to print the requirement log
+  await registerLogView(context);
 
   await required.checkAllApps();
 
@@ -247,7 +248,6 @@ export async function activate(context: ExtensionContext) {
     deploymentView,
     dashboardView,
     checkForConnection,
-    logView,
   ];
   context.subscriptions.push(...subscriptions);
 

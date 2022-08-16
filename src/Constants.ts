@@ -150,17 +150,6 @@ export class Constants {
     },
   };
 
-  public static panels = {
-    log: {
-      viewType: 'truffle-vscode.panel.log',
-      tool: {
-        truffle: 'truffle',
-        ganache: 'ganache',
-        dashboard: 'dashboard',
-      },
-    },
-  };
-
   public static contractExtension = {
     json: '.json',
     sol: '.sol',

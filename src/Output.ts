@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {commands} from 'vscode';
-import {Constants} from './Constants';
+import {LogView} from './views/LogView';
 
 export enum OutputLabel {
   truffleForVSCode = 'Truffle for VSCode',
@@ -25,12 +25,7 @@ export class Output {
    * @param description - represents the log description
    */
   public static outputLine(label: OutputLabel, message: string, description?: string): void {
-    commands.executeCommand(
-      `${Constants.panels.log.viewType}.create.log`,
-      label,
-      this.formatMessage(label, message),
-      description
-    );
+    commands.executeCommand(`${LogView.viewType}.create.log`, label, this.formatMessage(label, message), description);
   }
 
   /**
@@ -40,7 +35,7 @@ export class Output {
    * @param description - represents the log description
    */
   public static dispose(label: OutputLabel, description?: string): void {
-    commands.executeCommand(`${Constants.panels.log.viewType}.dispose.tab`, label, description);
+    commands.executeCommand(`${LogView.viewType}.dispose.tab`, label, description);
   }
 
   /**

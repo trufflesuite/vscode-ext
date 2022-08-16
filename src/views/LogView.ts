@@ -1,12 +1,26 @@
-import * as vscode from 'vscode';
 import fs from 'fs-extra';
 import path from 'path';
-import {Constants} from '@/Constants';
 import {OutputLabel} from '@/Output';
+import {
+  CancellationToken,
+  commands,
+  ExtensionContext,
+  Uri,
+  WebviewView,
+  WebviewViewProvider,
+  WebviewViewResolveContext,
+  window,
+} from 'vscode';
 
 enum Commands {
   createLog = 'createLog',
   disposeTab = 'disposeTab',
+}
+
+enum Tools {
+  truffle = 'truffle',
+  ganache = 'ganache',
+  dashboard = 'dashboard',
 }
 
 type TLog = {
@@ -16,20 +30,21 @@ type TLog = {
   description?: string;
 };
 
-class LogView implements vscode.WebviewViewProvider {
-  private _extensionUri: vscode.Uri;
-  private _view?: vscode.WebviewView;
+export class LogView implements WebviewViewProvider {
+  public static readonly viewType = 'truffle-vscode.panel.log';
+  private _extensionUri: Uri;
+  private _view?: WebviewView;
   private _lazyLogs: TLog[];
 
-  constructor(private readonly _context: vscode.ExtensionContext) {
+  constructor(private readonly _context: ExtensionContext) {
     this._extensionUri = this._context.extensionUri;
     this._lazyLogs = [];
   }
 
   public async resolveWebviewView(
-    webviewView: vscode.WebviewView,
-    _context: vscode.WebviewViewResolveContext,
-    _token: vscode.CancellationToken
+    webviewView: WebviewView,
+    _context: WebviewViewResolveContext,
+    _token: CancellationToken
   ): Promise<void> {
     // Set the webview
     this._view = webviewView;
@@ -133,15 +148,15 @@ class LogView implements vscode.WebviewViewProvider {
     switch (label) {
       case OutputLabel.ganacheCommands:
         // Ganache
-        tool = Constants.panels.log.tool.ganache;
+        tool = Tools.ganache;
         break;
       case OutputLabel.dashboardCommands:
         // Dashboard
-        tool = Constants.panels.log.tool.dashboard;
+        tool = Tools.dashboard;
         break;
       // Truffle
       default:
-        tool = Constants.panels.log.tool.truffle;
+        tool = Tools.truffle;
         break;
     }
 
@@ -190,25 +205,26 @@ class LogView implements vscode.WebviewViewProvider {
  *
  * @param context - An extension context is a collection of utilities private to an extension
  */
-export function registerLogView(context: vscode.ExtensionContext): vscode.Disposable {
+export async function registerLogView(context: ExtensionContext): Promise<void> {
   const logView = new LogView(context);
 
+  // Registers the web view provider
+  context.subscriptions.push(window.registerWebviewViewProvider(LogView.viewType, logView));
+
   // Registers the command responsible for creating the logs
-  vscode.commands.registerCommand(
-    `${Constants.panels.log.viewType}.create.log`,
-    async (label: OutputLabel, message: string, description?: string) => {
-      await logView.createLog(label, message, description);
-    }
+  context.subscriptions.push(
+    commands.registerCommand(
+      `${LogView.viewType}.create.log`,
+      async (label: OutputLabel, message: string, description?: string) => {
+        await logView.createLog(label, message, description);
+      }
+    )
   );
 
   // Registers the command responsible for disposing the tabs
-  vscode.commands.registerCommand(
-    `${Constants.panels.log.viewType}.dispose.tab`,
-    async (label: OutputLabel, description?: string) => {
+  context.subscriptions.push(
+    commands.registerCommand(`${LogView.viewType}.dispose.tab`, async (label: OutputLabel, description?: string) => {
       await logView.disposeTab(label, description);
-    }
+    })
   );
-
-  // Returns the result of web view provider registration
-  return vscode.window.registerWebviewViewProvider(Constants.panels.log.viewType, logView);
 }
