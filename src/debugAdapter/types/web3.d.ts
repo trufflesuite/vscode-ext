@@ -40,6 +40,7 @@ declare namespace Web3 {
     getBlockNumber: any;
     currentProvider: any;
     getAccounts: any;
+    getBalance: any;
   }
 
   const providers: {

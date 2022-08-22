@@ -36,6 +36,7 @@ import {registerDeploymentView} from './views/DeploymentsView';
 import {registerFileExplorerView} from './views/fileExplorer';
 import {registerHelpView} from './views/HelpView';
 import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
+import {registerGanacheDetails} from './pages/GanacheDetails';
 
 export async function activate(context: ExtensionContext) {
   /**
@@ -66,12 +67,16 @@ export async function activate(context: ExtensionContext) {
   TreeService.initialize('truffle-vscode.truffle');
   await sdkCoreCommands.initialize(context.globalState);
 
+  //#region trufflesuite pages
   const welcomePage = new WelcomePage(context);
   const requirementsPage = new RequirementsPage(context);
   const changelogPage = new ChangelogPage(context);
 
   await welcomePage.checkAndShow();
   await changelogPage.checkAndShow();
+
+  registerGanacheDetails(context);
+  //#endregion
 
   registerCommand('truffle-vscode.openUrl', (node: OpenUrlTreeItem) => node.openUrl());
 
