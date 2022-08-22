@@ -420,7 +420,7 @@ describe('Required helper', () => {
         assert.strictEqual(result, true, 'returned result should be true');
         assert.strictEqual(tryExecuteCommandMock.callCount, 3, 'tryExecuteCommand should be called 3 times');
         assert.strictEqual(showErrorMessageMock.called, false, "showErrorMessage shouldn't be called");
-        assert.strictEqual(executeVSCommandMock.called, true, "executeVSCommand shouldn't be called");
+        assert.strictEqual(executeVSCommandMock.called, true, 'executeVSCommand should be called');
       });
 
       it('should return false when there are invalid versions', async () => {
@@ -464,7 +464,7 @@ describe('Required helper', () => {
         assert.strictEqual(result, true, 'returned result should be true');
         assert.strictEqual(tryExecuteCommandMock.callCount, 3, 'tryExecuteCommand should be called 3 times');
         assert.strictEqual(showErrorMessageMock.called, false, "showErrorMessage shouldn't be called");
-        assert.strictEqual(executeVSCommandMock.called, true, "executeVSCommand shouldn't be called");
+        assert.strictEqual(executeVSCommandMock.called, true, 'executeVSCommand should be called');
       });
 
       it('should return false when there are invalid versions', async () => {
