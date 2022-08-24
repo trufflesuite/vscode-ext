@@ -193,7 +193,7 @@
       },
       {
         "command": "truffle-vscode.getGanacheServerInfo",
-        "title": "Get More Information...",
+        "title": "Get Details...",
         "category": "Truffle"
       },
       {

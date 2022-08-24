@@ -75,7 +75,7 @@ export async function activate(context: ExtensionContext) {
   await welcomePage.checkAndShow();
   await changelogPage.checkAndShow();
 
-  registerGanacheDetails(context);
+  await registerGanacheDetails(context);
   //#endregion
 
   registerCommand('truffle-vscode.openUrl', (node: OpenUrlTreeItem) => node.openUrl());

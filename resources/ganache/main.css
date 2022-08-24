@@ -81,22 +81,6 @@
 }
 
 @font-face {
-  font-family: 'Fira Sans Bold';
-  font-weight: 300;
-  font-style: normal;
-
-  src: url(assets/fonts/FiraSans-Bold.ttf) format('truetype');
-}
-
-@font-face {
-  font-family: 'Fira Sans SemiBold';
-  font-weight: 300;
-  font-style: normal;
-
-  src: url(assets/fonts/FiraSans-SemiBold.ttf) format('truetype');
-}
-
-@font-face {
   font-family: 'Fira Code Regular';
   font-weight: 300;
   font-style: normal;
@@ -104,19 +88,12 @@
   src: url(assets/fonts/FiraCode-Regular.ttf) format('truetype');
 }
 
-@font-face {
-  font-family: 'Grand Hotel';
-  font-weight: 300;
-  font-style: normal;
-
-  src: url(assets/fonts/GrandHotel-Regular.ttf) format('truetype');
-}
-
 html {
   box-sizing: border-box !important;
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
   background-color: #312c2a !important;
+  height: 100vh !important;
 }
 
 body {
@@ -124,107 +101,101 @@ body {
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004) !important;
   background-color: var(--app-background-color) !important;
   color: var(--app-button-primary-background-color) !important;
-  font-family: 'Fira Sans' !important;
+  font-family: Fira Sans !important;
   font-weight: 200 !important;
+  height: 100vh !important;
 }
 
-div.tab-frame {
-  background-color: var(--app-navbar-background);
+.StatusAndControls {
+  width: 100vw;
+  height: 56px;
+  color: var(--app-statusbar-text);
+  display: flex;
+  -webkit-app-region: no-drag;
+  flex-shrink: 0;
+  flex-direction: column;
+  font-family: RobotoCondensed-Bold;
+  background-color: var(--app-statusbar-background);
+  border-bottom: solid 1px var(--app-navbar-background);
 }
 
-div.tab-frame input {
-  display: none;
+.Status {
+  display: flex;
+  flex: 1;
 }
 
-div.tab-frame label {
-  float: left;
-  padding: 8px 24px;
-  color: gray;
-  background-color: var(--app-navbar-background);
-  line-height: 35px;
-  font-size: 15px;
-  font-family: 'RobotoCondensed-Bold';
-  text-transform: uppercase;
-  cursor: pointer;
-  min-width: 145px;
+.StatusIndicator {
+  padding: 0 0rem 0 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 55px;
+  border-right: 1px solid var(--app-statusbar-item-border-color);
 }
 
-div.tab-frame label svg {
-  width: 35px;
-  float: left;
-  fill: none;
-  stroke: gray;
+.Metric {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+  padding-right: 1rem;
 }
 
-div.tab-frame label span {
-  margin-left: 10px;
+.Metric div {
+  font-size: 10px;
+  margin: 0;
+  padding: 0;
 }
 
-div.tab-frame input:checked + label {
+.Metric span {
+  font-size: 13px;
   color: var(--primary-color);
-}
-
-div.tab-frame input:checked + label svg {
-  stroke: var(--primary-color);
-}
-
-div.tab-frame div.tab {
-  display: none;
-  clear: left;
-  height: 85vh;
-  color: var(--text-color);
-  overflow-y: scroll;
-  background-color: var(--app-background-color);
-}
-
-div.tab-frame input:nth-of-type(1):checked ~ .tab:nth-of-type(1),
-div.tab-frame input:nth-of-type(2):checked ~ .tab:nth-of-type(2),
-div.tab-frame input:nth-of-type(3):checked ~ .tab:nth-of-type(3),
-div.tab-frame input:nth-of-type(4):checked ~ .tab:nth-of-type(4),
-div.tab-frame input:nth-of-type(5):checked ~ .tab:nth-of-type(5) {
-  display: block;
+  text-transform: uppercase;
 }
 
 .AccountCard {
+  width: 100%;
+  height: 100%;
+  background: white;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.3rem 0.8rem;
-  background-color: var(--app-card-default-background);
-  position: relative;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.MiniTxCard {
+  font-family: Fira Code Regular, monospaced;
+  width: 100%;
+  background: var(--app-card-default-background);
+  padding: 28px 18px;
+  word-wrap: break-word;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  transition: all 0.3s;
   border-bottom: 1px solid #aaa;
 }
 
-.AddressAndBalance {
+.MiniTxCard .Row.Top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.MiniTxCard .Row {
+  margin-bottom: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 120px 200px;
+}
+
+.MiniTxCard .RowItem {
   display: flex;
   flex-direction: row;
-  width: 60%;
-}
-
-.AccountAddress {
-  font-weight: bold;
-  margin-right: 2rem;
-}
-
-.AccountBalance {
-  font-weight: bold;
-}
-
-.SecondaryInfo {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  width: 40%;
-}
-
-.TransactionCount {
-  width: 20%;
+  justify-content: space-between;
+  cursor: pointer;
 }
 
 .Label {
   font-size: 0.75rem;
-  font-family: 'RobotoCondensed-Regular';
+  font-family: RobotoCondensed-Regular;
   font-weight: 800;
   color: var(--app-card-label);
   margin-bottom: 0.25rem;
@@ -233,7 +204,62 @@ div.tab-frame input:nth-of-type(5):checked ~ .tab:nth-of-type(5) {
 
 .Value {
   font-size: 1.125rem;
-  font-family: 'Fira Code Regular';
+  font-family: Fira Code Regular;
   color: var(--app-card-value);
   word-break: break-all;
+}
+
+.MiniTxCard .Row:last-of-type {
+  margin-bottom: 0;
+}
+
+.MiniTxCard .SecondaryItems .Value {
+  font-size: 0.825rem;
+}
+
+.TxHash .Value {
+  font-weight: bold;
+}
+
+.Waiting {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  font-family: RobotoCondensed-Bold;
+  text-transform: uppercase;
+  font-size: 1.3rem;
+  color: var(--app-page-intentionally-left-blank);
+}
+
+.Button {
+  resize: none;
+  border: 0;
+  background-color: var(--app-button-primary-color);
+  height: 32px;
+  padding: 0 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-transform: uppercase;
+  color: var(--app-button-primary-background-color);
+  border-radius: 3px;
+  font-family: RobotoCondensed-Bold;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 32px;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  -webkit-app-region: no-drag;
+  padding-left: 1rem;
+  margin: 0.75rem 0.5rem 0.75rem 0;
+}
+
+.Button svg {
+  height: 18px;
+  width: 18px;
+  margin-right: 0.5rem;
 }

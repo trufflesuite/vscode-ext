@@ -41,6 +41,7 @@ declare namespace Web3 {
     currentProvider: any;
     getAccounts: any;
     getBalance: any;
+    getGasPrice: any;
   }
 
   const providers: {
