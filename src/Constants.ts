@@ -1,7 +1,6 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {IAzExtOutputChannel} from '@microsoft/vscode-azext-utils';
 import os from 'os';
 import path from 'path';
 import {ExtensionContext, extensions} from 'vscode';
@@ -30,17 +29,6 @@ export class Constants {
   public static extensionName = packageJSON.name;
   public static extensionVersion = packageJSON.version;
   public static extensionKey = packageJSON.aiKey;
-
-  public static outputChannel = {
-    truffleForVSCode: 'Truffle for VSCode',
-    executeCommand: 'Truffle: Execute command',
-    ganacheCommands: 'Truffle: Ganache Server',
-    genericCommands: 'Truffle: Generic Server',
-    dashboardCommands: 'Truffle: Dashboard Server',
-    requirements: 'Truffle: Requirements',
-    telemetryClient: 'Truffle: Telemetry Client',
-    treeManager: 'Truffle: Service Tree Manager',
-  };
 
   public static truffleConfigRequireNames = {
     fs: 'fs',
@@ -71,6 +59,15 @@ export class Constants {
   public static dashboardPort = 24012;
   public static dashboardRetryTimeout = 2000; // milliseconds
   public static dashboardRetryAttempts = 5;
+
+  public static fileExplorerConfig = {
+    contractFolder: 'contracts',
+    contextValue: {
+      root: 'root',
+      folder: 'folder',
+      file: 'file',
+    },
+  };
 
   // Values are quite brittle and don't map directly to the requirements.html screen.
   public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
@@ -618,6 +615,7 @@ export class Constants {
     signInButton: 'Sign In',
     transactionBytecodeWasCopiedToClipboard: 'Transaction Bytecode was copied to clipboard',
     transactionNodeNameValidating: 'Transaction Node name validating...',
+    transactionNotFound: 'No transactions deployed to this network',
     unsupportedVersionOfExternalExtension: (name: string, currentVersion: string, supportedVersion: string) =>
       `You try to use "${name}" extension of version ${currentVersion}, but current supported vesrion is ${supportedVersion}.`,
   };
@@ -805,15 +803,6 @@ export class Constants {
     '**/Modules/TinyMCE/JoplinLists/**',
     '**/Modules/TinyMCE/IconPack/**',
   ];
-}
-
-/**
- * Namespace for common variables used throughout the extension. They must be initialized in the activate() method of extension.ts
- */
-export namespace ext {
-  export const prefix = 'truffle-vscode';
-  export let context: ExtensionContext;
-  export let outputChannel: IAzExtOutputChannel;
 }
 
 export enum ChainId {

@@ -26,4 +26,4 @@ jobs:
         run: yarn eslint
 
       - name: Tests
-        run: yarn test
+        run: yarn test:int

@@ -5,7 +5,7 @@ import assert from 'assert';
 import fs from 'fs';
 import path from 'path';
 import sinon from 'sinon';
-import vscode, {QuickPickItem} from 'vscode';
+import * as vscode from 'vscode';
 import {window} from 'vscode';
 import {TruffleCommands} from '@/commands';
 import {Constants} from '@/Constants';
@@ -95,7 +95,9 @@ describe('TruffleCommands - Write To Buffer', () => {
       sinon.stub(ContractDB, 'getContractInstances').resolves(mockContracts);
       sinon
         .stub(window, 'showQuickPick')
-        .callsFake(async function showQuickPick(items: readonly QuickPickItem[] | Thenable<readonly QuickPickItem[]>) {
+        .callsFake(async function showQuickPick(
+          items: readonly vscode.QuickPickItem[] | Thenable<readonly vscode.QuickPickItem[]>
+        ) {
           if (items instanceof Array) {
             return items.find((arg: any) => arg.label === selectedNetworkName);
           }
