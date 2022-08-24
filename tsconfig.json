@@ -37,7 +37,7 @@
     "allowJs": true,
     "checkJs": false,
     "skipLibCheck": true,
-    "typeRoots": ["./node_modules/@types", "./node_modules/@machinomy", "./src/debugger/types", "./typings/"],
+    "typeRoots": ["./src/debugger/types"],
     "types": ["mocha", "chai", "node", "global"]
   },
   "include": [

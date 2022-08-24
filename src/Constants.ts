@@ -103,7 +103,7 @@ export class Constants {
     },
     [OptionalApps.hardhat]: {
       max: '',
-      min: '2.10.0',
+      min: '2.9.0',
     },
   };
 
