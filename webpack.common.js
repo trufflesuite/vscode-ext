@@ -11,15 +11,11 @@ module.exports = {
   target: 'node',
   entry: {
     extension: './src/extension.ts',
-    debugger: './src/debugger.ts',
   },
   output: {
     path: path.join(__dirname, 'out', 'src'),
     filename: '[name].js',
     libraryTarget: 'commonjs2',
-  },
-  optimization: {
-    minimize: true,
   },
   externals: function ({context, request}, callback) {
     if (/^vscode$/.test(request)) {
@@ -52,13 +48,7 @@ module.exports = {
   },
   plugins: [
     new CopyPlugin({
-      patterns: [
-        {from: './src/debugAdapter/web3ProviderResolver.js', to: './'},
-        {from: './src/helpers/checkTruffleConfigTemplate.js', to: './'},
-      ],
-    }),
-    new webpack.DefinePlugin({
-      IS_BUNDLE_TIME: true,
+      patterns: [{from: './src/helpers/checkTruffleConfigTemplate.js', to: './'}],
     }),
   ],
   node: {
