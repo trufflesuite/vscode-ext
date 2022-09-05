@@ -37,6 +37,4 @@ export const EVALUATE_REQUEST_TYPES = {
 
 export const DEBUG_TYPE = 'truffle';
 
-export const EMBED_DEBUG_ADAPTER = typeof IS_BUNDLE_TIME === 'undefined' || IS_BUNDLE_TIME === false;
-
 export const ERROR_MESSAGE_ID = 1;

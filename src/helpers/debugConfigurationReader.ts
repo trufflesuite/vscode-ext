@@ -12,7 +12,7 @@ import {generate} from 'astring';
 import ESTree from 'estree';
 import fs from 'fs-extra';
 import path from 'path';
-import {tryExecuteCommandInFork} from './cmdCommandExecutor';
+import {tryExecuteCommandInFork} from '../debugAdapter/cmdCommandExecutor';
 import {IConfiguration, INetwork, INetworkOption, IProvider} from '@/helpers/ConfigurationReader';
 
 const truffleConfigRequireNames = {
@@ -134,10 +134,7 @@ export namespace ConfigurationReader {
   }
 
   async function getTruffleMetadata(workingDirectory: string): Promise<IConfiguration> {
-    const truffleConfigTemplatePath =
-      typeof IS_BUNDLE_TIME === 'undefined' || IS_BUNDLE_TIME === false
-        ? path.join(__dirname, '..', 'helpers', 'checkTruffleConfigTemplate.js')
-        : path.join(__dirname, 'checkTruffleConfigTemplate.js');
+    const truffleConfigTemplatePath = path.join(__dirname, 'checkTruffleConfigTemplate.js');
     const truffleConfigPath = 'truffle-config.js';
 
     const result = await tryExecuteCommandInFork(workingDirectory, truffleConfigTemplatePath, truffleConfigPath);

@@ -535,7 +535,6 @@
       {
         "type": "truffle",
         "label": "Truffle - Debugger",
-        "program": "./out/src/debugger.js",
         "runtime": "node",
         "configurationAttributes": {
           "launch": {
@@ -700,7 +699,7 @@
     "webpack:dev": "webpack --config webpack.dev.js",
     "webpack:prod": "webpack --config webpack.prod.js",
     "watch:webpack": "webpack --watch --config webpack.dev.js",
-    "copyFiles": "copyfiles -V -f ./src/debugAdapter/web3ProviderResolver.js ./src/helpers/checkTruffleConfigTemplate.js ./out/src/ ",
+    "copyFiles": "copyfiles -V -f ./src/helpers/checkTruffleConfigTemplate.js ./out/src/",
     "watch:tsc": "tsc-watch --onCompilationComplete \"yarn copyFiles\" ",
     "watch": "yarn watch:tsc",
     "prettier": "prettier --check .",
