@@ -4,12 +4,19 @@
 import {Constants, RequiredApps} from '@/Constants';
 import {required} from '@/helpers/required';
 import {checkTruffleConfigNaming} from '@/helpers/TruffleConfiguration';
-import {showIgnorableNotification, showInputBox, showOpenFolderDialog, showQuickPick} from '@/helpers/userInteraction';
+import {showIgnorableNotification, showOpenFolderDialog, showQuickPick} from '@/helpers/userInteraction';
 import {CancellationEvent} from '@/Models';
 import {Telemetry} from '@/TelemetryClient';
 import fs from 'fs-extra';
-import {Uri, window, workspace} from 'vscode';
+import requestPromise from 'request-promise';
+import {QuickPickItem, Uri, window, workspace} from 'vscode';
 import {gitHelper, outputCommandHelper} from '../helpers';
+
+type TBox = {
+  label: string;
+  detail: string;
+  unbox: string;
+};
 
 interface IProjectDestination {
   cmd: (projectPath: string) => Promise<void>;
@@ -81,20 +88,20 @@ async function createNewEmptyProject(projectPath: string): Promise<void> {
 }
 
 async function createProjectFromTruffleBox(projectPath: string): Promise<void> {
-  const truffleBoxName = await getTruffleBoxName();
+  const truffleUnboxCommand = await getTruffleUnboxCommand();
 
-  Telemetry.sendEvent('ProjectCommands.createProjectFromTruffleBox.started', {truffleBoxName});
+  Telemetry.sendEvent('ProjectCommands.createProjectFromTruffleBox.started', {truffleUnboxCommand});
 
-  await createProject(projectPath, truffleBoxName);
+  await createProject(projectPath, truffleUnboxCommand);
 
-  Telemetry.sendEvent('ProjectCommands.createProjectFromTruffleBox.finished', {truffleBoxName});
+  Telemetry.sendEvent('ProjectCommands.createProjectFromTruffleBox.finished', {truffleUnboxCommand});
 }
 
-async function createProject(projectPath: string, truffleBoxName: string): Promise<void> {
+async function createProject(projectPath: string, truffleUnboxCommand: string): Promise<void> {
   await showIgnorableNotification(Constants.statusBarMessages.creatingProject, async () => {
     try {
-      Telemetry.sendEvent('ProjectCommands.createProject.unbox', {truffleBoxName});
-      await outputCommandHelper.executeCommand(projectPath, 'npx', RequiredApps.truffle, 'unbox', truffleBoxName);
+      Telemetry.sendEvent('ProjectCommands.createProject.unbox', {truffleUnboxCommand});
+      await outputCommandHelper.executeCommand(projectPath, 'npx', RequiredApps.truffle, 'unbox', truffleUnboxCommand);
 
       checkTruffleConfigNaming(projectPath);
       workspace.updateWorkspaceFolders(0, workspace.workspaceFolders ? workspace.workspaceFolders.length : null, {
@@ -108,16 +115,38 @@ async function createProject(projectPath: string, truffleBoxName: string): Promi
   });
 }
 
-async function getTruffleBoxName(): Promise<string> {
-  return await showInputBox({
-    ignoreFocusOut: true,
-    prompt: Constants.paletteLabels.enterTruffleBoxName,
-    validateInput: (value: string) => {
-      if (value.indexOf('://') !== -1 || value.indexOf('git@') !== -1 || value.split('/').length === 2) {
-        return Constants.validationMessages.forbiddenSymbols;
-      }
+/**
+ * Gets the boxes list and show the options to the user
+ * @returns the unbox command of the box selected by the user
+ */
+async function getTruffleUnboxCommand(): Promise<string> {
+  const boxes = await getBoxes();
 
-      return;
-    },
-  });
+  const pick = (await showQuickPick(boxes as QuickPickItem[], {
+    placeHolder: Constants.paletteLabels.enterTruffleBoxName,
+    ignoreFocusOut: true,
+  })) as TBox;
+
+  return pick.unbox;
+}
+
+/**
+ * Gets the json file containing all the boxes from trufflesuite.com
+ * @returns a list of boxes based on the TBox type
+ */
+async function getBoxes(): Promise<TBox[]> {
+  try {
+    const response = await requestPromise.get(Constants.truffleBoxes);
+    const result = JSON.parse(response);
+
+    return Object.values(result).map((box: any) => {
+      return {
+        label: box.displayName,
+        detail: box.description,
+        unbox: box.official ? box.repoName : `${box.userOrg}/${box.repoName}`,
+      } as TBox;
+    });
+  } catch (error) {
+    throw new Error(Constants.errorMessageStrings.FetchingBoxesHasFailed);
+  }
 }

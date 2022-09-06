@@ -43,6 +43,7 @@ export class Constants {
     migrations_directory: path.join('./', 'migrations'),
   };
 
+  public static truffleBoxes = 'https://trufflesuite.com/boxes/data.json';
   public static defaultTruffleBox = 'truffle-box/vscode-starter-box';
   public static defaultDebounceTimeout = 300;
   public static defaultInputNameInBdm = 'transaction-node';
@@ -590,6 +591,7 @@ export class Constants {
     VariableShouldBeDefined: Constants.getMessageVariableShouldBeDefined,
     WorkspaceShouldBeOpened: 'Workspace should be opened',
     DashboardVersionError: 'Please upgrade to the latest version of Truffle to use this feature',
+    FetchingBoxesHasFailed: 'An error occurred while fetching boxes',
   };
 
   public static informationMessage = {
