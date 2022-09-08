@@ -13,7 +13,7 @@ import {
   Service,
   ServiceTypes,
 } from '../../Models/TreeItems';
-import {Output} from '../../Output';
+import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '../../TelemetryClient';
 
 class ExtensionTreeManager {
@@ -47,7 +47,7 @@ class ExtensionTreeManager {
       } catch (error) {
         Telemetry.sendException(error as Error);
         Output.outputLine(
-          Constants.outputChannel.treeManager,
+          OutputLabel.treeManager,
           `${Constants.errorMessageStrings.LoadServiceTreeFailed} ${(error as Error).message}`
         );
       }
