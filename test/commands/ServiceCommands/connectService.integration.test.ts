@@ -5,7 +5,7 @@ import assert from 'assert';
 import rewire from 'rewire';
 import sinon from 'sinon';
 import uuid from 'uuid';
-import * as vscode from 'vscode';
+import vscode, {Uri} from 'vscode';
 import {Constants} from '../../../src/Constants';
 import {ItemType} from '../../../src/Models';
 import {LocalService, InfuraProject, Project} from '../../../src/Models/TreeItems';
@@ -15,7 +15,7 @@ import {GanacheService, TreeManager} from '../../../src/services';
 const {project} = Constants.treeItemData;
 
 const mockExtension: vscode.Extension<unknown> = {
-  extensionUri: vscode.Uri.parse(''),
+  extensionUri: Uri.parse(''),
   activate: mockActivate,
   exports: {},
   extensionKind: vscode.ExtensionKind.UI,

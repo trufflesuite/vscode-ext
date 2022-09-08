@@ -138,7 +138,10 @@ export namespace ConfigurationReader {
       typeof IS_BUNDLE_TIME === 'undefined' || IS_BUNDLE_TIME === false
         ? path.join(__dirname, '..', 'helpers', 'checkTruffleConfigTemplate.js')
         : path.join(__dirname, 'checkTruffleConfigTemplate.js');
-    const truffleConfigPath = 'truffle-config.js';
+    const truffleConfigPath = path.relative(
+      path.dirname(truffleConfigTemplatePath),
+      path.join(workingDirectory, 'truffle-config.js')
+    );
 
     const result = await tryExecuteCommandInFork(workingDirectory, truffleConfigTemplatePath, truffleConfigPath);
     const truffleConfigObject = result.messages!.find((message) => message.command === 'truffleConfig');

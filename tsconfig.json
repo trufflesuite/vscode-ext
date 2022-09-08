@@ -3,7 +3,7 @@
     "module": "commonjs",
     "target": "es6",
     "outDir": "out",
-    "lib": ["es6"],
+    "lib": ["es6", "dom"],
     "sourceMap": true,
     "resolveJsonModule": true,
     "baseUrl": "./",
@@ -48,20 +48,5 @@
     "test/**/*.ts",
     "test/**/*.json"
   ],
-  "exclude": ["node_modules", ".vscode-test", "drizzleUI", "ui-test"],
-
-  // In order for `ts-node`[1] to load `.d.ts` definitions,
-  // we need to explicitly enable the `files`[2] option.
-  //
-  // We use `.d.ts` definitions to declare variables outside `src/`,
-  // for instance `IS_BUILD_TIME` from `webpack.common.js`.
-  //
-  // Since we invoke `ts-node` from `.mocharc.js`,
-  // we need to enable this option here.
-  //
-  // [1] https://typestrong.org/ts-node/docs/configuration/#via-tsconfigjson-recommended
-  // [2] https://typestrong.org/ts-node/docs/options#files
-  "ts-node": {
-    "files": true
-  }
+  "exclude": ["node_modules", ".vscode-test", "drizzleUI", "ui-test"]
 }

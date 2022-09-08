@@ -61,7 +61,7 @@ jobs:
         run: yarn install --immutable --immutable-cache --check-cache
 
       - name: run tests
-        run: yarn test:int
+        run: yarn test
 
       - name: update metadata in package.json
         uses: onlyutkarsh/patch-files-action@v1.0.3

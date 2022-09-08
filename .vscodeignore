@@ -3,6 +3,7 @@
 .vscode/**
 .vscode-test/**
 coverage/**
+drizzleUI/**
 node_modules/**
 out/**
 !out/src/mscorlib.js
@@ -13,6 +14,7 @@ out/**
 !out/src/checkTruffleConfigTemplate.js
 src/**
 test/**
+ui-test/**
 .editorconfig
 .gitignore
 .npmignore
@@ -21,7 +23,6 @@ test/**
 **/*.map
 **/*.ts
 **/webpack.*.js
-**/.mocharc.js
 **/coverconfig.json
 .husky/**
 **/GitVersion.yml

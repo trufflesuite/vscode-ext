@@ -18,21 +18,14 @@ class SdkCoreCommands {
   }
 
   /**
-   * Triggers the build process to compile smart contracts.
-   *
-   * @param contractUri if provided, it is the `Uri` of the smart contract to be compiled.
+   * Calls build on an extension
    */
-  public async build(contractUri?: Uri): Promise<void> {
-    return this.extensionAdapter.build(contractUri);
+  public async build(uri: Uri): Promise<void> {
+    return this.extensionAdapter.build(uri);
   }
 
-  /**
-   * Deploys, _i.e._, `migrate`, smart contracts into a Network.
-   *
-   * @param contractUri FIXME: Is this used?
-   */
-  public async deploy(contractUri?: Uri): Promise<void> {
-    return this.extensionAdapter.deploy(contractUri);
+  public async deploy(uri: Uri): Promise<void> {
+    return this.extensionAdapter.deploy(uri);
   }
 
   private async getCoreSdk() {

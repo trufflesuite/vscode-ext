@@ -6,7 +6,7 @@ import os from 'os';
 import {OutputChannel, window, workspace} from 'vscode';
 import TelemetryReporter from 'vscode-extension-telemetry';
 import {Constants} from './Constants';
-import {Output, OutputLabel} from './Output';
+import {Output} from './Output';
 
 class ExtensionTelemetry {
   private readonly output?: OutputChannel;
@@ -22,7 +22,7 @@ class ExtensionTelemetry {
     const extensionKey = process.env.AIKEY || Constants.extensionKey;
     if (isEnableTelemetry) {
       if (isTestRun) {
-        this.output = window.createOutputChannel(OutputLabel.telemetryClient);
+        this.output = window.createOutputChannel(Constants.outputChannel.telemetryClient);
       } else {
         try {
           this.reporter = new TelemetryReporter(Constants.extensionName, Constants.extensionVersion, extensionKey);
@@ -30,7 +30,10 @@ class ExtensionTelemetry {
           this.defaultProperties['common.vscodemachineid'] = generateMachineId();
           this.defaultProperties['common.vscodesessionid'] = generateSessionId();
         } catch (error) {
-          Output.outputLine(OutputLabel.telemetryClient, `Initialize done with error: ${(error as Error).message}`);
+          Output.outputLine(
+            Constants.outputChannel.telemetryClient,
+            `Initialize done with error: ${(error as Error).message}`
+          );
         }
       }
     }
