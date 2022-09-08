@@ -308,6 +308,10 @@
         {
           "when": "false",
           "command": "truffle-vscode.buildSingleContract"
+        },
+        {
+          "when": "false",
+          "command": "truffle-vscode.getGanacheServerInfo"
         }
       ],
       "view/title": [

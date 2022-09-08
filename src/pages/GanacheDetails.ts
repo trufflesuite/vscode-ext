@@ -25,7 +25,7 @@ type TProjectInformation = {
  */
 type TProviderInformation = {
   currentBlock: number;
-  gasPrice: number;
+  gasPrice: string;
   gasLimit: number;
   networkId: string;
   rpcServer: string;
