@@ -18,10 +18,10 @@ export type ContractData = {
   lookupMap: Map<string, string>;
 };
 
-export async function prepareContracts(workingDirectory: any, providerUrl: string): Promise<ContractData> {
+export async function prepareContracts(workingDirectory: any): Promise<ContractData> {
   // TODO, the same code in the debuggerCommands.ts, do refactoring
   const debugNetwork = new DebugNetwork(workingDirectory);
-  await debugNetwork.load(providerUrl);
+  await debugNetwork.load();
   const contractBuildDir = debugNetwork.getTruffleConfiguration()!.contracts_build_directory;
   const debugNetworkOptions = debugNetwork.getNetwork()!.options;
   const web3 = new Web3Wrapper(debugNetworkOptions);

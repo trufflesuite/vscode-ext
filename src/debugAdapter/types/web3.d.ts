@@ -39,7 +39,6 @@ declare namespace Web3 {
     getTransactionReceipt: any;
     getBlockNumber: any;
     currentProvider: any;
-    getAccounts: any;
   }
 
   const providers: {
@@ -50,7 +49,6 @@ declare namespace Web3 {
 
 // eslint-disable-next-line no-redeclare
 declare class Web3 {
-  static IBatchRequest: any;
   constructor(provider: Web3.IProvider);
 
   eth: Web3.IWeb3Eth;

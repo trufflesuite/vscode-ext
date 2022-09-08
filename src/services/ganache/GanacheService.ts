@@ -1,7 +1,6 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {OutputLabel} from '@/Output';
 import {ChildProcess} from 'child_process';
 import {OutputChannel, window} from 'vscode';
 import {Constants, RequiredApps} from '../../Constants';
@@ -102,7 +101,7 @@ export namespace GanacheService {
     }
 
     const process = spawnProcess(undefined, 'npx', args);
-    const output = window.createOutputChannel(`${OutputLabel.ganacheCommands}:${port}`);
+    const output = window.createOutputChannel(`${Constants.outputChannel.ganacheCommands}:${port}`);
     const ganacheProcess = {port, process, output} as IGanacheProcess;
 
     output.show(true);

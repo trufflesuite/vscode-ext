@@ -106,7 +106,7 @@ export class SolidityDebugSession extends LoggingDebugSession {
       logger.setup(args.noDebug ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
 
       // start the program in the runtime
-      await this._runtime.attach(args.txHash, args.workingDirectory, args.providerUrl);
+      await this._runtime.attach(args.txHash, args.workingDirectory);
       await this._runtime.processInitialBreakPoints();
 
       // Events order is important

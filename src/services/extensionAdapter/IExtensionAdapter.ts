@@ -4,7 +4,6 @@ import {Uri} from 'vscode';
 
 export interface IExtensionAdapter {
   validateExtension: () => Promise<void>;
-
-  build: (contractUri?: Uri) => Promise<void>;
-  deploy: (contractUri?: Uri) => Promise<void>;
+  build: (uri: Uri) => Promise<void>;
+  deploy: (uri: Uri) => Promise<void>;
 }

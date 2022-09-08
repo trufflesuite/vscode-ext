@@ -27,7 +27,7 @@ describe('Telemetry helper test', () => {
   ];
 
   testNetworks.forEach((network) => {
-    it(`mapNetworkName should return correct result for network '${network.name}'`, () => {
+    it('mapNetworkName should return correct result', () => {
       // Act
       const result = telemetryHelper.mapNetworkName(network.name);
 
@@ -52,7 +52,7 @@ describe('Telemetry helper test', () => {
   ];
 
   testItemTypes.forEach((testItemType) => {
-    it(`mapNetworkName should return correct result for network type '${testItemType.expectedResult}'`, () => {
+    it('mapNetworkName should return correct result', () => {
       // Act
       const result = telemetryHelper.mapItemType(testItemType.itemType);
 

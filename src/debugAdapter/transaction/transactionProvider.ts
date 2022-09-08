@@ -1,7 +1,6 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from '@/Constants';
 import {TRANSACTION_NUMBER_TO_SHOW} from '../constants/transaction';
 import {ContractJsonsProvider} from '../contracts/contractJsonsProvider';
 import {groupBy} from '../helpers';
@@ -26,34 +25,16 @@ export class TransactionProvider {
   }
 
   public async getLastTransactionHashes(take: number = TRANSACTION_NUMBER_TO_SHOW): Promise<string[]> {
-    let latestBlockNumber: number;
-
-    try {
-      latestBlockNumber = await this._web3.eth.getBlockNumber();
-    } catch {
-      throw new Error(Constants.informationMessage.transactionNotFound);
-    }
-
-    const totalBlocks = latestBlockNumber - take > 0 ? take : latestBlockNumber;
-    const startingBlockNumber = latestBlockNumber - take > 0 ? latestBlockNumber - take : 0;
-    const blockNumbers = Array.from({length: totalBlocks}, (_, i) => i + 1 + startingBlockNumber).reverse();
-    const batchRequest = this._web3.createBatchRequest();
-
-    blockNumbers.forEach((block) => {
-      batchRequest.add(this._web3.eth.getBlock, block, true);
-    });
-
-    const blocks: any[] = await batchRequest.execute();
-    const accounts: string[] = await this._web3.eth.getAccounts();
+    const latestBlockNumber = await this._web3.eth.getBlockNumber();
+    const latestBlock = await this._web3.eth.getBlock(latestBlockNumber);
     const txHashes: string[] = [];
-
-    blocks.forEach((block) => {
-      const txs: any = Object.values(block.transactions)
-        .filter((tx: any) => accounts.includes(tx.from))
-        .map((tx: any) => tx.hash);
-
-      txHashes.push(...txs);
-    });
+    let block = latestBlock;
+    while (txHashes.length <= take && block.number > 0) {
+      for (let i = 0; i < block.transactions.length && txHashes.length < TRANSACTION_NUMBER_TO_SHOW; i++) {
+        txHashes.push(block.transactions[i]);
+      }
+      block = await this._web3.eth.getBlock(block.number - 1);
+    }
 
     return txHashes;
   }

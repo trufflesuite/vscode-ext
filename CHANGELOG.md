@@ -2,28 +2,6 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
-## 2.5.0 - _Haiku_ 😈
-
-This release has improved support to debug over a forked network and working with multiple Truffle projects in the same workspace.
-The brand new Walkthrough helps users to explore and discover the main features of the extension.
-Moreover, it has some bug fixes, internal optimisations, and code refactor for better maintainability.
-
-Give it a try and let us know what you think!
-
-### What's Changed
-
-- Ability to debug over a forked network [\#186](https://github.com/trufflesuite/vscode-ext/pull/186) ([xhulz](https://github.com/xhulz))
-- Use `contracts_directory` from Truffle config in `Create Contract` command [\#193](https://github.com/trufflesuite/vscode-ext/pull/193) ([acuarica](https://github.com/acuarica))
-- Fix Command Palette display filter for Build/Deploy/Create Contracts commands [\#192](https://github.com/trufflesuite/vscode-ext/pull/192) ([acuarica](https://github.com/acuarica))
-- Add support to run out tests without VS Code Development Extension Host [\#191](https://github.com/trufflesuite/vscode-ext/pull/191) ([acuarica](https://github.com/acuarica))
-- Add support for multiple Truffle config files [\#181](https://github.com/trufflesuite/vscode-ext/pull/181) ([acuarica](https://github.com/acuarica))
-- Honor the `contract_build_directory` property in Deployments view [\#179](https://github.com/trufflesuite/vscode-ext/pull/179) ([acuarica](https://github.com/acuarica))
-- Ability to compile a single contract [\#177](https://github.com/trufflesuite/vscode-ext/pull/177) ([xhulz](https://github.com/xhulz))
-- Dashboard link has added to dashboard view panel [\#172](https://github.com/trufflesuite/vscode-ext/pull/172) ([xhulz](https://github.com/xhulz))
-- Debug only works with Ganache Development Instance [\#170](https://github.com/trufflesuite/vscode-ext/pull/170) ([xhulz](https://github.com/xhulz))
-- Add a Walkthrough on the Getting Started splash [\#148](https://github.com/trufflesuite/vscode-ext/pull/148) ([acuarica](https://github.com/acuarica))
-- Replace `open` package with `vscode.env.openExternal` [\#195](https://github.com/trufflesuite/vscode-ext/pull/195) ([acuarica](https://github.com/acuarica))
-
 ## 2.4.0 - _Goblins_ 😈
 
 This release has some fixes around internal optimisations for our CI/Linting and cleanup of code where we were seeing issues with building contracts in mono repos etc.

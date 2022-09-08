@@ -142,8 +142,7 @@ besu: {
 
 ## Development
 
-We welcome pull requests.
-To get started, just fork this repo, clone it locally, and run:
+We welcome pull requests. To get started, just fork this repo, clone it locally, and run:
 
 ```shell
 # Install
@@ -152,9 +151,6 @@ yarn install
 
 # Test
 yarn test
-
-# Integration Test
-yarn test:int
 ```
 
 There are more docs online at the VS Code website on how to develop plugins at the [VS Code Docs - Extension API](https://code.visualstudio.com/api).
