@@ -38,6 +38,7 @@
   "activationEvents": [
     "onView:truffle-vscode.truffle",
     "onView:truffle-vscode.explorer-view",
+    "onView:truffle-vscode.panel.log",
     "onCommand:truffle-vscode.showWelcomePage",
     "onCommand:truffle-vscode.showRequirementsPage",
     "onCommand:truffle-vscode.refresh",
@@ -524,6 +525,15 @@
           "contextualTitle": "Help & Feedback section"
         }
       ],
+      "truffle-panel": [
+        {
+          "type": "webview",
+          "id": "truffle-vscode.panel.log",
+          "name": "",
+          "contextualTitle": "Truffle",
+          "icon": "images/views/history.svg"
+        }
+      ],
       "debug": [
         {
           "id": "truffle-vscode.InstructionView",
@@ -608,6 +618,13 @@
       "activitybar": [
         {
           "id": "truffle-activitybar-container",
+          "title": "Truffle",
+          "icon": "images/truffle.svg"
+        }
+      ],
+      "panel": [
+        {
+          "id": "truffle-panel",
           "title": "Truffle",
           "icon": "images/truffle.svg"
         }
