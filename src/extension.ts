@@ -17,7 +17,6 @@ import {Constants} from './Constants';
 import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
 import {required} from '@/helpers/required';
 import {CancellationEvent} from './Models';
-import {Output} from './Output';
 import {ChangelogPage, RequirementsPage, WelcomePage} from './pages';
 import {
   AdapterType,
@@ -33,10 +32,11 @@ import {Telemetry} from './TelemetryClient';
 import {NetworkNodeView, ProjectView} from './ViewItems';
 import {registerDashboardView} from './views/DashboardView';
 import {registerDeploymentView} from './views/DeploymentsView';
-import {registerFileExplorerView} from './views/fileExplorer';
+import {registerFileExplorerView} from './views/FileExplorer';
 import {registerHelpView} from './views/HelpView';
 import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 import {registerGanacheDetails} from './pages/GanacheDetails';
+import {registerLogView} from './views/LogView';
 
 export async function activate(context: ExtensionContext) {
   /**
@@ -54,9 +54,11 @@ export async function activate(context: ExtensionContext) {
   }
 
   Constants.initialize(context); // still do this first.
-  Output.init(context);
 
   DebuggerConfiguration.initialize(context);
+
+  // Registering the log view as first because it needs to print the requirement log
+  await registerLogView(context);
 
   await required.checkAllApps();
 
@@ -267,7 +269,6 @@ export async function deactivate(): Promise<void> {
   ContractDB.dispose();
   Telemetry.dispose();
   TreeManager.dispose();
-  Output.dispose();
 }
 
 async function tryExecute(func: () => Promise<any>, errorMessage: string | null = null): Promise<void> {

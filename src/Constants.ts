@@ -482,11 +482,19 @@ export class Constants {
   public static typeOfSolidityProject = {
     action: {
       emptyProject: 'createEmptyProject',
+      sampleProject: 'createSampleProject',
       projectFromTruffleBox: 'createProjectFromTruffleBox',
     },
     text: {
-      emptyProject: 'Create basic project',
-      projectFromTruffleBox: 'Create Project from Truffle box',
+      emptyProject: 'Create empty project',
+      sampleProject: 'Create sample project',
+      projectFromTruffleBox: 'Create project from Truffle box',
+    },
+    description: {
+      emptyProject: 'Empty project equivalent of truffle init',
+      sampleProject: 'Sample project (current vscode-starter-box) with some enhancements)',
+      projectFromTruffleBox:
+        'Project from Truffle Box (which will launch another dropdown with the full list of all boxes)',
     },
   };
 
