@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <link rel="stylesheet" href="{{root}}/resources/ganache/main.css" />
+    <title>Ganache Details</title>
+  </head>
+
+  <body>
+    <div>
+      <div class="StatusAndControls">
+        <div class="Status">
+          <div class="StatusIndicator">
+            <div class="Metric">
+              <div>CURRENT BLOCK</div>
+              <span id="current.block"></span>
+            </div>
+          </div>
+          <div class="StatusIndicator">
+            <div class="Metric">
+              <div>GAS PRICE</div>
+              <span id="gas.price"></span>
+            </div>
+          </div>
+          <div class="StatusIndicator">
+            <div class="Metric">
+              <div>GAS LIMIT</div>
+              <span id="gas.limit"></span>
+            </div>
+          </div>
+          <div class="StatusIndicator">
+            <div class="Metric">
+              <div>NETWORK ID</div>
+              <span id="network.id"></span>
+            </div>
+          </div>
+          <div class="StatusIndicator">
+            <div class="Metric">
+              <div>RPC SERVER</div>
+              <span id="rpc.server"></span>
+            </div>
+          </div>
+          <div class="StatusIndicator">
+            <div class="Metric">
+              <button class="Button" id="btn.refresh">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                  <g
+                    fill="none"
+                    stroke="#444"
+                    stroke-width="2"
+                    stroke-miterlimit="10"
+                  >
+                    <path
+                      d="M3 16c0 7.2 5.8 13 13 13s13-5.8 13-13S23.2 3 16 3c-5.2 0-9.9 3.2-11.9 7.7"
+                    ></path>
+                    <path
+                      stroke-linecap="square"
+                      d="M3.2 3.8l.9 6.9 6.9-.9"
+                    ></path>
+                  </g></svg
+                >REFRESH
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="AccountCard" id="txs.container"></div>
+    </div>
+    <script src="{{root}}/resources/ganache/main.js"></script>
+  </body>
+</html>

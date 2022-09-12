@@ -193,6 +193,11 @@
         "category": "Truffle"
       },
       {
+        "command": "truffle-vscode.getGanacheServerInfo",
+        "title": "Get Details...",
+        "category": "Truffle"
+      },
+      {
         "command": "truffle-vscode.signInToInfuraAccount",
         "title": "Sign in to Infura account",
         "category": "Truffle"
@@ -304,6 +309,10 @@
         {
           "when": "false",
           "command": "truffle-vscode.buildSingleContract"
+        },
+        {
+          "when": "false",
+          "command": "truffle-vscode.getGanacheServerInfo"
         }
       ],
       "view/title": [
@@ -362,6 +371,11 @@
           "group": "truffle-0@0"
         },
         {
+          "command": "truffle-vscode.disconnectProject",
+          "when": "view == truffle-vscode.truffle && viewItem == localproject",
+          "group": "truffle-0@0"
+        },
+        {
           "command": "truffle-vscode.startGanacheServer",
           "when": "view == truffle-vscode.truffle && viewItem == localproject",
           "group": "truffle-1@0"
@@ -377,14 +391,9 @@
           "group": "truffle-1@2"
         },
         {
-          "command": "truffle-vscode.disconnectProject",
+          "command": "truffle-vscode.getGanacheServerInfo",
           "when": "view == truffle-vscode.truffle && viewItem == localproject",
-          "group": "truffle-0@0"
-        },
-        {
-          "command": "truffle-vscode.disconnectProject",
-          "when": "view == truffle-vscode.truffle && viewItem == bdmproject",
-          "group": "truffle-0@0"
+          "group": "truffle-2@0"
         },
         {
           "command": "truffle-vscode.copyRPCEndpointAddress",

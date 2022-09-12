@@ -1,0 +1,265 @@
+:root {
+  --primary-color: rgba(235, 182, 126, 1);
+  --text-color: rgba(54, 65, 83, 1);
+
+  --truffle-green: #3fe0c5;
+  --subtle-green: #bcecd4;
+  --complimentary1: rgba(109, 163, 184, 1);
+  --error: #ec5c5c;
+
+  --app-background-color: rgba(255, 255, 255, 1);
+
+  --app-window-control-background: rgba(29, 28, 27, 1);
+  --app-navbar-background: rgba(64, 61, 58, 1);
+  --app-navbar-text: rgba(151, 151, 151, 1);
+  --app-navbar-icon-color: rgba(128, 128, 128, 1);
+
+  --app-statusbar-text: rgba(204, 204, 204, 1);
+  --app-statusbar-background: rgba(51, 48, 46, 1);
+  --app-statusbar-active-item-background: rgba(86, 78, 72, 1);
+  --app-statusbar-item-border-color: rgba(64, 61, 58, 1);
+  --app-statusbar-btn-text: #f8d2ab;
+
+  --app-card-default-border: rgba(200, 199, 196, 1);
+  --app-card-default-background: rgba(251, 249, 246, 1);
+  --app-card-label: rgba(96, 92, 89, 1);
+  --app-card-value: rgba(57, 52, 48, 1);
+
+  --app-highlight-color: rgba(208, 195, 188, 1);
+
+  --app-sidebar-background-color: rgba(42, 40, 37, 1);
+  --app-sidebar-header-text-color: rgba(96, 172, 197, 1);
+  --app-sidebar-divider-color: rgba(76, 75, 74, 1);
+
+  --app-panel-background-color: var(--app-background-color);
+  --app-panel-text-color: var(--app-sidebar-background-color);
+  --app-panel-divider-color: rgba(158, 148, 132, 1);
+  --app-panel-header-border-color: var(--app-panel-divider-color);
+
+  --app-button-primary-background-color: rgba(78, 60, 65, 1);
+  --app-button-primary-color: rgba(242, 175, 103, 1);
+  --app-button-primary-disabled-border-color: rgba(227, 227, 227, 1);
+
+  --app-account-list-background: rgba(255, 255, 255, 1);
+  --app-account-list-header-divider-color: var(--text-color);
+
+  --app-mnemonic-background-color: rgba(255, 255, 255, 1);
+
+  --app-title-bar-btn-close: rgba(255, 96, 88, 1);
+  --app-title-bar-btn-min: rgba(255, 191, 47, 1);
+  --app-title-bar-btn-max: rgba(40, 201, 64, 1);
+
+  --app-config-tab-active-text-color: rgba(235, 182, 126, 1);
+
+  --app-Blocks-card-header-title-text-color: rgba(102, 143, 156, 1);
+
+  --app-page-intentionally-left-blank: rgb(215, 215, 215);
+}
+
+@font-face {
+  font-family: 'RobotoCondensed-Regular';
+  font-weight: 300;
+  font-style: bold;
+
+  src: url(assets/fonts/RobotoCondensed-Regular.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'RobotoCondensed-Bold';
+  font-weight: 700;
+  font-style: bold;
+
+  src: url(assets/fonts/RobotoCondensed-Bold.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Fira Sans';
+  font-weight: 300;
+  font-style: normal;
+
+  src: url(assets/fonts/FiraSans-Regular.ttf) format('truetype');
+}
+
+@font-face {
+  font-family: 'Fira Code Regular';
+  font-weight: 300;
+  font-style: normal;
+
+  src: url(assets/fonts/FiraCode-Regular.ttf) format('truetype');
+}
+
+html {
+  box-sizing: border-box !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  background-color: #312c2a !important;
+  height: 100vh !important;
+}
+
+body {
+  padding: 0 !important;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004) !important;
+  background-color: var(--app-background-color) !important;
+  color: var(--app-button-primary-background-color) !important;
+  font-family: Fira Sans !important;
+  font-weight: 200 !important;
+  height: 100vh !important;
+}
+
+.StatusAndControls {
+  width: 100vw;
+  height: 56px;
+  color: var(--app-statusbar-text);
+  display: flex;
+  -webkit-app-region: no-drag;
+  flex-shrink: 0;
+  flex-direction: column;
+  font-family: RobotoCondensed-Bold;
+  background-color: var(--app-statusbar-background);
+  border-bottom: solid 1px var(--app-navbar-background);
+}
+
+.Status {
+  display: flex;
+  flex: 1;
+}
+
+.StatusIndicator {
+  padding: 0 0rem 0 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 55px;
+  border-right: 1px solid var(--app-statusbar-item-border-color);
+}
+
+.Metric {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+  padding-right: 1rem;
+}
+
+.Metric div {
+  font-size: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.Metric span {
+  font-size: 13px;
+  color: var(--primary-color);
+  text-transform: uppercase;
+}
+
+.AccountCard {
+  width: 100%;
+  height: 100%;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.MiniTxCard {
+  font-family: Fira Code Regular, monospaced;
+  width: 100%;
+  background: var(--app-card-default-background);
+  padding: 28px 18px;
+  word-wrap: break-word;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  transition: all 0.3s;
+  border-bottom: 1px solid #aaa;
+}
+
+.MiniTxCard .Row.Top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.MiniTxCard .Row {
+  margin-bottom: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 120px 200px;
+}
+
+.MiniTxCard .RowItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.Label {
+  font-size: 0.75rem;
+  font-family: RobotoCondensed-Regular;
+  font-weight: 800;
+  color: var(--app-card-label);
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+}
+
+.Value {
+  font-size: 1.125rem;
+  font-family: Fira Code Regular;
+  color: var(--app-card-value);
+  word-break: break-all;
+}
+
+.MiniTxCard .Row:last-of-type {
+  margin-bottom: 0;
+}
+
+.MiniTxCard .SecondaryItems .Value {
+  font-size: 0.825rem;
+}
+
+.TxHash .Value {
+  font-weight: bold;
+}
+
+.Waiting {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  font-family: RobotoCondensed-Bold;
+  text-transform: uppercase;
+  font-size: 1.3rem;
+  color: var(--app-page-intentionally-left-blank);
+}
+
+.Button {
+  resize: none;
+  border: 0;
+  background-color: var(--app-button-primary-color);
+  height: 32px;
+  padding: 0 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-transform: uppercase;
+  color: var(--app-button-primary-background-color);
+  border-radius: 3px;
+  font-family: RobotoCondensed-Bold;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 32px;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  -webkit-app-region: no-drag;
+  padding-left: 1rem;
+  margin: 0.75rem 0.5rem 0.75rem 0;
+}
+
+.Button svg {
+  height: 18px;
+  width: 18px;
+  margin-right: 0.5rem;
+}
