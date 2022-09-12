@@ -7,6 +7,7 @@ import {Telemetry} from '@/TelemetryClient';
 import * as path from 'path';
 import glob from 'glob';
 import {showQuickPick} from '@/helpers/userInteraction';
+import {TruffleCommands} from '@/commands';
 
 /**
  * The [glob](https://github.com/isaacs/node-glob#glob-primer) pattern to match Truffle config file names.
@@ -140,6 +141,17 @@ export async function getAllTruffleWorkspaces(): Promise<TruffleWorkspace[]> {
   );
 
   return workspaces;
+}
+
+export async function autoDeploySolidityFiles(toggleOnOff: boolean): Promise<void> {
+  if (toggleOnOff) {
+    workspace.onDidSaveTextDocument(async (e) => {
+      const file = Uri.parse(e.fileName);
+      await TruffleCommands.deployContracts(file);
+    });
+  } else {
+    workspace.onDidSaveTextDocument(() => undefined);
+  }
 }
 
 /**

@@ -37,6 +37,7 @@ import {registerHelpView} from './views/HelpView';
 import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 import {registerGanacheDetails} from './pages/GanacheDetails';
 import {registerLogView} from './views/LogView';
+import {autoDeploySolidityFiles} from './helpers/workspace';
 
 export async function activate(context: ExtensionContext) {
   /**
@@ -81,6 +82,8 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   registerCommand('truffle-vscode.openUrl', (node: OpenUrlTreeItem) => node.openUrl());
+
+  autoDeploySolidityFiles(true);
 
   //#region trufflesuite extension commands
   const refresh = commands.registerCommand('truffle-vscode.refresh', (element) => {
