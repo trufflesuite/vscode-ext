@@ -20,7 +20,7 @@ import {IDeployDestination, ItemType} from '@/Models';
 import {NetworkForContractItem} from '@/Models/QuickPickItems';
 import {InfuraProject, LocalProject, LocalService, TLocalProjectOptions} from '@/Models/TreeItems';
 import {Project} from '@/Models/TreeItems';
-import {Output, outputChannel, OutputLabel} from '@/Output';
+import {Output, OutputLabel} from '@/Output';
 import {
   ContractDB,
   ContractInstanceWithMetadata,
@@ -77,7 +77,6 @@ export namespace TruffleCommands {
     }
 
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
-      Output.show();
       await outputCommandHelper.executeCommand(contractDirectory, 'npx', args.join(' '));
       commands.executeCommand('truffle-vscode.views.deployments.refresh');
 
@@ -123,7 +122,7 @@ export namespace TruffleCommands {
       (reason) => {
         // ignore
         const outputStr = `Error refreshing view: ${reason}`;
-        outputChannel ? outputChannel.append(outputStr) : console.log(outputStr);
+        Output ? Output.outputLine(OutputLabel.truffleForVSCode, outputStr) : console.log(outputStr);
       }
     );
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandFinished');
@@ -509,8 +508,6 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
     const workspaceRoot = path.dirname(truffleConfigPath);
     const truffleConfigName = path.basename(truffleConfigPath);
     await fs.ensureDir(workspaceRoot);
-
-    Output.show();
 
     try {
       await installRequiredDependencies();

@@ -26,9 +26,7 @@ describe('ProjectCommands', () => {
     describe('newSolidityProject', () => {
       let helpersMock: sinon.SinonMock;
       let userInteractionMock: sinon.SinonMock;
-      //let gitHelperMock: sinon.SinonMock;
       let showQuickPickMock: sinon.SinonStub<any[], any>;
-      //let gitInitMock: sinon.SinonStub<any[], any>;
       let requiredMock: sinon.SinonMock;
       let checkRequiredAppsMock: sinon.SinonExpectation;
       let withProgressStub: sinon.SinonStub<
@@ -43,8 +41,6 @@ describe('ProjectCommands', () => {
           cmd: () => undefined,
           label: 'emptyProject',
         });
-        //gitHelperMock = sinon.mock(helpers.gitHelper);
-        //gitInitMock = gitHelperMock.expects('gitInit').returns(() => undefined);
         requiredMock = sinon.mock(required);
         checkRequiredAppsMock = requiredMock.expects('checkRequiredApps');
 
@@ -56,7 +52,6 @@ describe('ProjectCommands', () => {
 
       afterEach(() => {
         requiredMock.restore();
-        //gitHelperMock.restore();
         helpersMock.restore();
         userInteractionMock.restore();
         withProgressStub.restore();
@@ -66,8 +61,6 @@ describe('ProjectCommands', () => {
         // Arrange
         checkRequiredAppsMock.returns(false);
         const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-        //projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
-        //const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
 
         // Act
         await projectCommandsRewire.ProjectCommands.newSolidityProject();
@@ -75,16 +68,12 @@ describe('ProjectCommands', () => {
         // Assert
         assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
         assert.strictEqual(showQuickPickMock.notCalled, true, 'showQuickPick should not be called');
-        //assert.strictEqual(chooseNewProjectDirMock.notCalled, true, 'chooseNewProjectDir should not be called');
-        //assert.strictEqual(gitInitMock.notCalled, true, 'gitInit should not be called');
       });
 
       it('Method newSolidityProject provide type of new project, because we have all required apps.', async () => {
         // Arrange
         checkRequiredAppsMock.returns(true);
         const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-        //projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(projectPath));
-        //const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
 
         // Act
         await projectCommandsRewire.ProjectCommands.newSolidityProject();
@@ -92,9 +81,6 @@ describe('ProjectCommands', () => {
         // Assert
         assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
         assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
-        //assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
-        //assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
-        //assert.strictEqual(gitInitMock.args[0][0], projectPath, 'git init should be called with correct arguments');
       });
     });
 

@@ -61,8 +61,9 @@ export namespace DebuggerCommands {
 async function getQuickPickItems(txProvider: TransactionProvider) {
   const txHashes = await txProvider.getLastTransactionHashes();
   const txInfos = await txProvider.getTransactionsInfo(txHashes);
+  const lastTxsDeployed = txInfos.filter((tx) => tx.contractName !== '');
 
-  return txInfos.map((txInfo) => {
+  return lastTxsDeployed.map((txInfo) => {
     const label = shortenHash(txInfo.hash);
     const description = generateDescription(txInfo.contractName, txInfo.methodName);
     return {alwaysShow: true, label, description, detail: txInfo.hash} as QuickPickItem;

@@ -12,7 +12,7 @@ import {showQuickPick} from '@/helpers/userInteraction';
 import {QuickPickItem} from 'vscode';
 import {LocalProject} from '@/Models/TreeItems/LocalProject';
 import {LocalNetworkNode} from '@/Models/TreeItems';
-import {ConfigurationReader} from './configurationReader';
+import {ConfigurationReader} from '../helpers/debugConfigurationReader';
 
 export class DebugNetwork {
   public workingDirectory: string;

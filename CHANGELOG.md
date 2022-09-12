@@ -23,6 +23,7 @@ Give it a try and let us know what you think!
 - Debug only works with Ganache Development Instance [\#170](https://github.com/trufflesuite/vscode-ext/pull/170) ([xhulz](https://github.com/xhulz))
 - Add a Walkthrough on the Getting Started splash [\#148](https://github.com/trufflesuite/vscode-ext/pull/148) ([acuarica](https://github.com/acuarica))
 - Replace `open` package with `vscode.env.openExternal` [\#195](https://github.com/trufflesuite/vscode-ext/pull/195) ([acuarica](https://github.com/acuarica))
+- Always use the embedded Debug Adapter [\#218](https://github.com/trufflesuite/vscode-ext/pull/218) ([acuarica](https://github.com/acuarica))
 
 ## 2.4.0 - _Goblins_ 😈
 
