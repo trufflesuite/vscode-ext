@@ -24,7 +24,7 @@ enum ProjectType {
  * Represents the command for creating the new project (destinations).
  */
 interface IProjectDestination {
-  cmd: (projectPath: string, projectType: ProjectType) => Promise<void>;
+  cmd: (projectType: ProjectType) => Promise<void>;
   label: string;
   detail?: string;
   projectType: ProjectType;
@@ -42,9 +42,6 @@ export namespace ProjectCommands {
     if (!(await required.checkRequiredApps())) {
       return;
     }
-
-    // Chooses the directory path where the new project will be created
-    const projectPath = await chooseNewProjectDir();
 
     // Sets the QuickPick items
     const typeOfSolidityProjectDestination: IProjectDestination[] = [
@@ -75,10 +72,7 @@ export namespace ProjectCommands {
     })) as IProjectDestination;
 
     // Creates the project
-    await command.cmd(projectPath, command.projectType);
-
-    // Starts the git
-    await gitHelper.gitInit(projectPath);
+    await command.cmd(command.projectType);
 
     Telemetry.sendEvent('ProjectCommands.newSolidityProject.finished');
   }
@@ -118,13 +112,20 @@ async function chooseNewProjectDir(): Promise<string> {
 /**
  * This function is responsible for creating the project according to the chosen project type.
  *
- * @param projectPath the directory path where the project will be created
  * @param projectType the type of project the user wants to create: empty, default, or unbox a truffle project
  */
-async function createProject(projectPath: string, projectType: ProjectType): Promise<void> {
+async function createProject(projectType: ProjectType) {
+  let truffleBoxName: string;
+
+  // Gets the name of truffle box case the project type is "box"
+  if (projectType === ProjectType.box) truffleBoxName = await getTruffleBoxName();
+
+  // Chooses the directory path where the new project will be created
+  const projectPath = await chooseNewProjectDir();
+
   await showIgnorableNotification(Constants.statusBarMessages.creatingProject, async () => {
     try {
-      Telemetry.sendEvent(`ProjectCommands.createProject.${projectType}.started`);
+      Telemetry.sendEvent(`ProjectCommands.createProject.startEmptyProject.started`);
 
       // Checks the project type
       switch (projectType) {
@@ -133,7 +134,7 @@ async function createProject(projectPath: string, projectType: ProjectType): Pro
           await outputCommandHelper.executeCommand(projectPath, 'npx', RequiredApps.truffle, 'init');
           break;
         case ProjectType.sample:
-          // Starts a default project
+          // Starts a sample project
           await outputCommandHelper.executeCommand(
             projectPath,
             'npx',
@@ -142,13 +143,10 @@ async function createProject(projectPath: string, projectType: ProjectType): Pro
             Constants.defaultTruffleBox
           );
           break;
-        case ProjectType.box: {
-          // Gets the name of truffle box
-          const truffleBoxName = await getTruffleBoxName();
-          // Unboxs the truffle project
+        case ProjectType.box:
+          // Unboxs a truffle project
           await outputCommandHelper.executeCommand(projectPath, 'npx', RequiredApps.truffle, 'unbox', truffleBoxName);
           break;
-        }
       }
 
       // Looking for truffle config named in old style and rename it to truffle-config.js
@@ -159,13 +157,16 @@ async function createProject(projectPath: string, projectType: ProjectType): Pro
         uri: Uri.file(projectPath),
       });
 
-      Telemetry.sendEvent(`ProjectCommands.createProject.${projectType}.finished`);
+      Telemetry.sendEvent(`ProjectCommands.createProject.startEmptyProject.finished`);
     } catch (error) {
       fs.emptyDirSync(projectPath);
       Telemetry.sendException(new Error(Constants.errorMessageStrings.NewProjectCreationFailed));
       throw new Error(`${Constants.errorMessageStrings.NewProjectCreationFailed} ${(error as Error).message}`);
     }
   });
+
+  // Starts the git
+  await gitHelper.gitInit(projectPath);
 }
 
 /**
