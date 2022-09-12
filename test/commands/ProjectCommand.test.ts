@@ -320,7 +320,7 @@ describe('ProjectCommands', () => {
           );
           assert.strictEqual(
             executeCommandMock.args[0][4],
-            Constants.defaultTruffleBox,
+            Constants.sampleTruffleBox,
             'executeCommand should be called with correct arguments'
           );
           assert.strictEqual(
@@ -490,7 +490,7 @@ describe('ProjectCommands', () => {
           );
           assert.strictEqual(
             executeCommandMock.args[0][4],
-            Constants.defaultTruffleBox,
+            Constants.sampleTruffleBox,
             'executeCommand should be called with correct arguments'
           );
           assert.strictEqual(
@@ -645,7 +645,7 @@ describe('ProjectCommands', () => {
         );
         assert.strictEqual(
           executeCommandMock.args[0][4],
-          Constants.defaultTruffleBox,
+          Constants.sampleTruffleBox,
           'executeCommand should be called with correct arguments'
         );
         assert.strictEqual(updateWorkspaceFoldersMock.notCalled, true, 'updateWorkspaceFolders should not be called');
@@ -1015,7 +1015,7 @@ describe('ProjectCommands', () => {
       );
       assert.strictEqual(
         executeCommandMock.args[0][4],
-        Constants.defaultTruffleBox,
+        Constants.sampleTruffleBox,
         'executeCommand should be called with correct arguments'
       );
       assert.strictEqual(updateWorkspaceFoldersMock.calledOnce, true, 'updateWorkspaceFolders should be called once');

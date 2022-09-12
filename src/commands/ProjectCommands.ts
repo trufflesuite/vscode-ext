@@ -125,7 +125,7 @@ async function createProject(projectType: ProjectType) {
 
   await showIgnorableNotification(Constants.statusBarMessages.creatingProject, async () => {
     try {
-      Telemetry.sendEvent(`ProjectCommands.createProject.startEmptyProject.started`);
+      Telemetry.sendEvent(`ProjectCommands.createProject.${projectType}.started`);
 
       // Checks the project type
       switch (projectType) {
@@ -140,7 +140,7 @@ async function createProject(projectType: ProjectType) {
             'npx',
             RequiredApps.truffle,
             'unbox',
-            Constants.defaultTruffleBox
+            Constants.sampleTruffleBox
           );
           break;
         case ProjectType.box:
@@ -157,7 +157,7 @@ async function createProject(projectType: ProjectType) {
         uri: Uri.file(projectPath),
       });
 
-      Telemetry.sendEvent(`ProjectCommands.createProject.startEmptyProject.finished`);
+      Telemetry.sendEvent(`ProjectCommands.createProject.${projectType}.finished`);
     } catch (error) {
       fs.emptyDirSync(projectPath);
       Telemetry.sendException(new Error(Constants.errorMessageStrings.NewProjectCreationFailed));
