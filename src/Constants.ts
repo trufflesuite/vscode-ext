@@ -43,7 +43,7 @@ export class Constants {
     migrations_directory: path.join('./', 'migrations'),
   };
 
-  public static defaultTruffleBox = 'truffle-box/vscode-starter-box';
+  public static sampleTruffleBox = 'truffle-box/vscode-starter-box';
   public static defaultDebounceTimeout = 300;
   public static defaultInputNameInBdm = 'transaction-node';
 
