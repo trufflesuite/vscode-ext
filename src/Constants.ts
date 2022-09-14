@@ -73,15 +73,10 @@ export class Constants {
     configuration: {
       statusBar: {
         text: {
-          on: {
-            label: 'Contract Auto Deploy: ON',
-            message: 'Contract auto deploy has been switched on.',
-          },
-          off: {
-            label: 'Contract Auto Deploy: OFF',
-            message: 'Contract auto deploy has been switched off.',
-          },
+          enabled: 'Contract Auto Deploy: ON',
+          disabled: 'Contract Auto Deploy: OFF',
         },
+        tooltip: 'Turn on/off automatic deployment when saving .sol files',
         command: 'truffle-vscode.contracts.deployOnSave',
       },
       extension: {

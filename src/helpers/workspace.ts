@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {ExtensionContext, Uri, workspace} from 'vscode';
+import {Memento, TextDocument, Uri, workspace} from 'vscode';
 import {Constants} from '@/Constants';
 import {Telemetry} from '@/TelemetryClient';
 import * as path from 'path';
 import glob from 'glob';
 import {showQuickPick} from '@/helpers/userInteraction';
-import {ContractCommands} from '@/commands/ContractCommands';
+import {TruffleCommands} from '@/commands';
 
 /**
  * The [glob](https://github.com/isaacs/node-glob#glob-primer) pattern to match Truffle config file names.
@@ -187,16 +187,24 @@ async function selectTruffleConfigFromQuickPick(workspaces: TruffleWorkspace[]):
   return result.truffleWorkspace;
 }
 
-export async function onDidSaveTextDocument(context: ExtensionContext): Promise<void> {
-  context.subscriptions.push(
-    workspace.onDidSaveTextDocument(async (event) => {
-      switch (path.extname(event.fileName)) {
-        case '.sol':
-          ContractCommands.autoDeployContracts(context, event);
-          break;
-        default:
-          break;
-      }
-    })
-  );
+/**
+ * Every time the `workspace.onDidSaveTextDocument` listener emits a notification,
+ * this function receives, identifies the file extension and calls the corresponding function.
+ *
+ * @param globalState A memento object that stores state independent of the current opened workspace.
+ * @param document Represents a text document, such as a source file.
+ */
+export async function saveTextDocument(globalState: Memento, document: TextDocument): Promise<void> {
+  switch (path.extname(document.fileName)) {
+    case '.sol': {
+      // Gets the current state of the status bar item
+      const isAutoDeployOnSaveEnabled = globalState.get<boolean>(Constants.globalStateKeys.contractAutoDeployOnSave);
+
+      // If enabled, calls the function that performs the deployment
+      if (isAutoDeployOnSaveEnabled) await TruffleCommands.deployContracts(Uri.parse(document.fileName));
+      break;
+    }
+    default:
+      break;
+  }
 }
