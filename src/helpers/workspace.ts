@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Uri, workspace} from 'vscode';
+import {ExtensionContext, Uri, workspace} from 'vscode';
 import {Constants} from '@/Constants';
 import {Telemetry} from '@/TelemetryClient';
 import * as path from 'path';
 import glob from 'glob';
 import {showQuickPick} from '@/helpers/userInteraction';
-import {TruffleCommands} from '@/commands';
+import {ContractCommands} from '@/commands/ContractCommands';
 
 /**
  * The [glob](https://github.com/isaacs/node-glob#glob-primer) pattern to match Truffle config file names.
@@ -143,17 +143,6 @@ export async function getAllTruffleWorkspaces(): Promise<TruffleWorkspace[]> {
   return workspaces;
 }
 
-export async function autoDeploySolidityFiles(toggleOnOff: boolean): Promise<void> {
-  if (toggleOnOff) {
-    workspace.onDidSaveTextDocument(async (e) => {
-      const file = Uri.parse(e.fileName);
-      await TruffleCommands.deployContracts(file);
-    });
-  } else {
-    workspace.onDidSaveTextDocument(() => undefined);
-  }
-}
-
 /**
  * Searches for Truffle config files in `workspaceRootPath` recursively.
  *
@@ -196,4 +185,18 @@ async function selectTruffleConfigFromQuickPick(workspaces: TruffleWorkspace[]):
   });
 
   return result.truffleWorkspace;
+}
+
+export async function onDidSaveTextDocument(context: ExtensionContext): Promise<void> {
+  context.subscriptions.push(
+    workspace.onDidSaveTextDocument(async (event) => {
+      switch (path.extname(event.fileName)) {
+        case '.sol':
+          ContractCommands.autoDeployContracts(context, event);
+          break;
+        default:
+          break;
+      }
+    })
+  );
 }

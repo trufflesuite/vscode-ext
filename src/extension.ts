@@ -11,6 +11,7 @@ import {
   ServiceCommands,
   TruffleCommands,
   GenericCommands,
+  ContractCommands,
 } from './commands';
 import {Constants} from './Constants';
 
@@ -37,7 +38,7 @@ import {registerHelpView} from './views/HelpView';
 import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 import {registerGanacheDetails} from './pages/GanacheDetails';
 import {registerLogView} from './views/LogView';
-import {autoDeploySolidityFiles} from './helpers/workspace';
+import {onDidSaveTextDocument} from './helpers/workspace';
 
 export async function activate(context: ExtensionContext) {
   /**
@@ -79,11 +80,12 @@ export async function activate(context: ExtensionContext) {
   await changelogPage.checkAndShow();
 
   await registerGanacheDetails(context);
+
+  await onDidSaveTextDocument(context);
+  await ContractCommands.deployContractOnSave(context);
   //#endregion
 
   registerCommand('truffle-vscode.openUrl', (node: OpenUrlTreeItem) => node.openUrl());
-
-  autoDeploySolidityFiles(true);
 
   //#region trufflesuite extension commands
   const refresh = commands.registerCommand('truffle-vscode.refresh', (element) => {
@@ -217,6 +219,7 @@ export async function activate(context: ExtensionContext) {
       await sdkCoreCommands.initialize(context.globalState);
     }
   });
+
   //#endregion
 
   // #region truffle views
