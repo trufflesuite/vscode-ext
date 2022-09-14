@@ -4,11 +4,12 @@
 import {Constants, RequiredApps} from '@/Constants';
 import {required} from '@/helpers/required';
 import {checkTruffleConfigNaming} from '@/helpers/TruffleConfiguration';
-import {showIgnorableNotification, showInputBox, showOpenFolderDialog, showQuickPick} from '@/helpers/userInteraction';
+import {showIgnorableNotification, showOpenFolderDialog, showQuickPick} from '@/helpers/userInteraction';
 import {CancellationEvent} from '@/Models';
 import {Telemetry} from '@/TelemetryClient';
 import fs from 'fs-extra';
-import {Uri, window, workspace} from 'vscode';
+import requestPromise from 'request-promise';
+import {QuickPickItem, Uri, window, workspace} from 'vscode';
 import {gitHelper, outputCommandHelper} from '../helpers';
 
 /**
@@ -23,6 +24,12 @@ enum ProjectType {
 /**
  * Represents the command for creating the new project (destinations).
  */
+type TBox = {
+  label: string;
+  detail: string;
+  unbox: string;
+};
+
 interface IProjectDestination {
   cmd: (projectType: ProjectType) => Promise<void>;
   label: string;
@@ -115,10 +122,10 @@ async function chooseNewProjectDir(): Promise<string> {
  * @param projectType the type of project the user wants to create: empty, default, or unbox a truffle project
  */
 async function createProject(projectType: ProjectType) {
-  let truffleBoxName: string;
+  let truffleUnboxCommand: string;
 
   // Gets the name of truffle box case the project type is "box"
-  if (projectType === ProjectType.box) truffleBoxName = await getTruffleBoxName();
+  if (projectType === ProjectType.box) truffleUnboxCommand = await getTruffleUnboxCommand();
 
   // Chooses the directory path where the new project will be created
   const projectPath = await chooseNewProjectDir();
@@ -145,7 +152,13 @@ async function createProject(projectType: ProjectType) {
           break;
         case ProjectType.box:
           // Unboxs a truffle project
-          await outputCommandHelper.executeCommand(projectPath, 'npx', RequiredApps.truffle, 'unbox', truffleBoxName);
+          await outputCommandHelper.executeCommand(
+            projectPath,
+            'npx',
+            RequiredApps.truffle,
+            'unbox',
+            truffleUnboxCommand
+          );
           break;
       }
 
@@ -170,21 +183,37 @@ async function createProject(projectType: ProjectType) {
 }
 
 /**
- * This function is responsible for allowing the user to type the name of a
- * truffle box so that the unbox is performed.
- *
- * @returns the truffle box name
+ * Gets the boxes list and show the options to the user
+ * @returns the unbox command of the box selected by the user
  */
-async function getTruffleBoxName(): Promise<string> {
-  return await showInputBox({
-    ignoreFocusOut: true,
-    prompt: Constants.paletteLabels.enterTruffleBoxName,
-    validateInput: (value: string) => {
-      if (value.indexOf('://') !== -1 || value.indexOf('git@') !== -1 || value.split('/').length === 2) {
-        return Constants.validationMessages.forbiddenSymbols;
-      }
+async function getTruffleUnboxCommand(): Promise<string> {
+  const boxes = await getBoxes();
 
-      return;
-    },
-  });
+  const pick = (await showQuickPick(boxes as QuickPickItem[], {
+    placeHolder: Constants.paletteLabels.enterTruffleBoxName,
+    ignoreFocusOut: true,
+  })) as TBox;
+
+  return pick.unbox;
+}
+
+/**
+ * Gets the json file containing all the boxes from trufflesuite.com
+ * @returns a list of boxes based on the TBox type
+ */
+async function getBoxes(): Promise<TBox[]> {
+  try {
+    const response = await requestPromise.get(Constants.truffleBoxes);
+    const result = JSON.parse(response);
+
+    return Object.values(result).map((box: any) => {
+      return {
+        label: box.displayName,
+        detail: box.description,
+        unbox: box.official ? box.repoName : `${box.userOrg}/${box.repoName}`,
+      } as TBox;
+    });
+  } catch (error) {
+    throw new Error(Constants.errorMessageStrings.FetchingBoxesHasFailed);
+  }
 }

@@ -12,6 +12,7 @@ import {required} from '../../src/helpers/required';
 import * as userInteraction from '../../src/helpers/userInteraction';
 import {CancellationEvent} from '../../src/Models';
 import {Output} from '../../src/Output';
+import * as vscode from 'vscode';
 
 enum ProjectType {
   empty = 'empty',
@@ -350,14 +351,12 @@ describe('ProjectCommands', () => {
         async () => {
           // Arrange
           sinon.stub(workspace, 'workspaceFolders').value(['1']);
-          const helpersMock = sinon.mock(userInteraction);
           const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
           const createProject = projectCommandsRewire.__get__('createProject');
+          projectCommandsRewire.__set__('getTruffleUnboxCommand', sinon.mock().returns(truffleBoxName));
+          const getTruffleUnboxCommandMock = projectCommandsRewire.__get__('getTruffleUnboxCommand');
           projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
           const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
-          const showInputBoxMock = helpersMock.expects('showInputBox');
-
-          showInputBoxMock.returns(truffleBoxName);
 
           // Act
           await createProject(ProjectType.box);
@@ -400,6 +399,11 @@ describe('ProjectCommands', () => {
             'updateWorkspaceFolders should be called with correct arguments'
           );
           assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
+          assert.strictEqual(
+            getTruffleUnboxCommandMock.calledOnce,
+            true,
+            'getTruffleUnboxCommand should be called once'
+          );
           assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
           assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
         }
@@ -520,14 +524,12 @@ describe('ProjectCommands', () => {
         async () => {
           // Arrange
           sinon.stub(workspace, 'workspaceFolders').value(undefined);
-          const helpersMock = sinon.mock(userInteraction);
           const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
           const createProject = projectCommandsRewire.__get__('createProject');
+          projectCommandsRewire.__set__('getTruffleUnboxCommand', sinon.mock().returns(truffleBoxName));
+          const getTruffleUnboxCommandMock = projectCommandsRewire.__get__('getTruffleUnboxCommand');
           projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
           const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
-          const showInputBoxMock = helpersMock.expects('showInputBox');
-
-          showInputBoxMock.returns(truffleBoxName);
 
           // Act
           await createProject(ProjectType.box);
@@ -570,6 +572,11 @@ describe('ProjectCommands', () => {
             'updateWorkspaceFolders should be called with correct arguments'
           );
           assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
+          assert.strictEqual(
+            getTruffleUnboxCommandMock.calledOnce,
+            true,
+            'getTruffleUnboxCommand should be called once'
+          );
           assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
           assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
         }
@@ -657,14 +664,12 @@ describe('ProjectCommands', () => {
       it('Method createProject run command for unbox a truffle box project and creation was fell of project.', async () => {
         // Arrange
         executeCommandMock.throws();
-        const helpersMock = sinon.mock(userInteraction);
         const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
         const createProject = projectCommandsRewire.__get__('createProject');
+        projectCommandsRewire.__set__('getTruffleUnboxCommand', sinon.mock().returns(truffleBoxName));
+        const getTruffleUnboxCommandMock = projectCommandsRewire.__get__('getTruffleUnboxCommand');
         projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
         const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
-        const showInputBoxMock = helpersMock.expects('showInputBox');
-
-        showInputBoxMock.returns(truffleBoxName);
 
         // Act
         const action = async () => {
@@ -696,27 +701,30 @@ describe('ProjectCommands', () => {
         );
         assert.strictEqual(updateWorkspaceFoldersMock.notCalled, true, 'updateWorkspaceFolders should not be called');
         assert.strictEqual(emptyDirSyncMock.calledOnce, true, 'emptyDirSync should be called once');
+        assert.strictEqual(getTruffleUnboxCommandMock.calledOnce, true, 'getTruffleUnboxCommand should be called once');
         assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
         assert.strictEqual(gitInitMock.calledOnce, false, 'gitInit should not be called once');
       });
     });
 
-    it('Method getTruffleBoxName should return a value', async () => {
+    it('Method getTruffleUnboxCommand should return a value', async () => {
       // Arrange
-      const helpersMock = sinon.mock(userInteraction);
-      const testName = 'test';
+      const displayName = 'drizzle';
+      const repoName = 'drizzle-box';
       const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-      const getTruffleBoxName = projectCommandsRewire.__get__('getTruffleBoxName');
-      const showInputBoxMock = helpersMock.expects('showInputBox');
+      const getTruffleUnboxCommand = projectCommandsRewire.__get__('getTruffleUnboxCommand');
+      const showQuickPickMock = sinon.stub(vscode.window, 'showQuickPick');
 
-      showInputBoxMock.returns(testName);
+      showQuickPickMock.onCall(0).callsFake((items: any) => {
+        return items.find((item: any) => item.label === displayName);
+      });
 
       // Act
-      const result = await getTruffleBoxName();
+      const result = await getTruffleUnboxCommand();
 
       // Assert
-      assert.strictEqual(result, testName, 'result should be equal to expected string');
-      assert.strictEqual(showInputBoxMock.calledOnce, true, 'showInputBox should be called once');
+      assert.strictEqual(result, repoName, 'result should be equal to expected string');
+      assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
     });
   });
 
@@ -1042,15 +1050,11 @@ describe('ProjectCommands', () => {
       checkRequiredAppsMock.returns(true);
       readdirMock.returns([]);
       sinon.stub(workspace, 'workspaceFolders').value(['1']);
-      const helpersMock = sinon.mock(userInteraction);
 
       const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
       const createProject = projectCommandsRewire.__get__('createProject');
-      projectCommandsRewire.__set__('getTruffleBoxName', sinon.mock().returns(truffleBoxName));
-      const getTruffleBoxNameMock = projectCommandsRewire.__get__('getTruffleBoxName');
-      const showInputBoxMock = helpersMock.expects('showInputBox');
-
-      showInputBoxMock.returns(truffleBoxName);
+      projectCommandsRewire.__set__('getTruffleUnboxCommand', sinon.mock().returns(truffleBoxName));
+      const getTruffleUnboxCommandMock = projectCommandsRewire.__get__('getTruffleUnboxCommand');
 
       showErrorMessageMock.returns(Constants.informationMessage.openButton);
       showQuickPickMock.returns({
@@ -1068,7 +1072,7 @@ describe('ProjectCommands', () => {
       assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
       assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
       assert.strictEqual(gitInitMock.args[0][0], firstProjectPath, 'gitInit should be called with correct arguments');
-      assert.strictEqual(getTruffleBoxNameMock.calledOnce, true, 'getTruffleBoxName should be called once');
+      assert.strictEqual(getTruffleUnboxCommandMock.calledOnce, true, 'getTruffleUnboxCommand should be called once');
       assert.strictEqual(showOpenFolderDialogMock.calledOnce, true, 'showOpenFolderDialog should be called once');
       assert.strictEqual(ensureDirMock.calledOnce, true, 'ensureDir should be called once');
       assert.strictEqual(
@@ -1192,7 +1196,7 @@ describe('ProjectCommands', () => {
 
     it(
       'Method newSolidityProject get truffleBoxName and create new project with this name. ' +
-        'showInputBox called twice in getTruffleBoxName.',
+        'showInputBox called twice in getTruffleUnboxCommand.',
       async () => {
         // Arrange
         checkRequiredAppsMock.returns(true);
@@ -1200,9 +1204,10 @@ describe('ProjectCommands', () => {
         executeCommandMock.throws();
 
         const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-        projectCommandsRewire.__set__('getTruffleBoxName', sinon.mock().returns(truffleBoxName));
-        const getTruffleBoxNameMock = projectCommandsRewire.__get__('getTruffleBoxName');
         const createProject = projectCommandsRewire.__get__('createProject');
+        projectCommandsRewire.__set__('getTruffleUnboxCommand', sinon.mock().returns(truffleBoxName));
+        const getTruffleUnboxCommandMock = projectCommandsRewire.__get__('getTruffleUnboxCommand');
+
         showErrorMessageMock.returns(Constants.informationMessage.openButton);
         showQuickPickMock.returns({
           cmd: createProject,
@@ -1221,7 +1226,7 @@ describe('ProjectCommands', () => {
         assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
         assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
         assert.strictEqual(gitInitMock.notCalled, true, 'gitInit should not be called');
-        assert.strictEqual(getTruffleBoxNameMock.calledOnce, true, 'getTruffleBoxName should be called once');
+        assert.strictEqual(getTruffleUnboxCommandMock.calledOnce, true, 'getTruffleUnboxCommand should be called once');
         assert.strictEqual(showOpenFolderDialogMock.calledOnce, true, 'showOpenFolderDialog should be called once');
         assert.strictEqual(ensureDirMock.calledOnce, true, 'ensureDir should be called once');
         assert.strictEqual(
