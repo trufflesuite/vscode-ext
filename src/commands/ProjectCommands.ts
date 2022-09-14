@@ -12,6 +12,18 @@ import requestPromise from 'request-promise';
 import {QuickPickItem, Uri, window, workspace} from 'vscode';
 import {gitHelper, outputCommandHelper} from '../helpers';
 
+/**
+ * Represents the project type for creating a new project.
+ */
+enum ProjectType {
+  empty = 'empty',
+  sample = 'sample',
+  box = 'box',
+}
+
+/**
+ * Represents the command for creating the new project (destinations).
+ */
 type TBox = {
   label: string;
   detail: string;
@@ -19,41 +31,66 @@ type TBox = {
 };
 
 interface IProjectDestination {
-  cmd: (projectPath: string) => Promise<void>;
+  cmd: (projectType: ProjectType) => Promise<void>;
   label: string;
+  detail?: string;
+  projectType: ProjectType;
 }
 
 export namespace ProjectCommands {
+  /**
+   * This role is a public role responsible for allowing the user to start
+   * creating the project.
+   */
   export async function newSolidityProject(): Promise<void> {
     Telemetry.sendEvent('ProjectCommands.newSolidityProject.started');
+
+    // Checks if required applications are installed
     if (!(await required.checkRequiredApps())) {
       return;
     }
 
+    // Sets the QuickPick items
     const typeOfSolidityProjectDestination: IProjectDestination[] = [
       {
-        cmd: createNewEmptyProject,
+        cmd: createProject,
         label: Constants.typeOfSolidityProject.text.emptyProject,
+        detail: Constants.typeOfSolidityProject.description.emptyProject,
+        projectType: ProjectType.empty,
       },
       {
-        cmd: createProjectFromTruffleBox,
+        cmd: createProject,
+        label: Constants.typeOfSolidityProject.text.sampleProject,
+        detail: Constants.typeOfSolidityProject.description.sampleProject,
+        projectType: ProjectType.sample,
+      },
+      {
+        cmd: createProject,
         label: Constants.typeOfSolidityProject.text.projectFromTruffleBox,
+        detail: Constants.typeOfSolidityProject.description.projectFromTruffleBox,
+        projectType: ProjectType.box,
       },
     ];
 
-    const command = await showQuickPick(typeOfSolidityProjectDestination, {
+    // Displays the QuickPick with the possibilities to choose between project types
+    const command = (await showQuickPick(typeOfSolidityProjectDestination, {
       placeHolder: Constants.placeholders.selectTypeOfSolidityProject,
       ignoreFocusOut: true,
-    });
+    })) as IProjectDestination;
 
-    const projectPath = await chooseNewProjectDir();
+    // Creates the project
+    await command.cmd(command.projectType);
 
-    Telemetry.sendEvent('ProjectCommands.newSolidityProject.initialization');
-    await command.cmd(projectPath);
-    await gitHelper.gitInit(projectPath);
+    Telemetry.sendEvent('ProjectCommands.newSolidityProject.finished');
   }
 }
 
+/**
+ * This function is responsible for allowing the user to choose in which directory
+ * the new project will be created.
+ *
+ * @returns the project path
+ */
 async function chooseNewProjectDir(): Promise<string> {
   const projectPath = await showOpenFolderDialog();
 
@@ -79,40 +116,70 @@ async function chooseNewProjectDir(): Promise<string> {
   return projectPath;
 }
 
-async function createNewEmptyProject(projectPath: string): Promise<void> {
-  Telemetry.sendEvent('ProjectCommands.createNewEmptyProject.started');
+/**
+ * This function is responsible for creating the project according to the chosen project type.
+ *
+ * @param projectType the type of project the user wants to create: empty, default, or unbox a truffle project
+ */
+async function createProject(projectType: ProjectType) {
+  let truffleUnboxCommand: string;
 
-  await createProject(projectPath, Constants.defaultTruffleBox);
+  // Gets the name of truffle box case the project type is "box"
+  if (projectType === ProjectType.box) truffleUnboxCommand = await getTruffleUnboxCommand();
 
-  Telemetry.sendEvent('ProjectCommands.createNewEmptyProject.finished');
-}
+  // Chooses the directory path where the new project will be created
+  const projectPath = await chooseNewProjectDir();
 
-async function createProjectFromTruffleBox(projectPath: string): Promise<void> {
-  const truffleUnboxCommand = await getTruffleUnboxCommand();
-
-  Telemetry.sendEvent('ProjectCommands.createProjectFromTruffleBox.started', {truffleUnboxCommand});
-
-  await createProject(projectPath, truffleUnboxCommand);
-
-  Telemetry.sendEvent('ProjectCommands.createProjectFromTruffleBox.finished', {truffleUnboxCommand});
-}
-
-async function createProject(projectPath: string, truffleUnboxCommand: string): Promise<void> {
   await showIgnorableNotification(Constants.statusBarMessages.creatingProject, async () => {
     try {
-      Telemetry.sendEvent('ProjectCommands.createProject.unbox', {truffleUnboxCommand});
-      await outputCommandHelper.executeCommand(projectPath, 'npx', RequiredApps.truffle, 'unbox', truffleUnboxCommand);
+      Telemetry.sendEvent(`ProjectCommands.createProject.${projectType}.started`);
 
+      // Checks the project type
+      switch (projectType) {
+        case ProjectType.empty:
+          // Starts a empty project
+          await outputCommandHelper.executeCommand(projectPath, 'npx', RequiredApps.truffle, 'init');
+          break;
+        case ProjectType.sample:
+          // Starts a sample project
+          await outputCommandHelper.executeCommand(
+            projectPath,
+            'npx',
+            RequiredApps.truffle,
+            'unbox',
+            Constants.sampleTruffleBox
+          );
+          break;
+        case ProjectType.box:
+          // Unboxs a truffle project
+          await outputCommandHelper.executeCommand(
+            projectPath,
+            'npx',
+            RequiredApps.truffle,
+            'unbox',
+            truffleUnboxCommand
+          );
+          break;
+      }
+
+      // Looking for truffle config named in old style and rename it to truffle-config.js
       checkTruffleConfigNaming(projectPath);
+
+      // Updates the workspace folders with the new workspace
       workspace.updateWorkspaceFolders(0, workspace.workspaceFolders ? workspace.workspaceFolders.length : null, {
         uri: Uri.file(projectPath),
       });
+
+      Telemetry.sendEvent(`ProjectCommands.createProject.${projectType}.finished`);
     } catch (error) {
       fs.emptyDirSync(projectPath);
       Telemetry.sendException(new Error(Constants.errorMessageStrings.NewProjectCreationFailed));
       throw new Error(`${Constants.errorMessageStrings.NewProjectCreationFailed} ${(error as Error).message}`);
     }
   });
+
+  // Starts the git
+  await gitHelper.gitInit(projectPath);
 }
 
 /**

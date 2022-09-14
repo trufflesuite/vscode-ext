@@ -1,7 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {ExtensionContext, OutputChannel, window} from 'vscode';
+import {commands} from 'vscode';
+import {LogView} from './views/LogView';
 
 export enum OutputLabel {
   truffleForVSCode = 'Truffle for VSCode',
@@ -15,43 +16,35 @@ export enum OutputLabel {
 }
 
 export class Output {
-  public static output(label: OutputLabel, message: string): void {
-    this._outputChannel.append(this.formatMessage(label, message));
-  }
-
-  public static outputLine(label: OutputLabel, message: string): void {
-    this._outputChannel.appendLine(this.formatMessage(label, message));
-  }
-
-  public static info(label: OutputLabel, message: string): void {
-    this.outputLine(label, message);
-  }
-
-  public static show(): void {
-    this._outputChannel.show();
-  }
-
-  public static hide(): void {
-    this._outputChannel.hide();
-  }
-
-  public static dispose(): void {
-    this._outputChannel.dispose();
-  }
-
-  private static _outputChannel: OutputChannel = window.createOutputChannel(OutputLabel.truffleForVSCode);
-
-  private static formatMessage(label = '', message = ''): string {
-    return `${label ? `[${label}] ` : ''}${message}`;
+  /**
+   * Append the given value and a line feed character
+   * to the log panel
+   *
+   * @param label - represents the log type
+   * @param message - represents the log text
+   * @param description - represents the log description
+   */
+  public static outputLine(label: OutputLabel, message: string, description?: string): void {
+    commands.executeCommand(`${LogView.viewType}.create.log`, label, this.formatMessage(label, message), description);
   }
 
   /**
-   * Call this only once to push the outputChannel into the list of subscriptions.
+   * Remove the log container from the log panel
+   *
+   * @param label - represents the log type
+   * @param description - represents the log description
    */
-  public static init(context: ExtensionContext) {
-    context.subscriptions.push(this._outputChannel);
-    outputChannel = this._outputChannel;
+  public static dispose(label: OutputLabel, description?: string): void {
+    commands.executeCommand(`${LogView.viewType}.dispose.tab`, label, description);
+  }
+
+  /**
+   * Format the text of the message that will be printed
+   *
+   * @param label - represents the log type
+   * @param message - represents the log text
+   */
+  private static formatMessage(label = '', message = ''): string {
+    return `${label ? `[${label}] ` : ''}${message}`;
   }
 }
-
-export declare let outputChannel: OutputChannel;
