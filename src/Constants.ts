@@ -70,6 +70,29 @@ export class Constants {
     },
   };
 
+  public static contract = {
+    configuration: {
+      statusBar: {
+        text: {
+          enabled: 'Contract Auto Deploy: ON',
+          disabled: 'Contract Auto Deploy: OFF',
+        },
+        tooltip: 'Turn on/off automatic deployment when saving .sol files',
+        command: 'truffle-vscode.contracts.deployOnSave',
+      },
+      extension: {
+        json: '.json',
+        sol: '.sol',
+        txt: '.txt',
+      },
+      properties: {
+        abi: 'abi',
+        bytecode: 'bytecode',
+        deployedBytecode: 'deployedBytecode',
+      },
+    },
+  };
+
   // Values are quite brittle and don't map directly to the requirements.html screen.
   public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
     [RequiredApps.ganache]: {
@@ -116,6 +139,7 @@ export class Constants {
     isNotifiedAboutOZSdk: 'isNotifiedAboutOZSdk',
     mnemonicStorageKey: 'mnemonicStorage',
     serviceResourceKey: 'treeContent',
+    contractAutoDeployOnSave: 'contractAutoDeployOnSave',
   };
 
   public static infuraFileResponse = {
@@ -151,23 +175,11 @@ export class Constants {
     },
   };
 
-  public static contractExtension = {
-    json: '.json',
-    sol: '.sol',
-    txt: '.txt',
-  };
-
   public static networkProtocols = {
     file: 'file://',
     ftp: 'ftp://',
     http: 'http://',
     https: 'https://',
-  };
-
-  public static contractProperties = {
-    abi: 'abi',
-    bytecode: 'bytecode',
-    deployedBytecode: 'deployedBytecode',
   };
 
   public static propertyLabels = {
@@ -347,7 +359,7 @@ export class Constants {
     },
     hasDigits: /(?=.*\d)/g,
     infuraProjectname: /^([a-zA-Z]|\d|\s|[-_:]){3,}$/g,
-    isJsonFile: new RegExp(Constants.contractExtension.json + '$'),
+    isJsonFile: new RegExp(Constants.contract.configuration.extension.json + '$'),
     isLowerCase: /^[a-z0-9_\-!@$^&()+=?/<>|[\]{}:.\\~ #`*"'%;,]+$/g,
     isUrl: /^(?:http(s)?:\/\/)?[\w:@.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/gim,
     lowerCaseLetter: /(?=.*[a-z]).*/g,

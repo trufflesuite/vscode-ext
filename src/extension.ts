@@ -11,6 +11,7 @@ import {
   ServiceCommands,
   TruffleCommands,
   GenericCommands,
+  ContractCommands,
 } from './commands';
 import {Constants} from './Constants';
 
@@ -37,6 +38,8 @@ import {registerHelpView} from './views/HelpView';
 import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 import {registerGanacheDetails} from './pages/GanacheDetails';
 import {registerLogView} from './views/LogView';
+import {saveTextDocument} from './helpers/workspace';
+import {StatusBarItems} from './Models/StatusBarItems/Contract';
 
 export async function activate(context: ExtensionContext) {
   /**
@@ -62,12 +65,17 @@ export async function activate(context: ExtensionContext) {
 
   await required.checkAllApps();
 
+  // #region commands
   await ContractDB.initialize(AdapterType.IN_MEMORY);
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
   TreeManager.initialize(context.globalState);
   TreeService.initialize('truffle-vscode.truffle');
   await sdkCoreCommands.initialize(context.globalState);
+
+  // Starts the status bar item for automatic deploy
+  const contractStatusBarItem = new StatusBarItems.Contract(context.globalState);
+  //#endregion
 
   //#region trufflesuite pages
   const welcomePage = new WelcomePage(context);
@@ -76,8 +84,6 @@ export async function activate(context: ExtensionContext) {
 
   await welcomePage.checkAndShow();
   await changelogPage.checkAndShow();
-
-  await registerGanacheDetails(context);
   //#endregion
 
   registerCommand('truffle-vscode.openUrl', (node: OpenUrlTreeItem) => node.openUrl());
@@ -123,6 +129,8 @@ export async function activate(context: ExtensionContext) {
       });
     }
   );
+
+  await registerGanacheDetails(context);
   //#endregion
 
   //#region Generic extension commands
@@ -170,6 +178,13 @@ export async function activate(context: ExtensionContext) {
   const getPrivateKeyFromMnemonic = commands.registerCommand('truffle-vscode.getPrivateKey', async () => {
     await tryExecute(() => TruffleCommands.getPrivateKeyFromMnemonic());
   });
+  const deployContractsOnSave = commands.registerCommand(
+    Constants.contract.configuration.statusBar.command,
+    async () => {
+      // Calls the action that enables/disables auto-deployment when saving a .sol file
+      await tryExecute(() => ContractCommands.setEnableOrDisableAutoDeploy(contractStatusBarItem));
+    }
+  );
   //#endregion
 
   //#region services with dialog
@@ -208,15 +223,19 @@ export async function activate(context: ExtensionContext) {
   });
   //#endregion
 
-  //#region other subscriptions
+  //#region workspace subscriptions
   const changeCoreSdkConfigurationListener = workspace.onDidChangeConfiguration(async (event) => {
     if (event.affectsConfiguration(Constants.userSettings.coreSdkSettingsKey)) {
       await sdkCoreCommands.initialize(context.globalState);
     }
   });
+  const didSaveTextDocumentListener = workspace.onDidSaveTextDocument(async (event) => {
+    // Calls the action that listens for the save files event
+    await saveTextDocument(context.globalState, event);
+  });
   //#endregion
 
-  // #region truffle views
+  //#region truffle views
 
   const fileExplorerView = registerFileExplorerView('truffle-vscode', 'views.explorer');
   const helpView = registerHelpView('truffle-vscode.views.help');
@@ -243,10 +262,12 @@ export async function activate(context: ExtensionContext) {
     stopGanacheServer,
     resartGanacheServer,
     getPrivateKeyFromMnemonic,
+    deployContractsOnSave,
     signInToInfuraAccount,
     signOutOfInfuraAccount,
     showProjectsFromInfuraAccount,
     changeCoreSdkConfigurationListener,
+    didSaveTextDocumentListener,
     // new view - main views
     fileExplorerView,
     helpView,

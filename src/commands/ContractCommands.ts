@@ -1,6 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {StatusBarItems} from '@/Models/StatusBarItems/Contract';
 import {commands, ExtensionContext, Uri, window} from 'vscode';
 import {Constants} from '../Constants';
 import {CancellationEvent} from '../Models';
@@ -9,6 +10,22 @@ import {ContractDB, ContractService} from '../services';
 import {Telemetry} from '../TelemetryClient';
 
 export namespace ContractCommands {
+  /**
+   * This function is responsible for enabling or disabling the automatic deployment of contracts
+   *
+   * @param contractStatusBarItem The object representing the status bar contract item.
+   */
+  export async function setEnableOrDisableAutoDeploy(contractStatusBarItem: StatusBarItems.Contract): Promise<void> {
+    // Gets the current auto deploy current state and invert its value
+    const enableOrDisableAutoDeploy = contractStatusBarItem.getState() ? false : true;
+
+    // Set the new state value
+    contractStatusBarItem.setState(enableOrDisableAutoDeploy);
+  }
+
+  /**
+   * @deprecated The method should not be used
+   */
   export async function showSmartContractPage(context: ExtensionContext, uri: Uri): Promise<void> {
     Telemetry.sendEvent('ContractCommands.showSmartContract.commandStarted');
     const contractName = ContractService.getContractNameBySolidityFile(uri.fsPath);

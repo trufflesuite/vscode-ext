@@ -132,7 +132,7 @@ export namespace TruffleCommands {
     Telemetry.sendEvent('TruffleCommands.writeAbiToBuffer.commandStarted');
     const contract = await readCompiledContract(uri);
 
-    await vscodeEnvironment.writeToClipboard(JSON.stringify(contract[Constants.contractProperties.abi]));
+    await vscodeEnvironment.writeToClipboard(JSON.stringify(contract[Constants.contract.configuration.properties.abi]));
     Telemetry.sendEvent('TruffleCommands.writeAbiToBuffer.commandFinished');
   }
 
@@ -140,7 +140,7 @@ export namespace TruffleCommands {
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandStarted');
     const contract = await readCompiledContract(uri);
 
-    await vscodeEnvironment.writeToClipboard(contract[Constants.contractProperties.bytecode]);
+    await vscodeEnvironment.writeToClipboard(contract[Constants.contract.configuration.properties.bytecode]);
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
   }
 
@@ -150,7 +150,7 @@ export namespace TruffleCommands {
     ensureFileIsContractJson(uri.fsPath);
 
     const contractInstances = (await ContractDB.getContractInstances(
-      path.basename(uri.fsPath, Constants.contractExtension.json)
+      path.basename(uri.fsPath, Constants.contract.configuration.extension.json)
     )) as ContractInstanceWithMetadata[];
     const contractInstancesWithNetworkInfo = contractInstances.filter((contractIns) => {
       return contractIns.network.name !== undefined && !!contractIns.provider && !!contractIns.address;
@@ -568,7 +568,7 @@ async function readCompiledContract(uri: Uri): Promise<any> {
 }
 
 function ensureFileIsContractJson(filePath: string) {
-  if (path.extname(filePath) !== Constants.contractExtension.json) {
+  if (path.extname(filePath) !== Constants.contract.configuration.extension.json) {
     const error = new Error(Constants.errorMessageStrings.InvalidContract);
     Telemetry.sendException(error);
     throw error;

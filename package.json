@@ -258,6 +258,11 @@
         "command": "truffle-vscode.views.dashboard.copyRPCEndpointAddress",
         "title": "Copy RPC Endpoint Address",
         "category": "Truffle"
+      },
+      {
+        "command": "truffle-vscode.contracts.deployOnSave",
+        "title": "Deploy the contract when it is saved",
+        "category": "Truffle"
       }
     ],
     "breakpoints": [
@@ -313,6 +318,10 @@
         {
           "when": "false",
           "command": "truffle-vscode.getGanacheServerInfo"
+        },
+        {
+          "when": "false",
+          "command": "truffle-vscode.contracts.deployOnSave"
         }
       ],
       "view/title": [
