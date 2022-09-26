@@ -5,7 +5,7 @@ import truffleDebugger from '@truffle/debugger';
 import assert from 'assert';
 import sinon from 'sinon';
 import * as contractsPrepareHelpers from '../../src/debugAdapter/contracts/contractsPrepareHelpers';
-import {IContractModel} from '../../src/debugAdapter/models/IContractModel';
+// import {IContractModel} from '../../src/debugAdapter/models/IContractModel';
 import RuntimeInterface from '../../src/debugAdapter/runtimeInterface';
 
 describe('RuntimeInterface unit tests', () => {
@@ -14,7 +14,7 @@ describe('RuntimeInterface unit tests', () => {
   beforeEach(async () => {
     sinon
       .stub(contractsPrepareHelpers, 'prepareContracts')
-      .resolves({contracts: contractsMock, lookupMap: new Map(), resolved: [], provider: {}, files: []});
+      .resolves({ sources: new Map(), provider: '', compilations: [] });
   });
 
   afterEach(() => {
@@ -25,14 +25,14 @@ describe('RuntimeInterface unit tests', () => {
     // Arrange
     const sessionSelectorView = (selector: any) => {
       if (selector === truffleDebugger.selectors.evm.current.callstack) {
-        return [{address: contractAddressMock}];
+        return [{ address: contractAddressMock }];
       }
       return {};
     };
     const sessionMock = buildSessionMock(sessionSelectorView);
     sinon.stub(RuntimeInterface.prototype, 'generateSession' as any).resolves(sessionMock);
-    const currentDebugLine = {column: 1, file: contractSourcePathMock, line: 1};
-    sinon.stub(RuntimeInterface.prototype, 'currentLine').returns({column: 1, file: contractSourcePathMock, line: 1});
+    const currentDebugLine = { column: 1, file: contractSourcePathMock, line: 1 };
+    sinon.stub(RuntimeInterface.prototype, 'currentLine').returns({ column: 1, file: contractSourcePathMock, line: 1 });
 
     // Act
     runtimeInterface = await initMockRuntime();
@@ -71,20 +71,20 @@ describe('RuntimeInterface unit tests', () => {
 
 const contractAddressMock = 'AddressA';
 const contractSourcePathMock = 'path_to_contract';
-const contractMock: IContractModel = {
-  abi: [],
-  address: contractAddressMock,
-  ast: {},
-  binary: '',
-  compiler: {},
-  contractName: '',
-  deployedBinary: '',
-  deployedSourceMap: '',
-  source: '',
-  sourceMap: '',
-  sourcePath: contractSourcePathMock,
-};
-const contractsMock = [contractMock];
+// const contractMock: IContractModel = {
+//   abi: [],
+//   address: contractAddressMock,
+//   ast: {},
+//   binary: '',
+//   compiler: {},
+//   contractName: '',
+//   deployedBinary: '',
+//   deployedSourceMap: '',
+//   source: '',
+//   sourceMap: '',
+//   sourcePath: contractSourcePathMock,
+// };
+// const contractsMock = [contractMock];
 
 const baseSessionMock: truffleDebugger.Session = {
   addBreakpoint: (_breakPoint: any) => ({}),
@@ -108,7 +108,7 @@ function assertCallstackMessage(callStackProp: string, callStackValue: any) {
 }
 
 function buildSessionMock(view?: (selectors: any) => any) {
-  const sessionMock = {...baseSessionMock};
+  const sessionMock = { ...baseSessionMock };
   if (view) {
     sessionMock.view = view;
   }

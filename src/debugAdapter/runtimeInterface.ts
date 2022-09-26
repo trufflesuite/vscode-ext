@@ -2,22 +2,20 @@
 // Licensed under the MIT license.
 
 import truffleDebugger from '@truffle/debugger';
-import {EventEmitter} from 'events';
-import {filterContractsWithAddress, prepareContracts} from './contracts/contractsPrepareHelpers';
-import {TranslatedResult, translateTruffleVariables} from './helpers';
-import {DebuggerTypes} from './models/debuggerTypes';
-import {ICallInfo} from './models/ICallInfo';
-import {IContractModel} from './models/IContractModel';
-import {IInstruction} from './models/IInstruction';
+import { EventEmitter } from 'events';
+import { prepareContracts } from './contracts/contractsPrepareHelpers';
+import { TranslatedResult, translateTruffleVariables } from './helpers';
+import { DebuggerTypes } from './models/debuggerTypes';
+import { ICallInfo } from './models/ICallInfo';
+import { IInstruction } from './models/IInstruction';
 
 export default class RuntimeInterface extends EventEmitter {
   private _isDebuggerAttached: boolean;
   private _session: truffleDebugger.Session | undefined;
   private _selectors: truffleDebugger.Selectors;
   private _numBreakpoints: number;
-  private _deployedContracts: IContractModel[];
-  private _initialBreakPoints: Array<{path: string; lines: number[]}>;
-  private _fileLookupMap: Map<string, string>;
+  private _initialBreakPoints: Array<{ path: string; lines: number[] }>;
+  private _sources: Map<string, string>;
 
   constructor() {
     super();
@@ -26,8 +24,7 @@ export default class RuntimeInterface extends EventEmitter {
     this._numBreakpoints = 0;
     this._isDebuggerAttached = false;
     this._initialBreakPoints = [];
-    this._deployedContracts = [];
-    this._fileLookupMap = new Map();
+    this._sources = new Map();
   }
 
   public clearBreakpoints(): Promise<void> {
@@ -35,7 +32,7 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   public storeInitialBreakPoints(path: string, lines: number[]) {
-    this._initialBreakPoints.push({path, lines});
+    this._initialBreakPoints.push({ path, lines });
   }
 
   public async processInitialBreakPoints() {
@@ -44,7 +41,7 @@ export default class RuntimeInterface extends EventEmitter {
     }
 
     for (const initialBreakPoint of this._initialBreakPoints) {
-      const {path, lines} = initialBreakPoint;
+      const { path, lines } = initialBreakPoint;
       for (const line of lines) {
         await this.setBreakpoint(path, line);
       }
@@ -75,29 +72,8 @@ export default class RuntimeInterface extends EventEmitter {
   // Get stack trace (without method name)
   public callStack(): ICallInfo[] {
     this.validateSession();
-    const callStack = this._session!.view(this._selectors.evm.current.callstack);
     const currentLine = this.currentLine();
-    if (callStack.length === 1) {
-      return [{...currentLine, method: 'Current'}];
-    }
-
-    const result: ICallInfo[] = [];
-    // There is no api to get line/collumn of previous call
-    // That's why set them as default
-    const defaultLine = {line: 0, column: 0};
-    for (let i = 0; i < callStack.length - 1; i++) {
-      // processing all previous calls
-      const contract = this._deployedContracts.find(
-        (c: any) => c.address === (callStack[i].address || callStack[i].storageAddress)
-      );
-      if (contract === undefined) {
-        throw new Error(`Coundn't find contract by address ${callStack[i].address || callStack[i].storageAddress}`);
-      }
-      result.push({file: contract.sourcePath, ...defaultLine, method: 'Previous'});
-    }
-
-    result.push({...currentLine, method: 'Current'});
-    return result;
+    return [{ ...currentLine, method: 'Current' }];
   }
 
   /**
@@ -108,7 +84,7 @@ export default class RuntimeInterface extends EventEmitter {
     Record<string, TranslatedResult> | any
   > {
     if (this._session) {
-      const variables = await this._session.variables({indicateUnknown: true});
+      const variables = await this._session.variables({ indicateUnknown: true });
       return translateTruffleVariables(variables);
     } else {
       return Promise.resolve({});
@@ -152,14 +128,11 @@ export default class RuntimeInterface extends EventEmitter {
   public async attach(txHash: string, workingDirectory: string, providerUrl: string): Promise<void> {
     const result = await prepareContracts(workingDirectory, providerUrl);
 
-    this._deployedContracts = filterContractsWithAddress(result.contracts);
-
     const options: truffleDebugger.DebuggerOptions = {
-      contracts: result.contracts,
-      files: result.files,
       provider: result.provider,
+      compilations: result.compilations,
     };
-    this._fileLookupMap = result.lookupMap;
+    this._sources = result.sources;
     this._session = await this.generateSession(txHash, options);
     this._isDebuggerAttached = true;
   }
@@ -172,7 +145,7 @@ export default class RuntimeInterface extends EventEmitter {
       throw new Error('No source file');
     }
     // so if we have a file in a location that doesn't map 1:1 to the actual file name in the compiler we map it here...
-    const file = this._fileLookupMap.has(sourcePath) ? this._fileLookupMap.get(sourcePath) : sourcePath;
+    const file = this._sources.has(sourcePath) ? this._sources.get(sourcePath) : sourcePath;
 
     return {
       column: currentLocation.sourceRange ? currentLocation.sourceRange.lines.start.column : 0,
@@ -211,7 +184,12 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   private async generateSession(txHash: string, options: truffleDebugger.DebuggerOptions) {
-    const bugger = await truffleDebugger.forTx(txHash, options);
+    //const bugger = await truffleDebugger.forTx(txHash, options);
+    const bugger = await truffleDebugger.forTx(txHash, {
+      provider: options.provider,
+      compilations: options.compilations,
+    });
+
     return bugger.connect();
   }
 
