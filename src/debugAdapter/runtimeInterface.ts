@@ -3,7 +3,7 @@
 
 import truffleDebugger from '@truffle/debugger';
 import { EventEmitter } from 'events';
-import { prepareContracts } from './contracts/contractsPrepareHelpers';
+import { ContractHelper } from './contracts/contractHelpers';
 import { TranslatedResult, translateTruffleVariables } from './helpers';
 import { DebuggerTypes } from './models/debuggerTypes';
 import { ICallInfo } from './models/ICallInfo';
@@ -121,18 +121,25 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   /**
-   * FIXME: rework this
-   * @param txHash
-   * @param workingDirectory
+   * This function attaches the debugger and starts the debugging process
+   *
+   * @param txHash The transaction hash to debug.
+   * @param workingDirectory The workspace path where the truffle project is located.
+   * @param providerUrl The url provider where the contracts were deployed.
+   * @returns
    */
   public async attach(txHash: string, workingDirectory: string, providerUrl: string): Promise<void> {
-    const result = await prepareContracts(workingDirectory, providerUrl);
+    // Gets the contracts compilation
+    const result = await ContractHelper.prepare(workingDirectory);
 
+    // Sets the truffle debugger options
     const options: truffleDebugger.DebuggerOptions = {
-      provider: result.provider,
-      compilations: result.compilations,
+      provider: providerUrl,
+      compilations: result.shimCompilations,
     };
-    this._sources = result.sources;
+
+    // Sets the properties to use during the debugger process
+    this._sources = result.mappedSources;
     this._session = await this.generateSession(txHash, options);
     this._isDebuggerAttached = true;
   }

@@ -4,17 +4,14 @@
 import truffleDebugger from '@truffle/debugger';
 import assert from 'assert';
 import sinon from 'sinon';
-import * as contractsPrepareHelpers from '../../src/debugAdapter/contracts/contractsPrepareHelpers';
-// import {IContractModel} from '../../src/debugAdapter/models/IContractModel';
+import * as contractHelpers from '../../src/debugAdapter/contracts/contractHelpers';
 import RuntimeInterface from '../../src/debugAdapter/runtimeInterface';
 
 describe('RuntimeInterface unit tests', () => {
   let runtimeInterface: RuntimeInterface;
 
   beforeEach(async () => {
-    sinon
-      .stub(contractsPrepareHelpers, 'prepareContracts')
-      .resolves({ sources: new Map(), provider: '', compilations: [] });
+    sinon.stub(contractHelpers.ContractHelper, 'prepare').resolves({ mappedSources: new Map(), shimCompilations: [] });
   });
 
   afterEach(() => {
@@ -71,20 +68,6 @@ describe('RuntimeInterface unit tests', () => {
 
 const contractAddressMock = 'AddressA';
 const contractSourcePathMock = 'path_to_contract';
-// const contractMock: IContractModel = {
-//   abi: [],
-//   address: contractAddressMock,
-//   ast: {},
-//   binary: '',
-//   compiler: {},
-//   contractName: '',
-//   deployedBinary: '',
-//   deployedSourceMap: '',
-//   source: '',
-//   sourceMap: '',
-//   sourcePath: contractSourcePathMock,
-// };
-// const contractsMock = [contractMock];
 
 const baseSessionMock: truffleDebugger.Session = {
   addBreakpoint: (_breakPoint: any) => ({}),
