@@ -12,7 +12,7 @@ import { required } from '../../src/helpers/required';
 import * as userInteraction from '../../src/helpers/userInteraction';
 import { CancellationEvent } from '../../src/Models';
 import { Output } from '../../src/Output';
-// import * as vscode from 'vscode';
+import * as vscode from 'vscode';
 
 enum ProjectType {
   empty = 'empty',
@@ -707,25 +707,25 @@ describe('ProjectCommands', () => {
       });
     });
 
-    // it('Method getTruffleUnboxCommand should return a value', async () => {
-    //   // Arrange
-    //   const displayName = 'drizzle';
-    //   const repoName = 'drizzle-box';
-    //   const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-    //   const getTruffleUnboxCommand = projectCommandsRewire.__get__('getTruffleUnboxCommand');
-    //   const showQuickPickMock = sinon.stub(vscode.window, 'showQuickPick');
+    it('Method getTruffleUnboxCommand should return a value', async () => {
+      // Arrange
+      const displayName = 'pet-shop';
+      const repoName = 'pet-shop-box';
+      const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
+      const getTruffleUnboxCommand = projectCommandsRewire.__get__('getTruffleUnboxCommand');
+      const showQuickPickMock = sinon.stub(vscode.window, 'showQuickPick');
 
-    //   showQuickPickMock.onCall(0).callsFake((items: any) => {
-    //     return items.find((item: any) => item.label === displayName);
-    //   });
+      showQuickPickMock.onCall(0).callsFake((items: any) => {
+        return items.find((item: any) => item.label === displayName);
+      });
 
-    //   // Act
-    //   const result = await getTruffleUnboxCommand();
+      // Act
+      const result = await getTruffleUnboxCommand();
 
-    //   // Assert
-    //   assert.strictEqual(result, repoName, 'result should be equal to expected string');
-    //   assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
-    // });
+      // Assert
+      assert.strictEqual(result, repoName, 'result should be equal to expected string');
+      assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+    });
   });
 
   describe('Integration tests', () => {
