@@ -3,7 +3,7 @@
 
 declare module '@truffle/debugger' {
   // Fixme: bumping TS might make all this work...
-  import { provider as Web3Provider } from 'web3-core';
+  import {provider as Web3Provider} from 'web3-core';
 
   // import type Web3 from "web3";
   interface Selectors {
@@ -20,7 +20,7 @@ declare module '@truffle/debugger' {
     removeAllBreakpoints: () => Promise<void>;
     view: (selectors: any) => any;
     addBreakpoint: (breakPoint: any) => unknown;
-    variables: ({ indicateUnknown: boolean }?) => Promise<any>;
+    variables: ({indicateUnknown: boolean}?) => Promise<any>;
     continueUntilBreakpoint: () => Promise<void>;
     stepNext: () => Promise<void>;
     stepInto: () => Promise<void>;
@@ -50,5 +50,5 @@ declare module '@truffle/debugger' {
    */
   function forTx(txHash: string, options: DebuggerOptions): Promise<Debugger>;
 
-  export { selectors, Selectors, forTx, Session, DebuggerOptions };
+  export {selectors, Selectors, forTx, Session, DebuggerOptions};
 }

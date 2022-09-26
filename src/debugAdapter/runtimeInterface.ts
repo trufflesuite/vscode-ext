@@ -2,19 +2,19 @@
 // Licensed under the MIT license.
 
 import truffleDebugger from '@truffle/debugger';
-import { EventEmitter } from 'events';
-import { ContractHelper } from './contracts/contractHelpers';
-import { TranslatedResult, translateTruffleVariables } from './helpers';
-import { DebuggerTypes } from './models/debuggerTypes';
-import { ICallInfo } from './models/ICallInfo';
-import { IInstruction } from './models/IInstruction';
+import {EventEmitter} from 'events';
+import {ContractHelper} from './contracts/contractHelpers';
+import {TranslatedResult, translateTruffleVariables} from './helpers';
+import {DebuggerTypes} from './models/debuggerTypes';
+import {ICallInfo} from './models/ICallInfo';
+import {IInstruction} from './models/IInstruction';
 
 export default class RuntimeInterface extends EventEmitter {
   private _isDebuggerAttached: boolean;
   private _session: truffleDebugger.Session | undefined;
   private _selectors: truffleDebugger.Selectors;
   private _numBreakpoints: number;
-  private _initialBreakPoints: Array<{ path: string; lines: number[] }>;
+  private _initialBreakPoints: Array<{path: string; lines: number[]}>;
   private _sources: Map<string, string>;
 
   constructor() {
@@ -32,7 +32,7 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   public storeInitialBreakPoints(path: string, lines: number[]) {
-    this._initialBreakPoints.push({ path, lines });
+    this._initialBreakPoints.push({path, lines});
   }
 
   public async processInitialBreakPoints() {
@@ -41,7 +41,7 @@ export default class RuntimeInterface extends EventEmitter {
     }
 
     for (const initialBreakPoint of this._initialBreakPoints) {
-      const { path, lines } = initialBreakPoint;
+      const {path, lines} = initialBreakPoint;
       for (const line of lines) {
         await this.setBreakpoint(path, line);
       }
@@ -73,7 +73,7 @@ export default class RuntimeInterface extends EventEmitter {
   public callStack(): ICallInfo[] {
     this.validateSession();
     const currentLine = this.currentLine();
-    return [{ ...currentLine, method: 'Current' }];
+    return [{...currentLine, method: 'Current'}];
   }
 
   /**
@@ -84,7 +84,7 @@ export default class RuntimeInterface extends EventEmitter {
     Record<string, TranslatedResult> | any
   > {
     if (this._session) {
-      const variables = await this._session.variables({ indicateUnknown: true });
+      const variables = await this._session.variables({indicateUnknown: true});
       return translateTruffleVariables(variables);
     } else {
       return Promise.resolve({});

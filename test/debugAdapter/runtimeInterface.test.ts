@@ -11,7 +11,7 @@ describe('RuntimeInterface unit tests', () => {
   let runtimeInterface: RuntimeInterface;
 
   beforeEach(async () => {
-    sinon.stub(contractHelpers.ContractHelper, 'prepare').resolves({ mappedSources: new Map(), shimCompilations: [] });
+    sinon.stub(contractHelpers.ContractHelper, 'prepare').resolves({mappedSources: new Map(), shimCompilations: []});
   });
 
   afterEach(() => {
@@ -22,14 +22,14 @@ describe('RuntimeInterface unit tests', () => {
     // Arrange
     const sessionSelectorView = (selector: any) => {
       if (selector === truffleDebugger.selectors.evm.current.callstack) {
-        return [{ address: contractAddressMock }];
+        return [{address: contractAddressMock}];
       }
       return {};
     };
     const sessionMock = buildSessionMock(sessionSelectorView);
     sinon.stub(RuntimeInterface.prototype, 'generateSession' as any).resolves(sessionMock);
-    const currentDebugLine = { column: 1, file: contractSourcePathMock, line: 1 };
-    sinon.stub(RuntimeInterface.prototype, 'currentLine').returns({ column: 1, file: contractSourcePathMock, line: 1 });
+    const currentDebugLine = {column: 1, file: contractSourcePathMock, line: 1};
+    sinon.stub(RuntimeInterface.prototype, 'currentLine').returns({column: 1, file: contractSourcePathMock, line: 1});
 
     // Act
     runtimeInterface = await initMockRuntime();
@@ -91,7 +91,7 @@ function assertCallstackMessage(callStackProp: string, callStackValue: any) {
 }
 
 function buildSessionMock(view?: (selectors: any) => any) {
-  const sessionMock = { ...baseSessionMock };
+  const sessionMock = {...baseSessionMock};
   if (view) {
     sessionMock.view = view;
   }

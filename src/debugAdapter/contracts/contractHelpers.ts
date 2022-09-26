@@ -3,9 +3,9 @@
 
 import Compiler from '@truffle/workflow-compile';
 import Config from '@truffle/config';
-import { Compilations } from '@truffle/codec';
+import {Compilations} from '@truffle/codec';
 import path from 'path';
-import { Source } from '@truffle/compile-common';
+import {Source} from '@truffle/compile-common';
 
 export namespace ContractHelper {
   /**
@@ -32,14 +32,14 @@ export namespace ContractHelper {
    */
   export async function prepare(workingDirectory: any): Promise<ContractData> {
     // Retreives the truffle configuration file
-    const config = Config.detect({ workingDirectory: workingDirectory });
+    const config = Config.detect({workingDirectory: workingDirectory});
 
     // Sets the properties for the compilation
     config.all = true;
     config.quiet = true;
 
     // Compiles the contracts and convert it on shim
-    const { compilations } = await Compiler.compile(config);
+    const {compilations} = await Compiler.compile(config);
     const shimCompilations = Compilations.Utils.shimCompilations(compilations);
 
     // Retrieves sources path so the debug can open them

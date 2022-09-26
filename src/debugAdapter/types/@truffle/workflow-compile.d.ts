@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 declare module '@truffle/workflow-compile' {
-  import type { Compilation, CompiledContract } from '@truffle/compile-common';
+  import type {Compilation, CompiledContract} from '@truffle/compile-common';
 
   interface Artifacts {
     /**
@@ -25,5 +25,5 @@ declare module '@truffle/workflow-compile' {
    */
   function compile(config: TruffleConfig): Promise<Artifacts>;
 
-  export { Artifacts, compile };
+  export {Artifacts, compile};
 }
