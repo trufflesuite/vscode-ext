@@ -121,7 +121,7 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   /**
-   * This function attaches the debugger and starts the debugging process
+   * This function attaches the debugger and starts the debugging process.
    *
    * @param txHash The transaction hash to debug.
    * @param workingDirectory The workspace path where the truffle project is located.
