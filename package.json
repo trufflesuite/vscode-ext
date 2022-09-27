@@ -812,7 +812,6 @@
     "@truffle/debugger": "^10.0.14",
     "@truffle/resolver": "^9.0.4",
     "@truffle/workflow-compile": "^4.0.33",
-    "@truffle/environment": "^0.2.123",
     "abi-decoder": "^2.4.0",
     "acorn": "^8.7.1",
     "acorn-walk": "^8.2.0",
