@@ -42,7 +42,6 @@ export default class UriHandlerController implements UriHandler {
     } catch (error) {
       // Displays a message if the command or arguments are badly formatted
       window.showErrorMessage(Constants.errorMessageStrings.UriHandlerError);
-      console.log(error);
     }
   }
 }
