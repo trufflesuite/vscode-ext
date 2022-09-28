@@ -2,10 +2,11 @@
 // Licensed under the MIT license.
 
 import * as outputCommandHelper from './command';
-import {extractEnumsInfo, extractEnumsInfoSafe} from './enumExtractor';
+import { extractEnumsInfo, extractEnumsInfoSafe } from './enumExtractor';
 import * as gitHelper from './git';
 import * as shell from './shell';
 import * as telemetryHelper from './telemetry';
+import UriHandlerController from './uriHandlerController';
 import * as userSettings from './userSettings';
 import * as vscodeEnvironment from './vscodeEnvironment';
 
@@ -21,4 +22,5 @@ export {
   telemetryHelper,
   userSettings,
   vscodeEnvironment,
+  UriHandlerController,
 };

@@ -5,13 +5,13 @@ import * as assert from 'assert';
 import fs from 'fs-extra';
 import rewire from 'rewire';
 import sinon from 'sinon';
-import {CancellationToken, Progress, ProgressOptions, window, workspace} from 'vscode';
-import {Constants, RequiredApps} from '../../src/Constants';
+import { CancellationToken, Progress, ProgressOptions, window, workspace } from 'vscode';
+import { Constants, RequiredApps } from '../../src/Constants';
 import * as helpers from '../../src/helpers/';
-import {required} from '../../src/helpers/required';
+import { required } from '../../src/helpers/required';
 import * as userInteraction from '../../src/helpers/userInteraction';
-import {CancellationEvent} from '../../src/Models';
-import {Output} from '../../src/Output';
+import { CancellationEvent } from '../../src/Models';
+import { Output } from '../../src/Output';
 import * as vscode from 'vscode';
 
 enum ProjectType {
@@ -709,8 +709,8 @@ describe('ProjectCommands', () => {
 
     it('Method getTruffleUnboxCommand should return a value', async () => {
       // Arrange
-      const displayName = 'drizzle';
-      const repoName = 'drizzle-box';
+      const displayName = 'pet-shop';
+      const repoName = 'pet-shop-box';
       const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
       const getTruffleUnboxCommand = projectCommandsRewire.__get__('getTruffleUnboxCommand');
       const showQuickPickMock = sinon.stub(vscode.window, 'showQuickPick');

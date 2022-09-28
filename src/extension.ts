@@ -40,10 +40,11 @@ import { registerGanacheDetails } from './pages/GanacheDetails';
 import { registerLogView } from './views/LogView';
 import { saveTextDocument } from './helpers/workspace';
 import { StatusBarItems } from './Models/StatusBarItems/Contract';
-import UriHandler from './helpers/uriHandler';
+import { UriHandlerController } from './helpers';
 
 export async function activate(context: ExtensionContext) {
-  new UriHandler();
+  new UriHandlerController();
+
   /**
    * Wrapper around `registerCommand` that pushes the resulting `Disposable`
    * into the `context`'s `subscriptions`.
