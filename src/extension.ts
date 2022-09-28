@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { commands, ExtensionContext, Uri, window, workspace } from 'vscode';
+import {commands, ExtensionContext, Uri, window, workspace} from 'vscode';
 import {
   DebuggerCommands,
   GanacheCommands,
@@ -13,12 +13,12 @@ import {
   GenericCommands,
   ContractCommands,
 } from './commands';
-import { Constants } from './Constants';
+import {Constants} from './Constants';
 
-import { DebuggerConfiguration } from './debugAdapter/configuration/debuggerConfiguration';
-import { required } from '@/helpers/required';
-import { CancellationEvent } from './Models';
-import { ChangelogPage, RequirementsPage, WelcomePage } from './pages';
+import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
+import {required} from '@/helpers/required';
+import {CancellationEvent} from './Models';
+import {ChangelogPage, RequirementsPage, WelcomePage} from './pages';
 import {
   AdapterType,
   ContractDB,
@@ -29,18 +29,18 @@ import {
   TreeService,
   DashboardService,
 } from './services';
-import { Telemetry } from './TelemetryClient';
-import { NetworkNodeView, ProjectView } from './ViewItems';
-import { registerDashboardView } from './views/DashboardView';
-import { registerDeploymentView } from './views/DeploymentsView';
-import { registerFileExplorerView } from './views/FileExplorer';
-import { registerHelpView } from './views/HelpView';
-import { OpenUrlTreeItem } from './views/lib/OpenUrlTreeItem';
-import { registerGanacheDetails } from './pages/GanacheDetails';
-import { registerLogView } from './views/LogView';
-import { saveTextDocument } from './helpers/workspace';
-import { StatusBarItems } from './Models/StatusBarItems/Contract';
-import { UriHandlerController } from './helpers';
+import {Telemetry} from './TelemetryClient';
+import {NetworkNodeView, ProjectView} from './ViewItems';
+import {registerDashboardView} from './views/DashboardView';
+import {registerDeploymentView} from './views/DeploymentsView';
+import {registerFileExplorerView} from './views/FileExplorer';
+import {registerHelpView} from './views/HelpView';
+import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
+import {registerGanacheDetails} from './pages/GanacheDetails';
+import {registerLogView} from './views/LogView';
+import {saveTextDocument} from './helpers/workspace';
+import {StatusBarItems} from './Models/StatusBarItems/Contract';
+import {UriHandlerController} from './helpers';
 
 export async function activate(context: ExtensionContext) {
   new UriHandlerController();

@@ -3,7 +3,7 @@
 
 import os from 'os';
 import path from 'path';
-import { ExtensionContext, extensions } from 'vscode';
+import {ExtensionContext, extensions} from 'vscode';
 
 const extensionId = 'trufflesuite-csi.truffle-vscode';
 const packageJSON = extensions.getExtension(extensionId)!.packageJSON;
@@ -94,7 +94,7 @@ export class Constants {
   };
 
   // Values are quite brittle and don't map directly to the requirements.html screen.
-  public static requiredVersions: { [key: string]: string | { min: string; max: string } } = {
+  public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
     [RequiredApps.ganache]: {
       max: '8.0.0',
       min: '6.0.0',
@@ -237,32 +237,32 @@ export class Constants {
   public static treeItemData = {
     dashboard: {
       contextValue: 'dashboard',
-      iconPath: { dark: '', light: '' },
+      iconPath: {dark: '', light: ''},
       label: 'Truffle Dashboard',
       prefix: 'dsh',
     },
     network: {
       default: {
         contextValue: 'network',
-        iconPath: { dark: '', light: '' },
+        iconPath: {dark: '', light: ''},
       },
       infura: {
         contextValue: 'network',
-        iconPath: { dark: '', light: '' },
+        iconPath: {dark: '', light: ''},
       },
       local: {
         contextValue: 'localnetwork',
-        iconPath: { dark: '', light: '' },
+        iconPath: {dark: '', light: ''},
       },
       generic: {
         contextValue: 'network',
-        iconPath: { dark: '', light: '' },
+        iconPath: {dark: '', light: ''},
       },
     },
     layer: {
       infura: {
         contextValue: 'layer',
-        iconPath: { dark: '', light: '' },
+        iconPath: {dark: '', light: ''},
         layerOne: {
           label: 'Layer One',
           value: 1,
@@ -276,36 +276,36 @@ export class Constants {
     project: {
       default: {
         contextValue: 'project',
-        iconPath: { dark: '', light: '' },
+        iconPath: {dark: '', light: ''},
       },
       infura: {
         contextValue: 'project',
-        iconPath: { dark: '', light: '' },
+        iconPath: {dark: '', light: ''},
       },
       local: {
         contextValue: 'localproject',
-        iconPath: { dark: '', light: '' },
+        iconPath: {dark: '', light: ''},
       },
       generic: {
         contextValue: 'genericproject',
-        iconPath: { dark: '', light: '' },
+        iconPath: {dark: '', light: ''},
       },
     },
     service: {
       default: {
         contextValue: 'service',
-        iconPath: { dark: '', light: '' },
+        iconPath: {dark: '', light: ''},
         label: 'Default Service',
       },
       infura: {
         contextValue: 'service',
-        iconPath: { dark: '', light: '' },
+        iconPath: {dark: '', light: ''},
         label: 'Infura Service',
         prefix: 'inf',
       },
       local: {
         contextValue: 'service',
-        iconPath: { dark: '', light: '' },
+        iconPath: {dark: '', light: ''},
         label: 'Ganache Service',
         prefix: 'loc',
         type: {
@@ -341,7 +341,7 @@ export class Constants {
       },
       generic: {
         contextValue: 'service',
-        iconPath: { dark: '', light: '' },
+        iconPath: {dark: '', light: ''},
         label: 'Other Service',
         prefix: 'gnr',
       },
@@ -461,7 +461,7 @@ export class Constants {
 
   // More information see here
   // https://ethereum.stackexchange.com/questions/17051/how-to-select-a-network-id-or-is-there-a-list-of-network-ids
-  public static infuraEndpointsIds: { [key: string]: number } = {
+  public static infuraEndpointsIds: {[key: string]: number} = {
     goerli: 5,
     kovan: 42,
     mainnet: 1,

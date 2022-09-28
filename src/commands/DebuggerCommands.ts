@@ -2,16 +2,16 @@
 // Licensed under the MIT license.
 
 import path from 'path';
-import { debug, DebugConfiguration, QuickPickItem, Uri, workspace } from 'vscode';
+import {debug, DebugConfiguration, QuickPickItem, Uri, workspace} from 'vscode';
 
-import { DEBUG_TYPE } from '@/debugAdapter/constants/debugAdapter';
-import { DebugNetwork } from '@/debugAdapter/debugNetwork';
-import { shortenHash } from '@/debugAdapter/functions';
-import { TransactionProvider } from '@/debugAdapter/transaction/transactionProvider';
-import { Web3Wrapper } from '@/debugAdapter/web3Wrapper';
-import { getTruffleWorkspace, getPathByPlatform } from '@/helpers/workspace';
-import { showInputBox, showQuickPick } from '@/helpers/userInteraction';
-import { Telemetry } from '@/TelemetryClient';
+import {DEBUG_TYPE} from '@/debugAdapter/constants/debugAdapter';
+import {DebugNetwork} from '@/debugAdapter/debugNetwork';
+import {shortenHash} from '@/debugAdapter/functions';
+import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvider';
+import {Web3Wrapper} from '@/debugAdapter/web3Wrapper';
+import {getTruffleWorkspace, getPathByPlatform} from '@/helpers/workspace';
+import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
+import {Telemetry} from '@/TelemetryClient';
 
 export namespace DebuggerCommands {
   export async function startSolidityDebugger() {
@@ -45,7 +45,7 @@ export namespace DebuggerCommands {
     } else {
       // if remote network then require txHash
       const placeHolder = 'Type the transaction hash you want to debug (0x...)';
-      const txHash = await showInputBox({ placeHolder });
+      const txHash = await showInputBox({placeHolder});
 
       if (txHash) await startDebugging(txHash, workingDirectory, providerUrl);
     }
@@ -60,7 +60,7 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
   return lastTxsDeployed.map((txInfo) => {
     const label = shortenHash(txInfo.hash);
     const description = generateDescription(txInfo.contractName, txInfo.methodName);
-    return { alwaysShow: true, label, description, detail: txInfo.hash } as QuickPickItem;
+    return {alwaysShow: true, label, description, detail: txInfo.hash} as QuickPickItem;
   });
 }
 

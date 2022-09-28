@@ -1,6 +1,6 @@
-import { startDebugging } from '@/commands';
-import { Constants } from '@/Constants';
-import { Disposable, Uri, UriHandler, window } from 'vscode';
+import {startDebugging} from '@/commands';
+import {Constants} from '@/Constants';
+import {Disposable, Uri, UriHandler, window} from 'vscode';
 
 type TDebugInformation = {
   txHash: string;
