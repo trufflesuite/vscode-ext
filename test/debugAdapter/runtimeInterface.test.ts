@@ -11,7 +11,7 @@ describe('RuntimeInterface unit tests', () => {
   let runtimeInterface: RuntimeInterface;
 
   beforeEach(async () => {
-    sinon.stub(contractHelpers.ContractHelper, 'prepare').resolves({mappedSources: new Map(), shimCompilations: []});
+    sinon.stub(contractHelpers, 'prepareContract').resolves({mappedSources: new Map(), shimCompilations: []});
   });
 
   afterEach(() => {

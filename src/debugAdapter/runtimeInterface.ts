@@ -3,7 +3,7 @@
 
 import truffleDebugger from '@truffle/debugger';
 import {EventEmitter} from 'events';
-import {ContractHelper} from './contracts/contractHelpers';
+import {prepareContract} from './contracts/contractHelpers';
 import {TranslatedResult, translateTruffleVariables} from './helpers';
 import {DebuggerTypes} from './models/debuggerTypes';
 import {ICallInfo} from './models/ICallInfo';
@@ -130,7 +130,7 @@ export default class RuntimeInterface extends EventEmitter {
    */
   public async attach(txHash: string, workingDirectory: string, providerUrl: string): Promise<void> {
     // Gets the contracts compilation
-    const result = await ContractHelper.prepare(workingDirectory);
+    const result = await prepareContract(workingDirectory);
 
     // Sets the truffle debugger options
     const options: truffleDebugger.DebuggerOptions = {
