@@ -29,7 +29,7 @@ export type ContractData = {
  * @returns A object (ContractData) with the mapped source files and
  * the contract compilations (shim).
  */
-export async function prepareContract(workingDirectory: any): Promise<ContractData> {
+export async function prepareContracts(workingDirectory: any): Promise<ContractData> {
   // Retreives the truffle configuration file
   const config = Config.detect({workingDirectory: workingDirectory});
 
@@ -70,8 +70,11 @@ async function getContractSourcePath(workingDirectory: string, sources: Source[]
       const absolutePathValue = source.ast![absolutePathKey] as string;
 
       // Checks if the file origin (project or node modules)
-      if (absolutePathValue.startsWith('project:/')) mappedSources.set(source.sourcePath, source.sourcePath);
-      else mappedSources.set(source.sourcePath, path.join(workingDirectory, 'node_modules', absolutePathValue));
+      if (absolutePathValue.startsWith('project:/')) {
+        mappedSources.set(source.sourcePath, source.sourcePath);
+      } else {
+        mappedSources.set(source.sourcePath, path.join(workingDirectory, 'node_modules', absolutePathValue));
+      }
     })
   );
 

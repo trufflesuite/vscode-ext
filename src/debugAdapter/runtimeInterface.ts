@@ -3,7 +3,7 @@
 
 import truffleDebugger from '@truffle/debugger';
 import {EventEmitter} from 'events';
-import {prepareContract} from './contracts/contractHelpers';
+import {prepareContracts} from './contracts/contractHelpers';
 import {TranslatedResult, translateTruffleVariables} from './helpers';
 import {DebuggerTypes} from './models/debuggerTypes';
 import {ICallInfo} from './models/ICallInfo';
@@ -15,7 +15,10 @@ export default class RuntimeInterface extends EventEmitter {
   private _selectors: truffleDebugger.Selectors;
   private _numBreakpoints: number;
   private _initialBreakPoints: Array<{path: string; lines: number[]}>;
-  private _sources: Map<string, string>;
+  /**
+   * A list of mapped files so debug can open.
+   */
+  private _mappedSources: Map<string, string>;
 
   constructor() {
     super();
@@ -24,7 +27,7 @@ export default class RuntimeInterface extends EventEmitter {
     this._numBreakpoints = 0;
     this._isDebuggerAttached = false;
     this._initialBreakPoints = [];
-    this._sources = new Map();
+    this._mappedSources = new Map();
   }
 
   public clearBreakpoints(): Promise<void> {
@@ -130,7 +133,7 @@ export default class RuntimeInterface extends EventEmitter {
    */
   public async attach(txHash: string, workingDirectory: string, providerUrl: string): Promise<void> {
     // Gets the contracts compilation
-    const result = await prepareContract(workingDirectory);
+    const result = await prepareContracts(workingDirectory);
 
     // Sets the truffle debugger options
     const options: truffleDebugger.DebuggerOptions = {
@@ -139,7 +142,7 @@ export default class RuntimeInterface extends EventEmitter {
     };
 
     // Sets the properties to use during the debugger process
-    this._sources = result.mappedSources;
+    this._mappedSources = result.mappedSources;
     this._session = await this.generateSession(txHash, options);
     this._isDebuggerAttached = true;
   }
@@ -152,7 +155,7 @@ export default class RuntimeInterface extends EventEmitter {
       throw new Error('No source file');
     }
     // so if we have a file in a location that doesn't map 1:1 to the actual file name in the compiler we map it here...
-    const file = this._sources.has(sourcePath) ? this._sources.get(sourcePath) : sourcePath;
+    const file = this._mappedSources.has(sourcePath) ? this._mappedSources.get(sourcePath) : sourcePath;
 
     return {
       column: currentLocation.sourceRange ? currentLocation.sourceRange.lines.start.column : 0,
@@ -191,12 +194,7 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   private async generateSession(txHash: string, options: truffleDebugger.DebuggerOptions) {
-    //const bugger = await truffleDebugger.forTx(txHash, options);
-    const bugger = await truffleDebugger.forTx(txHash, {
-      provider: options.provider,
-      compilations: options.compilations,
-    });
-
+    const bugger = await truffleDebugger.forTx(txHash, options);
     return bugger.connect();
   }
 
