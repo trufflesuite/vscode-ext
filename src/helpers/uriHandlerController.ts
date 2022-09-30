@@ -1,6 +1,6 @@
 import {startDebugging} from '@/commands';
 import {Constants} from '@/Constants';
-import {Disposable, Uri, UriHandler, window} from 'vscode';
+import {Uri, UriHandler, window} from 'vscode';
 
 type TDebugInformation = {
   txHash: string;
@@ -12,18 +12,7 @@ enum Commands {
   debug = 'debug',
 }
 
-export default class UriHandlerController implements UriHandler {
-  private disposables: Disposable[] = [];
-
-  constructor() {
-    this.disposables.push(window.registerUriHandler(this));
-  }
-
-  dispose() {
-    this.disposables.forEach((disposable) => disposable.dispose());
-    this.disposables = [];
-  }
-
+export class UriHandlerController implements UriHandler {
   async handleUri(uri: Uri): Promise<void> {
     try {
       // Gets the command name

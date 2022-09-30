@@ -47,7 +47,9 @@ export namespace DebuggerCommands {
       const placeHolder = 'Type the transaction hash you want to debug (0x...)';
       const txHash = await showInputBox({placeHolder});
 
-      if (txHash) await startDebugging(txHash, workingDirectory, providerUrl);
+      if (txHash) {
+        await startDebugging(txHash, workingDirectory, providerUrl);
+      }
     }
   }
 }
