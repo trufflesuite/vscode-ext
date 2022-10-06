@@ -59,5 +59,6 @@ export class Output {
    */
   public static init(context: ExtensionContext) {
     context.subscriptions.push(this._outputChannel);
+    this._outputChannel.show();
   }
 }
