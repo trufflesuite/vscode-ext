@@ -709,8 +709,8 @@ describe('ProjectCommands', () => {
 
     it('Method getTruffleUnboxCommand should return a value', async () => {
       // Arrange
-      const displayName = 'drizzle';
-      const repoName = 'drizzle-box';
+      const displayName = 'pet-shop';
+      const repoName = 'pet-shop-box';
       const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
       const getTruffleUnboxCommand = projectCommandsRewire.__get__('getTruffleUnboxCommand');
       const showQuickPickMock = sinon.stub(vscode.window, 'showQuickPick');
