@@ -62,7 +62,7 @@ export namespace GanacheService {
 
     if (portStatus === PortStatus.GANACHE) {
       const pid = await findPid(port);
-      ganacheProcesses[port] = {pid, port};
+      ganacheProcesses[port] = ganacheProcesses[port] ? ganacheProcesses[port] : {pid, port};
     }
 
     if (portStatus === PortStatus.FREE) {
@@ -122,6 +122,7 @@ export namespace GanacheService {
     } catch (error) {
       Telemetry.sendException(error as Error);
       await stopGanacheProcess(ganacheProcess, true);
+      await Output.dispose(OutputLabel.ganacheCommands, port.toString());
       throw error;
     }
 
@@ -135,7 +136,7 @@ export namespace GanacheService {
 
     const {output, pid, port, process} = ganacheProcess;
     delete ganacheProcesses[port];
-    Output.dispose(OutputLabel.ganacheCommands, port.toString());
+    await Output.dispose(OutputLabel.ganacheCommands, port.toString());
 
     if (process) {
       removeAllListeners(process);

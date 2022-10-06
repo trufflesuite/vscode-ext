@@ -71,7 +71,7 @@ describe('Unit tests GanacheService', () => {
     });
   });
 
-  ['1', '65535', '8454', 8000, 8454].forEach((port) => {
+  ['1', '65535', 8000, 8454].forEach((port) => {
     it(`startGanacheServer should pass validation if port is ${port}`, async () => {
       // Arrange
       const urlValidatorSpy = sinon.spy(UrlValidator, 'validatePort');

@@ -39,7 +39,7 @@ export class Output {
    * @param label - represents the log type
    * @param description - represents the log description
    */
-  public static dispose(label: OutputLabel, description?: string): void {
+  public static async dispose(label: OutputLabel, description?: string): Promise<void> {
     commands.executeCommand(`${LogView.viewType}.dispose.tab`, label, description);
   }
 
@@ -59,6 +59,13 @@ export class Output {
    */
   public static init(context: ExtensionContext) {
     context.subscriptions.push(this._outputChannel);
+  }
+
+  public static show(): void {
     this._outputChannel.show();
+  }
+
+  public static hide(): void {
+    this._outputChannel.hide();
   }
 }
