@@ -40,6 +40,7 @@ import {registerGanacheDetails} from './pages/GanacheDetails';
 import {registerLogView} from './views/LogView';
 import {saveTextDocument} from './helpers/workspace';
 import {StatusBarItems} from './Models/StatusBarItems/Contract';
+import {Output} from './Output';
 
 export async function activate(context: ExtensionContext) {
   /**
@@ -57,6 +58,9 @@ export async function activate(context: ExtensionContext) {
   }
 
   Constants.initialize(context); // still do this first.
+
+  // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
+  Output.init(context);
 
   DebuggerConfiguration.initialize(context);
 
