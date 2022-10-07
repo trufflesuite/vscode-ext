@@ -16,7 +16,6 @@ div.tab-frame label {
   cursor: pointer;
   min-height: 15px;
   margin-right: 2px;
-  color: #f2ede7;
   text-transform: uppercase;
   font-size: 12px;
 }
@@ -38,7 +37,6 @@ div.tab-frame div.tab {
   padding: 10px;
   clear: left;
   height: 85vh;
-  color: #fff;
   overflow-y: scroll;
 }
 
