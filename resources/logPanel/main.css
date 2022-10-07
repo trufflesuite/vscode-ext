@@ -19,7 +19,6 @@ div.tab-frame label {
   color: #f2ede7;
   text-transform: uppercase;
   font-size: 12px;
-  background-color: #33262a;
 }
 
 div.tab-frame label img {
@@ -30,9 +29,8 @@ div.tab-frame label img {
 }
 
 div.tab-frame input:checked + label {
-  background: #40e0c5;
-  color: #33262a;
-  cursor: default;
+  border-bottom: solid 1px #40e0c5;
+  cursor: hover;
 }
 
 div.tab-frame div.tab {
