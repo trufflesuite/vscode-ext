@@ -35,11 +35,8 @@ declare module '@truffle/debugger' {
    * More permissively typed Object
    */
   type DebuggerOptions = {
-    contracts?: Array<any>;
-    files?: Array<string>;
     provider: Web3Provider;
     compilations?: Array<any>;
-    lightMode?: boolean;
   };
 
   /**
