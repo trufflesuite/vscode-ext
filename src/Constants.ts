@@ -505,7 +505,7 @@ export class Constants {
     },
     description: {
       emptyProject: 'Empty project equivalent of truffle init',
-      sampleProject: 'Sample project (current vscode-starter-box) with some enhancements)',
+      sampleProject: 'Sample project (current vscode-starter-box with some enhancements)',
       projectFromTruffleBox:
         'Project from Truffle Box (which will launch another dropdown with the full list of all boxes)',
     },
