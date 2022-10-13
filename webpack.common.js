@@ -27,6 +27,9 @@ module.exports = {
   },
   resolve: {
     // .json is added to prevent import error from /node_modules/got/index.js
+    alias: {
+      'original-require': require.resolve('./polyfills/original-require'),
+    },
     extensions: ['.ts', '.js', '.json'],
     plugins: [
       new TsconfigPathsPlugin({
