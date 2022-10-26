@@ -8,6 +8,13 @@ import {TranslatedResult, translateTruffleVariables} from './helpers';
 import {DebuggerTypes} from './models/debuggerTypes';
 import {ICallInfo} from './models/ICallInfo';
 import {IInstruction} from './models/IInstruction';
+import {writeFileSync} from 'fs-extra';
+import {fetchAndCompileForDebugger} from '@truffle/fetch-and-compile';
+import {LocalNetworkNode, LocalProject} from '@/Models/TreeItems';
+import {getChainId} from '@/functions/explorer';
+import * as path from 'path';
+import {TreeManager} from '@/services/tree/TreeManager';
+import {ItemType} from '@/Models';
 
 export default class RuntimeInterface extends EventEmitter {
   private _isDebuggerAttached: boolean;
@@ -19,6 +26,8 @@ export default class RuntimeInterface extends EventEmitter {
    * A list of mapped files so debug can open.
    */
   private _mappedSources: Map<string, string>;
+
+  private _contractDir = '';
 
   constructor() {
     super();
@@ -143,19 +152,49 @@ export default class RuntimeInterface extends EventEmitter {
 
     // Sets the properties to use during the debugger process
     this._mappedSources = result.mappedSources;
-    this._session = await this.generateSession(txHash, options);
+    this._contractDir = path.join(workingDirectory, 'contracts');
+    const networkId = this.getNetworkId(providerUrl);
+
+    this._session = await this.generateSession(txHash, networkId, options);
     this._isDebuggerAttached = true;
+  }
+
+  private getNetworkId(providerUrl: string) {
+    const services = TreeManager.getItem(ItemType.LOCAL_SERVICE);
+
+    if (!services || !services.getChildren()) {
+      return undefined;
+    }
+
+    const projects = services.getChildren() as LocalProject[];
+    const project = projects.find((project) => {
+      const network = project.getChildren().at(0) as LocalNetworkNode;
+      return `${network.url.protocol}//${network.url.host}` === providerUrl;
+    })!;
+    return getChainId(project.options.forkedNetwork);
   }
 
   public currentLine(): DebuggerTypes.IFrame {
     this.validateSession();
     const currentLocation = this._session!.view(this._selectors.controller.current.location);
-    const sourcePath = this._session!.view(this._selectors.sourcemapping.current.source).sourcePath;
+    const source = this._session!.view(this._selectors.sourcemapping.current.source);
+    const sourcePath = source.sourcePath;
+
     if (!sourcePath) {
       throw new Error('No source file');
     }
     // so if we have a file in a location that doesn't map 1:1 to the actual file name in the compiler we map it here...
-    const file = this._mappedSources.has(sourcePath) ? this._mappedSources.get(sourcePath) : sourcePath;
+    // const file = this._mappedSources.has(sourcePath) ? this._mappedSources.get(sourcePath) : sourcePath;
+    let file: string;
+    if (this._mappedSources.has(sourcePath)) {
+      file = this._mappedSources.get(sourcePath)!;
+    } else {
+      // const tmp = os.tmpdir();
+      const path = this._contractDir + '/' + sourcePath;
+      writeFileSync(path, source.source);
+      file = path;
+      // file = sourcePath;
+    }
 
     return {
       column: currentLocation.sourceRange ? currentLocation.sourceRange.lines.start.column : 0,
@@ -193,8 +232,18 @@ export default class RuntimeInterface extends EventEmitter {
     }
   }
 
-  private async generateSession(txHash: string, options: truffleDebugger.DebuggerOptions) {
+  private async generateSession(
+    txHash: string,
+    networkId: string | number | undefined,
+    options: truffleDebugger.DebuggerOptions
+  ) {
     const bugger = await truffleDebugger.forTx(txHash, options);
+
+    if (networkId) {
+      // await fetchAndCompileForDebugger(bugger, {network: {networkId: 5}}); //Note: mutates bugger!!
+      await fetchAndCompileForDebugger(bugger, {network: {networkId: networkId as any}}); //Note: mutates bugger!!
+    }
+
     return bugger.connect();
   }
 

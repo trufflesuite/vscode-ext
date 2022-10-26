@@ -97,7 +97,7 @@ export class DebugNetwork {
    *
    * @returns an Array of `LocalProject` from the _Networks_ view.
    */
-  private getProjects(): LocalProject[] {
+  public getProjects(): LocalProject[] {
     const services = TreeManager.getItem(ItemType.LOCAL_SERVICE);
 
     if (!services || !services.getChildren()) {
