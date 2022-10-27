@@ -1,6 +1,6 @@
-import fs from "fs-extra";
-import {Memento} from "vscode";
-import {Constants} from "../Constants";
+import fs from 'fs-extra';
+import {Memento} from 'vscode';
+import {Constants} from '@/Constants';
 
 class ExtensionMnemonicRepository {
   private globalState?: Memento;

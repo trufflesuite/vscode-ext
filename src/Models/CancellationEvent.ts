@@ -9,6 +9,6 @@ export class CancellationEvent extends Error {
       Error.captureStackTrace(this, CancellationEvent);
     }
 
-    this.name = "CancellationEvent";
+    this.name = 'CancellationEvent';
   }
 }

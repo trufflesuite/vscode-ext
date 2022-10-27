@@ -1,17 +1,16 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import truffleProvider from "@truffle/provider";
-import Web3 from "web3";
-import {ConfigurationReader} from "./configurationReader";
-// import * as web3core from "web3-core";
+import {INetworkOption} from '@/helpers/ConfigurationReader';
+import truffleProvider from '@truffle/provider';
+import Web3 from 'web3';
 
 export class Web3Wrapper extends Web3 {
   private _networkId: number | undefined;
-  private _options: ConfigurationReader.INetworkOption;
+  private _options: INetworkOption;
   private _cachedProvider: any;
 
-  public constructor(options: ConfigurationReader.INetworkOption) {
+  public constructor(options: INetworkOption) {
     const innerProvider = getWeb3InnerProvider(options);
     super(innerProvider);
     this._options = options;
@@ -51,13 +50,13 @@ export class Web3Wrapper extends Web3 {
 
   private async validateNetworkId(networkId: number) {
     const declaredNetworkId = this._options.network_id;
-    if (declaredNetworkId !== "*") {
+    if (declaredNetworkId !== '*') {
       if (networkId.toString() !== declaredNetworkId.toString()) {
         const error =
-          "The network id specified in the truffle config " +
+          'The network id specified in the truffle config ' +
           `(${networkId}) does not match the one returned by the network ` +
           `(${declaredNetworkId}).  Ensure that both the network and the ` +
-          "provider are properly configured.";
+          'provider are properly configured.';
         throw new Error(error);
       }
     }
@@ -68,10 +67,10 @@ function PromiseBatch(batch: Web3.IBatchRequest) {
   const _batch = batch;
   const _requests: Array<Promise<any>> = [];
   return {
-    add(method: any, hash: string) {
+    add(method: any, ...args: any[]) {
       const promise = new Promise<any>((accept, reject) => {
         _batch.add(
-          method.request(hash, (error: any, result: any) => {
+          method.request(...args, (error: any, result: any) => {
             if (error) {
               reject(error);
             }
@@ -88,9 +87,9 @@ function PromiseBatch(batch: Web3.IBatchRequest) {
   };
 }
 
-function getProviderUrl(options: ConfigurationReader.INetworkOption): string {
+function getProviderUrl(options: INetworkOption): string {
   if (options.host && options.port) {
-    const protocol = options.websockets ? "ws" : "http";
+    const protocol = options.websockets ? 'ws' : 'http';
     return `${protocol}://${options.host}:${options.port}`;
   }
 
@@ -98,13 +97,13 @@ function getProviderUrl(options: ConfigurationReader.INetworkOption): string {
     return options.provider.url;
   }
 
-  throw new Error("Undefined network options.");
+  throw new Error('Undefined network options.');
 }
 
-function getWeb3InnerProvider(options: ConfigurationReader.INetworkOption): Web3.IProvider {
+function getWeb3InnerProvider(options: INetworkOption): Web3.IProvider {
   const providerUrl = getProviderUrl(options);
   let provider;
-  if (providerUrl.startsWith("ws")) {
+  if (providerUrl.startsWith('ws')) {
     provider = new Web3.providers.WebsocketProvider(providerUrl);
   } else {
     provider = new Web3.providers.HttpProvider(providerUrl);

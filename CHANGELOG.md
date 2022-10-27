@@ -2,7 +2,86 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
-## 2.2.4
+## 2.6.0 - _Arbequina_ 🌳
+
+This release brings a number of new features including an improved new project workflow, an information tab for your locally running Ganache instances, and a dedicated panel for all logging out from Truffle, Ganache and Dashboard. It also includes a fix for the debugger wherein it was unable to find the source files (resulting in a 'No source file" error) and range of smaller fixes and optimizations.
+
+Give it a try and let us know what you think!
+
+### What's Changed
+
+- Dropdown when selecting a box to "unbox" [\#220](https://github.com/trufflesuite/vscode-ext/pull/220) ([xhulz](https://github.com/xhulz))
+- Dedicated tab(s) in VS Code panel [\#205](https://github.com/trufflesuite/vscode-ext/pull/205) ([xhulz](https://github.com/xhulz))
+- Networks (Local Instance) - Get More Information [\#217](https://github.com/trufflesuite/vscode-ext/pull/217) ([xhulz](https://github.com/xhulz))
+- Fix Truffle Logo [\#215](https://github.com/trufflesuite/vscode-ext/pull/215) ([michaeljohnbennett](https://github.com/michaeljohnbennett))
+- Remove redundant txns from dialog after a redeploy [\#225](https://github.com/trufflesuite/vscode-ext/pull/225) ([xhulz](https://github.com/xhulz))
+- Have new project match truffle init [\#222](https://github.com/trufflesuite/vscode-ext/pull/222) ([xhulz](https://github.com/xhulz))
+- Create an "auto-deploy on save" toggle in the Contract Explorer [\#227](https://github.com/trufflesuite/vscode-ext/pull/227) ([xhulz](https://github.com/xhulz))
+- Debugger loading incorrect source file or throwing "No source file" error [\#229](https://github.com/trufflesuite/vscode-ext/pull/229) ([xhulz](https://github.com/xhulz))
+- Spurious closing bracket on "Create sample project" entry when creating a new project [\#238](https://github.com/trufflesuite/vscode-ext/pull/238) ([xhulz](https://github.com/xhulz))
+- Temporarily continue logging to the Truffle for VS Code output channel [\#237](https://github.com/trufflesuite/vscode-ext/pull/237) ([xhulz](https://github.com/xhulz))
+- Minor stylistic tweaks to output tabs [\#240](https://github.com/trufflesuite/vscode-ext/pull/240) ([kevinbluer](https://github.com/kevinbluer))
+
+## 2.5.0 - _Haiku_ 😈
+
+This release has improved support to debug over a forked network and working with multiple Truffle projects in the same workspace.
+The brand new Walkthrough helps users to explore and discover the main features of the extension.
+Moreover, it has some bug fixes, internal optimisations, and code refactor for better maintainability.
+
+Give it a try and let us know what you think!
+
+### What's Changed
+
+- Ability to debug over a forked network [\#186](https://github.com/trufflesuite/vscode-ext/pull/186) ([xhulz](https://github.com/xhulz))
+- Use `contracts_directory` from Truffle config in `Create Contract` command [\#193](https://github.com/trufflesuite/vscode-ext/pull/193) ([acuarica](https://github.com/acuarica))
+- Fix Command Palette display filter for Build/Deploy/Create Contracts commands [\#192](https://github.com/trufflesuite/vscode-ext/pull/192) ([acuarica](https://github.com/acuarica))
+- Add support to run out tests without VS Code Development Extension Host [\#191](https://github.com/trufflesuite/vscode-ext/pull/191) ([acuarica](https://github.com/acuarica))
+- Add support for multiple Truffle config files [\#181](https://github.com/trufflesuite/vscode-ext/pull/181) ([acuarica](https://github.com/acuarica))
+- Honor the `contract_build_directory` property in Deployments view [\#179](https://github.com/trufflesuite/vscode-ext/pull/179) ([acuarica](https://github.com/acuarica))
+- Ability to compile a single contract [\#177](https://github.com/trufflesuite/vscode-ext/pull/177) ([xhulz](https://github.com/xhulz))
+- Dashboard link has added to dashboard view panel [\#172](https://github.com/trufflesuite/vscode-ext/pull/172) ([xhulz](https://github.com/xhulz))
+- Debug only works with Ganache Development Instance [\#170](https://github.com/trufflesuite/vscode-ext/pull/170) ([xhulz](https://github.com/xhulz))
+- Add a Walkthrough on the Getting Started splash [\#148](https://github.com/trufflesuite/vscode-ext/pull/148) ([acuarica](https://github.com/acuarica))
+- Replace `open` package with `vscode.env.openExternal` [\#195](https://github.com/trufflesuite/vscode-ext/pull/195) ([acuarica](https://github.com/acuarica))
+- Always use the embedded Debug Adapter [\#218](https://github.com/trufflesuite/vscode-ext/pull/218) ([acuarica](https://github.com/acuarica))
+
+## 2.4.0 - _Goblins_ 😈
+
+This release has some fixes around internal optimisations for our CI/Linting and cleanup of code where we were seeing issues with building contracts in mono repos etc.
+
+We also added some new Truffle Dashboard integration/view. Give it a try and let us know what you think!
+
+### What's Changed
+
+- Fix/debug workspace by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/116
+- Feature/eslint config changes by @michaeljohnbennett in https://github.com/trufflesuite/vscode-ext/pull/118
+- issue #121, renamed "explorer - truffle "to "contract explorer" by @NikolaiSch in https://github.com/trufflesuite/vscode-ext/pull/122
+- Edit the required apps page to display the version range of all apps by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/120
+- Feature/eslint fixes - Part2 - Config cleanup for truffle configuration by @michaeljohnbennett in https://github.com/trufflesuite/vscode-ext/pull/119
+- fix: added new PR checks by @michaeljohnbennett in https://github.com/trufflesuite/vscode-ext/pull/126
+- fix: hdwallet npm package has updated to truffle/hdwallet-provider by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/127
+- feat(explorer): added createContract by @NikolaiSch in https://github.com/trufflesuite/vscode-ext/pull/123
+- Improve Truffle Dashboard deployment integration by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/114
+- fix: auto load has implemented by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/136
+- refactor: remove unused code that checks whether Python is installed by @acuarica in https://github.com/trufflesuite/vscode-ext/pull/139
+- fix: start ganache command when invoked from the command palette by @acuarica in https://github.com/trufflesuite/vscode-ext/pull/142
+- fix: activationEvents list commands has reverted by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/167
+- fix: contract deployment is not forking networks by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/146
+- Draft: Required app was validating NPM local packages by @xhulz in https://github.com/trufflesuite/vscode-ext/pull/164
+
+### New Contributors
+
+- @acuarica made their first contribution in https://github.com/trufflesuite/vscode-ext/pull/139
+
+**Full Changelog**: https://github.com/trufflesuite/vscode-ext/compare/v2.3.4...V2.4.0
+
+## 2.3.4
+
+This release is a fix to the windows path issues that were reported.
+
+- fix: Build/Deploy commands were not working with mapping volumes on Windows 11 [PR](https://github.com/trufflesuite/vscode-ext/pull/110). The issue was found on windows 11 platform only. It was related to volume mapping. If the user open a project in root (C:), the build/deploy commands are working fine. But, if the project is opened in a mapping volume, the problem occurred. A fix was made and applied for windows platforms only.
+
+## 2.3.3
 
 Welcome to the new look Changelog. We will add more info against each release where we think it will add value and inform you of what new cool features we are creating or paving the way for. This month we did a bunch of protoyping and internal features/improvements for viewing your projects, layer 1/2 support via Infura and forking made simple for Ganache from the UI.
 
@@ -16,9 +95,9 @@ Welcome to the new look Changelog. We will add more info against each release wh
   - We are working on the basis of single repos (not monorepos of multiple truffle projects) so we are going to be releasing fixes for that in the future.
 - fix: Preventing possible bug on required apps [PR](https://github.com/trufflesuite/vscode-ext/pull/71). There are times when the required apps check can sometimes happen twice internally causing this error to say you have not got all the required apps installed correctly. This fixes that issue. 🤞🏻
 - Forked ganache instance [PR](https://github.com/trufflesuite/vscode-ext/pull/70). Fork your blockchains, just like on the command line. Through a set of dialogs you can now fork any network via Infura at a specific block or latest and this will now configure that and have it visible in your network list.
+- fix: Build/Deploy commands were not working with mapping volumes on Windows 11 [PR](https://github.com/trufflesuite/vscode-ext/pull/110). The issue was found on windows 11 platform only. It was related to volume mapping. If the user open a project in root (C:), the build/deploy commands are working fine. But, if the project is opened in a mapping volume, the problem occurred. A fix was made and applied for windows platforms only.
 
 Most of these are great enhancements to our codebase and thank you to all the contributors!
-
 
 ## 2.2.3
 

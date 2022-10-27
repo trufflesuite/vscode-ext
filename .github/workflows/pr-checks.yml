@@ -1,0 +1,13 @@
+# PR Checks File for checking PR commits meet our requirements.
+name: PR Checks
+
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+jobs:
+  pr-checks:
+    name: Core CI Checks - Workflow Call
+    uses: ./.github/workflows/core-ci-checks.yml
+    secrets: inherit

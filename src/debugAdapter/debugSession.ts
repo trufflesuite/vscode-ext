@@ -1,4 +1,4 @@
-import {basename} from "path";
+import {basename} from 'path';
 import {
   Breakpoint,
   BreakpointEvent,
@@ -11,26 +11,26 @@ import {
   StoppedEvent,
   TerminatedEvent,
   Thread,
-} from "@vscode/debugadapter";
-import {DebugProtocol} from "@vscode/debugprotocol";
+} from '@vscode/debugadapter';
+import {DebugProtocol} from '@vscode/debugprotocol';
 import {
   ERROR_MESSAGE_ID,
   EVALUATE_REQUEST_TYPES,
   EVENT_REASONS,
   EVENT_TYPES,
   MAIN_THREAD,
-} from "./constants/debugAdapter";
-import {GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS} from "./constants/debugSessionCommands";
-import {DebuggerTypes} from "./models/debuggerTypes";
-import RuntimeInterface from "./runtimeInterface";
-import VariablesHandler from "./variablesHandler";
+} from './constants/debugAdapter';
+import {GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS} from './constants/debugSessionCommands';
+import {DebuggerTypes} from './models/debuggerTypes';
+import RuntimeInterface from './runtimeInterface';
+import VariablesHandler from './variablesHandler';
 
 export class SolidityDebugSession extends LoggingDebugSession {
   private _runtime: RuntimeInterface;
   private _variablesHandler: VariablesHandler;
 
   public constructor() {
-    super("debugAdapter.txt");
+    super('debugAdapter.txt');
     // this debugger uses zero-based lines and columns
     this.setDebuggerLinesStartAt1(false);
     this.setDebuggerColumnsStartAt1(false);
@@ -106,7 +106,7 @@ export class SolidityDebugSession extends LoggingDebugSession {
       logger.setup(args.noDebug ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
 
       // start the program in the runtime
-      await this._runtime.attach(args.txHash, args.workingDirectory);
+      await this._runtime.attach(args.txHash, args.workingDirectory, args.providerUrl);
       await this._runtime.processInitialBreakPoints();
 
       // Events order is important
@@ -288,7 +288,7 @@ export class SolidityDebugSession extends LoggingDebugSession {
         response.body = {result, variablesReference};
         this.sendResponse(response);
       } else {
-        response.body = {result: "", variablesReference: -1};
+        response.body = {result: '', variablesReference: -1};
         this.sendResponse(response);
       }
     });
@@ -318,7 +318,7 @@ export class SolidityDebugSession extends LoggingDebugSession {
     return new Source(basename(filePath), this.convertDebuggerPathToClient(filePath), undefined, undefined, null);
   }
 
-  private async sendErrorIfFailed(response: DebugProtocol.Response, fn: () => {}) {
+  private async sendErrorIfFailed(response: DebugProtocol.Response, fn: () => unknown): Promise<void> {
     try {
       await fn();
     } catch (e) {
@@ -328,7 +328,7 @@ export class SolidityDebugSession extends LoggingDebugSession {
       } else {
         msg = `{e}`;
       }
-      this.sendErrorResponse(response, {id: ERROR_MESSAGE_ID, format: msg}, "", null, undefined);
+      this.sendErrorResponse(response, {id: ERROR_MESSAGE_ID, format: msg}, '', null, undefined);
     }
   }
 }

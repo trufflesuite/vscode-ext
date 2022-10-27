@@ -1,33 +1,33 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import assert from "assert";
-import uuid from "uuid";
-import {ItemType} from "..//src/Models";
-import {telemetryHelper} from "../src/helpers";
+import assert from 'assert';
+import uuid from 'uuid';
+import {ItemType} from '..//src/Models';
+import {telemetryHelper} from '../src/helpers';
 
-describe("Telemetry helper test", () => {
+describe('Telemetry helper test', () => {
   const testNetworks = [
     {
-      expectedResult: "loc",
-      name: "development",
+      expectedResult: 'loc',
+      name: 'development',
     },
     {
-      expectedResult: "inf",
+      expectedResult: 'inf',
       name: `inf_${uuid.v4()}`,
     },
     {
-      expectedResult: "loc",
+      expectedResult: 'loc',
       name: `loc_${uuid.v4()}`,
     },
     {
-      expectedResult: "other",
+      expectedResult: 'other',
       name: `${uuid.v4()}`,
     },
   ];
 
   testNetworks.forEach((network) => {
-    it("mapNetworkName should return correct result", () => {
+    it(`mapNetworkName should return correct result for network '${network.name}'`, () => {
       // Act
       const result = telemetryHelper.mapNetworkName(network.name);
 
@@ -38,21 +38,21 @@ describe("Telemetry helper test", () => {
 
   const testItemTypes = [
     {
-      expectedResult: "loc",
+      expectedResult: 'loc',
       itemType: ItemType.LOCAL_PROJECT,
     },
     {
-      expectedResult: "inf",
+      expectedResult: 'inf',
       itemType: ItemType.INFURA_PROJECT,
     },
     {
-      expectedResult: "other",
+      expectedResult: 'other',
       itemType: ItemType.MEMBER,
     },
   ];
 
   testItemTypes.forEach((testItemType) => {
-    it("mapNetworkName should return correct result", () => {
+    it(`mapNetworkName should return correct result for network type '${testItemType.expectedResult}'`, () => {
       // Act
       const result = telemetryHelper.mapItemType(testItemType.itemType);
 

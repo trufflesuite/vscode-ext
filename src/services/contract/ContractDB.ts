@@ -1,12 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { EventEmitter } from "events";
-import { Telemetry } from "../../TelemetryClient";
-import { AbstractAdapter } from "./AbstractAdapter";
-import { ContractInstance } from "./ContractInstance";
-import { InMemoryAdapter } from "./InMemoryAdapter";
-import { TruffleDBAdapter } from "./TruffleDBAdapter";
+import {EventEmitter} from 'events';
+import {Telemetry} from '../../TelemetryClient';
+import {AbstractAdapter} from './AbstractAdapter';
+import {ContractInstance} from './ContractInstance';
+import {InMemoryAdapter} from './InMemoryAdapter';
+import {TruffleDBAdapter} from './TruffleDBAdapter';
 
 class ExtensionContractDB {
   public readonly bus: EventEmitter;
@@ -17,7 +17,7 @@ class ExtensionContractDB {
   }
 
   public async initialize(adapterType: AdapterType): Promise<void> {
-    Telemetry.sendEvent("ContractDB.initialize", { adapterType });
+    Telemetry.sendEvent('ContractDB.initialize', {adapterType});
     if (this.adapter) {
       await this.adapter.dispose();
       this.adapter = undefined;
@@ -32,7 +32,7 @@ class ExtensionContractDB {
     }
 
     if (!this.adapter) {
-      Telemetry.sendEvent("ContractDB.initialize.unknownAdapterType", { adapterType });
+      Telemetry.sendEvent('ContractDB.initialize.unknownAdapterType', {adapterType});
       return;
     }
 
@@ -58,7 +58,7 @@ class ExtensionContractDB {
         .map((contract) => contract.contractName)
         .filter((contractName, index, arr) => arr.indexOf(contractName) === index);
 
-      this.bus.emit("updateContracts", contractNames);
+      this.bus.emit('updateContracts', contractNames);
     }
   }
 
@@ -68,8 +68,8 @@ class ExtensionContractDB {
 }
 
 export enum AdapterType {
-  IN_MEMORY = "InMemory",
-  TRUFFLE_DB = "TruffleDB",
+  IN_MEMORY = 'InMemory',
+  TRUFFLE_DB = 'TruffleDB',
 }
 
 export const ContractDB = new ExtensionContractDB();

@@ -1,27 +1,24 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import truffleDebugger from "@truffle/debugger";
-import assert from "assert";
-import sinon from "sinon";
-import * as contractsPrepareHelpers from "../../src/debugAdapter/contracts/contractsPrepareHelpers";
-import {IContractModel} from "../../src/debugAdapter/models/IContractModel";
-import RuntimeInterface from "../../src/debugAdapter/runtimeInterface";
+import truffleDebugger from '@truffle/debugger';
+import assert from 'assert';
+import sinon from 'sinon';
+import * as contractHelpers from '../../src/debugAdapter/contracts/contractHelpers';
+import RuntimeInterface from '../../src/debugAdapter/runtimeInterface';
 
-describe("RuntimeInterface unit tests", () => {
+describe('RuntimeInterface unit tests', () => {
   let runtimeInterface: RuntimeInterface;
 
   beforeEach(async () => {
-    sinon
-      .stub(contractsPrepareHelpers, "prepareContracts")
-      .resolves({contracts: contractsMock, lookupMap: new Map(), resolved: [], provider: {}, files: []});
+    sinon.stub(contractHelpers, 'prepareContracts').resolves({mappedSources: new Map(), shimCompilations: []});
   });
 
   afterEach(() => {
     sinon.restore();
   });
 
-  it("callStack should pass when session.view(evm.current.callstack) contains one call", async () => {
+  it('callStack should pass when session.view(evm.current.callstack) contains one call', async () => {
     // Arrange
     const sessionSelectorView = (selector: any) => {
       if (selector === truffleDebugger.selectors.evm.current.callstack) {
@@ -30,9 +27,9 @@ describe("RuntimeInterface unit tests", () => {
       return {};
     };
     const sessionMock = buildSessionMock(sessionSelectorView);
-    sinon.stub(RuntimeInterface.prototype, "generateSession" as any).resolves(sessionMock);
+    sinon.stub(RuntimeInterface.prototype, 'generateSession' as any).resolves(sessionMock);
     const currentDebugLine = {column: 1, file: contractSourcePathMock, line: 1};
-    sinon.stub(RuntimeInterface.prototype, "currentLine").returns({column: 1, file: contractSourcePathMock, line: 1});
+    sinon.stub(RuntimeInterface.prototype, 'currentLine').returns({column: 1, file: contractSourcePathMock, line: 1});
 
     // Act
     runtimeInterface = await initMockRuntime();
@@ -42,13 +39,13 @@ describe("RuntimeInterface unit tests", () => {
     assert.strictEqual(
       callStack[0].column,
       currentDebugLine.column,
-      assertCallstackMessage("column", currentDebugLine.column)
+      assertCallstackMessage('column', currentDebugLine.column)
     );
-    assert.strictEqual(callStack[0].file, currentDebugLine.file, assertCallstackMessage("file", currentDebugLine.file));
-    assert.strictEqual(callStack[0].line, currentDebugLine.line, assertCallstackMessage("line", currentDebugLine.line));
+    assert.strictEqual(callStack[0].file, currentDebugLine.file, assertCallstackMessage('file', currentDebugLine.file));
+    assert.strictEqual(callStack[0].line, currentDebugLine.line, assertCallstackMessage('line', currentDebugLine.line));
   });
 
-  it("currentLine should throw error when no sourcePath", async () => {
+  it('currentLine should throw error when no sourcePath', async () => {
     // Arrange
     const sessionSelectorView = (selector: any) => {
       if (selector === truffleDebugger.selectors.controller.current.location) {
@@ -59,7 +56,7 @@ describe("RuntimeInterface unit tests", () => {
       return {};
     };
     const sessionMock = buildSessionMock(sessionSelectorView);
-    sinon.stub(RuntimeInterface.prototype, "generateSession" as any).resolves(sessionMock);
+    sinon.stub(RuntimeInterface.prototype, 'generateSession' as any).resolves(sessionMock);
     // Act
     runtimeInterface = await initMockRuntime();
 
@@ -69,22 +66,8 @@ describe("RuntimeInterface unit tests", () => {
   });
 });
 
-const contractAddressMock = "AddressA";
-const contractSourcePathMock = "path_to_contract";
-const contractMock: IContractModel = {
-  abi: [],
-  address: contractAddressMock,
-  ast: {},
-  binary: "",
-  compiler: {},
-  contractName: "",
-  deployedBinary: "",
-  deployedSourceMap: "",
-  source: "",
-  sourceMap: "",
-  sourcePath: contractSourcePathMock,
-};
-const contractsMock = [contractMock];
+const contractAddressMock = 'AddressA';
+const contractSourcePathMock = 'path_to_contract';
 
 const baseSessionMock: truffleDebugger.Session = {
   addBreakpoint: (_breakPoint: any) => ({}),
@@ -99,7 +82,7 @@ const baseSessionMock: truffleDebugger.Session = {
 
 async function initMockRuntime() {
   const runtimeInterface = new RuntimeInterface();
-  await runtimeInterface.attach("", "");
+  await runtimeInterface.attach('', '', '');
   return runtimeInterface;
 }
 

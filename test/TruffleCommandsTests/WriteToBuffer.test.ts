@@ -1,32 +1,32 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import assert from "assert";
-import fs from "fs";
-import path from "path";
-import sinon from "sinon";
-import vscode, {CancellationToken, QuickPickItem, QuickPickOptions} from "vscode";
-import {window} from "vscode";
-import {TruffleCommands} from "../../src/commands/TruffleCommands";
-import {Constants} from "../../src/Constants";
-import {vscodeEnvironment} from "../../src/helpers";
-import {EnumStorage} from "../../src/Models";
-import {ContractDB, ContractInstanceWithMetadata, ContractService} from "../../src/services";
-import {Contract} from "../../src/services/contract/Contract";
+import assert from 'assert';
+import fs from 'fs';
+import path from 'path';
+import sinon from 'sinon';
+import * as vscode from 'vscode';
+import {window} from 'vscode';
+import {TruffleCommands} from '@/commands';
+import {Constants} from '@/Constants';
+import {vscodeEnvironment} from '../../src/helpers';
+import {EnumStorage} from '@/Models';
+import {ContractDB, ContractInstanceWithMetadata, ContractService} from '@/services';
+import {Contract} from '@/services/contract/Contract';
 
-describe("TruffleCommands - Write To Buffer", () => {
+describe('TruffleCommands - Write To Buffer', () => {
   const fileUri = {
-    fsPath: path.join(__dirname, "testData", "TestContract.json"),
+    fsPath: path.join(__dirname, 'testData', 'TestContract.json'),
   } as vscode.Uri;
 
-  describe("Integration test", () => {
-    describe("Success path", () => {
+  describe('Integration test', () => {
+    describe('Success path', () => {
       const testJson = fs.readFileSync(fileUri.fsPath, null);
       const testJsonString = JSON.parse(testJson.toString());
 
-      it("writeBytecodeToBuffer should write correct bytecode to clipboard", async () => {
+      it('writeBytecodeToBuffer should write correct bytecode to clipboard', async () => {
         // Arrange
-        const testBytecode = testJsonString[Constants.contractProperties.bytecode];
+        const testBytecode = testJsonString[Constants.contract.configuration.properties.bytecode];
 
         // Act
         await TruffleCommands.writeBytecodeToBuffer(fileUri);
@@ -35,28 +35,28 @@ describe("TruffleCommands - Write To Buffer", () => {
         assert.strictEqual(
           await vscode.env.clipboard.readText(),
           testBytecode,
-          "clipboard should store correct bytecode"
+          'clipboard should store correct bytecode'
         );
       });
 
-      it("writeAbiToBuffer should write correct abi to clipboard", async () => {
+      it('writeAbiToBuffer should write correct abi to clipboard', async () => {
         // Arrange
-        const testAbi = JSON.stringify(testJsonString[Constants.contractProperties.abi]);
+        const testAbi = JSON.stringify(testJsonString[Constants.contract.configuration.properties.abi]);
 
         // Act
         await TruffleCommands.writeAbiToBuffer(fileUri);
 
         // Assert
-        assert.strictEqual(await vscode.env.clipboard.readText(), testAbi, "clipboard should store correct aby");
+        assert.strictEqual(await vscode.env.clipboard.readText(), testAbi, 'clipboard should store correct aby');
       });
     });
 
-    describe("Invalid cases", () => {
+    describe('Invalid cases', () => {
       const invalidFileUri = {
-        fsPath: path.join(__dirname, "WriteToBuffer.test.ts"),
+        fsPath: path.join(__dirname, 'WriteToBuffer.test.ts'),
       } as vscode.Uri;
 
-      it("writeBytecodeToBuffer throw error when uri is not JSON file", async () => {
+      it('writeBytecodeToBuffer throw error when uri is not JSON file', async () => {
         // Act and assert
         await assert.rejects(
           TruffleCommands.writeBytecodeToBuffer(invalidFileUri),
@@ -65,7 +65,7 @@ describe("TruffleCommands - Write To Buffer", () => {
         );
       });
 
-      it("writeAbiToBuffer throw error when uri is not JSON file", async () => {
+      it('writeAbiToBuffer throw error when uri is not JSON file', async () => {
         // Act and assert
         await assert.rejects(
           TruffleCommands.writeAbiToBuffer(invalidFileUri),
@@ -76,43 +76,39 @@ describe("TruffleCommands - Write To Buffer", () => {
     });
   });
 
-  describe("Unit test", () => {
-    it("writeDeployedBytecodeToBuffer should complete basic pipeline", async () => {
+  describe('Unit test', () => {
+    it('writeDeployedBytecodeToBuffer should complete basic pipeline', async () => {
       // Arrange
       const mockContractInstance = {
-        id: "",
+        id: '',
         contract: {} as Contract,
-        contractName: "",
-        updateDate: "",
+        contractName: '',
+        updateDate: '',
         enumsInfo: new EnumStorage(),
-        provider: {host: "test"},
-        network: {id: "", name: "networkName"},
-        address: "contractAddress",
+        provider: {host: 'test'},
+        network: {id: '', name: 'networkName'},
+        address: 'contractAddress',
       } as ContractInstanceWithMetadata;
       const mockContracts = [mockContractInstance];
       const selectedNetworkName = mockContractInstance.network.name;
 
-      sinon.stub(ContractDB, "getContractInstances").resolves(mockContracts);
+      sinon.stub(ContractDB, 'getContractInstances').resolves(mockContracts);
       sinon
-        .stub(window, "showQuickPick")
+        .stub(window, 'showQuickPick')
         .callsFake(async function showQuickPick(
-          items: readonly QuickPickItem[] | Thenable<readonly QuickPickItem[]>,
-          options?: QuickPickOptions,
-          token?: CancellationToken
+          items: readonly vscode.QuickPickItem[] | Thenable<readonly vscode.QuickPickItem[]>
         ) {
-          console.log("fake Quickpick", {items, options, token});
           if (items instanceof Array) {
-            console.log("returning somethings", {items});
             return items.find((arg: any) => arg.label === selectedNetworkName);
           }
           //
           return undefined;
         });
 
-      const writeToClipboardStub = sinon.stub(vscodeEnvironment, "writeToClipboard").resolves();
+      const writeToClipboardStub = sinon.stub(vscodeEnvironment, 'writeToClipboard').resolves();
       const getDeployedByteCodeByAddressStub = sinon
-        .stub(ContractService, "getDeployedBytecodeByAddress")
-        .resolves("deployedByteCode");
+        .stub(ContractService, 'getDeployedBytecodeByAddress')
+        .resolves('deployedByteCode');
 
       // Act
       await TruffleCommands.writeDeployedBytecodeToBuffer(fileUri);
@@ -124,9 +120,9 @@ describe("TruffleCommands - Write To Buffer", () => {
           mockContractInstance.address!
         ),
         true,
-        "getContractDeployedBytecodeByAddress should be called with exact params"
+        'getContractDeployedBytecodeByAddress should be called with exact params'
       );
-      assert.strictEqual(writeToClipboardStub.called, true, "writeToClipboard should be called");
+      assert.strictEqual(writeToClipboardStub.called, true, 'writeToClipboard should be called');
     });
   });
 });

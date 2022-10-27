@@ -1,0 +1,126 @@
+name: Build VSIX Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseType:
+        description: 'What type of release are you wanting?'
+        required: true
+        default: 'pre-release'
+        type: choice
+        options:
+          - 'pre-release'
+          - 'release'
+
+jobs:
+  build-vsix:
+    name: build vsix
+    runs-on: windows-latest
+    env:
+      VSCE_FLAGS: ''
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v2
+
+      - name: fetch all history and tags from all branches for gitversion
+        run: git fetch --prune --unshallow
+
+      - name: install gitversion tool
+        uses: gittools/actions/gitversion/setup@v0.9.13
+        with:
+          versionSpec: '5.x'
+
+      - name: execute gitversion
+        id: gitversion # step id used as reference for output values
+        uses: gittools/actions/gitversion/execute@v0.9.13
+
+      - name: getPackageName
+        id: packageJson
+        uses: myrotvorets/info-from-package-json-action@1.1.0
+
+      - name: print Details
+        run: |
+          echo "::Major: ${{ steps.gitversion.outputs.major }}::"
+          echo "::Minor: ${{ steps.gitversion.outputs.minor }}::"
+          echo "::Patch: ${{ steps.gitversion.outputs.patch }}::"
+          echo "::MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}::"
+          echo "::PreRelease: ${{ steps.gitversion.outputs.preReleaseTag }}::"
+          echo "::SemVer: ${{ steps.gitversion.outputs.semVer }}::"
+          echo "::PackageName: ${{steps.packageJson.outputs.packageName}} ::"
+          echo "::github.ref: ${{github.ref}} ::"
+          echo "::github.ref_name: ${{github.ref_name}} ::"
+          echo "::release type: ${{inputs.releaseType}} ::"
+
+      - name: setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: lts/*
+          cache: 'yarn'
+
+      - name: clean install dependencies. Fail on lockfile Changes.
+        run: yarn install --immutable --immutable-cache --check-cache
+
+      - name: run tests
+        run: yarn test:int
+
+      - name: update metadata in package.json
+        uses: onlyutkarsh/patch-files-action@v1.0.3
+        with:
+          files: '${{github.workspace}}/package.json'
+          patch-syntax: |
+            = /version => "${{ steps.gitversion.outputs.majorMinorPatch }}"
+            = /aiKey => "${{ secrets.AIKEY }}"
+
+      - name: set vsix path
+        run: |
+          echo "vsix_path=${{steps.packageJson.outputs.packageName}}-${{steps.gitversion.outputs.majorMinorPatch}}" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: configure package - pre-release
+        id: package_flags_prerelease
+        if: ${{ steps.gitversion.outputs.preReleaseTag != '' }}
+        run: |
+          echo "VSCE_FLAGS=--pre-release --yarn " | Out-File -FilePath $env:GITHUB_ENV -Append
+          echo "flags_set=true" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: package - pre-release - package.json - set preRelease flag to true
+        if: ${{ inputs.releaseType == 'pre-release' }}
+        uses: onlyutkarsh/patch-files-action@v1.0.3
+        with:
+          files: '${{github.workspace}}/package.json'
+          patch-syntax: |
+            = /__metadata/isPreReleaseVersion => "true"
+
+      - name: package - pre-release
+        if: ${{ inputs.releaseType == 'pre-release' }}
+        run: |
+          echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }}::"
+          yarn package ${{ env.VSCE_FLAGS }}
+          echo "vsix_type=-PRE_RELEASE" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: package - release - package.json - set preRelease flag to false
+        if: ${{ inputs.releaseType == 'release' }}
+        uses: onlyutkarsh/patch-files-action@v1.0.3
+        with:
+          files: '${{github.workspace}}/package.json'
+          patch-syntax: |
+            = /__metadata/isPreReleaseVersion => "false"
+
+      - name: package - release
+        if: ${{ inputs.releaseType == 'release' }}
+        run: |
+          echo ":: Packaging VSIX VSCE_FLAGS=${{ env.VSCE_FLAGS }}, ${{ env.flags_set }} ::"
+          yarn package
+          echo "vsix_type=-RELEASE" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: print vsix path
+        run: |
+          echo ":: VSIX Path: ${{ env.vsix_path }} TYPE: ${{ env.vsix_type }}::"
+
+      - name: upload vsix as artifact
+        uses: actions/upload-artifact@v1
+        with:
+          path: ${{ github.workspace }}/${{ env.vsix_path }}.vsix
+          name: ${{ env.vsix_path }}${{ env.vsix_type }}.vsix
+#      - name: publish to marketplace
+#        if: github.ref == 'refs/heads/master'
+#        run: npm run deploy ${{ env.PAT }}

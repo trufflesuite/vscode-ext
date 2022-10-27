@@ -1,15 +1,15 @@
-import path from "path";
+import path from 'path';
 
-import {runTests} from "@vscode/test-electron";
+import {runTests} from '@vscode/test-electron';
 
 async function main() {
   try {
-    const extensionDevelopmentPath = path.resolve(__dirname, "../../");
+    const extensionDevelopmentPath = path.resolve(__dirname, '../../');
     const extensionTestsPath = path.resolve(__dirname);
 
     await runTests({extensionDevelopmentPath, extensionTestsPath});
   } catch (err) {
-    console.error("Failed to run tests");
+    console.error('Failed to run tests');
     process.exit(1);
   }
 }

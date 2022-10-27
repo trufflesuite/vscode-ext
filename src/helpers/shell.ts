@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import { tryExecuteCommand } from "./command";
+import {tryExecuteCommand} from './command';
 
-const isWin = process.platform === "win32";
+const isWin = process.platform === 'win32';
 
 export async function killPort(port: string | number): Promise<void> {
   const pid = await findPid(port);
@@ -11,7 +11,7 @@ export async function killPort(port: string | number): Promise<void> {
   return killPid(pid);
 }
 
-export async function killPid(pid: number = NaN): Promise<void> {
+export async function killPid(pid = NaN): Promise<void> {
   if (isNaN(pid)) {
     return;
   }

@@ -1,18 +1,18 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Handles, Scope} from "@vscode/debugadapter";
-import {DebugProtocol} from "@vscode/debugprotocol";
-import {OBJECT_VARIABLE_DISPLAY_NAME, SCOPES} from "./constants/variablesView";
-import {TranslatedResult} from "./helpers";
-import {IExpressionEval} from "./models/IExpressionEval";
-import RuntimeInterface from "./runtimeInterface";
-import _ from "lodash";
+import {Handles, Scope} from '@vscode/debugadapter';
+import {DebugProtocol} from '@vscode/debugprotocol';
+import _ from 'lodash';
+import {OBJECT_VARIABLE_DISPLAY_NAME, SCOPES} from './constants/variablesView';
+import {TranslatedResult} from './helpers';
+import {IExpressionEval} from './models/IExpressionEval';
+import RuntimeInterface from './runtimeInterface';
 
 export default class VariablesHandler {
   private _runtime: RuntimeInterface;
-  private _scopes: Scope[];
-  private _handles: Handles<string>;
+  private readonly _scopes: Scope[];
+  private readonly _handles: Handles<string>;
 
   constructor(runtime: RuntimeInterface) {
     this._runtime = runtime;
@@ -30,9 +30,9 @@ export default class VariablesHandler {
   }
 
   public async getVariableAttributesByVariableRef(variablesReference: number): Promise<DebugProtocol.Variable[]> {
-    let result: DebugProtocol.Variable[] = [];
+    let result: DebugProtocol.Variable[];
     let variables: Record<string, TranslatedResult>;
-    let variablePath: string = "";
+    let variablePath = '';
     switch (variablesReference) {
       case SCOPES.all.ref:
         variables = await this._runtime.variables();
@@ -42,8 +42,7 @@ export default class VariablesHandler {
         // requesting object variable
         variablePath = this._handles.get(variablesReference);
         variables = await this._runtime.variables();
-        variables = this.getVariableAttributesByKeyPath(variablePath, variables);
-        //console.log("obj var: ", {variables, variablePath, tr});
+        variables = VariablesHandler.getVariableAttributesByKeyPath(variablePath, variables);
         result = this.mapToDebuggableVariables(variablePath, variables);
     }
 
@@ -54,16 +53,12 @@ export default class VariablesHandler {
   // expression = "parent.childA.child1"
   public async evaluateExpression(expression: string): Promise<IExpressionEval> {
     const variablesObj = await this._runtime.variables();
-    const variable = this.getVariableAttributesByKeyPath(expression, variablesObj);
-    const isObjType = this.isSpecificObjectTypeValue(variable, typeof variable);
+    const variable = VariablesHandler.getVariableAttributesByKeyPath(expression, variablesObj);
+    const isObjType = VariablesHandler.isSpecificObjectTypeValue(variable, typeof variable);
     return {
-      result: this.getDisplayValue(variable, isObjType),
-      variablesReference: isObjType ? this._handles.create(this.generateVariablesAttrKey("", expression)) : 0,
+      result: VariablesHandler.getDisplayValue(variable, isObjType),
+      variablesReference: isObjType ? this._handles.create(this.generateVariablesAttrKey('', expression)) : 0,
     };
-  }
-
-  private isSpecificObjectTypeValue(value: any, valueType: string) {
-    return !Array.isArray(value) && value !== null && value !== undefined && valueType === "object";
   }
 
   // generate "path.to.attribute"
@@ -71,21 +66,7 @@ export default class VariablesHandler {
     if (_.isEmpty(variablePath)) {
       return attribute;
     } else {
-      return `${_.trimStart(variablePath, ".")}.${attribute}`;
-    }
-  }
-
-  private getVariableAttributesByKeyPath(keyPath: string, variable: Record<string, TranslatedResult>): any {
-    // trim off the first . to make object get work properly.
-    // let key = keyPath;
-    // if(keyPath.indexOf('.') === 0){
-    //   key = _.trimStart(key, '.');
-    // }
-    // console.log("getVariableAttributesByKeyPath", {keyPath, variable});
-    try {
-      return _.get(variable, keyPath);
-    } catch (e) {
-      return {} as TranslatedResult;
+      return `${_.trimStart(variablePath, '.')}.${attribute}`;
     }
   }
 
@@ -101,31 +82,41 @@ export default class VariablesHandler {
     variable: Record<string, TranslatedResult>
   ): DebugProtocol.Variable[] {
     const result: DebugProtocol.Variable[] = [];
-    // console.error("mapToDebuggableVariables:", {variablePath, variable});
-
     for (const attr in variable) {
       // remove our metadata fields...
-      if (variable.hasOwnProperty(attr) && attr !== "typeName") {
+      if (variable.hasOwnProperty(attr) && attr !== 'typeName') {
         const value = variable[attr];
         result.push(this.buildResult(value, attr, variablePath));
       }
     }
-    // console.log("results:", {variablePath, result});
     return result;
   }
 
   private buildResult(value: TranslatedResult, attr: string, variablePath: string): DebugProtocol.Variable {
     const type = typeof value;
-    const isRef = this.isSpecificObjectTypeValue(value, type);
+    const isRef = VariablesHandler.isSpecificObjectTypeValue(value, type);
     return {
       name: attr,
       type,
-      value: this.getDisplayValue(value, isRef),
+      value: VariablesHandler.getDisplayValue(value, isRef),
       variablesReference: isRef ? this._handles.create(this.generateVariablesAttrKey(variablePath, attr)) : 0,
     };
   }
 
-  private getDisplayValue(obj: TranslatedResult, isSpecificObjectType: boolean) {
-    return isSpecificObjectType ? obj.typeName || OBJECT_VARIABLE_DISPLAY_NAME : JSON.stringify(obj);
-  }
+  private static getDisplayValue = (obj: TranslatedResult, isSpecificObjectType: boolean) =>
+    isSpecificObjectType ? obj.typeName || OBJECT_VARIABLE_DISPLAY_NAME : JSON.stringify(obj);
+
+  private static getVariableAttributesByKeyPath = (
+    keyPath: string,
+    variable: Record<string, TranslatedResult>
+  ): any => {
+    try {
+      return _.get(variable, keyPath);
+    } catch (e) {
+      return {} as TranslatedResult;
+    }
+  };
+
+  private static isSpecificObjectTypeValue = (value: any, valueType: string) =>
+    !Array.isArray(value) && value !== null && value !== undefined && valueType === 'object';
 }
