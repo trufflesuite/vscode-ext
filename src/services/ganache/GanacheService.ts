@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {OutputLabel} from '@/Output';
+import {Output, OutputLabel} from '@/Output';
 import {ChildProcess} from 'child_process';
 import {OutputChannel, window} from 'vscode';
 import {Constants, RequiredApps} from '../../Constants';
@@ -14,6 +14,7 @@ import {isGanacheServer, waitGanacheStarted} from './GanacheServiceClient';
 
 export namespace GanacheService {
   export interface IGanacheProcess {
+    // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
     output?: OutputChannel;
     pid?: number;
     port: number | string;
@@ -61,14 +62,17 @@ export namespace GanacheService {
 
     if (portStatus === PortStatus.GANACHE) {
       const pid = await findPid(port);
-      ganacheProcesses[port] = {pid, port};
+      ganacheProcesses[port] = ganacheProcesses[port] ? ganacheProcesses[port] : {pid, port};
     }
 
     if (portStatus === PortStatus.FREE) {
       ganacheProcesses[port] = await spawnGanacheServer(port, options);
     }
+
+    // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
     // open the channel to show the output.
     ganacheProcesses[port]?.output?.show(false);
+
     Telemetry.sendEvent('GanacheServiceClient.waitGanacheStarted.serverStarted');
     return ganacheProcesses[port];
   }
@@ -102,9 +106,13 @@ export namespace GanacheService {
     }
 
     const process = spawnProcess(undefined, 'npx', args);
+
+    // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
     const output = window.createOutputChannel(`${OutputLabel.ganacheCommands}:${port}`);
+
     const ganacheProcess = {port, process, output} as IGanacheProcess;
 
+    // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
     output.show(true);
 
     try {
@@ -114,6 +122,7 @@ export namespace GanacheService {
     } catch (error) {
       Telemetry.sendException(error as Error);
       await stopGanacheProcess(ganacheProcess, true);
+      await Output.dispose(OutputLabel.ganacheCommands, port.toString());
       throw error;
     }
 
@@ -127,12 +136,14 @@ export namespace GanacheService {
 
     const {output, pid, port, process} = ganacheProcess;
     delete ganacheProcesses[port];
+    await Output.dispose(OutputLabel.ganacheCommands, port.toString());
 
     if (process) {
       removeAllListeners(process);
       process.kill('SIGINT');
     }
 
+    // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
     if (output) {
       output.dispose();
     }
@@ -144,10 +155,12 @@ export namespace GanacheService {
 
   function addAllListeners(output: OutputChannel, port: number | string, process: ChildProcess): void {
     process.stdout!.on('data', (data: string | Buffer) => {
+      Output.outputLine(OutputLabel.ganacheCommands, data.toString(), port.toString());
       output.appendLine(data.toString());
     });
 
     process.stderr!.on('data', (data: string | Buffer) => {
+      Output.outputLine(OutputLabel.ganacheCommands, data.toString(), port.toString());
       output.appendLine(data.toString());
     });
 

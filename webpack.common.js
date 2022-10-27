@@ -26,6 +26,9 @@ module.exports = {
     callback();
   },
   resolve: {
+    alias: {
+      'original-require': require.resolve('./polyfills/original-require'),
+    },
     // .json is added to prevent import error from /node_modules/got/index.js
     extensions: ['.ts', '.js', '.json'],
     plugins: [

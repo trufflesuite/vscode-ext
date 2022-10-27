@@ -71,7 +71,7 @@ describe('Unit tests GanacheService', () => {
     });
   });
 
-  ['1', '65535', '8454', 8000, 8454].forEach((port) => {
+  ['1', '65535', 8000, 8454].forEach((port) => {
     it(`startGanacheServer should pass validation if port is ${port}`, async () => {
       // Arrange
       const urlValidatorSpy = sinon.spy(UrlValidator, 'validatePort');
@@ -146,7 +146,6 @@ describe('Unit tests GanacheService', () => {
 
   it('startGanacheServer if server was not started should throw exception and dispose all', async () => {
     // Arrange
-    const channelDisposeSpy = sinon.spy(channel, 'dispose');
     const killProcessStub = sinon.stub(processMock, 'kill');
     const processRemoveAllListenersSpy = sinon.spy(processMock, 'removeAllListeners');
 
@@ -156,7 +155,6 @@ describe('Unit tests GanacheService', () => {
     sinon
       .stub(GanacheServiceClient, 'waitGanacheStarted')
       .throws(new Error(Constants.ganacheCommandStrings.cannotStartServer));
-    sinon.stub(window, 'createOutputChannel').returns(channel as OutputChannel);
 
     // Act and Assert
     await assert.rejects(
@@ -165,7 +163,6 @@ describe('Unit tests GanacheService', () => {
       Constants.ganacheCommandStrings.cannotStartServer
     );
     assert.strictEqual(killProcessStub.calledOnce, true);
-    assert.strictEqual(channelDisposeSpy.calledOnce, true);
     assert.strictEqual(processRemoveAllListenersSpy.calledOnce, true);
   });
 
@@ -198,10 +195,8 @@ describe('Unit tests GanacheService', () => {
       const killPidStub = sinon.stub(shell, 'killPid');
       const killProcessStub = sinon.stub(processMock, 'kill');
       const processSpy = sinon.spy(processMock, 'removeAllListeners');
-      const channelDisposeSpy = sinon.spy(channel, 'dispose');
 
       GanacheService.ganacheProcesses[defaultPort] = {
-        output: channel,
         port: defaultPort,
         process: processMock,
       } as GanacheService.IGanacheProcess;
@@ -214,7 +209,6 @@ describe('Unit tests GanacheService', () => {
       assert.strictEqual(killPidStub.called, false, '"killPid" shouldn\'t be executed for target process');
       assert.strictEqual(killProcessStub.calledOnce, true, '"kill" should be executed for target process');
       assert.strictEqual(processSpy.calledOnce, true, '"removeAllListeners" should be executed for target process');
-      assert.strictEqual(channelDisposeSpy.calledOnce, true, '"dispose" should be executed for channel');
     });
 
     it('stopGanacheServer should kill out of band process and remove element from ganacheProcesses list', async () => {
@@ -222,7 +216,6 @@ describe('Unit tests GanacheService', () => {
       const killPidStub = sinon.stub(shell, 'killPid');
       const killProcessStub = sinon.stub(processMock, 'kill');
       const processSpy = sinon.spy(processMock, 'removeAllListeners');
-      const channelDisposeSpy = sinon.spy(channel, 'dispose');
 
       GanacheService.ganacheProcesses[defaultPort] = {
         pid: 321,
@@ -237,7 +230,6 @@ describe('Unit tests GanacheService', () => {
       assert.strictEqual(killPidStub.called, true, '"killPid" should be executed for target process');
       assert.strictEqual(killProcessStub.calledOnce, false, '"kill" shouldn\'t be executed for target process');
       assert.strictEqual(processSpy.calledOnce, false, '"removeAllListeners" shouldn\'t be executed for process');
-      assert.strictEqual(channelDisposeSpy.calledOnce, false, '"dispose" shouldn\'t be executed for channel');
     });
 
     it('stopGanacheServer should not do anything if passed port not presented in "ganacheProcesses" list', async () => {

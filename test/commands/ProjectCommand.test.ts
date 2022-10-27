@@ -12,18 +12,22 @@ import {required} from '../../src/helpers/required';
 import * as userInteraction from '../../src/helpers/userInteraction';
 import {CancellationEvent} from '../../src/Models';
 import {Output} from '../../src/Output';
+import * as vscode from 'vscode';
+
+enum ProjectType {
+  empty = 'empty',
+  sample = 'sample',
+  box = 'box',
+}
 
 describe('ProjectCommands', () => {
   describe('Unit tests', () => {
-    const projectPath = 'projectPath';
     const truffleBoxName = 'truffleBoxName';
 
     describe('newSolidityProject', () => {
       let helpersMock: sinon.SinonMock;
       let userInteractionMock: sinon.SinonMock;
-      let gitHelperMock: sinon.SinonMock;
       let showQuickPickMock: sinon.SinonStub<any[], any>;
-      let gitInitMock: sinon.SinonStub<any[], any>;
       let requiredMock: sinon.SinonMock;
       let checkRequiredAppsMock: sinon.SinonExpectation;
       let withProgressStub: sinon.SinonStub<
@@ -38,8 +42,6 @@ describe('ProjectCommands', () => {
           cmd: () => undefined,
           label: 'emptyProject',
         });
-        gitHelperMock = sinon.mock(helpers.gitHelper);
-        gitInitMock = gitHelperMock.expects('gitInit').returns(() => undefined);
         requiredMock = sinon.mock(required);
         checkRequiredAppsMock = requiredMock.expects('checkRequiredApps');
 
@@ -51,7 +53,6 @@ describe('ProjectCommands', () => {
 
       afterEach(() => {
         requiredMock.restore();
-        gitHelperMock.restore();
         helpersMock.restore();
         userInteractionMock.restore();
         withProgressStub.restore();
@@ -61,8 +62,6 @@ describe('ProjectCommands', () => {
         // Arrange
         checkRequiredAppsMock.returns(false);
         const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-        projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
-        const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
 
         // Act
         await projectCommandsRewire.ProjectCommands.newSolidityProject();
@@ -70,16 +69,12 @@ describe('ProjectCommands', () => {
         // Assert
         assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
         assert.strictEqual(showQuickPickMock.notCalled, true, 'showQuickPick should not be called');
-        assert.strictEqual(chooseNewProjectDirMock.notCalled, true, 'chooseNewProjectDir should not be called');
-        assert.strictEqual(gitInitMock.notCalled, true, 'gitInit should not be called');
       });
 
       it('Method newSolidityProject provide type of new project, because we have all required apps.', async () => {
         // Arrange
         checkRequiredAppsMock.returns(true);
         const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-        projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(projectPath));
-        const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
 
         // Act
         await projectCommandsRewire.ProjectCommands.newSolidityProject();
@@ -87,9 +82,6 @@ describe('ProjectCommands', () => {
         // Assert
         assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
         assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
-        assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
-        assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
-        assert.strictEqual(gitInitMock.args[0][0], projectPath, 'git init should be called with correct arguments');
       });
     });
 
@@ -219,60 +211,6 @@ describe('ProjectCommands', () => {
       });
     });
 
-    describe('createNewEmptyProject', () => {
-      let withProgressStub: sinon.SinonStub<
-        [ProgressOptions, (progress: Progress<any>, token: CancellationToken) => any],
-        any
-      >;
-
-      beforeEach(() => {
-        withProgressStub = sinon.stub(window, 'withProgress');
-      });
-
-      afterEach(() => {
-        withProgressStub.restore();
-      });
-
-      it('Method createNewEmptyProject runs method createProject.', async () => {
-        // Arrange
-        const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-        const createNewEmptyProject = projectCommandsRewire.__get__('createNewEmptyProject');
-
-        // Act
-        await createNewEmptyProject(projectPath);
-
-        // Assert
-        assert.strictEqual(withProgressStub.calledOnce, true, 'withProgress should be called once');
-      });
-    });
-
-    it('Method createProjectFromTruffleBox runs method createProject with special truffle box name.', async () => {
-      // Arrange
-      const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-      const createProjectFromTruffleBox = projectCommandsRewire.__get__('createProjectFromTruffleBox');
-      projectCommandsRewire.__set__('getTruffleBoxName', sinon.mock().returns(truffleBoxName));
-      const getTruffleBoxNameMock = projectCommandsRewire.__get__('getTruffleBoxName');
-      projectCommandsRewire.__set__('createProject', sinon.mock());
-      const createProjectMock = projectCommandsRewire.__get__('createProject');
-
-      // Act
-      await createProjectFromTruffleBox(projectPath);
-
-      // Assert
-      assert.strictEqual(getTruffleBoxNameMock.calledOnce, true, 'getTruffleBoxName should be called once');
-      assert.strictEqual(createProjectMock.calledOnce, true, 'createProject should be called once');
-      assert.strictEqual(
-        createProjectMock.args[0][0],
-        projectPath,
-        'createProject should be called with correct arguments'
-      );
-      assert.strictEqual(
-        createProjectMock.args[0][1],
-        truffleBoxName,
-        'createProject should be called with correct arguments'
-      );
-    });
-
     describe('createProject', () => {
       let outputCommandHelperMock: sinon.SinonMock;
       let executeCommandMock: sinon.SinonExpectation;
@@ -280,6 +218,8 @@ describe('ProjectCommands', () => {
       let updateWorkspaceFoldersMock: sinon.SinonExpectation;
       let fsMock: sinon.SinonMock;
       let emptyDirSyncMock: sinon.SinonExpectation;
+      let gitHelperMock: sinon.SinonMock;
+      let gitInitMock: sinon.SinonStub<any[], any>;
 
       beforeEach(() => {
         outputCommandHelperMock = sinon.mock(helpers.outputCommandHelper);
@@ -288,6 +228,8 @@ describe('ProjectCommands', () => {
         updateWorkspaceFoldersMock = workspaceMock.expects('updateWorkspaceFolders');
         fsMock = sinon.mock(fs);
         emptyDirSyncMock = fsMock.expects('emptyDirSync');
+        gitHelperMock = sinon.mock(helpers.gitHelper);
+        gitInitMock = gitHelperMock.expects('gitInit').returns(() => undefined);
       });
 
       afterEach(() => {
@@ -295,24 +237,132 @@ describe('ProjectCommands', () => {
       });
 
       it(
-        'Method createProject run command for create new project and project was created successfully. ' +
+        'Method createProject run command for create a empty project and project was created successfully. ' +
           'Workspace was updated to certain workspace.',
         async () => {
           // Arrange
           sinon.stub(workspace, 'workspaceFolders').value(['1']);
           const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
           const createProject = projectCommandsRewire.__get__('createProject');
+          projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
+          const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
 
           // Act
-          await createProject(projectPath, truffleBoxName);
+          await createProject(ProjectType.empty);
 
           // Assert
           assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
           assert.strictEqual(
-            executeCommandMock.args[0][0],
-            projectPath,
+            executeCommandMock.args[0][1],
+            'npx',
             'executeCommand should be called with correct arguments'
           );
+          assert.strictEqual(
+            executeCommandMock.args[0][2],
+            RequiredApps.truffle,
+            'executeCommand should be called with correct arguments'
+          );
+          assert.strictEqual(
+            executeCommandMock.args[0][3],
+            'init',
+            'executeCommand should be called with correct arguments'
+          );
+          assert.strictEqual(
+            updateWorkspaceFoldersMock.calledOnce,
+            true,
+            'updateWorkspaceFolders should be called once'
+          );
+          assert.strictEqual(
+            updateWorkspaceFoldersMock.args[0][0],
+            0,
+            'updateWorkspaceFolders should be called with correct arguments'
+          );
+          assert.strictEqual(
+            updateWorkspaceFoldersMock.args[0][1],
+            1,
+            'updateWorkspaceFolders should be called with correct arguments'
+          );
+          assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
+          assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
+          assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
+        }
+      );
+
+      it(
+        'Method createProject run command for unbox a sample project and project was created successfully. ' +
+          'Workspace was updated to certain workspace.',
+        async () => {
+          // Arrange
+          sinon.stub(workspace, 'workspaceFolders').value(['1']);
+          const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
+          const createProject = projectCommandsRewire.__get__('createProject');
+          projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
+          const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
+
+          // Act
+          await createProject(ProjectType.sample);
+
+          // Assert
+          assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
+          assert.strictEqual(
+            executeCommandMock.args[0][1],
+            'npx',
+            'executeCommand should be called with correct arguments'
+          );
+          assert.strictEqual(
+            executeCommandMock.args[0][2],
+            RequiredApps.truffle,
+            'executeCommand should be called with correct arguments'
+          );
+          assert.strictEqual(
+            executeCommandMock.args[0][3],
+            'unbox',
+            'executeCommand should be called with correct arguments'
+          );
+          assert.strictEqual(
+            executeCommandMock.args[0][4],
+            Constants.sampleTruffleBox,
+            'executeCommand should be called with correct arguments'
+          );
+          assert.strictEqual(
+            updateWorkspaceFoldersMock.calledOnce,
+            true,
+            'updateWorkspaceFolders should be called once'
+          );
+          assert.strictEqual(
+            updateWorkspaceFoldersMock.args[0][0],
+            0,
+            'updateWorkspaceFolders should be called with correct arguments'
+          );
+          assert.strictEqual(
+            updateWorkspaceFoldersMock.args[0][1],
+            1,
+            'updateWorkspaceFolders should be called with correct arguments'
+          );
+          assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
+          assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
+          assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
+        }
+      );
+
+      it(
+        'Method createProject run command for unbox a truffle box project and project was created successfully. ' +
+          'Workspace was updated to certain workspace.',
+        async () => {
+          // Arrange
+          sinon.stub(workspace, 'workspaceFolders').value(['1']);
+          const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
+          const createProject = projectCommandsRewire.__get__('createProject');
+          projectCommandsRewire.__set__('getTruffleUnboxCommand', sinon.mock().returns(truffleBoxName));
+          const getTruffleUnboxCommandMock = projectCommandsRewire.__get__('getTruffleUnboxCommand');
+          projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
+          const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
+
+          // Act
+          await createProject(ProjectType.box);
+
+          // Assert
+          assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
           assert.strictEqual(
             executeCommandMock.args[0][1],
             'npx',
@@ -348,34 +398,144 @@ describe('ProjectCommands', () => {
             1,
             'updateWorkspaceFolders should be called with correct arguments'
           );
-          assert.strictEqual(
-            updateWorkspaceFoldersMock.args[0][2].uri.path,
-            `/${projectPath}`,
-            'updateWorkspaceFolders should be called with correct arguments'
-          );
           assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
+          assert.strictEqual(
+            getTruffleUnboxCommandMock.calledOnce,
+            true,
+            'getTruffleUnboxCommand should be called once'
+          );
+          assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
+          assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
         }
       );
 
       it(
-        'Method createProject run command for create new project and project was created successfully. ' +
+        'Method createProject run command for create a empty project and project was created successfully. ' +
           'Workspace was not updated to certain workspace.',
         async () => {
           // Arrange
           sinon.stub(workspace, 'workspaceFolders').value(undefined);
           const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
           const createProject = projectCommandsRewire.__get__('createProject');
+          projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
+          const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
 
           // Act
-          await createProject(projectPath, truffleBoxName);
+          await createProject(ProjectType.empty);
 
           // Assert
           assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
           assert.strictEqual(
-            executeCommandMock.args[0][0],
-            projectPath,
+            executeCommandMock.args[0][1],
+            'npx',
             'executeCommand should be called with correct arguments'
           );
+          assert.strictEqual(
+            executeCommandMock.args[0][2],
+            RequiredApps.truffle,
+            'executeCommand should be called with correct arguments'
+          );
+          assert.strictEqual(
+            executeCommandMock.args[0][3],
+            'init',
+            'executeCommand should be called with correct arguments'
+          );
+          assert.strictEqual(
+            updateWorkspaceFoldersMock.calledOnce,
+            true,
+            'updateWorkspaceFolders should be called once'
+          );
+          assert.strictEqual(
+            updateWorkspaceFoldersMock.args[0][0],
+            0,
+            'updateWorkspaceFolders should be called with correct arguments'
+          );
+          assert.strictEqual(
+            updateWorkspaceFoldersMock.args[0][1],
+            null,
+            'updateWorkspaceFolders should be called with correct arguments'
+          );
+          assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
+          assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
+          assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
+        }
+      );
+
+      it(
+        'Method createProject run command for unbox a sample project and project was created successfully. ' +
+          'Workspace was not updated to certain workspace.',
+        async () => {
+          // Arrange
+          sinon.stub(workspace, 'workspaceFolders').value(undefined);
+          const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
+          const createProject = projectCommandsRewire.__get__('createProject');
+          projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
+          const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
+
+          // Act
+          await createProject(ProjectType.sample);
+
+          // Assert
+          assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
+          assert.strictEqual(
+            executeCommandMock.args[0][1],
+            'npx',
+            'executeCommand should be called with correct arguments'
+          );
+          assert.strictEqual(
+            executeCommandMock.args[0][2],
+            RequiredApps.truffle,
+            'executeCommand should be called with correct arguments'
+          );
+          assert.strictEqual(
+            executeCommandMock.args[0][3],
+            'unbox',
+            'executeCommand should be called with correct arguments'
+          );
+          assert.strictEqual(
+            executeCommandMock.args[0][4],
+            Constants.sampleTruffleBox,
+            'executeCommand should be called with correct arguments'
+          );
+          assert.strictEqual(
+            updateWorkspaceFoldersMock.calledOnce,
+            true,
+            'updateWorkspaceFolders should be called once'
+          );
+          assert.strictEqual(
+            updateWorkspaceFoldersMock.args[0][0],
+            0,
+            'updateWorkspaceFolders should be called with correct arguments'
+          );
+          assert.strictEqual(
+            updateWorkspaceFoldersMock.args[0][1],
+            null,
+            'updateWorkspaceFolders should be called with correct arguments'
+          );
+          assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
+          assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
+          assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
+        }
+      );
+
+      it(
+        'Method createProject run command for unbox a truffle box project and project was created successfully. ' +
+          'Workspace was not updated to certain workspace.',
+        async () => {
+          // Arrange
+          sinon.stub(workspace, 'workspaceFolders').value(undefined);
+          const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
+          const createProject = projectCommandsRewire.__get__('createProject');
+          projectCommandsRewire.__set__('getTruffleUnboxCommand', sinon.mock().returns(truffleBoxName));
+          const getTruffleUnboxCommandMock = projectCommandsRewire.__get__('getTruffleUnboxCommand');
+          projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
+          const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
+
+          // Act
+          await createProject(ProjectType.box);
+
+          // Assert
+          assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
           assert.strictEqual(
             executeCommandMock.args[0][1],
             'npx',
@@ -411,34 +571,114 @@ describe('ProjectCommands', () => {
             null,
             'updateWorkspaceFolders should be called with correct arguments'
           );
-          assert.strictEqual(
-            updateWorkspaceFoldersMock.args[0][2].uri.path,
-            `/${projectPath}`,
-            'updateWorkspaceFolders should be called with correct arguments'
-          );
           assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
+          assert.strictEqual(
+            getTruffleUnboxCommandMock.calledOnce,
+            true,
+            'getTruffleUnboxCommand should be called once'
+          );
+          assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
+          assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
         }
       );
 
-      it('Method createProject run command for create new project and creation was fell of project.', async () => {
+      it('Method createProject run command for create a empty project and creation was fell of project.', async () => {
         // Arrange
         executeCommandMock.throws();
         const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
         const createProject = projectCommandsRewire.__get__('createProject');
+        projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
+        const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
 
         // Act
         const action = async () => {
-          await createProject(projectPath, truffleBoxName);
+          await createProject(ProjectType.empty);
         };
 
         // Assert
         await assert.rejects(action, Error, Constants.errorMessageStrings.NewProjectCreationFailed);
         assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
         assert.strictEqual(
-          executeCommandMock.args[0][0],
-          projectPath,
+          executeCommandMock.args[0][1],
+          'npx',
           'executeCommand should be called with correct arguments'
         );
+        assert.strictEqual(
+          executeCommandMock.args[0][2],
+          RequiredApps.truffle,
+          'executeCommand should be called with correct arguments'
+        );
+        assert.strictEqual(
+          executeCommandMock.args[0][3],
+          'init',
+          'executeCommand should be called with correct arguments'
+        );
+        assert.strictEqual(updateWorkspaceFoldersMock.notCalled, true, 'updateWorkspaceFolders should not be called');
+        assert.strictEqual(emptyDirSyncMock.calledOnce, true, 'emptyDirSync should be called once');
+        assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
+        assert.strictEqual(gitInitMock.calledOnce, false, 'gitInit should not be called once');
+      });
+
+      it('Method createProject run command for unbox a sample project and creation was fell of project.', async () => {
+        // Arrange
+        executeCommandMock.throws();
+        const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
+        const createProject = projectCommandsRewire.__get__('createProject');
+        projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
+        const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
+
+        // Act
+        const action = async () => {
+          await createProject(ProjectType.sample);
+        };
+
+        // Assert
+        await assert.rejects(action, Error, Constants.errorMessageStrings.NewProjectCreationFailed);
+        assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
+        assert.strictEqual(
+          executeCommandMock.args[0][1],
+          'npx',
+          'executeCommand should be called with correct arguments'
+        );
+        assert.strictEqual(
+          executeCommandMock.args[0][2],
+          RequiredApps.truffle,
+          'executeCommand should be called with correct arguments'
+        );
+        assert.strictEqual(
+          executeCommandMock.args[0][3],
+          'unbox',
+          'executeCommand should be called with correct arguments'
+        );
+        assert.strictEqual(
+          executeCommandMock.args[0][4],
+          Constants.sampleTruffleBox,
+          'executeCommand should be called with correct arguments'
+        );
+        assert.strictEqual(updateWorkspaceFoldersMock.notCalled, true, 'updateWorkspaceFolders should not be called');
+        assert.strictEqual(emptyDirSyncMock.calledOnce, true, 'emptyDirSync should be called once');
+        assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
+        assert.strictEqual(gitInitMock.calledOnce, false, 'gitInit should not be called once');
+      });
+
+      it('Method createProject run command for unbox a truffle box project and creation was fell of project.', async () => {
+        // Arrange
+        executeCommandMock.throws();
+        const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
+        const createProject = projectCommandsRewire.__get__('createProject');
+        projectCommandsRewire.__set__('getTruffleUnboxCommand', sinon.mock().returns(truffleBoxName));
+        const getTruffleUnboxCommandMock = projectCommandsRewire.__get__('getTruffleUnboxCommand');
+        projectCommandsRewire.__set__('chooseNewProjectDir', sinon.mock().returns(''));
+        const chooseNewProjectDirMock = projectCommandsRewire.__get__('chooseNewProjectDir');
+
+        // Act
+        const action = async () => {
+          await createProject(ProjectType.box);
+        };
+
+        // Assert
+        await assert.rejects(action, Error, Constants.errorMessageStrings.NewProjectCreationFailed);
+        assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
         assert.strictEqual(
           executeCommandMock.args[0][1],
           'npx',
@@ -461,30 +701,30 @@ describe('ProjectCommands', () => {
         );
         assert.strictEqual(updateWorkspaceFoldersMock.notCalled, true, 'updateWorkspaceFolders should not be called');
         assert.strictEqual(emptyDirSyncMock.calledOnce, true, 'emptyDirSync should be called once');
-        assert.strictEqual(
-          emptyDirSyncMock.args[0][0],
-          projectPath,
-          'emptyDirSync should be called with correct arguments'
-        );
+        assert.strictEqual(getTruffleUnboxCommandMock.calledOnce, true, 'getTruffleUnboxCommand should be called once');
+        assert.strictEqual(chooseNewProjectDirMock.calledOnce, true, 'chooseNewProjectDir should be called once');
+        assert.strictEqual(gitInitMock.calledOnce, false, 'gitInit should not be called once');
       });
     });
 
-    it('Method getTruffleBoxName should return a value', async () => {
+    it('Method getTruffleUnboxCommand should return a value', async () => {
       // Arrange
-      const helpersMock = sinon.mock(userInteraction);
-      const testName = 'test';
+      const displayName = 'pet-shop';
+      const repoName = 'pet-shop-box';
       const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-      const getTruffleBoxName = projectCommandsRewire.__get__('getTruffleBoxName');
-      const showInputBoxMock = helpersMock.expects('showInputBox');
+      const getTruffleUnboxCommand = projectCommandsRewire.__get__('getTruffleUnboxCommand');
+      const showQuickPickMock = sinon.stub(vscode.window, 'showQuickPick');
 
-      showInputBoxMock.returns(testName);
+      showQuickPickMock.onCall(0).callsFake((items: any) => {
+        return items.find((item: any) => item.label === displayName);
+      });
 
       // Act
-      const result = await getTruffleBoxName();
+      const result = await getTruffleUnboxCommand();
 
       // Assert
-      assert.strictEqual(result, testName, 'result should be equal to expected string');
-      assert.strictEqual(showInputBoxMock.calledOnce, true, 'showInputBox should be called once');
+      assert.strictEqual(result, repoName, 'result should be equal to expected string');
+      assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
     });
   });
 
@@ -571,11 +811,16 @@ describe('ProjectCommands', () => {
       readdirMock.twice();
       readdirMock.onCall(0).returns(['somePath']);
       readdirMock.onCall(1).returns([]);
-      showQuickPickMock.returns({
-        cmd: () => undefined,
-        label: 'emptyProject',
-      });
       const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
+      const createProject = projectCommandsRewire.__get__('createProject');
+
+      showQuickPickMock.returns({
+        cmd: createProject,
+        label: Constants.typeOfSolidityProject.text.emptyProject,
+        detail: Constants.typeOfSolidityProject.description.emptyProject,
+        projectType: ProjectType.empty,
+      });
+
       showErrorMessageMock.returns(Constants.informationMessage.openButton);
 
       // Act
@@ -584,8 +829,6 @@ describe('ProjectCommands', () => {
       // Assert
       assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
       assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
-      assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
-      assert.strictEqual(gitInitMock.args[0][0], secondProjectPath, 'gitInit should be called with correct arguments');
       assert.strictEqual(showOpenFolderDialogMock.calledTwice, true, 'showOpenFolderDialog should be called twice');
       assert.strictEqual(ensureDirMock.calledTwice, true, 'ensureDir should be called twice');
       assert.strictEqual(
@@ -616,12 +859,16 @@ describe('ProjectCommands', () => {
       // Arrange
       checkRequiredAppsMock.returns(true);
       sinon.stub(workspace, 'workspaceFolders').value(['1']);
+      const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
+      const createProject = projectCommandsRewire.__get__('createProject');
+
       readdirMock.returns([]);
       showQuickPickMock.returns({
-        cmd: () => undefined,
-        label: 'emptyProject',
+        cmd: createProject,
+        label: Constants.typeOfSolidityProject.text.emptyProject,
+        detail: Constants.typeOfSolidityProject.description.emptyProject,
+        projectType: ProjectType.empty,
       });
-      const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
 
       // Act
       await projectCommandsRewire.ProjectCommands.newSolidityProject();
@@ -643,19 +890,21 @@ describe('ProjectCommands', () => {
       assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not be called');
     });
 
-    it('Method createNewEmptyProject runs method createProject, and new empty project was created successfully.', async () => {
+    it('Method newSolidityProject runs method createProject, and a new empty project was created successfully.', async () => {
       // Arrange
       checkRequiredAppsMock.returns(true);
       readdirMock.returns([]);
       sinon.stub(workspace, 'workspaceFolders').value(['1']);
 
       const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-      const createNewEmptyProject = projectCommandsRewire.__get__('createNewEmptyProject');
+      const createProject = projectCommandsRewire.__get__('createProject');
 
       showErrorMessageMock.returns(Constants.informationMessage.openButton);
       showQuickPickMock.returns({
-        cmd: createNewEmptyProject,
+        cmd: createProject,
         label: Constants.typeOfSolidityProject.text.emptyProject,
+        detail: Constants.typeOfSolidityProject.description.emptyProject,
+        projectType: ProjectType.empty,
       });
 
       // Act
@@ -694,12 +943,7 @@ describe('ProjectCommands', () => {
       );
       assert.strictEqual(
         executeCommandMock.args[0][3],
-        'unbox',
-        'executeCommand should be called with correct arguments'
-      );
-      assert.strictEqual(
-        executeCommandMock.args[0][4],
-        Constants.defaultTruffleBox,
+        'init',
         'executeCommand should be called with correct arguments'
       );
       assert.strictEqual(updateWorkspaceFoldersMock.calledOnce, true, 'updateWorkspaceFolders should be called once');
@@ -721,30 +965,31 @@ describe('ProjectCommands', () => {
       assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
     });
 
-    it('Method createNewEmptyProject runs method createProject, and method createProject throws error.', async () => {
+    it('Method newSolidityProject runs method createProject, and a new sample project was created successfully.', async () => {
       // Arrange
       checkRequiredAppsMock.returns(true);
       readdirMock.returns([]);
-      executeCommandMock.throws();
+      sinon.stub(workspace, 'workspaceFolders').value(['1']);
 
       const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-      const createNewEmptyProject = projectCommandsRewire.__get__('createNewEmptyProject');
+      const createProject = projectCommandsRewire.__get__('createProject');
+
       showErrorMessageMock.returns(Constants.informationMessage.openButton);
       showQuickPickMock.returns({
-        cmd: createNewEmptyProject,
-        label: Constants.typeOfSolidityProject.text.emptyProject,
+        cmd: createProject,
+        label: Constants.typeOfSolidityProject.text.sampleProject,
+        detail: Constants.typeOfSolidityProject.description.sampleProject,
+        projectType: ProjectType.sample,
       });
 
       // Act
-      const action = async () => {
-        await projectCommandsRewire.ProjectCommands.newSolidityProject();
-      };
+      await projectCommandsRewire.ProjectCommands.newSolidityProject();
 
       // Assert
-      await assert.rejects(action, Error, Constants.errorMessageStrings.NewProjectCreationFailed);
       assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
       assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
-      assert.strictEqual(gitInitMock.notCalled, true, 'gitInit should not be called');
+      assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
+      assert.strictEqual(gitInitMock.args[0][0], firstProjectPath, 'gitInit should be called with correct arguments');
       assert.strictEqual(showOpenFolderDialogMock.calledOnce, true, 'showOpenFolderDialog should be called once');
       assert.strictEqual(ensureDirMock.calledOnce, true, 'ensureDir should be called once');
       assert.strictEqual(
@@ -778,33 +1023,45 @@ describe('ProjectCommands', () => {
       );
       assert.strictEqual(
         executeCommandMock.args[0][4],
-        Constants.defaultTruffleBox,
+        Constants.sampleTruffleBox,
         'executeCommand should be called with correct arguments'
       );
-      assert.strictEqual(updateWorkspaceFoldersMock.notCalled, true, 'updateWorkspaceFolders should not be called');
-      assert.strictEqual(emptyDirSyncMock.calledOnce, true, 'emptyDirSync should be called once');
+      assert.strictEqual(updateWorkspaceFoldersMock.calledOnce, true, 'updateWorkspaceFolders should be called once');
       assert.strictEqual(
-        emptyDirSyncMock.args[0][0],
-        firstProjectPath,
-        'emptyDirSync should be called with correct arguments'
+        updateWorkspaceFoldersMock.args[0][0],
+        0,
+        'updateWorkspaceFolders should be called with correct arguments'
       );
+      assert.strictEqual(
+        updateWorkspaceFoldersMock.args[0][1],
+        1,
+        'updateWorkspaceFolders should be called with correct arguments'
+      );
+      assert.strictEqual(
+        updateWorkspaceFoldersMock.args[0][2].uri.path,
+        `/${firstProjectPath}`,
+        'updateWorkspaceFolders should be called with correct arguments'
+      );
+      assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
     });
 
-    it('Method createProjectFromTruffleBox get truffleBoxName and create new project with this name.', async () => {
+    it('Method newSolidityProject runs method createProject, and a truffle unbox project was created successfully.', async () => {
       // Arrange
       checkRequiredAppsMock.returns(true);
       readdirMock.returns([]);
       sinon.stub(workspace, 'workspaceFolders').value(['1']);
 
       const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-      projectCommandsRewire.__set__('getTruffleBoxName', sinon.mock().returns(truffleBoxName));
-      const getTruffleBoxNameMock = projectCommandsRewire.__get__('getTruffleBoxName');
-      const createProjectFromTruffleBox = projectCommandsRewire.__get__('createProjectFromTruffleBox');
+      const createProject = projectCommandsRewire.__get__('createProject');
+      projectCommandsRewire.__set__('getTruffleUnboxCommand', sinon.mock().returns(truffleBoxName));
+      const getTruffleUnboxCommandMock = projectCommandsRewire.__get__('getTruffleUnboxCommand');
 
       showErrorMessageMock.returns(Constants.informationMessage.openButton);
       showQuickPickMock.returns({
-        cmd: createProjectFromTruffleBox,
+        cmd: createProject,
         label: Constants.typeOfSolidityProject.text.projectFromTruffleBox,
+        detail: Constants.typeOfSolidityProject.description.projectFromTruffleBox,
+        projectType: ProjectType.box,
       });
 
       // Act
@@ -814,8 +1071,8 @@ describe('ProjectCommands', () => {
       assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
       assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
       assert.strictEqual(gitInitMock.calledOnce, true, 'gitInit should be called once');
-      assert.strictEqual(getTruffleBoxNameMock.calledOnce, true, 'getTruffleBoxName should be called once');
-      assert.strictEqual(gitInitMock.args[0][0], firstProjectPath);
+      assert.strictEqual(gitInitMock.args[0][0], firstProjectPath, 'gitInit should be called with correct arguments');
+      assert.strictEqual(getTruffleUnboxCommandMock.calledOnce, true, 'getTruffleUnboxCommand should be called once');
       assert.strictEqual(showOpenFolderDialogMock.calledOnce, true, 'showOpenFolderDialog should be called once');
       assert.strictEqual(ensureDirMock.calledOnce, true, 'ensureDir should be called once');
       assert.strictEqual(
@@ -871,9 +1128,75 @@ describe('ProjectCommands', () => {
       assert.strictEqual(emptyDirSyncMock.notCalled, true, 'emptyDirSync should not be called');
     });
 
+    it('Method newSolidityProject runs method createProject, and a new empty project throws error.', async () => {
+      // Arrange
+      checkRequiredAppsMock.returns(true);
+      readdirMock.returns([]);
+      executeCommandMock.throws();
+
+      const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
+      const createProject = projectCommandsRewire.__get__('createProject');
+      showErrorMessageMock.returns(Constants.informationMessage.openButton);
+      showQuickPickMock.returns({
+        cmd: createProject,
+        label: Constants.typeOfSolidityProject.text.emptyProject,
+        detail: Constants.typeOfSolidityProject.description.emptyProject,
+        projectType: ProjectType.empty,
+      });
+
+      // Act
+      const action = async () => {
+        await projectCommandsRewire.ProjectCommands.newSolidityProject();
+      };
+
+      // Assert
+      await assert.rejects(action, Error, Constants.errorMessageStrings.NewProjectCreationFailed);
+      assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
+      assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
+      assert.strictEqual(gitInitMock.notCalled, true, 'gitInit should not be called');
+      assert.strictEqual(showOpenFolderDialogMock.calledOnce, true, 'showOpenFolderDialog should be called once');
+      assert.strictEqual(ensureDirMock.calledOnce, true, 'ensureDir should be called once');
+      assert.strictEqual(
+        ensureDirMock.args[0][0],
+        firstProjectPath,
+        'ensureDir should be called with correct arguments'
+      );
+      assert.strictEqual(readdirMock.calledOnce, true, 'readdir should be called once');
+      assert.strictEqual(readdirMock.args[0][0], firstProjectPath, 'readdir should be called with correct arguments');
+      assert.strictEqual(showErrorMessageMock.notCalled, true, 'showErrorMessage should not be called');
+      assert.strictEqual(executeCommandMock.calledOnce, true, 'executeCommand should be called once');
+      assert.strictEqual(
+        executeCommandMock.args[0][0],
+        firstProjectPath,
+        'executeCommand should be called with correct arguments'
+      );
+      assert.strictEqual(
+        executeCommandMock.args[0][1],
+        'npx',
+        'executeCommand should be called with correct arguments'
+      );
+      assert.strictEqual(
+        executeCommandMock.args[0][2],
+        RequiredApps.truffle,
+        'executeCommand should be called with correct arguments'
+      );
+      assert.strictEqual(
+        executeCommandMock.args[0][3],
+        'init',
+        'executeCommand should be called with correct arguments'
+      );
+      assert.strictEqual(updateWorkspaceFoldersMock.notCalled, true, 'updateWorkspaceFolders should not be called');
+      assert.strictEqual(emptyDirSyncMock.calledOnce, true, 'emptyDirSync should be called once');
+      assert.strictEqual(
+        emptyDirSyncMock.args[0][0],
+        firstProjectPath,
+        'emptyDirSync should be called with correct arguments'
+      );
+    });
+
     it(
-      'Method createProjectFromTruffleBox get truffleBoxName and create new project with this name. ' +
-        'showInputBox called twice in getTruffleBoxName.',
+      'Method newSolidityProject get truffleBoxName and create new project with this name. ' +
+        'showInputBox called twice in getTruffleUnboxCommand.',
       async () => {
         // Arrange
         checkRequiredAppsMock.returns(true);
@@ -881,13 +1204,16 @@ describe('ProjectCommands', () => {
         executeCommandMock.throws();
 
         const projectCommandsRewire = rewire('../../src/commands/ProjectCommands');
-        projectCommandsRewire.__set__('getTruffleBoxName', sinon.mock().returns(truffleBoxName));
-        const getTruffleBoxNameMock = projectCommandsRewire.__get__('getTruffleBoxName');
-        const createProjectFromTruffleBox = projectCommandsRewire.__get__('createProjectFromTruffleBox');
+        const createProject = projectCommandsRewire.__get__('createProject');
+        projectCommandsRewire.__set__('getTruffleUnboxCommand', sinon.mock().returns(truffleBoxName));
+        const getTruffleUnboxCommandMock = projectCommandsRewire.__get__('getTruffleUnboxCommand');
+
         showErrorMessageMock.returns(Constants.informationMessage.openButton);
         showQuickPickMock.returns({
-          cmd: createProjectFromTruffleBox,
+          cmd: createProject,
           label: Constants.typeOfSolidityProject.text.projectFromTruffleBox,
+          detail: Constants.typeOfSolidityProject.description.projectFromTruffleBox,
+          projectType: ProjectType.box,
         });
 
         // Act
@@ -900,7 +1226,7 @@ describe('ProjectCommands', () => {
         assert.strictEqual(checkRequiredAppsMock.calledOnce, true, 'checkRequiredApps should be called once');
         assert.strictEqual(showQuickPickMock.calledOnce, true, 'showQuickPick should be called once');
         assert.strictEqual(gitInitMock.notCalled, true, 'gitInit should not be called');
-        assert.strictEqual(getTruffleBoxNameMock.calledOnce, true, 'getTruffleBoxName should be called once');
+        assert.strictEqual(getTruffleUnboxCommandMock.calledOnce, true, 'getTruffleUnboxCommand should be called once');
         assert.strictEqual(showOpenFolderDialogMock.calledOnce, true, 'showOpenFolderDialog should be called once');
         assert.strictEqual(ensureDirMock.calledOnce, true, 'ensureDir should be called once');
         assert.strictEqual(

@@ -43,7 +43,8 @@ export class Constants {
     migrations_directory: path.join('./', 'migrations'),
   };
 
-  public static defaultTruffleBox = 'truffle-box/vscode-starter-box';
+  public static truffleBoxes = 'https://trufflesuite.com/boxes/data.json';
+  public static sampleTruffleBox = 'truffle-box/vscode-starter-box';
   public static defaultDebounceTimeout = 300;
   public static defaultInputNameInBdm = 'transaction-node';
 
@@ -66,6 +67,29 @@ export class Constants {
       root: 'root',
       folder: 'folder',
       file: 'file',
+    },
+  };
+
+  public static contract = {
+    configuration: {
+      statusBar: {
+        text: {
+          enabled: 'Contract Auto Deploy: ON',
+          disabled: 'Contract Auto Deploy: OFF',
+        },
+        tooltip: 'Turn on/off automatic deployment when saving .sol files',
+        command: 'truffle-vscode.contracts.deployOnSave',
+      },
+      extension: {
+        json: '.json',
+        sol: '.sol',
+        txt: '.txt',
+      },
+      properties: {
+        abi: 'abi',
+        bytecode: 'bytecode',
+        deployedBytecode: 'deployedBytecode',
+      },
     },
   };
 
@@ -115,6 +139,7 @@ export class Constants {
     isNotifiedAboutOZSdk: 'isNotifiedAboutOZSdk',
     mnemonicStorageKey: 'mnemonicStorage',
     serviceResourceKey: 'treeContent',
+    contractAutoDeployOnSave: 'contractAutoDeployOnSave',
   };
 
   public static infuraFileResponse = {
@@ -150,23 +175,11 @@ export class Constants {
     },
   };
 
-  public static contractExtension = {
-    json: '.json',
-    sol: '.sol',
-    txt: '.txt',
-  };
-
   public static networkProtocols = {
     file: 'file://',
     ftp: 'ftp://',
     http: 'http://',
     https: 'https://',
-  };
-
-  public static contractProperties = {
-    abi: 'abi',
-    bytecode: 'bytecode',
-    deployedBytecode: 'deployedBytecode',
   };
 
   public static propertyLabels = {
@@ -346,7 +359,7 @@ export class Constants {
     },
     hasDigits: /(?=.*\d)/g,
     infuraProjectname: /^([a-zA-Z]|\d|\s|[-_:]){3,}$/g,
-    isJsonFile: new RegExp(Constants.contractExtension.json + '$'),
+    isJsonFile: new RegExp(Constants.contract.configuration.extension.json + '$'),
     isLowerCase: /^[a-z0-9_\-!@$^&()+=?/<>|[\]{}:.\\~ #`*"'%;,]+$/g,
     isUrl: /^(?:http(s)?:\/\/)?[\w:@.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/gim,
     lowerCaseLetter: /(?=.*[a-z]).*/g,
@@ -482,11 +495,19 @@ export class Constants {
   public static typeOfSolidityProject = {
     action: {
       emptyProject: 'createEmptyProject',
+      sampleProject: 'createSampleProject',
       projectFromTruffleBox: 'createProjectFromTruffleBox',
     },
     text: {
-      emptyProject: 'Create basic project',
-      projectFromTruffleBox: 'Create Project from Truffle box',
+      emptyProject: 'Create empty project',
+      sampleProject: 'Create sample project',
+      projectFromTruffleBox: 'Create project from Truffle box',
+    },
+    description: {
+      emptyProject: 'Empty project equivalent of truffle init',
+      sampleProject: 'Sample project (current vscode-starter-box with some enhancements)',
+      projectFromTruffleBox:
+        'Project from Truffle Box (which will launch another dropdown with the full list of all boxes)',
     },
   };
 
@@ -590,6 +611,7 @@ export class Constants {
     VariableShouldBeDefined: Constants.getMessageVariableShouldBeDefined,
     WorkspaceShouldBeOpened: 'Workspace should be opened',
     DashboardVersionError: 'Please upgrade to the latest version of Truffle to use this feature',
+    FetchingBoxesHasFailed: 'An error occurred while fetching boxes',
   };
 
   public static informationMessage = {

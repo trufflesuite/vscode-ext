@@ -20,7 +20,7 @@ import {IDeployDestination, ItemType} from '@/Models';
 import {NetworkForContractItem} from '@/Models/QuickPickItems';
 import {InfuraProject, LocalProject, LocalService, TLocalProjectOptions} from '@/Models/TreeItems';
 import {Project} from '@/Models/TreeItems';
-import {Output, outputChannel, OutputLabel} from '@/Output';
+import {Output, OutputLabel} from '@/Output';
 import {
   ContractDB,
   ContractInstanceWithMetadata,
@@ -77,7 +77,9 @@ export namespace TruffleCommands {
     }
 
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
+      // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
       Output.show();
+
       await outputCommandHelper.executeCommand(contractDirectory, 'npx', args.join(' '));
       commands.executeCommand('truffle-vscode.views.deployments.refresh');
 
@@ -123,7 +125,7 @@ export namespace TruffleCommands {
       (reason) => {
         // ignore
         const outputStr = `Error refreshing view: ${reason}`;
-        outputChannel ? outputChannel.append(outputStr) : console.log(outputStr);
+        Output ? Output.outputLine(OutputLabel.truffleForVSCode, outputStr) : console.log(outputStr);
       }
     );
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandFinished');
@@ -133,7 +135,7 @@ export namespace TruffleCommands {
     Telemetry.sendEvent('TruffleCommands.writeAbiToBuffer.commandStarted');
     const contract = await readCompiledContract(uri);
 
-    await vscodeEnvironment.writeToClipboard(JSON.stringify(contract[Constants.contractProperties.abi]));
+    await vscodeEnvironment.writeToClipboard(JSON.stringify(contract[Constants.contract.configuration.properties.abi]));
     Telemetry.sendEvent('TruffleCommands.writeAbiToBuffer.commandFinished');
   }
 
@@ -141,7 +143,7 @@ export namespace TruffleCommands {
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandStarted');
     const contract = await readCompiledContract(uri);
 
-    await vscodeEnvironment.writeToClipboard(contract[Constants.contractProperties.bytecode]);
+    await vscodeEnvironment.writeToClipboard(contract[Constants.contract.configuration.properties.bytecode]);
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
   }
 
@@ -151,7 +153,7 @@ export namespace TruffleCommands {
     ensureFileIsContractJson(uri.fsPath);
 
     const contractInstances = (await ContractDB.getContractInstances(
-      path.basename(uri.fsPath, Constants.contractExtension.json)
+      path.basename(uri.fsPath, Constants.contract.configuration.extension.json)
     )) as ContractInstanceWithMetadata[];
     const contractInstancesWithNetworkInfo = contractInstances.filter((contractIns) => {
       return contractIns.network.name !== undefined && !!contractIns.provider && !!contractIns.address;
@@ -510,6 +512,7 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
     const truffleConfigName = path.basename(truffleConfigPath);
     await fs.ensureDir(workspaceRoot);
 
+    // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
     Output.show();
 
     try {
@@ -571,7 +574,7 @@ async function readCompiledContract(uri: Uri): Promise<any> {
 }
 
 function ensureFileIsContractJson(filePath: string) {
-  if (path.extname(filePath) !== Constants.contractExtension.json) {
+  if (path.extname(filePath) !== Constants.contract.configuration.extension.json) {
     const error = new Error(Constants.errorMessageStrings.InvalidContract);
     Telemetry.sendException(error);
     throw error;
