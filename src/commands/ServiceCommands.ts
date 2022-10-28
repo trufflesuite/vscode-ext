@@ -1,12 +1,12 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {QuickPickItem} from 'vscode';
-import {Constants} from '../Constants';
-import {telemetryHelper} from '../helpers';
-import {showInputBox, showQuickPick} from '../helpers/userInteraction';
-import {ItemType} from '../Models';
+import {Constants} from '@/Constants';
+import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
+import {ItemType} from '@/Models';
 import {
+  GenericProject,
+  GenericService,
   InfuraProject,
   InfuraService,
   LocalProject,
@@ -15,13 +15,13 @@ import {
   Service,
   ServiceTypes,
   TLocalProjectOptions,
-  GenericProject,
-  GenericService,
-} from '../Models/TreeItems';
-import {InfuraResourceExplorer, LocalResourceExplorer, GenericResourceExplorer} from '../resourceExplorers';
-import {GanacheService, TreeManager} from '../services';
-import {Telemetry} from '../TelemetryClient';
-import {ProjectView} from '../ViewItems';
+} from '@/Models/TreeItems';
+import {GenericResourceExplorer, InfuraResourceExplorer, LocalResourceExplorer} from '@/resourceExplorers';
+import {GanacheService, TreeManager} from '@/services';
+import {Telemetry} from '@/TelemetryClient';
+import {ProjectView} from '@/ViewItems';
+import {QuickPickItem} from 'vscode';
+import {telemetryHelper} from '../helpers';
 
 interface IServiceDestination {
   cmd: (service: Service) => Promise<Project>;
@@ -258,7 +258,7 @@ async function getBlockNumber(): Promise<number> {
 }
 
 async function getHostAddress(): Promise<string> {
-  const url: string = await showInputBox({
+  return await showInputBox({
     ignoreFocusOut: true,
     prompt: Constants.paletteLabels.enterNetworkUrl,
     placeHolder: Constants.placeholders.enterNetworkUrl,
@@ -269,12 +269,10 @@ async function getHostAddress(): Promise<string> {
       return null;
     },
   });
-
-  return url;
 }
 
 async function loadServiceType(): Promise<TServiceType[]> {
-  const networks: TServiceType[] = [
+  return [
     {
       label: Constants.treeItemData.service.local.type.default.label,
       isForked: Constants.treeItemData.service.local.type.default.isForked,
@@ -287,16 +285,12 @@ async function loadServiceType(): Promise<TServiceType[]> {
       description: Constants.treeItemData.service.local.type.forked.description,
       networks: [
         {label: Constants.treeItemData.service.local.type.forked.networks.mainnet},
-        {label: Constants.treeItemData.service.local.type.forked.networks.ropsten},
-        {label: Constants.treeItemData.service.local.type.forked.networks.kovan},
-        {label: Constants.treeItemData.service.local.type.forked.networks.rinkeby},
         {label: Constants.treeItemData.service.local.type.forked.networks.goerli},
+        {label: Constants.treeItemData.service.local.type.forked.networks.sepolia},
         {label: Constants.treeItemData.service.local.type.forked.networks.other},
       ],
     },
   ];
-
-  return networks;
 }
 
 async function addChild(service: Service, child: Project): Promise<void> {
