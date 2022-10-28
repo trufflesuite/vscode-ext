@@ -1,3 +1,6 @@
+/* Copyright (c) 2022. Consensys Software Inc. All rights reserved. */
+/* Licensed under the MIT license. */
+
 * {
   box-sizing: border-box;
   font-family: 'Segoe UI', sans-serif;
@@ -303,15 +306,20 @@ footer {
   max-height: 60px;
 }
 
-.required-app div {
+.required-app div,
+.required-app span {
   margin: 10px 0;
-  font-size: 15px;
+  font-size: 13px;
   text-align: center;
-  line-height: 20px;
+  line-height: 16px;
 }
 
 .required-app .version {
   color: mediumaquamarine;
+}
+
+.required-app .versionInvalid {
+  color: hotpink;
 }
 
 .required-app a {
@@ -339,6 +347,7 @@ footer {
 .required-app a.spinner span {
   visibility: hidden;
 }
+
 /*#endregion required*/
 
 /*#region spinner*/
@@ -364,6 +373,7 @@ footer {
   border-bottom-color: #ffffff;
   animation: spinner 0.8s ease infinite;
 }
+
 /*#endregion spinner*/
 
 /*#region partners*/
@@ -404,6 +414,7 @@ footer {
 .specific-partner > img {
   flex: 1;
 }
+
 /*#endregion partners*/
 
 /*#region sidebar*/

@@ -97,7 +97,7 @@ export class Constants {
   public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
     [RequiredApps.ganache]: {
       max: '8.0.0',
-      min: '6.0.0',
+      min: '7.4.3', // min post merge version with sepolia support.
     },
     [RequiredApps.git]: '2.10.0',
     [RequiredApps.hdwalletProvider]: {
