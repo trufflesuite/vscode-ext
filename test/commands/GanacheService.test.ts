@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import assert from 'assert';
@@ -120,7 +120,7 @@ describe('Unit tests GanacheService', () => {
     const spawnStub = sinon.stub(outputCommandHelper, 'spawnProcess').returns(processMock as cp.ChildProcess);
     const options: TLocalProjectOptions = {
       isForked: true,
-      forkedNetwork: 'rinkeby',
+      forkedNetwork: 'goerli',
       blockNumber: 1000,
       url: '',
     };
