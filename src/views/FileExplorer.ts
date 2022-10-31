@@ -1,3 +1,4 @@
+import {getAllTruffleWorkspaces} from '@/helpers/workspace';
 import {Output, OutputLabel} from '@/Output';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
@@ -384,35 +385,42 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
       return children.map(([name, type]) => Object.assign(vscode.Uri.file(path.join(element.fsPath, name)), {type}));
     }
 
-    const workspaceFolder = getWorkspaceFolder();
-    if (workspaceFolder) {
-      let children = await this.getSortedChildren(workspaceFolder.uri);
+    // Gets the workspace folders
+    const workspaces = await getAllTruffleWorkspaces();
 
-      if (this._baseFolder) {
-        // we need to filter for this folder
-        const baseFolderUri = children?.filter((cVal) => {
-          return cVal[1] == vscode.FileType.Directory && cVal[0] === this._baseFolder;
-        });
-        // if we find it we change our children to be its.
-        if (baseFolderUri && baseFolderUri.length > 0) {
-          // just set this to our baseFolder.
-          children = children.filter((v) => this._baseFolder?.localeCompare(v[0]) == 0);
-          Output.outputLine(OutputLabel.truffleForVSCode, `Setting Base Folder to: ${this._baseFolder}`);
-        } else {
-          Output.outputLine(
-            OutputLabel.truffleForVSCode,
-            `no baseFolder: ${this._baseFolder} found in children of workspace: ${children}`
-          );
-          vscode.window.showInformationMessage(`No folder "${this._baseFolder}" found in workspace.`);
-          return [];
-        }
-      }
-      // return the mapped entries.
-      return children.map(([name, type]) =>
-        Object.assign(vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, name)), {type})
-      );
+    // Checks if there are any workspaces
+    if (workspaces.length === 0) {
+      Output.outputLine(OutputLabel.truffleForVSCode, Constants.errorMessageStrings.TruffleConfigIsNotExist);
+
+      vscode.window.showInformationMessage(Constants.errorMessageStrings.TruffleConfigIsNotExist);
+      return [];
     }
-    return [];
+
+    // Gets all contracts folders
+    const contractFolders: Entry[] = [];
+
+    workspaces.forEach((workspace) => {
+      const contractFolder = path.join(workspace.workspace.fsPath, this._baseFolder!);
+
+      // Checks if the contract folder exists
+      if (fs.existsSync(contractFolder)) {
+        contractFolders.push(
+          Object.assign(vscode.Uri.file(contractFolder), {
+            type: vscode.FileType.Directory,
+          })
+        );
+      }
+    });
+
+    // Check if there are any contract folders
+    if (contractFolders.length === 0) {
+      Output.outputLine(OutputLabel.truffleForVSCode, Constants.errorMessageStrings.ContractFolderNotExists);
+
+      vscode.window.showInformationMessage(Constants.errorMessageStrings.ContractFolderNotExists);
+    }
+
+    // Returns the contract folders
+    return contractFolders;
   }
 
   async getSortedChildren(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
