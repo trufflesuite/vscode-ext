@@ -202,8 +202,7 @@ export default class RuntimeInterface extends EventEmitter {
   public currentLine(): DebuggerTypes.IFrame {
     this.validateSession();
     const currentLocation = this._session!.view(this._selectors.controller.current.location);
-    const source = this._session!.view(this._selectors.sourcemapping.current.source);
-    const sourcePath = source.sourcePath;
+    const sourcePath = this._session!.view(this._selectors.sourcemapping.current.source).sourcePath;
 
     if (!sourcePath) {
       throw new Error('No source file');
