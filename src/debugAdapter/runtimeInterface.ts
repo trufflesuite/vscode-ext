@@ -209,13 +209,7 @@ export default class RuntimeInterface extends EventEmitter {
       throw new Error('No source file');
     }
     // so if we have a file in a location that doesn't map 1:1 to the actual file name in the compiler we map it here...
-    // const file = this._mappedSources.has(sourcePath) ? this._mappedSources.get(sourcePath) : sourcePath;
-    let file: string;
-    if (this._mappedSources.has(sourcePath)) {
-      file = this._mappedSources.get(sourcePath)!;
-    } else {
-      file = sourcePath;
-    }
+    const file = this._mappedSources.has(sourcePath) ? this._mappedSources.get(sourcePath) : sourcePath;
 
     return {
       column: currentLocation.sourceRange ? currentLocation.sourceRange.lines.start.column : 0,
