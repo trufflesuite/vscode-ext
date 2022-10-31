@@ -12,9 +12,9 @@ import {writeFileSync} from 'fs-extra';
 import {fetchAndCompileForDebugger} from '@truffle/fetch-and-compile';
 import {LocalNetworkNode, LocalProject} from '@/Models/TreeItems';
 import {getChainId} from '@/functions/explorer';
-import * as path from 'path';
 import {TreeManager} from '@/services/tree/TreeManager';
 import {ItemType} from '@/Models';
+import * as os from 'os';
 
 export default class RuntimeInterface extends EventEmitter {
   private _isDebuggerAttached: boolean;
@@ -26,8 +26,6 @@ export default class RuntimeInterface extends EventEmitter {
    * A list of mapped files so debug can open.
    */
   private _mappedSources: Map<string, string>;
-
-  private _contractDir = '';
 
   constructor() {
     super();
@@ -144,21 +142,48 @@ export default class RuntimeInterface extends EventEmitter {
     // Gets the contracts compilation
     const result = await prepareContracts(workingDirectory);
 
+    // Sets the properties to use during the debugger process
+    this._mappedSources = result.mappedSources;
+    const networkId = this.getNetworkId(providerUrl);
+
     // Sets the truffle debugger options
     const options: truffleDebugger.DebuggerOptions = {
       provider: providerUrl,
       compilations: result.shimCompilations,
+      lightMode: networkId !== undefined,
     };
 
-    // Sets the properties to use during the debugger process
-    this._mappedSources = result.mappedSources;
-    this._contractDir = path.join(workingDirectory, 'contracts');
-    const networkId = this.getNetworkId(providerUrl);
-
     this._session = await this.generateSession(txHash, networkId, options);
+    this.serializeExternalSources();
+
     this._isDebuggerAttached = true;
   }
 
+  /**
+   *
+   */
+  private serializeExternalSources() {
+    const byId = this._session!.view(this._selectors.sourcemapping.info.sources).byId;
+
+    if (byId === undefined) {
+      return;
+    }
+
+    for (const compilation of Object.values(byId) as {compilationId: string; source: string; sourcePath: string}[]) {
+      if (compilation.compilationId.startsWith('externalFor')) {
+        const tmp = os.tmpdir();
+        const sourcePath = tmp + '/' + compilation.sourcePath;
+        writeFileSync(sourcePath, compilation.source);
+        this._mappedSources.set(compilation.sourcePath, sourcePath);
+      }
+    }
+  }
+
+  /**
+   *
+   * @param providerUrl
+   * @returns
+   */
   private getNetworkId(providerUrl: string) {
     const services = TreeManager.getItem(ItemType.LOCAL_SERVICE);
 
@@ -189,11 +214,7 @@ export default class RuntimeInterface extends EventEmitter {
     if (this._mappedSources.has(sourcePath)) {
       file = this._mappedSources.get(sourcePath)!;
     } else {
-      // const tmp = os.tmpdir();
-      const path = this._contractDir + '/' + sourcePath;
-      writeFileSync(path, source.source);
-      file = path;
-      // file = sourcePath;
+      file = sourcePath;
     }
 
     return {
@@ -240,8 +261,8 @@ export default class RuntimeInterface extends EventEmitter {
     const bugger = await truffleDebugger.forTx(txHash, options);
 
     if (networkId) {
-      // await fetchAndCompileForDebugger(bugger, {network: {networkId: 5}}); //Note: mutates bugger!!
       await fetchAndCompileForDebugger(bugger, {network: {networkId: networkId as any}}); //Note: mutates bugger!!
+      await (bugger as any).startFullMode();
     }
 
     return bugger.connect();
