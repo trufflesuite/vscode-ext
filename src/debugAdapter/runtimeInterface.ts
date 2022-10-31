@@ -160,11 +160,18 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   /**
+   * Serialize any (fetched) external sources into a temporary folder
+   * to be later opened by VS Code editor.
    *
+   * Whenever this `Session` has been initialized with fetch external sources,
+   * _i.e._, `fetchAndCompileForDebugger`,
+   * the corresponding sources are stores in this `Session`'s state.
+   * This method serialize these sources into a temporary folder.
    */
   private serializeExternalSources() {
     const byId = this._session!.view(this._selectors.sourcemapping.info.sources).byId;
 
+    // This guard is used so far in tests.
     if (byId === undefined) {
       return;
     }
@@ -180,9 +187,10 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   /**
+   * Retrieves the chain id of the `providerUrl`.
    *
-   * @param providerUrl
-   * @returns
+   * @param providerUrl the url to get chain id from.
+   * @returns the chain id of the given `providerUrl`.
    */
   private getNetworkId(providerUrl: string) {
     const services = TreeManager.getItem(ItemType.LOCAL_SERVICE);
@@ -245,6 +253,19 @@ export default class RuntimeInterface extends EventEmitter {
     }
   }
 
+  /**
+   * Generates the Truffle Debugger `Session`.
+   *
+   * `networkId` indicates which network this `Session`'s provider is forking from, if any.
+   * When `networkId` is defined,
+   * the Truffle `fetch-and-compile` module is used to fetch external sources,
+   * currently from Etherscan.
+   *
+   * @param txHash
+   * @param networkId
+   * @param options
+   * @returns
+   */
   private async generateSession(
     txHash: string,
     networkId: string | number | undefined,
