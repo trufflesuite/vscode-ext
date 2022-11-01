@@ -10,7 +10,6 @@ import {Uri} from 'vscode';
 
 export class HardHatExtensionAdapter implements IExtensionAdapter {
   async build(uri?: Uri): Promise<void> {
-    // ext.outputChannel.appendLine(`Building: ${uri?.toString}`);
     return buildContracts(uri);
   }
 

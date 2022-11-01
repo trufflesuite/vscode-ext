@@ -1,10 +1,12 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Memento, window, Uri} from 'vscode';
 import {Constants} from '@/Constants';
+import {Output, OutputLabel} from '@/Output';
+
+import {HardHatExtensionAdapter, IExtensionAdapter, TruffleExtensionAdapter} from '@/services/extensionAdapter';
+import {Memento, Uri, window} from 'vscode';
 import {userSettings} from '../helpers';
-import {IExtensionAdapter, TruffleExtensionAdapter, HardHatExtensionAdapter} from '@/services/extensionAdapter';
 
 class SdkCoreCommands {
   public extensionAdapter!: IExtensionAdapter;
@@ -14,8 +16,10 @@ class SdkCoreCommands {
     this.extensionAdapter = this.getExtensionAdapter(sdk.userValue ? sdk.userValue : sdk.defaultValue);
     this.extensionAdapter.validateExtension().then(
       (_) => {
-        // TODO: some output
-        // this.logger.outputLine(`Configuration Initialized. SdkCoreProvider: ${this.extensionAdapter.constructor.name}`);
+        Output.outputLine(
+          OutputLabel.sdkCoreCommands,
+          `Configuration Initialized. SdkCoreProvider: ${this.extensionAdapter.constructor.name}`
+        );
       },
       (error) => {
         window.showErrorMessage(error.message);
