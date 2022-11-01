@@ -3,8 +3,8 @@
 
 import {ConfigurationTarget, workspace} from 'vscode';
 
-export function getConfiguration(key: string): {defaultValue: string; userValue: string} {
-  const config = workspace.getConfiguration().inspect<string>(key);
+export async function getConfigurationAsync(key: string): Promise<{defaultValue: string; userValue: string}> {
+  const config = await workspace.getConfiguration().inspect(key);
 
   const defaultValue = config!.defaultValue as string;
   const userValue = config!.globalValue as string;

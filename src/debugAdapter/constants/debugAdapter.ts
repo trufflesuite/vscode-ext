@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 export const EVENT_TYPES = {
@@ -36,7 +36,5 @@ export const EVALUATE_REQUEST_TYPES = {
 };
 
 export const DEBUG_TYPE = 'truffle';
-
-export const EMBED_DEBUG_ADAPTER = typeof IS_BUNDLE_TIME === 'undefined' || IS_BUNDLE_TIME === false;
 
 export const ERROR_MESSAGE_ID = 1;

@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 declare module '@truffle/debugger' {
@@ -35,11 +35,8 @@ declare module '@truffle/debugger' {
    * More permissively typed Object
    */
   type DebuggerOptions = {
-    contracts?: Array<any>;
-    files?: Array<string>;
     provider: Web3Provider;
     compilations?: Array<any>;
-    lightMode?: boolean;
   };
 
   /**

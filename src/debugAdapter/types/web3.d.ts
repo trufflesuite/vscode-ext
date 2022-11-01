@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 declare namespace Web3 {
@@ -40,6 +40,8 @@ declare namespace Web3 {
     getBlockNumber: any;
     currentProvider: any;
     getAccounts: any;
+    getBalance: any;
+    getGasPrice: any;
   }
 
   const providers: {

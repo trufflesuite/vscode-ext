@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import path from 'path';
@@ -12,7 +12,7 @@ import {showQuickPick} from '@/helpers/userInteraction';
 import {QuickPickItem} from 'vscode';
 import {LocalProject} from '@/Models/TreeItems/LocalProject';
 import {LocalNetworkNode} from '@/Models/TreeItems';
-import {ConfigurationReader} from './configurationReader';
+import {ConfigurationReader} from '../helpers/debugConfigurationReader';
 
 export class DebugNetwork {
   public workingDirectory: string;

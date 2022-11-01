@@ -1,7 +1,7 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {OutputLabel} from '@/Output';
+import {Output, OutputLabel} from '@/Output';
 import {ChildProcess} from 'child_process';
 import {OutputChannel, window} from 'vscode';
 import {Constants, RequiredApps} from '../../Constants';
@@ -13,6 +13,7 @@ import {isDashboardRunning, waitDashboardStarted} from './DashboardServiceClient
 
 export namespace DashboardService {
   export interface IDashboardProcess {
+    // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
     output?: OutputChannel;
     pid?: number;
     port: number | string;
@@ -66,6 +67,7 @@ export namespace DashboardService {
       dashboardProcesses[port] = await spawnDashboardServer(port);
     }
 
+    // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
     // open the channel to show the output.
     dashboardProcesses[port]?.output?.show(false);
 
@@ -92,8 +94,14 @@ export namespace DashboardService {
 
   async function spawnDashboardServer(port: number | string): Promise<IDashboardProcess> {
     const process = spawnProcess(undefined, `${RequiredApps.truffle} ${RequiredApps.dashboard}`, []);
+
+    // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
     const output = window.createOutputChannel(`${OutputLabel.dashboardCommands}:${port}`);
+
     const dashboardProcess = {port, process, output} as IDashboardProcess;
+
+    // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
+    output.show(true);
 
     try {
       addAllListeners(output, port, process);
@@ -102,6 +110,7 @@ export namespace DashboardService {
     } catch (error) {
       Telemetry.sendException(error as Error);
       await stopDashboardProcess(dashboardProcess, true);
+      await Output.dispose(OutputLabel.dashboardCommands, port.toString());
       throw error;
     }
 
@@ -115,12 +124,14 @@ export namespace DashboardService {
 
     const {output, pid, port, process} = dashboardProcess;
     delete dashboardProcesses[port];
+    await Output.dispose(OutputLabel.dashboardCommands, port.toString());
 
     if (process) {
       removeAllListeners(process);
       process.kill('SIGINT');
     }
 
+    // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
     if (output) {
       output.dispose();
     }
@@ -132,10 +143,12 @@ export namespace DashboardService {
 
   function addAllListeners(output: OutputChannel, port: number | string, process: ChildProcess): void {
     process.stdout!.on('data', (data: string | Buffer) => {
+      Output.outputLine(OutputLabel.dashboardCommands, data.toString(), port.toString());
       output.appendLine(data.toString());
     });
 
     process.stderr!.on('data', (data: string | Buffer) => {
+      Output.outputLine(OutputLabel.dashboardCommands, data.toString(), port.toString());
       output.appendLine(data.toString());
     });
 

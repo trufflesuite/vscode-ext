@@ -2,6 +2,49 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
+## 2.6.0 - _Arbequina_ 🌳
+
+This release brings a number of new features including an improved new project workflow, an information tab for your locally running Ganache instances, and a dedicated panel for all logging out from Truffle, Ganache and Dashboard. It also includes a fix for the debugger wherein it was unable to find the source files (resulting in a 'No source file" error) and range of smaller fixes and optimizations.
+
+Give it a try and let us know what you think!
+
+### What's Changed
+
+- Dropdown when selecting a box to "unbox" [\#220](https://github.com/trufflesuite/vscode-ext/pull/220) ([xhulz](https://github.com/xhulz))
+- Dedicated tab(s) in VS Code panel [\#205](https://github.com/trufflesuite/vscode-ext/pull/205) ([xhulz](https://github.com/xhulz))
+- Networks (Local Instance) - Get More Information [\#217](https://github.com/trufflesuite/vscode-ext/pull/217) ([xhulz](https://github.com/xhulz))
+- Fix Truffle Logo [\#215](https://github.com/trufflesuite/vscode-ext/pull/215) ([michaeljohnbennett](https://github.com/michaeljohnbennett))
+- Remove redundant txns from dialog after a redeploy [\#225](https://github.com/trufflesuite/vscode-ext/pull/225) ([xhulz](https://github.com/xhulz))
+- Have new project match truffle init [\#222](https://github.com/trufflesuite/vscode-ext/pull/222) ([xhulz](https://github.com/xhulz))
+- Create an "auto-deploy on save" toggle in the Contract Explorer [\#227](https://github.com/trufflesuite/vscode-ext/pull/227) ([xhulz](https://github.com/xhulz))
+- Debugger loading incorrect source file or throwing "No source file" error [\#229](https://github.com/trufflesuite/vscode-ext/pull/229) ([xhulz](https://github.com/xhulz))
+- Spurious closing bracket on "Create sample project" entry when creating a new project [\#238](https://github.com/trufflesuite/vscode-ext/pull/238) ([xhulz](https://github.com/xhulz))
+- Temporarily continue logging to the Truffle for VS Code output channel [\#237](https://github.com/trufflesuite/vscode-ext/pull/237) ([xhulz](https://github.com/xhulz))
+- Minor stylistic tweaks to output tabs [\#240](https://github.com/trufflesuite/vscode-ext/pull/240) ([kevinbluer](https://github.com/kevinbluer))
+
+## 2.5.0 - _Haiku_ 😈
+
+This release has improved support to debug over a forked network and working with multiple Truffle projects in the same workspace.
+The brand new Walkthrough helps users to explore and discover the main features of the extension.
+Moreover, it has some bug fixes, internal optimisations, and code refactor for better maintainability.
+
+Give it a try and let us know what you think!
+
+### What's Changed
+
+- Ability to debug over a forked network [\#186](https://github.com/trufflesuite/vscode-ext/pull/186) ([xhulz](https://github.com/xhulz))
+- Use `contracts_directory` from Truffle config in `Create Contract` command [\#193](https://github.com/trufflesuite/vscode-ext/pull/193) ([acuarica](https://github.com/acuarica))
+- Fix Command Palette display filter for Build/Deploy/Create Contracts commands [\#192](https://github.com/trufflesuite/vscode-ext/pull/192) ([acuarica](https://github.com/acuarica))
+- Add support to run out tests without VS Code Development Extension Host [\#191](https://github.com/trufflesuite/vscode-ext/pull/191) ([acuarica](https://github.com/acuarica))
+- Add support for multiple Truffle config files [\#181](https://github.com/trufflesuite/vscode-ext/pull/181) ([acuarica](https://github.com/acuarica))
+- Honor the `contract_build_directory` property in Deployments view [\#179](https://github.com/trufflesuite/vscode-ext/pull/179) ([acuarica](https://github.com/acuarica))
+- Ability to compile a single contract [\#177](https://github.com/trufflesuite/vscode-ext/pull/177) ([xhulz](https://github.com/xhulz))
+- Dashboard link has added to dashboard view panel [\#172](https://github.com/trufflesuite/vscode-ext/pull/172) ([xhulz](https://github.com/xhulz))
+- Debug only works with Ganache Development Instance [\#170](https://github.com/trufflesuite/vscode-ext/pull/170) ([xhulz](https://github.com/xhulz))
+- Add a Walkthrough on the Getting Started splash [\#148](https://github.com/trufflesuite/vscode-ext/pull/148) ([acuarica](https://github.com/acuarica))
+- Replace `open` package with `vscode.env.openExternal` [\#195](https://github.com/trufflesuite/vscode-ext/pull/195) ([acuarica](https://github.com/acuarica))
+- Always use the embedded Debug Adapter [\#218](https://github.com/trufflesuite/vscode-ext/pull/218) ([acuarica](https://github.com/acuarica))
+
 ## 2.4.0 - _Goblins_ 😈
 
 This release has some fixes around internal optimisations for our CI/Linting and cleanup of code where we were seeing issues with building contracts in mono repos etc.

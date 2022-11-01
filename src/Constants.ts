@@ -48,7 +48,8 @@ export class Constants {
     migrations_directory: path.join('./', 'migrations'),
   };
 
-  public static defaultTruffleBox = 'truffle-box/vscode-starter-box';
+  public static truffleBoxes = 'https://trufflesuite.com/boxes/data.json';
+  public static sampleTruffleBox = 'truffle-box/vscode-starter-box';
   public static defaultDebounceTimeout = 300;
   public static defaultInputNameInBdm = 'transaction-node';
 
@@ -74,11 +75,34 @@ export class Constants {
     },
   };
 
+  public static contract = {
+    configuration: {
+      statusBar: {
+        text: {
+          enabled: 'Contract Auto Deploy: ON',
+          disabled: 'Contract Auto Deploy: OFF',
+        },
+        tooltip: 'Turn on/off automatic deployment when saving .sol files',
+        command: 'truffle-vscode.contracts.deployOnSave',
+      },
+      extension: {
+        json: '.json',
+        sol: '.sol',
+        txt: '.txt',
+      },
+      properties: {
+        abi: 'abi',
+        bytecode: 'bytecode',
+        deployedBytecode: 'deployedBytecode',
+      },
+    },
+  };
+
   // Values are quite brittle and don't map directly to the requirements.html screen.
   public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
     [RequiredApps.ganache]: {
       max: '8.0.0',
-      min: '6.0.0',
+      min: '7.4.3', // min post merge version with sepolia support.
     },
     [RequiredApps.git]: '2.10.0',
     [RequiredApps.hdwalletProvider]: {
@@ -124,6 +148,7 @@ export class Constants {
     isNotifiedAboutOZSdk: 'isNotifiedAboutOZSdk',
     mnemonicStorageKey: 'mnemonicStorage',
     serviceResourceKey: 'treeContent',
+    contractAutoDeployOnSave: 'contractAutoDeployOnSave',
   };
 
   public static infuraFileResponse = {
@@ -159,23 +184,11 @@ export class Constants {
     },
   };
 
-  public static contractExtension = {
-    json: '.json',
-    sol: '.sol',
-    txt: '.txt',
-  };
-
   public static networkProtocols = {
     file: 'file://',
     ftp: 'ftp://',
     http: 'http://',
     https: 'https://',
-  };
-
-  public static contractProperties = {
-    abi: 'abi',
-    bytecode: 'bytecode',
-    deployedBytecode: 'deployedBytecode',
   };
 
   public static propertyLabels = {
@@ -319,10 +332,8 @@ export class Constants {
             isForked: true,
             networks: {
               mainnet: 'Mainnet',
-              ropsten: 'Ropsten',
-              kovan: 'Kovan',
-              rinkeby: 'Rinkeby',
               goerli: 'Goerli',
+              sepolia: 'Sepolia',
               other: 'Other...',
             },
           },
@@ -355,7 +366,7 @@ export class Constants {
     },
     hasDigits: /(?=.*\d)/g,
     infuraProjectname: /^([a-zA-Z]|\d|\s|[-_:]){3,}$/g,
-    isJsonFile: new RegExp(Constants.contractExtension.json + '$'),
+    isJsonFile: new RegExp(Constants.contract.configuration.extension.json + '$'),
     isLowerCase: /^[a-z0-9_\-!@$^&()+=?/<>|[\]{}:.\\~ #`*"'%;,]+$/g,
     isUrl: /^(?:http(s)?:\/\/)?[\w:@.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/gim,
     lowerCaseLetter: /(?=.*[a-z]).*/g,
@@ -458,18 +469,14 @@ export class Constants {
   // More information see here
   // https://ethereum.stackexchange.com/questions/17051/how-to-select-a-network-id-or-is-there-a-list-of-network-ids
   public static infuraEndpointsIds: {[key: string]: number} = {
-    goerli: 5,
-    kovan: 42,
     mainnet: 1,
-    rinkeby: 4,
-    ropsten: 3,
+    goerli: 5,
+    sepolia: 11155111,
     'arbitrum-mainnet': 42161,
-    'arbitrum-rinkeby': 421611,
     'aurora-mainnet': 1313161554,
     'aurora-testnet': 1313161555,
     'near-mainnet': 0,
     'near-testnet': 0,
-    'optimism-kovan': 69,
     'optimism-mainnet': 10,
     'polygon-mainnet': 137,
     'polygon-mumbai': 80001,
@@ -491,11 +498,19 @@ export class Constants {
   public static typeOfSolidityProject = {
     action: {
       emptyProject: 'createEmptyProject',
+      sampleProject: 'createSampleProject',
       projectFromTruffleBox: 'createProjectFromTruffleBox',
     },
     text: {
-      emptyProject: 'Create basic project',
-      projectFromTruffleBox: 'Create Project from Truffle box',
+      emptyProject: 'Create empty project',
+      sampleProject: 'Create sample project',
+      projectFromTruffleBox: 'Create project from Truffle box',
+    },
+    description: {
+      emptyProject: 'Empty project equivalent of truffle init',
+      sampleProject: 'Sample project (current vscode-starter-box with some enhancements)',
+      projectFromTruffleBox:
+        'Project from Truffle Box (which will launch another dropdown with the full list of all boxes)',
     },
   };
 
@@ -599,6 +614,7 @@ export class Constants {
     VariableShouldBeDefined: Constants.getMessageVariableShouldBeDefined,
     WorkspaceShouldBeOpened: 'Workspace should be opened',
     DashboardVersionError: 'Please upgrade to the latest version of Truffle to use this feature',
+    FetchingBoxesHasFailed: 'An error occurred while fetching boxes',
     HHNoDefaultDeploy:
       'Hardhat has no default deploy command. Consider using the HardHat Deploy Plugin: [hardhat-deploy](https://github.com/wighawag/hardhat-deploy)',
   };
@@ -818,10 +834,8 @@ export class Constants {
 
 export enum ChainId {
   ETHEREUM = 1,
-  ROPSTEN = 3,
-  RINKEBY = 4,
-  GÖRLI = 5,
-  KOVAN = 42,
+  GOERLI = 5,
+  SEPOLIA = 11155111,
   MATIC = 137,
   MATIC_TESTNET = 80001,
   FANTOM = 250,

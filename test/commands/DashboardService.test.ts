@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import assert from 'assert';
@@ -113,7 +113,6 @@ describe('Unit tests DashboardService', () => {
 
   it('startDashboardServer if server was not started should throw exception and dispose all', async () => {
     // Arrange
-    const channelDisposeSpy = sinon.spy(channel, 'dispose');
     const killProcessStub = sinon.stub(processMock, 'kill');
     const processRemoveAllListenersSpy = sinon.spy(processMock, 'removeAllListeners');
 
@@ -123,7 +122,6 @@ describe('Unit tests DashboardService', () => {
     sinon
       .stub(DashboardServiceClient, 'waitDashboardStarted')
       .throws(new Error(Constants.dashboardCommandStrings.cannotStartServer));
-    sinon.stub(window, 'createOutputChannel').returns(channel as OutputChannel);
 
     // Act and Assert
     await assert.rejects(
@@ -132,7 +130,6 @@ describe('Unit tests DashboardService', () => {
       Constants.dashboardCommandStrings.cannotStartServer
     );
     assert.strictEqual(killProcessStub.calledOnce, true);
-    assert.strictEqual(channelDisposeSpy.calledOnce, true);
     assert.strictEqual(processRemoveAllListenersSpy.calledOnce, true);
   });
 
@@ -156,10 +153,8 @@ describe('Unit tests DashboardService', () => {
       const killPidStub = sinon.stub(shell, 'killPid');
       const killProcessStub = sinon.stub(processMock, 'kill');
       const processSpy = sinon.spy(processMock, 'removeAllListeners');
-      const channelDisposeSpy = sinon.spy(channel, 'dispose');
 
       DashboardService.dashboardProcesses[defaultPort] = {
-        output: channel,
         port: defaultPort,
         process: processMock,
       } as DashboardService.IDashboardProcess;
@@ -172,7 +167,6 @@ describe('Unit tests DashboardService', () => {
       assert.strictEqual(killPidStub.called, false, '"killPid" shouldn\'t be executed for target process');
       assert.strictEqual(killProcessStub.calledOnce, true, '"kill" should be executed for target process');
       assert.strictEqual(processSpy.calledOnce, true, '"removeAllListeners" should be executed for target process');
-      assert.strictEqual(channelDisposeSpy.calledOnce, true, '"dispose" should be executed for channel');
     });
 
     it('stopDashboardServer should kill out of band process and remove element from "dashboardProcesses" list', async () => {

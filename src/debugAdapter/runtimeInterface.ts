@@ -1,13 +1,12 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import truffleDebugger from '@truffle/debugger';
 import {EventEmitter} from 'events';
-import {filterContractsWithAddress, prepareContracts} from './contracts/contractsPrepareHelpers';
+import {prepareContracts} from './contracts/contractHelpers';
 import {TranslatedResult, translateTruffleVariables} from './helpers';
 import {DebuggerTypes} from './models/debuggerTypes';
 import {ICallInfo} from './models/ICallInfo';
-import {IContractModel} from './models/IContractModel';
 import {IInstruction} from './models/IInstruction';
 
 export default class RuntimeInterface extends EventEmitter {
@@ -15,9 +14,11 @@ export default class RuntimeInterface extends EventEmitter {
   private _session: truffleDebugger.Session | undefined;
   private _selectors: truffleDebugger.Selectors;
   private _numBreakpoints: number;
-  private _deployedContracts: IContractModel[];
   private _initialBreakPoints: Array<{path: string; lines: number[]}>;
-  private _fileLookupMap: Map<string, string>;
+  /**
+   * A list of mapped files so debug can open.
+   */
+  private _mappedSources: Map<string, string>;
 
   constructor() {
     super();
@@ -26,8 +27,7 @@ export default class RuntimeInterface extends EventEmitter {
     this._numBreakpoints = 0;
     this._isDebuggerAttached = false;
     this._initialBreakPoints = [];
-    this._deployedContracts = [];
-    this._fileLookupMap = new Map();
+    this._mappedSources = new Map();
   }
 
   public clearBreakpoints(): Promise<void> {
@@ -75,29 +75,8 @@ export default class RuntimeInterface extends EventEmitter {
   // Get stack trace (without method name)
   public callStack(): ICallInfo[] {
     this.validateSession();
-    const callStack = this._session!.view(this._selectors.evm.current.callstack);
     const currentLine = this.currentLine();
-    if (callStack.length === 1) {
-      return [{...currentLine, method: 'Current'}];
-    }
-
-    const result: ICallInfo[] = [];
-    // There is no api to get line/collumn of previous call
-    // That's why set them as default
-    const defaultLine = {line: 0, column: 0};
-    for (let i = 0; i < callStack.length - 1; i++) {
-      // processing all previous calls
-      const contract = this._deployedContracts.find(
-        (c: any) => c.address === (callStack[i].address || callStack[i].storageAddress)
-      );
-      if (contract === undefined) {
-        throw new Error(`Coundn't find contract by address ${callStack[i].address || callStack[i].storageAddress}`);
-      }
-      result.push({file: contract.sourcePath, ...defaultLine, method: 'Previous'});
-    }
-
-    result.push({...currentLine, method: 'Current'});
-    return result;
+    return [{...currentLine, method: 'Current'}];
   }
 
   /**
@@ -145,21 +124,25 @@ export default class RuntimeInterface extends EventEmitter {
   }
 
   /**
-   * FIXME: rework this
-   * @param txHash
-   * @param workingDirectory
+   * This function attaches the debugger and starts the debugging process.
+   *
+   * @param txHash The transaction hash to debug.
+   * @param workingDirectory The workspace path where the truffle project is located.
+   * @param providerUrl The url provider where the contracts were deployed.
+   * @returns
    */
   public async attach(txHash: string, workingDirectory: string, providerUrl: string): Promise<void> {
-    const result = await prepareContracts(workingDirectory, providerUrl);
+    // Gets the contracts compilation
+    const result = await prepareContracts(workingDirectory);
 
-    this._deployedContracts = filterContractsWithAddress(result.contracts);
-
+    // Sets the truffle debugger options
     const options: truffleDebugger.DebuggerOptions = {
-      contracts: result.contracts,
-      files: result.files,
-      provider: result.provider,
+      provider: providerUrl,
+      compilations: result.shimCompilations,
     };
-    this._fileLookupMap = result.lookupMap;
+
+    // Sets the properties to use during the debugger process
+    this._mappedSources = result.mappedSources;
     this._session = await this.generateSession(txHash, options);
     this._isDebuggerAttached = true;
   }
@@ -172,7 +155,7 @@ export default class RuntimeInterface extends EventEmitter {
       throw new Error('No source file');
     }
     // so if we have a file in a location that doesn't map 1:1 to the actual file name in the compiler we map it here...
-    const file = this._fileLookupMap.has(sourcePath) ? this._fileLookupMap.get(sourcePath) : sourcePath;
+    const file = this._mappedSources.has(sourcePath) ? this._mappedSources.get(sourcePath) : sourcePath;
 
     return {
       column: currentLocation.sourceRange ? currentLocation.sourceRange.lines.start.column : 0,

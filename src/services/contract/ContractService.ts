@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {getTruffleConfiguration} from '@/helpers/TruffleConfiguration';
@@ -14,7 +14,7 @@ export namespace ContractService {
   type PathDirectoryKey = 'contracts_directory' | 'migrations_directory' | 'contracts_build_directory';
 
   export function getContractNameBySolidityFile(solidityFilePath: string): string {
-    return path.basename(solidityFilePath, Constants.contractExtension.sol);
+    return path.basename(solidityFilePath, Constants.contract.configuration.extension.sol);
   }
 
   export async function getCompiledContractsMetadata(): Promise<Contract[]> {
@@ -81,7 +81,7 @@ export namespace ContractService {
 
     return fs
       .readdirSync(buildDir)
-      .filter((file) => path.extname(file) === Constants.contractExtension.json)
+      .filter((file) => path.extname(file) === Constants.contract.configuration.extension.json)
       .map((file) => path.join(buildDir, file))
       .filter((file) => fs.lstatSync(file).isFile());
   }

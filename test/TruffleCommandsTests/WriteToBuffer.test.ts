@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import assert from 'assert';
@@ -26,7 +26,7 @@ describe('TruffleCommands - Write To Buffer', () => {
 
       it('writeBytecodeToBuffer should write correct bytecode to clipboard', async () => {
         // Arrange
-        const testBytecode = testJsonString[Constants.contractProperties.bytecode];
+        const testBytecode = testJsonString[Constants.contract.configuration.properties.bytecode];
 
         // Act
         await TruffleCommands.writeBytecodeToBuffer(fileUri);
@@ -41,7 +41,7 @@ describe('TruffleCommands - Write To Buffer', () => {
 
       it('writeAbiToBuffer should write correct abi to clipboard', async () => {
         // Arrange
-        const testAbi = JSON.stringify(testJsonString[Constants.contractProperties.abi]);
+        const testAbi = JSON.stringify(testJsonString[Constants.contract.configuration.properties.abi]);
 
         // Act
         await TruffleCommands.writeAbiToBuffer(fileUri);

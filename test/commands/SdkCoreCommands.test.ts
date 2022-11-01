@@ -29,7 +29,7 @@ describe('Integration Tests - SDK Core Commands', () => {
   it('will use TruffleCommands By Default.', async function () {
     //given - I have the default value set to goto truffle.
     const theVal = Constants.coreSdk.truffle;
-    userSettingsMock.expects('getConfiguration').returns({defaultValue: theVal, userValue: theVal});
+    userSettingsMock.expects('getConfigurationAsync').returns({defaultValue: theVal, userValue: theVal});
 
     // when I call the SDKCoreCommand
     await sdkCoreCommands.initialize(globalState);
@@ -40,7 +40,7 @@ describe('Integration Tests - SDK Core Commands', () => {
 
   it('will use TruffleCommands When Configured.', async function () {
     const theVal = Constants.coreSdk.truffle;
-    userSettingsMock.expects('getConfiguration').returns({defaultValue: theVal, userValue: theVal});
+    userSettingsMock.expects('getConfigurationAsync').returns({defaultValue: theVal, userValue: theVal});
 
     // when I call the SDKCoreCommand
     await sdkCoreCommands.initialize(globalState);
@@ -50,7 +50,7 @@ describe('Integration Tests - SDK Core Commands', () => {
   });
   it('will use HardHatCommands When Configured.', async function () {
     const theVal = Constants.coreSdk.hardhat;
-    userSettingsMock.expects('getConfiguration').returns({defaultValue: theVal, userValue: theVal});
+    userSettingsMock.expects('getConfigurationAsync').returns({defaultValue: theVal, userValue: theVal});
 
     // when I call the SDKCoreCommand
     await sdkCoreCommands.initialize(globalState);

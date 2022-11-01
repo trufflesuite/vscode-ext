@@ -86,7 +86,7 @@ export async function tryExecuteCommandAsync(
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
 
       if (writeToOutputChannel) {
-        Output.output(OutputLabel.executeCommand, data);
+        Output.outputLine(OutputLabel.executeCommand, data);
       }
     });
 
@@ -94,7 +94,7 @@ export async function tryExecuteCommandAsync(
       data = data.toString();
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
       if (writeToOutputChannel) {
-        Output.output(OutputLabel.executeCommand, data);
+        Output.outputLine(OutputLabel.executeCommand, data);
       }
     });
 
@@ -168,7 +168,7 @@ export function tryExecuteCommandInForkAsync(
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
 
       if (writeToOutputChannel) {
-        Output.output(OutputLabel.executeCommand, data);
+        Output.outputLine(OutputLabel.executeCommand, data);
       }
     });
 
@@ -177,7 +177,7 @@ export function tryExecuteCommandInForkAsync(
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
 
       if (writeToOutputChannel) {
-        Output.output(OutputLabel.executeCommand, data);
+        Output.outputLine(OutputLabel.executeCommand, data);
       }
     });
 
@@ -197,7 +197,7 @@ export function tryExecuteCommandInForkAsync(
       cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
 
       if (writeToOutputChannel) {
-        Output.output(OutputLabel.executeCommand, data);
+        Output.outputLine(OutputLabel.executeCommand, data);
       }
     });
 
