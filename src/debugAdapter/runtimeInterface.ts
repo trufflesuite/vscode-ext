@@ -8,13 +8,14 @@ import {TranslatedResult, translateTruffleVariables} from './helpers';
 import {DebuggerTypes} from './models/debuggerTypes';
 import {ICallInfo} from './models/ICallInfo';
 import {IInstruction} from './models/IInstruction';
-import {writeFileSync} from 'fs-extra';
+import {mkdirpSync, writeFileSync} from 'fs-extra';
 import {fetchAndCompileForDebugger} from '@truffle/fetch-and-compile';
 import {LocalNetworkNode, LocalProject} from '@/Models/TreeItems';
 import {getChainId} from '@/functions/explorer';
 import {TreeManager} from '@/services/tree/TreeManager';
 import {ItemType} from '@/Models';
 import * as os from 'os';
+import * as path from 'path';
 
 export default class RuntimeInterface extends EventEmitter {
   private _isDebuggerAttached: boolean;
@@ -163,15 +164,20 @@ export default class RuntimeInterface extends EventEmitter {
    * Serialize any (fetched) external sources into a temporary folder
    * to be later opened by VS Code editor.
    *
-   * Whenever this `Session` has been initialized with fetch external sources,
+   * Whenever this `Session` has been already initialized with fetch external sources,
    * _i.e._, `fetchAndCompileForDebugger`,
-   * the corresponding sources are stores in this `Session`'s state.
-   * This method serialize these sources into a temporary folder.
+   * the corresponding sources are stored in this `Session`'s state.
+   * This method serialize these Session's sources into a temporary folder
+   * (as returned by `os.tmpdir()`).
+   *
+   * > Moreover, if the source path of contract being serialized is a nested path,
+   * > _.e.g._, `/@openzeppelin/contracts/access/Ownable.sol`,
+   * this method creates the whole folder path.
    */
   private serializeExternalSources() {
     const byId = this._session!.view(this._selectors.sourcemapping.info.sources).byId;
 
-    // This guard is used so far in tests.
+    // TODO: This guard is used so far in tests, not sure if `byId` can be undefined when running the extension.
     if (byId === undefined) {
       return;
     }
@@ -180,6 +186,10 @@ export default class RuntimeInterface extends EventEmitter {
       if (compilation.compilationId.startsWith('externalFor')) {
         const tmp = os.tmpdir();
         const sourcePath = tmp + '/' + compilation.sourcePath;
+
+        const sourceDir = path.dirname(sourcePath);
+        mkdirpSync(sourceDir);
+
         writeFileSync(sourcePath, compilation.source);
         this._mappedSources.set(compilation.sourcePath, sourcePath);
       }
