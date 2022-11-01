@@ -170,9 +170,9 @@ export default class RuntimeInterface extends EventEmitter {
    * This method serialize these Session's sources into a temporary folder
    * (as returned by `os.tmpdir()`).
    *
-   * > Moreover, if the source path of contract being serialized is a nested path,
+   * > Moreover, if the source path of a contract being serialized is a nested path,
    * > _.e.g._, `/@openzeppelin/contracts/access/Ownable.sol`,
-   * this method creates the whole folder path.
+   * this method creates the full folder path.
    */
   private serializeExternalSources() {
     const byId = this._session!.view(this._selectors.sourcemapping.info.sources).byId;
