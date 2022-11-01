@@ -1,13 +1,14 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {Constants} from '@/Constants';
+import {AbstractWorkspaceManager} from '@/helpers/workspace';
 import {Output, OutputLabel} from '@/Output';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as vscode from 'vscode';
-import {Constants} from '@/Constants';
 import {getWorkspaceFolder} from './Utils';
 
 //#region Utilities
@@ -182,7 +183,7 @@ export class FileStat implements vscode.FileStat {
  * Therefore, by using a `Uri` intersection type,
  * the same commands can be invoked from both the File Explorer and the Contract Explorer.
  */
-export type Entry = vscode.Uri & {type: vscode.FileType};
+export type Entry = vscode.Uri & {type: vscode.FileType; workspaceType?: AbstractWorkspaceManager.WorkspaceType};
 
 export type TElementTypes = {
   contextValue: string;
@@ -383,38 +384,67 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
     Output.outputLine(OutputLabel.truffleForVSCode, `Getting Children of: ${JSON.stringify(element)}`);
 
     if (element) {
-      const children = await this.readDirectory(element);
+      const children = await this.getSortedChildren(element);
       return children.map(([name, type]) => Object.assign(vscode.Uri.file(path.join(element.fsPath, name)), {type}));
     }
 
+    const abstractWorkspaces = AbstractWorkspaceManager.resolveAllWorkspaces();
+    console.log(`getChildren: `, {abstractWorkspaces});
     const workspaceFolder = getWorkspaceFolder();
-    if (workspaceFolder) {
-      let children = await this.getSortedChildren(workspaceFolder.uri);
 
-      if (this._baseFolder) {
-        // we need to filter for this folder
-        const baseFolderUri = children?.filter((cVal) => {
-          return cVal[1] == vscode.FileType.Directory && cVal[0] === this._baseFolder;
-        });
-        // if we find it we change our children to be its.
-        if (baseFolderUri && baseFolderUri.length > 0) {
-          // just set this to our baseFolder.
-          children = children.filter((v) => this._baseFolder?.localeCompare(v[0]) == 0);
-          Output.outputLine(OutputLabel.truffleForVSCode, `Setting Base Folder to: ${this._baseFolder}`);
-        } else {
-          Output.outputLine(
-            OutputLabel.truffleForVSCode,
-            `no baseFolder: ${this._baseFolder} found in children of workspace: ${children}`
-          );
-          vscode.window.showInformationMessage(`No folder "${this._baseFolder}" found in workspace.`);
-          return [];
+    if (workspaceFolder && abstractWorkspaces) {
+      const children = await this.getSortedChildren(workspaceFolder.uri);
+      const workspaceMap = new Map<string, AbstractWorkspaceManager.AbstractWorkspace>();
+      abstractWorkspaces.map((aw) => workspaceMap.set(aw.dirName, aw));
+
+      // for (const aw of abstractWorkspaces) {
+      //   const type =
+      //   children.push([Object.assign(vscode.Uri.file(path.join(aw.workspace.fsPath, name)), {type})])
+      //   // const chiddlers = await this.getSortedChildren(aw.workspace);
+      //   // console.log(`getChildren: loop:`, {chiddlers, aw});
+      //   // children = children.concat(
+      //   //   ...chiddlers.map(([name, type]) =>
+      //   //     Object.assign(vscode.Uri.file(path.join(aw.workspace.fsPath, name)), {type})
+      //   //   )
+      //   // );
+      // }
+      const ret = children.map<Entry>(([name, type]) => {
+        const workspaceType = workspaceMap.get(name)?.workspaceType;
+        return Object.assign(vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, name)), {type, workspaceType});
+      });
+      console.log(`getChildren: mapped workspaces:`, {children, workspaceMap, ret});
+      return ret;
+    } else {
+      // OLD CODE
+      if (workspaceFolder) {
+        let children = await this.getSortedChildren(workspaceFolder.uri);
+
+        if (this._baseFolder) {
+          // we need to filter for this folder
+          const baseFolderUri = children?.filter((cVal) => {
+            return cVal[1] == vscode.FileType.Directory && cVal[0] === this._baseFolder;
+          });
+          // if we find it we change our children to be its.
+          if (baseFolderUri && baseFolderUri.length > 0) {
+            // just set this to our baseFolder.
+            children = children.filter((v) => this._baseFolder?.localeCompare(v[0]) == 0);
+            Output.outputLine(OutputLabel.truffleForVSCode, `Setting Base Folder to: ${this._baseFolder}`);
+          } else {
+            Output.outputLine(
+              OutputLabel.truffleForVSCode,
+              `no baseFolder: ${this._baseFolder} found in children of workspace: ${children}`
+            );
+            vscode.window.showInformationMessage(`No folder "${this._baseFolder}" found in workspace.`);
+            return [];
+          }
         }
+        // return the mapped entries.
+        return children.map(([name, type]) =>
+          Object.assign(vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, name)), {type})
+        );
       }
-      // return the mapped entries.
-      return children.map(([name, type]) =>
-        Object.assign(vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, name)), {type})
-      );
     }
+
     return [];
   }
 
@@ -467,7 +497,9 @@ export function registerFileExplorerView(
 ): vscode.TreeView<Entry> {
   const openFileCommand = `${commandPrefix}.openFile`;
   const refreshExplorerCommand = `${commandPrefix}.${viewName}.refreshExplorer`;
-  const treeDataProvider = new FileSystemProvider(openFileCommand, Constants.fileExplorerConfig.contractFolder);
+  // const treeDataProvider = new FileSystemProvider(openFileCommand, Constants.fileExplorerConfig.contractFolder);
+  // fixing tree provider a bit...
+  const treeDataProvider = new FileSystemProvider(openFileCommand);
   vscode.commands.registerCommand(openFileCommand, (resource) => openResource(resource));
   vscode.commands.registerCommand(refreshExplorerCommand, (_) => treeDataProvider.refresh());
   return vscode.window.createTreeView(`${commandPrefix}.${viewName}`, {treeDataProvider});

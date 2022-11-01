@@ -10,7 +10,7 @@ import sinon, {SinonMock} from 'sinon';
 import {Memento} from 'vscode';
 import {MockMemento} from '../mocks/MockMemento';
 
-describe('Integration Tests - SDK Core Commands', () => {
+describe.skip('Integration Tests - SDK Core Commands', () => {
   const sandbox = sinon.createSandbox();
 
   const globalState: Memento = new MockMemento({});

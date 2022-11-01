@@ -11,9 +11,8 @@ import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '@/TelemetryClient';
 import {commands, Uri} from 'vscode';
 
-export async function buildContracts(uri?: Uri): Promise<void> {
+export async function buildContracts(ws?: AbstractWorkspaceManager.AbstractWorkspace, uri?: Uri): Promise<void> {
   Telemetry.sendEvent('HardhatCommands.buildContracts.commandStarted');
-
   if (!(await required.checkAppsSilent(OptionalApps.hardhat))) {
     Telemetry.sendEvent('HardhatCommands.buildContracts.hardhatInstallationMissing');
     await showNotification({
@@ -24,21 +23,20 @@ export async function buildContracts(uri?: Uri): Promise<void> {
     return;
   }
 
-  const ret = await AbstractWorkspaceManager.getWorkspaceForUri(uri);
-  Output.outputLine(OutputLabel.hardhatCommands, `found workspaces: ${JSON.stringify(ret)}`);
+  const workspaceDir = ws!.workspace.fsPath;
+
+  Output.outputLine(OutputLabel.hardhatCommands, `compiling: ${JSON.stringify(uri)} : ${workspaceDir}`);
   const args: string[] = [OptionalApps.hardhat, 'compile'];
-  const contractDirectory = ret.workspace.fsPath;
 
   // hardhat will compile all contracts, not one specifically.
-
   Output.outputLine(
     OutputLabel.hardhatCommands,
-    `Building: ${args} DIR: ${contractDirectory} Workspace: ${JSON.stringify(ret)} `
+    `Building: ${args} DIR: ${workspaceDir} Workspace: ${JSON.stringify(ws)} `
   );
 
   await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
     Output.show();
-    await outputCommandHelper.executeCommand(contractDirectory, 'npx', args.join(' '));
+    await outputCommandHelper.executeCommand(workspaceDir, 'npx', args.join(' '));
     commands.executeCommand('truffle-vscode.views.deployments.refresh');
 
     Telemetry.sendEvent('HardhatCommands.buildContracts.commandFinished');

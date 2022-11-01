@@ -234,7 +234,7 @@ export namespace AbstractWorkspaceManager {
 
   export class AbstractWorkspace {
     /**
-     * Creates a `TruffleWorkspace`.
+     * Creates a `Workspace` of varying Type.
      *
      * @param configPath the full path of the config file.
      * @param workspaceType - the type of config we have found.
