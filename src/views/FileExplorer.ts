@@ -7,7 +7,7 @@ import * as rimraf from 'rimraf';
 import * as vscode from 'vscode';
 import {ThemeIcon, Uri} from 'vscode';
 import {Constants} from '../Constants';
-import Config from '@truffle/config';
+import {ContractService} from '@/services/contract/ContractService';
 
 //#region Utilities
 
@@ -385,28 +385,25 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
       return [];
     }
 
-    // In some cases we may have more than one truffle configuration file, so it's better to remove duplicates item from the array
-    const uniqueWorkspaces = Array.from(new Set(workspaces.map((workspace) => workspace.dirName))).map((dirName) => {
-      return workspaces.find((workspace) => workspace.dirName === dirName)!;
-    });
-
     const contractFolders: Entry[] = [];
 
-    // Gets the contract folders
-    uniqueWorkspaces.forEach((workspace) => {
-      // Detects the contract folder from the truffle configuration file
-      const config = Config.detect({workingDirectory: workspace.workspace.fsPath});
+    await Promise.all(
+      // Gets the contract folders
+      workspaces.map(async (workspace) => {
+        // Gets the contract folder
+        const contractFolder = await ContractService.getContractsFolderPath(workspace);
 
-      // Checks if the contract folder exists
-      if (fs.existsSync(config.contracts_directory)) {
-        contractFolders.push(
-          Object.assign(Uri.parse(config.contracts_directory), {
-            type: vscode.FileType.Directory,
-            isContractFolder: true,
-          })
-        );
-      }
-    });
+        // Checks if the contract folder exists
+        if (fs.existsSync(contractFolder)) {
+          contractFolders.push(
+            Object.assign(Uri.parse(contractFolder), {
+              type: vscode.FileType.Directory,
+              isContractFolder: true,
+            })
+          );
+        }
+      })
+    );
 
     // Check if there are any contract folders
     if (contractFolders.length === 0) {
