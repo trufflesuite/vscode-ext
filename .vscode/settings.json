@@ -21,5 +21,13 @@
   ],
   "javascript.referencesCodeLens.enabled": true,
   "typescript.implementationsCodeLens.enabled": true,
-  "typescript.referencesCodeLens.enabled": true
+  "typescript.referencesCodeLens.enabled": true,
+  "chronicler.ffmpeg-binary": "/Users/xhulz/Documents/ffmpeg",
+  "chronicler.dest-folder": "/Users/xhulz/Documents/Recordings",
+  "chronicler.recording-defaults": {
+    "animatedGif": true,
+    "flags": null,
+    "fps": 10,
+    "countdown": 3
+  }
 }

@@ -62,7 +62,6 @@ export class Constants {
   public static dashboardRetryAttempts = 5;
 
   public static fileExplorerConfig = {
-    contractFolder: 'contracts',
     contextValue: {
       root: 'root',
       folder: 'folder',
@@ -606,7 +605,7 @@ export class Constants {
     WorkspaceShouldBeOpened: 'Workspace should be opened',
     DashboardVersionError: 'Please upgrade to the latest version of Truffle to use this feature',
     FetchingBoxesHasFailed: 'An error occurred while fetching boxes',
-    ContractFolderNotExists: 'No contract folder found for this workspace. Please create a contract folder.',
+    ContractFolderNotExists: 'No contract folder found in this workspace. Please create a contract folder.',
   };
 
   public static informationMessage = {
