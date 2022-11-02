@@ -185,7 +185,7 @@ export default class RuntimeInterface extends EventEmitter {
     for (const compilation of Object.values(byId) as {compilationId: string; source: string; sourcePath: string}[]) {
       if (compilation.compilationId.startsWith('externalFor')) {
         const tmp = os.tmpdir();
-        const sourcePath = tmp + '/' + compilation.sourcePath;
+        const sourcePath = path.join(tmp, compilation.sourcePath);
 
         const sourceDir = path.dirname(sourcePath);
         mkdirpSync(sourceDir);
