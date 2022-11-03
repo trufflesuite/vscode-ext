@@ -54,8 +54,23 @@ describe('DebuggerCommands unit tests', () => {
     sinon.restore();
   });
 
-  it('should generate and show quickPick when debugNetwork.isLocalNetwork() is true', async () => {
+  it('should `showinputBox` when debugNetwork.isLocalNetwork() is true', async () => {
     // Arrange
+    sinon.stub(DebugNetwork.prototype, 'isLocalNetwork').returns(true);
+    const showInputBoxFn = sinon.stub(userInteraction, 'showInputBox').resolves('');
+
+    // Act
+    await debugCommands.DebuggerCommands.startSolidityDebugger();
+
+    // Assert
+    assert.strictEqual(mockGetTxHashes.calledOnce, true, 'getLastTransactionHashes should be called');
+    assert.strictEqual(mockGetTxInfos.calledOnce, true, 'getTransactionsInfo should be called');
+    assert.strictEqual(showInputBoxFn.called, true, 'showInputBox should be called');
+  });
+
+  it('should `showQuickPick` when debugNetwork.isLocalNetwork() is true', async () => {
+    // Arrange
+    mockGetTxInfos.resolves([{hash: '0x1234', contractName: 'MetaCoin', methodName: 'constructor()'}]);
     sinon.stub(DebugNetwork.prototype, 'isLocalNetwork').returns(true);
     const createQuickPickFn = sinon.stub(userInteraction, 'showQuickPick').resolves({} as QuickPickItem);
 

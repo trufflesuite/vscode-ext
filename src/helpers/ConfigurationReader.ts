@@ -16,6 +16,12 @@ export interface INetworkOption {
   network_id: string | number;
   port?: number;
   host?: string;
+
+  /**
+   *
+   */
+  isForked?: boolean;
+
   /**
    * You will need this enabled to use the confirmations listener
    * or to hear Events using .on or .once. Default is false.

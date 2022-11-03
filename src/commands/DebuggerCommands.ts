@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import path from 'path';
-import {debug, DebugConfiguration, QuickPickItem, workspace} from 'vscode';
+import {debug, DebugConfiguration, QuickPickItem, QuickPickItemKind, workspace} from 'vscode';
 
 import {DEBUG_TYPE} from '@/debugAdapter/constants/debugAdapter';
 import {DebugNetwork} from '@/debugAdapter/debugNetwork';
@@ -12,6 +12,8 @@ import {Web3Wrapper} from '@/debugAdapter/web3Wrapper';
 import {getTruffleWorkspace, getPathByPlatform} from '@/helpers/workspace';
 import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
 import {Telemetry} from '@/TelemetryClient';
+
+const TX_REGEX = /^(?:0x)?[0-9a-fA-F]{64}$/;
 
 export namespace DebuggerCommands {
   export async function startSolidityDebugger() {
@@ -34,12 +36,37 @@ export namespace DebuggerCommands {
       const transactionProvider = new TransactionProvider(web3, contractBuildDir);
       const txHashesAsQuickPickItems = await getQuickPickItems(transactionProvider);
 
-      const txHashSelection = await showQuickPick(txHashesAsQuickPickItems, {
-        ignoreFocusOut: true,
-        placeHolder: 'Enter the transaction hash to debug',
-      });
+      const moreTxs = {
+        label: 'Or enter a transaction manually',
+        alwaysShow: true,
+      } as QuickPickItem;
 
-      const txHash = txHashSelection.detail || txHashSelection.label;
+      let txHashSelection;
+      if (txHashesAsQuickPickItems.length > 0)
+        txHashSelection = await showQuickPick(
+          [...txHashesAsQuickPickItems, {kind: QuickPickItemKind.Separator, label: ''}, moreTxs],
+          {
+            ignoreFocusOut: true,
+            placeHolder: 'Enter the transaction hash to debug',
+          }
+        );
+      else {
+        txHashSelection = moreTxs;
+      }
+
+      let txHash;
+      if (txHashSelection === moreTxs) {
+        txHash = await showInputBox({
+          placeHolder: 'Type the transaction hash you want to debug (0x...)',
+          validateInput: function (value: string) {
+            const match = TX_REGEX.exec(value.trim());
+            return match ? '' : 'The input does not look like a transaction, e.g., make sure it starts with `0x`';
+          },
+        });
+      } else {
+        txHash = txHashSelection.detail || txHashSelection.label;
+      }
+
       const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
       debug.startDebugging(workspaceFolder, config).then(() => {
         Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandFinished');
