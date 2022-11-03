@@ -62,7 +62,6 @@ export class Constants {
   public static dashboardRetryAttempts = 5;
 
   public static fileExplorerConfig = {
-    contractFolder: 'contracts',
     contextValue: {
       root: 'root',
       folder: 'folder',
@@ -601,11 +600,12 @@ export class Constants {
     SubscriptionNotFound: 'Can not find available subscription.',
     ThereAreNoMnemonics: 'There are no mnemonics',
     TruffleConfigHasIncorrectFormat: '"truffle-config.js" has incorrect format',
-    TruffleConfigIsNotExist: 'Truffle configuration file not found',
+    TruffleConfigIsNotExist: 'Unable to locate the truffle configuration file',
     VariableShouldBeDefined: Constants.getMessageVariableShouldBeDefined,
     WorkspaceShouldBeOpened: 'Workspace should be opened',
     DashboardVersionError: 'Please upgrade to the latest version of Truffle to use this feature',
     FetchingBoxesHasFailed: 'An error occurred while fetching boxes',
+    ContractFolderNotExists: 'There is no contract directory in this workspace',
   };
 
   public static informationMessage = {
