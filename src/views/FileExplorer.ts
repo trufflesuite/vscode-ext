@@ -1,11 +1,10 @@
 import {getAllTruffleWorkspaces} from '@/helpers/workspace';
-import {Output, OutputLabel} from '@/Output';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as vscode from 'vscode';
-import {ThemeIcon, Uri} from 'vscode';
+import {ThemeColor, ThemeIcon, Uri} from 'vscode';
 import {Constants} from '../Constants';
 import {ContractService} from '@/services/contract/ContractService';
 
@@ -181,12 +180,18 @@ export class FileStat implements vscode.FileStat {
  * Therefore, by using a `Uri` intersection type,
  * the same commands can be invoked from both the File Explorer and the Contract Explorer.
  */
-export type Entry = vscode.Uri & {type: vscode.FileType; isContractFolder: boolean};
+export type Entry = vscode.Uri & {
+  type: vscode.FileType;
+  label: string;
+  iconPath: vscode.ThemeIcon;
+  description?: string;
+  contextValue?: string;
+};
 
 export type TElementTypes = {
   contextValue: string;
   type: vscode.FileType;
-  isContractFolder: boolean;
+  isWorkspaceFolder: boolean;
 };
 
 //#endregion
@@ -222,17 +227,17 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
       {
         contextValue: Constants.fileExplorerConfig.contextValue.root,
         type: vscode.FileType.Directory,
-        isContractFolder: true,
+        isWorkspaceFolder: true,
       },
       {
         contextValue: Constants.fileExplorerConfig.contextValue.folder,
         type: vscode.FileType.Directory,
-        isContractFolder: false,
+        isWorkspaceFolder: false,
       },
       {
         contextValue: Constants.fileExplorerConfig.contextValue.file,
         type: vscode.FileType.File,
-        isContractFolder: false,
+        isWorkspaceFolder: false,
       },
     ];
   }
@@ -365,89 +370,106 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
 
   // tree data provider
   async getChildren(element?: Entry): Promise<Entry[]> {
-    Output.outputLine(OutputLabel.truffleForVSCode, `Getting Children of: ${element}`);
-
     if (element) {
+      // Reads files and directories of the given element
       const children = await this.readDirectory(element);
+
+      // Creates a new Entry for each child
       return children.map(([name, type]) =>
-        Object.assign(vscode.Uri.file(path.join(element.fsPath, name)), {type, isContractFolder: false})
+        Object.assign(vscode.Uri.file(path.join(element.fsPath, name)), {
+          type,
+          label: name,
+          iconPath: type === vscode.FileType.Directory ? new ThemeIcon('file-directory') : new ThemeIcon('file-code'),
+          contextValue: this.getTreeItemContextValue(type, false),
+        })
       );
     }
 
-    // Gets the workspace folders
+    // The tree view elements
+    const elements: Entry[] = [];
+
+    // Gets the truffle workspaces
     const workspaces = await getAllTruffleWorkspaces();
 
-    // Checks if there are any workspaces
+    // Checks if there are any truffle workspaces
     if (workspaces.length === 0) {
-      Output.outputLine(OutputLabel.truffleForVSCode, Constants.errorMessageStrings.TruffleConfigIsNotExist);
-      vscode.window.showInformationMessage(Constants.errorMessageStrings.TruffleConfigIsNotExist);
+      // Adds the error to the tree view elements
+      elements.push(
+        Object.assign({
+          type: vscode.FileType.File,
+          label: Constants.errorMessageStrings.TruffleConfigIsNotExist,
+          iconPath: new ThemeIcon('warning', new ThemeColor('errorForeground')),
+        })
+      );
 
-      return [];
+      return elements;
     }
 
-    const contractFolders: Entry[] = [];
-
+    // Gets all contract folders from the truffle workspaces
     await Promise.all(
-      // Gets the contract folders
       workspaces.map(async (workspace) => {
-        // Gets the contract folder
-        const contractFolder = await ContractService.getContractsFolderPath(workspace);
+        try {
+          // Gets the contract folder
+          const contractFolder = await ContractService.getContractsFolderPath(workspace);
 
-        // Checks if the contract folder exists
-        if (fs.existsSync(contractFolder)) {
-          contractFolders.push(
-            Object.assign(Uri.parse(contractFolder), {
-              type: vscode.FileType.Directory,
-              isContractFolder: true,
+          // Checks if the contract folder exists
+          if (fs.existsSync(contractFolder)) {
+            // Adds the contract folder to the tree view elements
+            elements.push(
+              Object.assign(Uri.parse(contractFolder), {
+                type: vscode.FileType.Directory,
+                label: path.basename(contractFolder),
+                iconPath: new ThemeIcon('file-directory'),
+                description: path.basename(path.dirname(contractFolder)),
+                contextValue: this.getTreeItemContextValue(vscode.FileType.Directory, true),
+              })
+            );
+          }
+        } catch (err) {
+          const error = err as Error;
+          // Adds the error to the tree view elements
+          elements.push(
+            Object.assign({
+              type: vscode.FileType.File,
+              label: error.message,
+              iconPath: new ThemeIcon('warning', new ThemeColor('errorForeground')),
             })
           );
         }
       })
     );
 
-    // Check if there are any contract folders
-    if (contractFolders.length === 0) {
-      Output.outputLine(OutputLabel.truffleForVSCode, Constants.errorMessageStrings.ContractFolderNotExists);
-      vscode.window.showInformationMessage(Constants.errorMessageStrings.ContractFolderNotExists);
+    // Check if the elements are empty
+    if (elements.length === 0) {
+      // Adds the error to the tree view elements
+      elements.push(
+        Object.assign({
+          type: vscode.FileType.File,
+          label: Constants.errorMessageStrings.ContractFolderNotExists,
+          iconPath: new ThemeIcon('warning', new ThemeColor('errorForeground')),
+        })
+      );
     }
 
-    // Returns the contract folders
-    return contractFolders;
-  }
-
-  async getSortedChildren(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
-    const children = await this.readDirectory(uri);
-    children.sort((a, b) => {
-      if (a[1] === b[1]) {
-        return a[0].localeCompare(b[0]);
-      }
-      return a[1] === vscode.FileType.Directory ? -1 : 1;
-    });
-    return children;
+    // Returns the elements
+    return elements;
   }
 
   getTreeItem(element: Entry): vscode.TreeItem {
     const treeItem = new vscode.TreeItem(
-      element,
+      element.label,
       element.type === vscode.FileType.Directory
         ? vscode.TreeItemCollapsibleState.Collapsed
         : vscode.TreeItemCollapsibleState.None
     );
 
-    switch (element.type) {
-      case vscode.FileType.Directory:
-        treeItem.label = path.basename(element.fsPath);
-        treeItem.iconPath = new ThemeIcon('file-directory');
-        treeItem.description = path.basename(path.dirname(element.fsPath));
-        break;
-      case vscode.FileType.File:
-        treeItem.label = path.basename(element.fsPath);
-        treeItem.iconPath = new ThemeIcon('file-code');
-        treeItem.command = {command: this._openFileCommand, title: 'Open File', arguments: [element]};
-        break;
-    }
+    treeItem.iconPath = element.iconPath;
+    treeItem.description = element.description;
+    treeItem.contextValue = element.contextValue;
 
-    treeItem.contextValue = this.getTreeItemContextValue(element);
+    if (element.fsPath && element.type === vscode.FileType.File) {
+      treeItem.command = {command: this._openFileCommand, title: 'Open File', arguments: [element]};
+    }
 
     return treeItem;
   }
@@ -457,13 +479,13 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
    * The `context Value` offers a filter on the file explorer menu that filters action alternatives such as:
    * `Create Contract`, `Build Contracts`, `Build This Contract`, `Deploy Contracts` and `Debug Transaction`.
    *
-   * @param element The element from TreeItem.
+   * @param type Enumeration of file types. The types File and Directory can also be a symbolic links, in that case use FileType.File | FileType.SymbolicLink and FileType.Directory | FileType.SymbolicLink.
+   * @param isWorkspaceFolder Indicates if the element is a workspace folder.
    * @returns A string containing the contextValue property.
    */
-  getTreeItemContextValue(element: Entry): string {
-    return this._elementTypes.find(
-      (ft) => ft.type === element.type && ft.isContractFolder === element.isContractFolder
-    )!.contextValue;
+  getTreeItemContextValue(type: vscode.FileType, isWorkspaceFolder: boolean): string {
+    return this._elementTypes.find((ft) => ft.type === type && ft.isWorkspaceFolder === isWorkspaceFolder)!
+      .contextValue;
   }
 }
 

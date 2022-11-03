@@ -605,7 +605,7 @@ export class Constants {
     WorkspaceShouldBeOpened: 'Workspace should be opened',
     DashboardVersionError: 'Please upgrade to the latest version of Truffle to use this feature',
     FetchingBoxesHasFailed: 'An error occurred while fetching boxes',
-    ContractFolderNotExists: 'No contract folder found in this workspace. Please create a contract folder.',
+    ContractFolderNotExists: 'There was no contract directory in this workspace.',
   };
 
   public static informationMessage = {
