@@ -37,7 +37,8 @@ export namespace DebuggerCommands {
       const txHashesAsQuickPickItems = await getQuickPickItems(transactionProvider);
 
       const moreTxs = {
-        label: 'Or enter a transaction manually',
+        label: '$(edit) Manually enter the transaction hash',
+        detail: 'Note that if the target network is forked, an attempt will be made to fetch the source',
         alwaysShow: true,
       } as QuickPickItem;
 
