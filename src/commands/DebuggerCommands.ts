@@ -46,7 +46,7 @@ export namespace DebuggerCommands {
           [...txHashesAsQuickPickItems, {kind: QuickPickItemKind.Separator, label: ''}, moreTxs],
           {
             ignoreFocusOut: true,
-            placeHolder: 'Enter the transaction hash to debug',
+            placeHolder: 'Select the transaction hash to debug',
           }
         );
       else {
