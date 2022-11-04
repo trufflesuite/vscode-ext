@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import os from 'os';
@@ -62,7 +62,6 @@ export class Constants {
   public static dashboardRetryAttempts = 5;
 
   public static fileExplorerConfig = {
-    contractFolder: 'contracts',
     contextValue: {
       root: 'root',
       folder: 'folder',
@@ -97,7 +96,7 @@ export class Constants {
   public static requiredVersions: {[key: string]: string | {min: string; max: string}} = {
     [RequiredApps.ganache]: {
       max: '8.0.0',
-      min: '6.0.0',
+      min: '7.4.3', // min post merge version with sepolia support.
     },
     [RequiredApps.git]: '2.10.0',
     [RequiredApps.hdwalletProvider]: {
@@ -323,10 +322,8 @@ export class Constants {
             isForked: true,
             networks: {
               mainnet: 'Mainnet',
-              ropsten: 'Ropsten',
-              kovan: 'Kovan',
-              rinkeby: 'Rinkeby',
               goerli: 'Goerli',
+              sepolia: 'Sepolia',
               other: 'Other...',
             },
           },
@@ -462,18 +459,14 @@ export class Constants {
   // More information see here
   // https://ethereum.stackexchange.com/questions/17051/how-to-select-a-network-id-or-is-there-a-list-of-network-ids
   public static infuraEndpointsIds: {[key: string]: number} = {
-    goerli: 5,
-    kovan: 42,
     mainnet: 1,
-    rinkeby: 4,
-    ropsten: 3,
+    goerli: 5,
+    sepolia: 11155111,
     'arbitrum-mainnet': 42161,
-    'arbitrum-rinkeby': 421611,
     'aurora-mainnet': 1313161554,
     'aurora-testnet': 1313161555,
     'near-mainnet': 0,
     'near-testnet': 0,
-    'optimism-kovan': 69,
     'optimism-mainnet': 10,
     'polygon-mainnet': 137,
     'polygon-mumbai': 80001,
@@ -505,7 +498,7 @@ export class Constants {
     },
     description: {
       emptyProject: 'Empty project equivalent of truffle init',
-      sampleProject: 'Sample project (current vscode-starter-box) with some enhancements)',
+      sampleProject: 'Sample project (current vscode-starter-box with some enhancements)',
       projectFromTruffleBox:
         'Project from Truffle Box (which will launch another dropdown with the full list of all boxes)',
     },
@@ -607,11 +600,12 @@ export class Constants {
     SubscriptionNotFound: 'Can not find available subscription.',
     ThereAreNoMnemonics: 'There are no mnemonics',
     TruffleConfigHasIncorrectFormat: '"truffle-config.js" has incorrect format',
-    TruffleConfigIsNotExist: 'Truffle configuration file not found',
+    TruffleConfigIsNotExist: 'Unable to locate the truffle configuration file',
     VariableShouldBeDefined: Constants.getMessageVariableShouldBeDefined,
     WorkspaceShouldBeOpened: 'Workspace should be opened',
     DashboardVersionError: 'Please upgrade to the latest version of Truffle to use this feature',
     FetchingBoxesHasFailed: 'An error occurred while fetching boxes',
+    ContractFolderNotExists: 'There is no contract directory in this workspace',
     UriHandlerError: 'Badly formatted. Ensure that the command and arguments are described correctly',
   };
 
@@ -830,10 +824,8 @@ export class Constants {
 
 export enum ChainId {
   ETHEREUM = 1,
-  ROPSTEN = 3,
-  RINKEBY = 4,
-  GÖRLI = 5,
-  KOVAN = 42,
+  GOERLI = 5,
+  SEPOLIA = 11155111,
   MATIC = 137,
   MATIC_TESTNET = 80001,
   FANTOM = 250,

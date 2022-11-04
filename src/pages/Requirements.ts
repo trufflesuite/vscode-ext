@@ -1,9 +1,9 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {ExtensionContext} from 'vscode';
-import {Constants} from '../Constants';
-import {required} from '../helpers/required';
+import {Constants} from '@/Constants';
+import {required} from '@/helpers/required';
 import {BasicWebView, IWebViewConfig} from './BasicWebView';
 
 export class RequirementsPage extends BasicWebView {
@@ -46,4 +46,22 @@ export class RequirementsPage extends BasicWebView {
       }
     }
   }
+
+  protected async getHtmlForWebview(): Promise<string> {
+    let html = await super.getHtmlForWebview();
+    if (html !== '') {
+      // let's get the versions we expect and inject them into the page...
+      const versions = await required.getAllVersions();
+      versions.forEach((v) => {
+        html = html.replace(new RegExp('{{' + v.app + '}}', 'g'), mapRequiredVersion(v.requiredVersion));
+        html = html.replace(new RegExp('{{' + v.app + '-installed}}', 'g'), v.version);
+        // change the CSS on installed version... green/pink depending on valid/invalid...
+        html = html.replace(new RegExp('{{' + v.app + '-version}}', 'g'), v.isValid ? 'version' : 'versionInvalid');
+      });
+    }
+    return html;
+  }
 }
+
+const mapRequiredVersion = (requiredVersion: string | {min: string; max: string}) =>
+  typeof requiredVersion === 'string' ? requiredVersion : `^${requiredVersion.min} - ⌵${requiredVersion.max}`;

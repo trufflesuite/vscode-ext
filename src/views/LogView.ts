@@ -76,7 +76,7 @@ export class LogView implements WebviewViewProvider {
    */
   public async createLog(label: OutputLabel, message: string, description?: string): Promise<void> {
     // Displays the log panel. Unfortunately it doesn't load immediately so we have to wait for the html to load
-    this._view?.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
+    // this._view?.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
 
     // Checks if the log panel has already been loaded and is visible
     if (this._view == null || this._view?.visible === false) {
@@ -99,7 +99,7 @@ export class LogView implements WebviewViewProvider {
    */
   public async disposeTab(label: OutputLabel, description?: string): Promise<void> {
     // Displays the log panel. Unfortunately it doesn't load immediately so we have to wait for the html to load
-    this._view?.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
+    // this._view?.show?.(true); // `show` is not implemented in 1.49 but is for 1.50 insiders
 
     // Checks if the log panel has already been loaded and is visible
     if (this._view?.visible === false) {

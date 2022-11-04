@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {commands} from 'vscode';
+import {commands, ExtensionContext, window} from 'vscode';
 import {LogView} from './views/LogView';
 
 export enum OutputLabel {
@@ -16,6 +16,8 @@ export enum OutputLabel {
 }
 
 export class Output {
+  private static readonly _outputChannel = window.createOutputChannel(OutputLabel.truffleForVSCode);
+
   /**
    * Append the given value and a line feed character
    * to the log panel
@@ -26,6 +28,9 @@ export class Output {
    */
   public static outputLine(label: OutputLabel, message: string, description?: string): void {
     commands.executeCommand(`${LogView.viewType}.create.log`, label, this.formatMessage(label, message), description);
+
+    // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
+    this._outputChannel.appendLine(this.formatMessage(label, message));
   }
 
   /**
@@ -34,7 +39,7 @@ export class Output {
    * @param label - represents the log type
    * @param description - represents the log description
    */
-  public static dispose(label: OutputLabel, description?: string): void {
+  public static async dispose(label: OutputLabel, description?: string): Promise<void> {
     commands.executeCommand(`${LogView.viewType}.dispose.tab`, label, description);
   }
 
@@ -46,5 +51,21 @@ export class Output {
    */
   private static formatMessage(label = '', message = ''): string {
     return `${label ? `[${label}] ` : ''}${message}`;
+  }
+
+  /**
+   * INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
+   * Call this only once to push the outputChannel into the list of subscriptions.
+   */
+  public static init(context: ExtensionContext) {
+    context.subscriptions.push(this._outputChannel);
+  }
+
+  public static show(): void {
+    this._outputChannel.show();
+  }
+
+  public static hide(): void {
+    this._outputChannel.hide();
   }
 }

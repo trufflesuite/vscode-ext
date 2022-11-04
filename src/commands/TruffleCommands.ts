@@ -77,6 +77,9 @@ export namespace TruffleCommands {
     }
 
     await showIgnorableNotification(Constants.statusBarMessages.buildingContracts, async () => {
+      // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
+      Output.show();
+
       await outputCommandHelper.executeCommand(contractDirectory, 'npx', args.join(' '));
       commands.executeCommand('truffle-vscode.views.deployments.refresh');
 
@@ -508,6 +511,9 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
     const workspaceRoot = path.dirname(truffleConfigPath);
     const truffleConfigName = path.basename(truffleConfigPath);
     await fs.ensureDir(workspaceRoot);
+
+    // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
+    Output.show();
 
     try {
       await installRequiredDependencies();

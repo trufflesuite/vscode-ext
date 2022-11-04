@@ -41,6 +41,7 @@ import {registerLogView} from './views/LogView';
 import {saveTextDocument} from './helpers/workspace';
 import {StatusBarItems} from './Models/StatusBarItems/Contract';
 import {UriHandlerController} from './helpers/uriHandlerController';
+import {Output} from './Output';
 
 export async function activate(context: ExtensionContext) {
   const uriHandler = window.registerUriHandler(new UriHandlerController());
@@ -60,6 +61,9 @@ export async function activate(context: ExtensionContext) {
   }
 
   Constants.initialize(context); // still do this first.
+
+  // INFO: THIS IS THE OLD VERSION OF LOGGER USING OUTPUT CHANNELS
+  Output.init(context);
 
   DebuggerConfiguration.initialize(context);
 
