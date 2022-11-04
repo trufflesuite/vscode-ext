@@ -29,8 +29,6 @@ export namespace DebuggerCommands {
     const web3 = new Web3Wrapper(debugNetworkOptions);
     const providerUrl = web3.getProviderUrl();
 
-    // const workspaceFolder = workspace.getWorkspaceFolder(workspaceUri);
-
     if (debugNetwork.isLocalNetwork()) {
       // if local service then provide last transactions to choose
       const transactionProvider = new TransactionProvider(web3, contractBuildDir);
@@ -93,11 +91,7 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
   });
 }
 
-export function generateDebugAdapterConfig(
-  txHash: string,
-  workingDirectory: string,
-  providerUrl: string
-): DebugConfiguration {
+function generateDebugAdapterConfig(txHash: string, workingDirectory: string, providerUrl: string): DebugConfiguration {
   return {
     files: [],
     name: 'Debug Transactions',
@@ -107,7 +101,7 @@ export function generateDebugAdapterConfig(
     type: DEBUG_TYPE,
     workingDirectory,
     timeout: 30000,
-  } as DebugConfiguration;
+  };
 }
 
 export async function startDebugging(txHash: string, workingDirectory: string, providerUrl: string): Promise<void> {
