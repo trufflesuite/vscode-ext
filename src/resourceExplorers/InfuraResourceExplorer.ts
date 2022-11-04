@@ -1,15 +1,15 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {QuickPickItem, window} from 'vscode';
-import {Constants} from '../Constants';
-import {showInputBox, showQuickPick} from '../helpers/userInteraction';
-import {InfuraProjectItem} from '../Models/QuickPickItems';
-import {InfuraNetworkNode, InfuraProject} from '../Models/TreeItems';
-import {InfuraLayer} from '../Models/TreeItems/InfuraLayer';
-import {IInfuraEndpointDto, IInfuraProjectDto, IInfuraProjectQuickPick} from '../services/infuraService/InfuraDto';
-import {InfuraServiceClient} from '../services/infuraService/InfuraServiceClient';
-import {Telemetry} from '../TelemetryClient';
+import {Constants} from '@/Constants';
+import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
+import {InfuraProjectItem} from '@/Models/QuickPickItems';
+import {InfuraNetworkNode, InfuraProject} from '@/Models/TreeItems';
+import {InfuraLayer} from '@/Models/TreeItems';
+import {IInfuraEndpointDto, IInfuraProjectDto, IInfuraProjectQuickPick} from '@/services/infuraService/InfuraDto';
+import {InfuraServiceClient} from '@/services';
+import {Telemetry} from '@/TelemetryClient';
 
 export class InfuraResourceExplorer {
   public async createProject(existingProjects: string[] = []): Promise<InfuraProject> {
@@ -124,7 +124,7 @@ export class InfuraResourceExplorer {
       }
     );
 
-    return answer.label === Constants.projectAvailability.private ? true : false;
+    return answer.label === Constants.projectAvailability.private;
   }
 
   private async getInfuraProject(

@@ -1,3 +1,6 @@
+<!-- Copyright (c) 2022. Consensys Software Inc. All rights reserved. -->
+<!-- Licensed under the MIT license. -->
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -33,8 +36,11 @@
               <div id="node" class="required-app disabled">
                 <img src="{{root}}/images/NodeLogo.png" />
                 <div class="description">
-                  Required version:
-                  <span class="version">⌃14.0.0 and ⌵17.0.0</span>
+                  Required:
+                  <span class="version">{{node}}</span>
+                  <br />
+                  Installed:
+                  <span class="{{node-version}}">{{node-installed}}</span>
                 </div>
                 <a class="spinner" href="https://nodejs.org">
                   <span>Install Node.js</span>
@@ -43,8 +49,11 @@
               <div id="git" class="required-app disabled">
                 <img src="{{root}}/images/GitLogo.png" />
                 <div class="description">
-                  Required version:
-                  <span class="version">2.10.0</span>
+                  Required:
+                  <span class="version">{{git}}</span>
+                  <br />
+                  Installed:
+                  <span class="{{git-version}}">{{git-installed}}</span>
                 </div>
                 <a class="spinner" href="https://git-scm.com/downloads">
                   <span>Install Git</span>
@@ -53,8 +62,11 @@
               <div id="npm" class="required-app disabled">
                 <img src="{{root}}/images/NpmLogo.png" />
                 <div class="description">
-                  Required version:
-                  <span class="version">⌃6.14.15 and ⌵9.0.0</span>
+                  Required:
+                  <span class="version">{{npm}}</span>
+                  <br />
+                  Installed:
+                  <span class="{{npm-version}}">{{npm-installed}}</span>
                 </div>
                 <a id="installNpm" class="spinner action" title="Install NPM">
                   <span>Install NPM</span>
@@ -71,8 +83,11 @@
               <div id="truffle" class="required-app disabled">
                 <img src="{{root}}/images/TruffleLogo.svg" />
                 <div class="description">
-                  Required version:
-                  <span class="version">⌃5.0.0 and ⌵6.0.0</span>
+                  Required:
+                  <span class="version">{{truffle}}</span>
+                  <br />
+                  Installed:
+                  <span class="{{truffle-version}}">{{truffle-installed}}</span>
                 </div>
                 <a
                   id="installTruffle"
@@ -85,8 +100,11 @@
               <div id="ganache" class="required-app disabled">
                 <img src="{{root}}/images/GanacheLogo.png" />
                 <div class="description">
-                  Required version:
-                  <span class="version">⌃6.0.0 and ⌵8.0.0</span>
+                  Required:
+                  <span class="version">{{ganache}}</span>
+                  <br />
+                  Installed:
+                  <span class="{{ganache-version}}">{{ganache-installed}}</span>
                 </div>
                 <a
                   id="installGanache"

@@ -1,11 +1,12 @@
-import {Output, OutputLabel} from '@/Output';
+import {getAllTruffleWorkspaces} from '@/helpers/workspace';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as vscode from 'vscode';
+import {ThemeColor, ThemeIcon, Uri} from 'vscode';
 import {Constants} from '../Constants';
-import {getWorkspaceFolder} from './Utils';
+import {ContractService} from '@/services/contract/ContractService';
 
 //#region Utilities
 
@@ -179,12 +180,18 @@ export class FileStat implements vscode.FileStat {
  * Therefore, by using a `Uri` intersection type,
  * the same commands can be invoked from both the File Explorer and the Contract Explorer.
  */
-export type Entry = vscode.Uri & {type: vscode.FileType};
+export type Entry = vscode.Uri & {
+  type: vscode.FileType;
+  label: string;
+  iconPath: vscode.ThemeIcon;
+  description?: string;
+  contextValue?: string;
+};
 
 export type TElementTypes = {
   contextValue: string;
   type: vscode.FileType;
-  isWorkspace: boolean;
+  isWorkspaceFolder: boolean;
 };
 
 //#endregion
@@ -196,9 +203,8 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
 
   /**
    * @param _openFileCommand The command name for opening files
-   * @param _baseFolder optionally the root folder inside the workspace we start in.
    */
-  constructor(private _openFileCommand: string, private _baseFolder?: string) {
+  constructor(private _openFileCommand: string) {
     this._onDidChangeFile = new vscode.EventEmitter<vscode.FileChangeEvent[]>();
     this._onDidChangeTree = new vscode.EventEmitter<Entry[]>();
     this._elementTypes = this.getElementTypes();
@@ -207,19 +213,6 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
   // Refresh full view
   public refresh(): void {
     this._onDidChangeTree.fire();
-  }
-
-  getBaseUri(): vscode.Uri {
-    const workspaceFolder = getWorkspaceFolder();
-    if (workspaceFolder) {
-      if (this._baseFolder) {
-        return vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, this._baseFolder));
-      } else {
-        return workspaceFolder.uri;
-      }
-    }
-    // fallback
-    return vscode.Uri.file('.');
   }
 
   /**
@@ -234,17 +227,17 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
       {
         contextValue: Constants.fileExplorerConfig.contextValue.root,
         type: vscode.FileType.Directory,
-        isWorkspace: true,
+        isWorkspaceFolder: true,
       },
       {
         contextValue: Constants.fileExplorerConfig.contextValue.folder,
         type: vscode.FileType.Directory,
-        isWorkspace: false,
+        isWorkspaceFolder: false,
       },
       {
         contextValue: Constants.fileExplorerConfig.contextValue.file,
         type: vscode.FileType.File,
-        isWorkspace: false,
+        isWorkspaceFolder: false,
       },
     ];
   }
@@ -377,66 +370,107 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
 
   // tree data provider
   async getChildren(element?: Entry): Promise<Entry[]> {
-    Output.outputLine(OutputLabel.truffleForVSCode, `Getting Children of: ${element}`);
-
     if (element) {
+      // Reads files and directories of the given element
       const children = await this.readDirectory(element);
-      return children.map(([name, type]) => Object.assign(vscode.Uri.file(path.join(element.fsPath, name)), {type}));
-    }
 
-    const workspaceFolder = getWorkspaceFolder();
-    if (workspaceFolder) {
-      let children = await this.getSortedChildren(workspaceFolder.uri);
-
-      if (this._baseFolder) {
-        // we need to filter for this folder
-        const baseFolderUri = children?.filter((cVal) => {
-          return cVal[1] == vscode.FileType.Directory && cVal[0] === this._baseFolder;
-        });
-        // if we find it we change our children to be its.
-        if (baseFolderUri && baseFolderUri.length > 0) {
-          // just set this to our baseFolder.
-          children = children.filter((v) => this._baseFolder?.localeCompare(v[0]) == 0);
-          Output.outputLine(OutputLabel.truffleForVSCode, `Setting Base Folder to: ${this._baseFolder}`);
-        } else {
-          Output.outputLine(
-            OutputLabel.truffleForVSCode,
-            `no baseFolder: ${this._baseFolder} found in children of workspace: ${children}`
-          );
-          vscode.window.showInformationMessage(`No folder "${this._baseFolder}" found in workspace.`);
-          return [];
-        }
-      }
-      // return the mapped entries.
+      // Creates a new Entry for each child
       return children.map(([name, type]) =>
-        Object.assign(vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, name)), {type})
+        Object.assign(vscode.Uri.file(path.join(element.fsPath, name)), {
+          type,
+          label: name,
+          iconPath: type === vscode.FileType.Directory ? new ThemeIcon('file-directory') : new ThemeIcon('file-code'),
+          contextValue: this.getTreeItemContextValue(type, false),
+        })
       );
     }
-    return [];
-  }
 
-  async getSortedChildren(uri: vscode.Uri): Promise<[string, vscode.FileType][]> {
-    const children = await this.readDirectory(uri);
-    children.sort((a, b) => {
-      if (a[1] === b[1]) {
-        return a[0].localeCompare(b[0]);
-      }
-      return a[1] === vscode.FileType.Directory ? -1 : 1;
-    });
-    return children;
+    // The tree view elements
+    const elements: Entry[] = [];
+
+    // Gets the truffle workspaces
+    const workspaces = await getAllTruffleWorkspaces();
+
+    // Checks if there are any truffle workspaces
+    if (workspaces.length === 0) {
+      // Adds the error to the tree view elements
+      elements.push(
+        Object.assign({
+          type: vscode.FileType.File,
+          label: Constants.errorMessageStrings.TruffleConfigIsNotExist,
+          iconPath: new ThemeIcon('warning', new ThemeColor('errorForeground')),
+        })
+      );
+
+      return elements;
+    }
+
+    // Gets all contract folders from the truffle workspaces
+    await Promise.all(
+      workspaces.map(async (workspace) => {
+        try {
+          // Gets the contract folder
+          const contractFolder = await ContractService.getContractsFolderPath(workspace);
+
+          // Checks if the contract folder exists
+          if (fs.existsSync(contractFolder)) {
+            // Adds the contract folder to the tree view elements
+            elements.push(
+              Object.assign(Uri.parse(contractFolder), {
+                type: vscode.FileType.Directory,
+                label: path.basename(contractFolder),
+                iconPath: new ThemeIcon('file-directory'),
+                description: path.basename(path.dirname(contractFolder)),
+                contextValue: this.getTreeItemContextValue(vscode.FileType.Directory, true),
+              })
+            );
+          }
+        } catch (err) {
+          const error = err as Error;
+          // Adds the error to the tree view elements
+          elements.push(
+            Object.assign({
+              type: vscode.FileType.File,
+              label: error.message,
+              iconPath: new ThemeIcon('warning', new ThemeColor('errorForeground')),
+            })
+          );
+        }
+      })
+    );
+
+    // Check if the elements are empty
+    if (elements.length === 0) {
+      // Adds the error to the tree view elements
+      elements.push(
+        Object.assign({
+          type: vscode.FileType.File,
+          label: Constants.errorMessageStrings.ContractFolderNotExists,
+          iconPath: new ThemeIcon('warning', new ThemeColor('errorForeground')),
+        })
+      );
+    }
+
+    // Returns the elements
+    return elements;
   }
 
   getTreeItem(element: Entry): vscode.TreeItem {
     const treeItem = new vscode.TreeItem(
-      element,
+      element.label,
       element.type === vscode.FileType.Directory
         ? vscode.TreeItemCollapsibleState.Collapsed
         : vscode.TreeItemCollapsibleState.None
     );
-    if (element.type === vscode.FileType.File)
-      treeItem.command = {command: this._openFileCommand, title: 'Open File', arguments: [element]};
 
-    treeItem.contextValue = this.getTreeItemContextValue(element);
+    treeItem.iconPath = element.iconPath;
+    treeItem.description = element.description;
+    treeItem.contextValue = element.contextValue;
+
+    if (element.fsPath && element.type === vscode.FileType.File) {
+      treeItem.command = {command: this._openFileCommand, title: 'Open File', arguments: [element]};
+    }
+
     return treeItem;
   }
 
@@ -445,12 +479,13 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
    * The `context Value` offers a filter on the file explorer menu that filters action alternatives such as:
    * `Create Contract`, `Build Contracts`, `Build This Contract`, `Deploy Contracts` and `Debug Transaction`.
    *
-   * @param element The element from TreeItem.
+   * @param type Enumeration of file types. The types File and Directory can also be a symbolic links, in that case use FileType.File | FileType.SymbolicLink and FileType.Directory | FileType.SymbolicLink.
+   * @param isWorkspaceFolder Indicates if the element is a workspace folder.
    * @returns A string containing the contextValue property.
    */
-  getTreeItemContextValue(element: Entry): string {
-    const isWorkspace = path.basename(element.path) === Constants.fileExplorerConfig.contractFolder ? true : false;
-    return this._elementTypes.find((ft) => ft.type === element.type && ft.isWorkspace === isWorkspace)!.contextValue;
+  getTreeItemContextValue(type: vscode.FileType, isWorkspaceFolder: boolean): string {
+    return this._elementTypes.find((ft) => ft.type === type && ft.isWorkspaceFolder === isWorkspaceFolder)!
+      .contextValue;
   }
 }
 
@@ -464,7 +499,7 @@ export function registerFileExplorerView(
 ): vscode.TreeView<Entry> {
   const openFileCommand = `${commandPrefix}.openFile`;
   const refreshExplorerCommand = `${commandPrefix}.${viewName}.refreshExplorer`;
-  const treeDataProvider = new FileSystemProvider(openFileCommand, Constants.fileExplorerConfig.contractFolder);
+  const treeDataProvider = new FileSystemProvider(openFileCommand);
   vscode.commands.registerCommand(openFileCommand, (resource) => openResource(resource));
   vscode.commands.registerCommand(refreshExplorerCommand, (_) => treeDataProvider.refresh());
   return vscode.window.createTreeView(`${commandPrefix}.${viewName}`, {treeDataProvider});

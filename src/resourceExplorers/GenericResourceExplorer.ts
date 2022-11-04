@@ -1,13 +1,13 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from '../Constants';
-import {showInputBox} from '../helpers/userInteraction';
-import {GenericNetworkNode, GenericProject} from '../Models/TreeItems';
-import {GenericService} from '../services';
-import {Telemetry} from '../TelemetryClient';
-import {DialogResultValidator} from '../validators/DialogResultValidator';
-import {UrlValidator} from '../validators/UrlValidator';
+import {Constants} from '@/Constants';
+import {showInputBox} from '@/helpers/userInteraction';
+import {GenericNetworkNode, GenericProject} from '@/Models/TreeItems';
+import {GenericService} from '@/services';
+import {Telemetry} from '@/TelemetryClient';
+import {DialogResultValidator} from '@/validators/DialogResultValidator';
+import {UrlValidator} from '@/validators/UrlValidator';
 
 export class GenericResourceExplorer {
   public async selectProject(existingProjects: string[] = [], existingPorts: number[] = []): Promise<GenericProject> {
