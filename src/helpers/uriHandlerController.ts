@@ -17,9 +17,14 @@ export class UriHandlerController implements UriHandler {
     try {
       // Gets the command name
       const command = uri.path.replace('/', '');
+      const searchParams = new URLSearchParams(uri.query);
 
       // Gets the configuration arguments
-      const debugConfig = JSON.parse(uri.query) as TDebugInformation;
+      const debugConfig: TDebugInformation = {
+        txHash: searchParams.get('txHash')!,
+        workingDirectory: searchParams.get('workingDirectory')!,
+        providerUrl: searchParams.get('providerUrl')!,
+      };
 
       // Checks what kind of command it will need to execute
       switch (command) {
