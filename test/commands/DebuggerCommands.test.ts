@@ -67,18 +67,4 @@ describe('DebuggerCommands unit tests', () => {
     assert.strictEqual(mockGetTxInfos.calledOnce, true, 'getTransactionsInfo should be called');
     assert.strictEqual(createQuickPickFn.called, true, 'createQuickPic should be called');
   });
-
-  it('should show inputBox when debugNetwork.isLocalNetwork() is false', async () => {
-    // Arrange
-    sinon.stub(DebugNetwork.prototype, 'isLocalNetwork').returns(false);
-    const showInputBoxFn = sinon.stub(userInteraction, 'showInputBox').resolves('');
-
-    // Act
-    await debugCommands.DebuggerCommands.startSolidityDebugger();
-
-    // Assert
-    assert.strictEqual(showInputBoxFn.called, true, 'showInputBox should be called');
-    assert.strictEqual(mockGetTxHashes.calledOnce, false, "getLastTransactionHashes shouldn't be called");
-    assert.strictEqual(mockGetTxInfos.calledOnce, false, "getTransactionsInfo shouldn't be called");
-  });
 });

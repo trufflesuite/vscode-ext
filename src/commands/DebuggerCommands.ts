@@ -10,7 +10,7 @@ import {shortenHash} from '@/debugAdapter/functions';
 import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvider';
 import {Web3Wrapper} from '@/debugAdapter/web3Wrapper';
 import {getTruffleWorkspace, getPathByPlatform} from '@/helpers/workspace';
-import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
+import {showQuickPick} from '@/helpers/userInteraction';
 import {Telemetry} from '@/TelemetryClient';
 
 export namespace DebuggerCommands {
@@ -29,28 +29,17 @@ export namespace DebuggerCommands {
 
     // const workspaceFolder = workspace.getWorkspaceFolder(workspaceUri);
 
-    if (debugNetwork.isLocalNetwork()) {
-      // if local service then provide last transactions to choose
-      const transactionProvider = new TransactionProvider(web3, contractBuildDir);
-      const txHashesAsQuickPickItems = await getQuickPickItems(transactionProvider);
+    const transactionProvider = new TransactionProvider(web3, contractBuildDir);
+    const txHashesAsQuickPickItems = await getQuickPickItems(transactionProvider);
 
-      const txHashSelection = await showQuickPick(txHashesAsQuickPickItems, {
-        ignoreFocusOut: true,
-        placeHolder: 'Enter the transaction hash to debug',
-      });
+    const txHashSelection = await showQuickPick(txHashesAsQuickPickItems, {
+      ignoreFocusOut: true,
+      placeHolder: 'Enter the transaction hash to debug',
+    });
 
-      const txHash = txHashSelection.detail || txHashSelection.label;
+    const txHash = txHashSelection.detail || txHashSelection.label;
 
-      await startDebugging(txHash, workingDirectory, providerUrl);
-    } else {
-      // if remote network then require txHash
-      const placeHolder = 'Type the transaction hash you want to debug (0x...)';
-      const txHash = await showInputBox({placeHolder});
-
-      if (txHash) {
-        await startDebugging(txHash, workingDirectory, providerUrl);
-      }
-    }
+    await startDebugging(txHash, workingDirectory, providerUrl);
   }
 }
 
@@ -66,11 +55,7 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
   });
 }
 
-export function generateDebugAdapterConfig(
-  txHash: string,
-  workingDirectory: string,
-  providerUrl: string
-): DebugConfiguration {
+function generateDebugAdapterConfig(txHash: string, workingDirectory: string, providerUrl: string): DebugConfiguration {
   return {
     files: [],
     name: 'Debug Transactions',
