@@ -54,7 +54,7 @@ export class UriHandlerController implements UriHandler {
         txHash: searchParams.get('txHash')!,
         workingDirectory: searchParams.get('workingDirectory')!,
         providerUrl: searchParams.get('providerUrl')!,
-        fetchExternal: Boolean(searchParams.get('fetchExternal')!),
+        fetchExternal: searchParams.get('fetchExternal')! === 'true',
       };
 
       // Checks the command and executes the corresponding action.
