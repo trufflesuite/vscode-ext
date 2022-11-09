@@ -35,7 +35,7 @@ export namespace DebuggerCommands {
       const txHashesAsQuickPickItems = await getQuickPickItems(transactionProvider);
 
       const moreTxs = {
-        label: '$(edit) Manually enter the transaction hash',
+        label: '$(edit) Manually enter the transaction hash (experimental)',
         detail: 'Note that if the target network is forked, an attempt will be made to fetch the source',
         alwaysShow: true,
       } as QuickPickItem;
@@ -47,6 +47,9 @@ export namespace DebuggerCommands {
           {
             ignoreFocusOut: true,
             placeHolder: 'Select the transaction hash to debug',
+            // TODO: It would be nice to filter by contract's name and/or method name
+            // matchOnDescription: true,
+            // matchOnDetail: true,
           }
         );
       else {
