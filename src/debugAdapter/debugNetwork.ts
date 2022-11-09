@@ -60,11 +60,13 @@ export class DebugNetwork {
   private async loadNetworkForDebug(providerUrl?: string): Promise<INetwork> {
     const projects = this.getProjects();
     const host = await this.getHost(projects, providerUrl);
+    const projectOptions = (host.getParent() as LocalProject).options;
 
     const networkOptionsForDebug: INetworkOption = {
       host: host.url.hostname,
       network_id: host.networkId,
       port: host.port,
+      isForked: projectOptions.isForked,
     };
 
     const networkForDebug: INetwork = {
