@@ -54,9 +54,8 @@ describe('DebuggerCommands unit tests', () => {
     sinon.restore();
   });
 
-  it('should generate and show quickPick when debugNetwork.isLocalNetwork() is true', async () => {
+  it('should generate and show quickPick when debugger is called', async () => {
     // Arrange
-    sinon.stub(DebugNetwork.prototype, 'isLocalNetwork').returns(true);
     const createQuickPickFn = sinon.stub(userInteraction, 'showQuickPick').resolves({} as QuickPickItem);
 
     // Act

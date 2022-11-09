@@ -39,7 +39,7 @@ export namespace DebuggerCommands {
 
     const txHash = txHashSelection.detail || txHashSelection.label;
 
-    // TODO: Add a way to select if the user wants to fetch external contracts
+    // TODO: Add a way to select if the user wants to fetch external contracts. For now, we will keep it as false.
     const fetchExternal = false;
 
     await startDebugging(txHash, workingDirectory, providerUrl, fetchExternal);

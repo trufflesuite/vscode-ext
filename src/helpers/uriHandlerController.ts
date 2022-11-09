@@ -1,32 +1,7 @@
 import {startDebugging} from '@/commands';
 import {Constants} from '@/Constants';
+import {DebuggerTypes} from '@/debugAdapter/models/debuggerTypes';
 import {Uri, UriHandler, window} from 'vscode';
-
-/**
- * This type of URI handler is used to handle the `truffle-vscode` URI scheme.
- */
-type TDebugInformation = {
-  /**
-   * The transaction hash to debug.
-   */
-  txHash: string;
-
-  /**
-   * The working directory of the project.
-   */
-  workingDirectory: string;
-
-  /**
-   * The network provider url.
-   */
-  providerUrl: string;
-
-  /**
-   * The fetch external contracts flag.
-   */
-  fetchExternal: boolean;
-};
-
 /**
  * This enum is used to identify the different types of commands that can be executed.
  */
@@ -50,7 +25,7 @@ export class UriHandlerController implements UriHandler {
       const searchParams = new URLSearchParams(uri.query);
 
       // Convert the URI parameters to a TDebugInformation object.
-      const debugConfig: TDebugInformation = {
+      const launchRequest: DebuggerTypes.ILaunchRequestArguments = {
         txHash: searchParams.get('txHash')!,
         workingDirectory: searchParams.get('workingDirectory')!,
         providerUrl: searchParams.get('providerUrl')!,
@@ -62,10 +37,10 @@ export class UriHandlerController implements UriHandler {
         case Commands.debug:
           // Calls the debugger with the given parameters.
           await startDebugging(
-            debugConfig.txHash,
-            debugConfig.workingDirectory,
-            debugConfig.providerUrl,
-            debugConfig.fetchExternal
+            launchRequest.txHash,
+            launchRequest.workingDirectory,
+            launchRequest.providerUrl,
+            launchRequest.fetchExternal!
           );
           break;
       }
