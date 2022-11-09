@@ -39,7 +39,10 @@ export namespace DebuggerCommands {
 
     const txHash = txHashSelection.detail || txHashSelection.label;
 
-    await startDebugging(txHash, workingDirectory, providerUrl);
+    // TODO: Add a way to select if the user wants to fetch external contracts
+    const fetchExternal = false;
+
+    await startDebugging(txHash, workingDirectory, providerUrl, fetchExternal);
   }
 }
 
@@ -55,7 +58,20 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
   });
 }
 
-function generateDebugAdapterConfig(txHash: string, workingDirectory: string, providerUrl: string): DebugConfiguration {
+/**
+ * This function is reponsible to generate the debug configuration adapter with the given parameters.
+ *
+ * @param txHash A transaction hash.
+ * @param workingDirectory The working directory of the project.
+ * @param providerUrl The network provider url.
+ * @param fetchExternal Indicates if the debugger should fetch external contracts.
+ */
+function generateDebugAdapterConfig(
+  txHash: string,
+  workingDirectory: string,
+  providerUrl: string,
+  fetchExternal: boolean
+): DebugConfiguration {
   return {
     files: [],
     name: 'Debug Transactions',
@@ -65,12 +81,26 @@ function generateDebugAdapterConfig(txHash: string, workingDirectory: string, pr
     type: DEBUG_TYPE,
     workingDirectory,
     timeout: 30000,
+    fetchExternal,
   } as DebugConfiguration;
 }
 
-export async function startDebugging(txHash: string, workingDirectory: string, providerUrl: string): Promise<void> {
+/**
+ * This functions is responsible for starting the solidity debugger with the given parameters.
+ *
+ * @param txHash A transaction hash.
+ * @param workingDirectory The working directory of the project.
+ * @param providerUrl The network provider url.
+ * @param fetchExternal Indicates if the debugger should fetch external contracts.
+ */
+export async function startDebugging(
+  txHash: string,
+  workingDirectory: string,
+  providerUrl: string,
+  fetchExternal: boolean
+): Promise<void> {
   const workspaceFolder = workspace.getWorkspaceFolder(Uri.parse(workingDirectory));
-  const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
+  const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl, fetchExternal);
 
   debug.startDebugging(workspaceFolder, config).then(() => {
     Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandFinished');
