@@ -213,8 +213,9 @@ export default class RuntimeInterface extends EventEmitter {
     const project = projects.find((project) => {
       const network = project.getChildren().at(0) as LocalNetworkNode;
       return `${network.url.protocol}//${network.url.host}` === providerUrl;
-    })!;
-    return getChainId(project.options.forkedNetwork);
+    });
+
+    return project ? getChainId(project.options.forkedNetwork) : undefined;
   }
 
   public currentLine(): DebuggerTypes.IFrame {
