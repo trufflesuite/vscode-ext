@@ -29,56 +29,46 @@ export namespace DebuggerCommands {
     const web3 = new Web3Wrapper(debugNetworkOptions);
     const providerUrl = web3.getProviderUrl();
 
-    if (debugNetwork.isLocalNetwork()) {
-      // if local service then provide last transactions to choose
-      const transactionProvider = new TransactionProvider(web3, contractBuildDir);
-      const txHashesAsQuickPickItems = await getQuickPickItems(transactionProvider);
+    // if local service then provide last transactions to choose
+    const transactionProvider = new TransactionProvider(web3, contractBuildDir);
+    const txHashesAsQuickPickItems = await getQuickPickItems(transactionProvider);
 
-      const moreTxs = {
-        label: '$(edit) Manually enter the transaction hash (experimental)',
-        detail: 'Note that if the target network is forked, an attempt will be made to fetch the source',
-        alwaysShow: true,
-      } as QuickPickItem;
+    const moreTxs = {
+      label: '$(edit) Manually enter the transaction hash (experimental)',
+      detail: 'Note that if the target network is forked, an attempt will be made to fetch the source',
+      alwaysShow: true,
+    } as QuickPickItem;
 
-      let txHashSelection;
-      if (txHashesAsQuickPickItems.length > 0)
-        txHashSelection = await showQuickPick(
-          [...txHashesAsQuickPickItems, {kind: QuickPickItemKind.Separator, label: ''}, moreTxs],
-          {
-            ignoreFocusOut: true,
-            placeHolder: 'Select the transaction hash to debug',
-            // TODO: It would be nice to filter by contract's name and/or method name
-            // matchOnDescription: true,
-            // matchOnDetail: true,
-          }
-        );
-      else {
-        txHashSelection = moreTxs;
-      }
-
-      let txHash;
-      if (txHashSelection === moreTxs) {
-        txHash = await showInputBox({
-          placeHolder: 'Type the transaction hash you want to debug (0x...)',
-          validateInput: function (value: string) {
-            const match = TX_REGEX.exec(value.trim());
-            return match ? '' : 'The input does not look like a transaction, e.g., make sure it starts with `0x`';
-          },
-        });
-      } else {
-        txHash = txHashSelection.detail || txHashSelection.label;
-      }
-
-      await startDebugging(txHash, workingDirectory, providerUrl);
-    } else {
-      // if remote network then require txHash
-      const placeHolder = 'Type the transaction hash you want to debug (0x...)';
-      const txHash = await showInputBox({placeHolder});
-
-      if (txHash) {
-        await startDebugging(txHash, workingDirectory, providerUrl);
-      }
+    let txHashSelection;
+    if (txHashesAsQuickPickItems.length > 0)
+      txHashSelection = await showQuickPick(
+        [...txHashesAsQuickPickItems, {kind: QuickPickItemKind.Separator, label: ''}, moreTxs],
+        {
+          ignoreFocusOut: true,
+          placeHolder: 'Select the transaction hash to debug',
+          // TODO: It would be nice to filter by contract's name and/or method name
+          // matchOnDescription: true,
+          // matchOnDetail: true,
+        }
+      );
+    else {
+      txHashSelection = moreTxs;
     }
+
+    let txHash;
+    if (txHashSelection === moreTxs) {
+      txHash = await showInputBox({
+        placeHolder: 'Type the transaction hash you want to debug (0x...)',
+        validateInput: function (value: string) {
+          const match = TX_REGEX.exec(value.trim());
+          return match ? '' : 'The input does not look like a transaction, e.g., make sure it starts with `0x`';
+        },
+      });
+    } else {
+      txHash = txHashSelection.detail || txHashSelection.label;
+    }
+
+    await startDebugging(txHash, workingDirectory, providerUrl);
   }
 }
 
@@ -94,8 +84,22 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
   });
 }
 
-function generateDebugAdapterConfig(txHash: string, workingDirectory: string, providerUrl: string): DebugConfiguration {
-  return {
+/**
+ * This functions is responsible for starting the solidity debugger with the given parameters.
+ *
+ * @param txHash A transaction hash.
+ * @param workingDirectory The working directory of the project.
+ * @param providerUrl The network provider url.
+ * @param fetchExternal Indicates if the debugger should fetch external contracts.
+ */
+export async function startDebugging(
+  txHash: string,
+  workingDirectory: string,
+  providerUrl: string,
+  fetchExternal?: boolean
+): Promise<void> {
+  const workspaceFolder = workspace.getWorkspaceFolder(Uri.parse(workingDirectory));
+  const config: DebugConfiguration = {
     files: [],
     name: 'Debug Transactions',
     providerUrl,
@@ -104,12 +108,8 @@ function generateDebugAdapterConfig(txHash: string, workingDirectory: string, pr
     type: DEBUG_TYPE,
     workingDirectory,
     timeout: 30000,
+    fetchExternal,
   };
-}
-
-export async function startDebugging(txHash: string, workingDirectory: string, providerUrl: string): Promise<void> {
-  const workspaceFolder = workspace.getWorkspaceFolder(Uri.parse(workingDirectory));
-  const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
 
   debug.startDebugging(workspaceFolder, config).then(() => {
     Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandFinished');

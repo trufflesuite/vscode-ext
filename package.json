@@ -67,7 +67,8 @@
     "onCommand:truffle-vscode.views.dashboard.restartDashboardServer",
     "onCommand:truffle-vscode.views.dashboard.openDashboard",
     "onCommand:truffle-vscode.views.dashboard.copyRPCEndpointAddress",
-    "onDebug"
+    "onDebug",
+    "onUri"
   ],
   "contributes": {
     "configuration": {

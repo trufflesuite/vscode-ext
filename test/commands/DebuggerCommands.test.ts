@@ -54,9 +54,8 @@ describe('DebuggerCommands unit tests', () => {
     sinon.restore();
   });
 
-  it('should `showinputBox` when debugNetwork.isLocalNetwork() is true', async () => {
+  it('should `showinputBox` when no more txs', async () => {
     // Arrange
-    sinon.stub(DebugNetwork.prototype, 'isLocalNetwork').returns(true);
     const showInputBoxFn = sinon.stub(userInteraction, 'showInputBox').resolves('');
 
     // Act
@@ -68,10 +67,9 @@ describe('DebuggerCommands unit tests', () => {
     assert.strictEqual(showInputBoxFn.called, true, 'showInputBox should be called');
   });
 
-  it('should `showQuickPick` when debugNetwork.isLocalNetwork() is true', async () => {
+  it('should `showQuickPick` when there are more txs', async () => {
     // Arrange
     mockGetTxInfos.resolves([{hash: '0x1234', contractName: 'MetaCoin', methodName: 'constructor()'}]);
-    sinon.stub(DebugNetwork.prototype, 'isLocalNetwork').returns(true);
     const createQuickPickFn = sinon.stub(userInteraction, 'showQuickPick').resolves({} as QuickPickItem);
 
     // Act
@@ -81,19 +79,5 @@ describe('DebuggerCommands unit tests', () => {
     assert.strictEqual(mockGetTxHashes.calledOnce, true, 'getLastTransactionHashes should be called');
     assert.strictEqual(mockGetTxInfos.calledOnce, true, 'getTransactionsInfo should be called');
     assert.strictEqual(createQuickPickFn.called, true, 'createQuickPic should be called');
-  });
-
-  it('should show inputBox when debugNetwork.isLocalNetwork() is false', async () => {
-    // Arrange
-    sinon.stub(DebugNetwork.prototype, 'isLocalNetwork').returns(false);
-    const showInputBoxFn = sinon.stub(userInteraction, 'showInputBox').resolves('');
-
-    // Act
-    await debugCommands.DebuggerCommands.startSolidityDebugger();
-
-    // Assert
-    assert.strictEqual(showInputBoxFn.called, true, 'showInputBox should be called');
-    assert.strictEqual(mockGetTxHashes.calledOnce, false, "getLastTransactionHashes shouldn't be called");
-    assert.strictEqual(mockGetTxInfos.calledOnce, false, "getTransactionsInfo shouldn't be called");
   });
 });

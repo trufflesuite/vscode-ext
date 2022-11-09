@@ -37,15 +37,6 @@ export class DebugNetwork {
     return this._networkForDebug;
   }
 
-  // Port and host are defined
-  public isLocalNetwork() {
-    if (!this._networkForDebug || !this._networkForDebug.options) {
-      throw new Error('Network is not defined. Try to call this.load()');
-    }
-    const options = this._networkForDebug.options;
-    return !!(options.host && options.port);
-  }
-
   private async loadConfiguration(): Promise<IConfiguration> {
     const configuration = await this._basedConfig!.getConfiguration(this.workingDirectory);
 

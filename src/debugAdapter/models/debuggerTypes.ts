@@ -25,9 +25,10 @@ export namespace DebuggerTypes {
     trace?: boolean;
     host?: string;
     txHash: string;
-    files: string[];
+    files?: string[];
     workingDirectory: string;
     providerUrl: string;
+    fetchExternal?: boolean;
   }
 
   export class LaunchedEvent implements DebugProtocol.Event {
