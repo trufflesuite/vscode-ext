@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {Constants} from '@/Constants';
-import {AbstractWorkspaceManager} from '@/helpers/workspace';
+import {AbstractWorkspace, resolveAllWorkspaces, WorkspaceType} from '@/helpers/AbstractWorkspace';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as path from 'path';
@@ -183,7 +183,7 @@ export class FileStat implements vscode.FileStat {
  * Therefore, by using a `Uri` intersection type,
  * the same commands can be invoked from both the File Explorer and the Contract Explorer.
  */
-export type EntryOld = vscode.Uri & {type: vscode.FileType; workspaceType?: AbstractWorkspaceManager.WorkspaceType};
+export type EntryOld = vscode.Uri & {type: vscode.FileType; workspaceType?: WorkspaceType};
 
 /**
  * Represents a top-level `TreeItem` for our file view...
@@ -417,8 +417,8 @@ export class FileSystemProvider implements vscode.TreeDataProvider<TreeItemEntry
     if (workspaceFolder) {
       const children = await this.getSortedChildren(workspaceFolder.uri);
       //workspace stuff...
-      const abstractWorkspaces = AbstractWorkspaceManager.resolveAllWorkspaces();
-      const workspaceMap = new Map<string, AbstractWorkspaceManager.AbstractWorkspace>();
+      const abstractWorkspaces = resolveAllWorkspaces();
+      const workspaceMap = new Map<string, AbstractWorkspace>();
       abstractWorkspaces.map((aw) => workspaceMap.set(aw.dirName, aw));
       return children.map<TreeItemEntry>(([name, type]) => {
         let icon: vscode.ThemeIcon | undefined = undefined;
@@ -428,9 +428,9 @@ export class FileSystemProvider implements vscode.TreeDataProvider<TreeItemEntry
           const ws = workspaceMap.get(name);
           const workspaceType = ws?.workspaceType;
           desc = ws?.configName;
-          if (workspaceType === AbstractWorkspaceManager.WorkspaceType.HARDHAT) {
+          if (workspaceType === WorkspaceType.HARDHAT) {
             icon = new vscode.ThemeIcon('mortar-board');
-          } else if (workspaceType === AbstractWorkspaceManager.WorkspaceType.TRUFFLE) {
+          } else if (workspaceType === WorkspaceType.TRUFFLE) {
             icon = new vscode.ThemeIcon('heart');
           }
         }

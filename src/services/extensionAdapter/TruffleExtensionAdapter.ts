@@ -2,24 +2,23 @@
 // Licensed under the MIT license.
 
 import {TruffleCommands} from '@/commands';
-import {AbstractWorkspaceManager} from '@/helpers/workspace';
+import {AbstractWorkspace, WorkspaceType} from '@/helpers/AbstractWorkspace';
 import {Uri} from 'vscode';
 import {IExtensionAdapter} from './IExtensionAdapter';
-import WorkspaceType = AbstractWorkspaceManager.WorkspaceType;
 
 export class TruffleExtensionAdapter implements IExtensionAdapter {
   public validateExtension = async (): Promise<void> => {
     // throw new Error("Method not implemented.");
   };
 
-  public build = async (_?: AbstractWorkspaceManager.AbstractWorkspace, contractUri?: Uri): Promise<void> => {
+  public build = async (ws: AbstractWorkspace, contractUri?: Uri): Promise<void> => {
     // TODO: rework this code to work with the workspace details.
-    return TruffleCommands.buildContracts(contractUri);
+    return TruffleCommands.buildContracts(ws, contractUri);
   };
 
-  public deploy = async (uri?: Uri): Promise<void> => {
-    return TruffleCommands.deployContracts(uri);
+  public deploy = async (ws: AbstractWorkspace): Promise<void> => {
+    return TruffleCommands.deployContracts(ws);
   };
 
-  extensionType: AbstractWorkspaceManager.WorkspaceType = WorkspaceType.TRUFFLE;
+  extensionType: WorkspaceType = WorkspaceType.TRUFFLE;
 }

@@ -1,31 +1,27 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from '@/Constants';
-import {AbstractWorkspaceManager} from '@/helpers/workspace';
+import {getWorkspaceForUri, WorkspaceType} from '@/helpers/AbstractWorkspace';
 import {Output, OutputLabel} from '@/Output';
 
-import {HardHatExtensionAdapter, IExtensionAdapter, TruffleExtensionAdapter} from '@/services/extensionAdapter';
-import {Memento, Uri, window} from 'vscode';
-import {userSettings} from '../helpers';
+import {
+  HardHatExtensionAdapter,
+  IExtensionAdapter,
+  TruffleExtensionAdapter,
+  UnknownExtensionAdapter,
+} from '@/services/extensionAdapter';
+import {Uri, window} from 'vscode';
 
 class SdkCoreCommands {
-  public extensionAdapter!: IExtensionAdapter;
-
   private extensionAdapters = new Map<string, IExtensionAdapter>();
 
-  public async initialize(_globalState: Memento): Promise<void> {
-    const sdk = await this.getCoreSdk();
-    this.getExtensionAdapter(sdk.userValue ? sdk.userValue : sdk.defaultValue);
-  }
-
-  private getExtensionAdapter(sdkVal: string): IExtensionAdapter | undefined {
+  public getExtensionAdapter(sdkVal: WorkspaceType): IExtensionAdapter | undefined {
     if (this.extensionAdapters.has(sdkVal)) {
       return this.extensionAdapters.get(sdkVal);
     }
     // let's initialise it otherwise
     const adapter = this.initExtensionAdapter(sdkVal);
-    console.log(`getExtensionAdapter: `, {adapter, sdkVal});
+    // console.log(`getExtensionAdapter: `, {adapter, sdkVal});
     adapter.validateExtension().then(
       (_) => {
         Output.outputLine(
@@ -47,11 +43,11 @@ class SdkCoreCommands {
    * @param contractUri if provided, it is the `Uri` of the smart contract to be compiled.
    */
   public async build(contractUri?: Uri): Promise<void> {
-    const ws = await AbstractWorkspaceManager.getWorkspaceForUri(contractUri);
+    const ws = await getWorkspaceForUri(contractUri);
     const buildUri = contractUri ? contractUri : ws.workspace;
-    console.log(`build: `, {contractUri, buildUri, type: ws.workspaceType, ret: ws});
-    return this.getExtensionAdapter(ws.workspaceType)!.build(ws, buildUri);
-    // return this.extensionAdapter.build(contractUri);
+    const adapter = await this.getExtensionAdapter(ws.workspaceType);
+    console.debug(`build:debug::`, {ws, buildUri, adapter});
+    return adapter!.build(ws, buildUri);
   }
 
   /**
@@ -60,21 +56,20 @@ class SdkCoreCommands {
    * @param contractUri FIXME: Is this used?
    */
   public async deploy(contractUri?: Uri): Promise<void> {
-    return this.extensionAdapter.deploy(contractUri);
+    const ws = await getWorkspaceForUri(contractUri);
+    const deployUri = contractUri ? contractUri : ws.workspace;
+    const adapter = await this.getExtensionAdapter(ws.workspaceType);
+    return adapter!.deploy(ws, deployUri);
   }
 
-  private async getCoreSdk() {
-    return userSettings.getConfigurationAsync(Constants.userSettings.coreSdkSettingsKey);
-  }
-
-  private initExtensionAdapter(sdk: string): IExtensionAdapter {
+  private initExtensionAdapter(sdk: WorkspaceType): IExtensionAdapter {
     switch (sdk) {
-      case Constants.coreSdk.hardhat:
+      case WorkspaceType.HARDHAT:
         return new HardHatExtensionAdapter();
-      case Constants.coreSdk.truffle:
+      case WorkspaceType.TRUFFLE:
         return new TruffleExtensionAdapter();
       default:
-        return new TruffleExtensionAdapter();
+        return new UnknownExtensionAdapter();
     }
   }
 }

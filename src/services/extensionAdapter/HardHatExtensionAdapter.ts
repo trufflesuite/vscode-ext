@@ -3,19 +3,18 @@
 
 import {buildContracts} from '@/commands/HardhatCommands';
 import {NotificationOptions} from '@/Constants';
+import {AbstractWorkspace, WorkspaceType} from '@/helpers/AbstractWorkspace';
 import {showNotification} from '@/helpers/userInteraction';
-import {AbstractWorkspaceManager} from '@/helpers/workspace';
 import {IExtensionAdapter} from '@/services/extensionAdapter/IExtensionAdapter';
 import {Constants} from '@/constants';
 import {Uri} from 'vscode';
-import WorkspaceType = AbstractWorkspaceManager.WorkspaceType;
 
 export class HardHatExtensionAdapter implements IExtensionAdapter {
-  build(workspace?: AbstractWorkspaceManager.AbstractWorkspace, contractUri?: Uri): Promise<void> {
+  build(workspace: AbstractWorkspace, contractUri?: Uri): Promise<void> {
     return buildContracts(workspace, contractUri);
   }
 
-  async deploy(_uri?: Uri): Promise<void> {
+  async deploy(_: AbstractWorkspace, _uri?: Uri): Promise<void> {
     await showNotification({
       message: Constants.errorMessageStrings.HHNoDefaultDeploy,
       type: NotificationOptions.error,
@@ -26,5 +25,5 @@ export class HardHatExtensionAdapter implements IExtensionAdapter {
     return Promise.resolve(undefined);
   }
 
-  extensionType: AbstractWorkspaceManager.WorkspaceType = WorkspaceType.HARDHAT;
+  extensionType: WorkspaceType = WorkspaceType.HARDHAT;
 }

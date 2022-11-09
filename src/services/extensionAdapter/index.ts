@@ -3,4 +3,5 @@
 
 export * from './IExtensionAdapter';
 export * from './TruffleExtensionAdapter';
+export * from './UnknownExtensionAdapter';
 export * from './HardHatExtensionAdapter';

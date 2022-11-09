@@ -1,13 +1,14 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {getWorkspaceForUri} from '@/helpers/AbstractWorkspace';
 import {getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
 import {commands, ProgressLocation, window} from 'vscode';
 import {Constants, RequiredApps, OptionalApps, AppTypes} from '@/Constants';
-import {AbstractWorkspaceManager, getPathByPlatform, getWorkspaceRoot} from '@/helpers/workspace';
+import {getPathByPlatform, getWorkspaceRoot} from '@/helpers/workspace';
 import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '@/TelemetryClient';
 import {executeCommand, tryExecuteCommand} from './command';
@@ -191,7 +192,7 @@ export namespace required {
    * @param packageName - the npm specific name
    */
   const getNpmPackageVersion: (packageName: string) => VersionCallback = (packageName: string) => async () => {
-    const workspace = await AbstractWorkspaceManager.getWorkspaceForUri();
+    const workspace = await getWorkspaceForUri();
     const platformPath = getPathByPlatform(workspace.workspace);
     return await getVersionWithArgs(
       platformPath,

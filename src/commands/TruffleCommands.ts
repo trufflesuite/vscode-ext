@@ -1,6 +1,7 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {AbstractWorkspace, getWorkspaceForUri} from '@/helpers/AbstractWorkspace';
 import {INetwork} from '@/helpers/ConfigurationReader';
 import {TruffleConfig} from '@/helpers/TruffleConfiguration';
 import {mnemonicToSeed} from 'bip39';
@@ -10,7 +11,7 @@ import path from 'path';
 import {QuickPickItem, Uri, window, commands, QuickPickItemKind} from 'vscode';
 import {Constants, RequiredApps} from '@/Constants';
 import {outputCommandHelper, telemetryHelper, vscodeEnvironment} from '../helpers';
-import {getTruffleWorkspace} from '@/helpers/workspace';
+// import {getTruffleWorkspace} from '@/helpers/workspace';
 import {required} from '@/helpers/required';
 
 import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from '@/helpers/userInteraction';
@@ -55,10 +56,11 @@ export namespace TruffleCommands {
   /**
    * Triggers the Truffle command line compiler using `npx`.
    *
+   * @param ws the workspace we are building in
    * @param contractUri if provided, compiles only `contractUri`.
    * @returns
    */
-  export async function buildContracts(contractUri?: Uri): Promise<void> {
+  export async function buildContracts(ws: AbstractWorkspace, contractUri?: Uri): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.buildContracts.commandStarted');
 
     if (!(await required.checkAppsSilent(RequiredApps.truffle))) {
@@ -67,10 +69,10 @@ export namespace TruffleCommands {
       return;
     }
 
-    const truffleWorkspace = await getTruffleWorkspace(contractUri);
-    const workspace = truffleWorkspace.workspace;
+    const workspace = ws.workspace;
+
     const contractDirectory = getPathByPlatform(workspace);
-    const args: string[] = [RequiredApps.truffle, 'compile', '--config', truffleWorkspace.truffleConfigName];
+    const args: string[] = [RequiredApps.truffle, 'compile', '--config', ws.configName];
 
     if (contractUri) {
       if (fs.lstatSync(contractUri.fsPath).isFile()) args.push(path.basename(contractUri.fsPath));
@@ -91,19 +93,16 @@ export namespace TruffleCommands {
    * Triggers the `migrate` option of the Truffle command line interface
    * using `npx`.
    *
-   * @param contractUri FIXME: Is this used?
+   * @param ws the workspace we are deploying from.
    */
-  export async function deployContracts(contractUri?: Uri) {
+  export async function deployContracts(ws: AbstractWorkspace) {
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandStarted');
 
-    const truffleWorkspace = await getTruffleWorkspace(contractUri);
-    const truffleConfigUri = getPathByPlatform(truffleWorkspace.truffleConfig);
+    const truffleConfigUri = getPathByPlatform(ws.configPath);
 
     const deployDestinations = [];
     deployDestinations.push(...getDefaultDeployDestinations(truffleConfigUri));
-    deployDestinations.push(
-      ...(await getTruffleDeployDestinations(truffleConfigUri, truffleWorkspace.truffleConfigName))
-    );
+    deployDestinations.push(...(await getTruffleDeployDestinations(truffleConfigUri, ws.configName)));
     deployDestinations.push(...(await getTreeDeployDestinations(truffleConfigUri)));
 
     const uniqueDestinations = removeDuplicateNetworks(deployDestinations);
@@ -208,7 +207,7 @@ export namespace TruffleCommands {
     let folderPath: string;
 
     if (folderUri === undefined) {
-      const truffleWorkspace = await getTruffleWorkspace();
+      const truffleWorkspace = await getWorkspaceForUri(folderUri);
       try {
         folderPath = await ContractService.getContractsFolderPath(truffleWorkspace);
       } catch (err) {

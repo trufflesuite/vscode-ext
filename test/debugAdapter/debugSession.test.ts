@@ -1,4 +1,4 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import assert from 'assert';
@@ -22,7 +22,7 @@ describe('DebugSession unit tests', () => {
   it("shouldn't contain vscode module as a dependency", (done) => {
     // vscode module can be resolved inside of the extension without any issues
     // that's why we should spawn independent node process to check
-    const debugSessionModule = pathJoin(__dirname, '../../src/debugAdapter/debugSession.js');
+    const debugSessionModule = pathJoin(__dirname, '../../src/debugAdapter/debugSession.ts');
     const debugSessionResolvingProcess = spawn(process.execPath, [debugSessionModule]);
     debugSessionResolvingProcess.on('close', () => {
       done();

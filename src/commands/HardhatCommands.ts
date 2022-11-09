@@ -6,12 +6,12 @@ import {Constants, NotificationOptions, OptionalApps} from '@/Constants';
 import {outputCommandHelper} from '@/helpers';
 import {required} from '@/helpers/required';
 import {showIgnorableNotification, showNotification} from '@/helpers/userInteraction';
-import {AbstractWorkspaceManager} from '@/helpers/workspace';
+import {AbstractWorkspace} from '@/helpers/AbstractWorkspace';
 import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '@/TelemetryClient';
 import {commands, Uri} from 'vscode';
 
-export async function buildContracts(ws?: AbstractWorkspaceManager.AbstractWorkspace, uri?: Uri): Promise<void> {
+export async function buildContracts(ws: AbstractWorkspace, uri?: Uri): Promise<void> {
   Telemetry.sendEvent('HardhatCommands.buildContracts.commandStarted');
   if (!(await required.checkAppsSilent(OptionalApps.hardhat))) {
     Telemetry.sendEvent('HardhatCommands.buildContracts.hardhatInstallationMissing');
@@ -23,7 +23,7 @@ export async function buildContracts(ws?: AbstractWorkspaceManager.AbstractWorks
     return;
   }
 
-  const workspaceDir = ws!.workspace.fsPath;
+  const workspaceDir = ws.workspace.fsPath;
 
   Output.outputLine(OutputLabel.hardhatCommands, `compiling: ${JSON.stringify(uri)} : ${workspaceDir}`);
   const args: string[] = [OptionalApps.hardhat, 'compile'];
