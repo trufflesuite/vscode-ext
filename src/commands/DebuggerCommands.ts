@@ -10,7 +10,7 @@ import {shortenHash} from '@/debugAdapter/functions';
 import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvider';
 import {Web3Wrapper} from '@/debugAdapter/web3Wrapper';
 import {getTruffleWorkspace, getPathByPlatform} from '@/helpers/workspace';
-import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
+import {showQuickPick} from '@/helpers/userInteraction';
 import {Telemetry} from '@/TelemetryClient';
 
 export namespace DebuggerCommands {
@@ -29,28 +29,20 @@ export namespace DebuggerCommands {
 
     // const workspaceFolder = workspace.getWorkspaceFolder(workspaceUri);
 
-    if (debugNetwork.isLocalNetwork()) {
-      // if local service then provide last transactions to choose
-      const transactionProvider = new TransactionProvider(web3, contractBuildDir);
-      const txHashesAsQuickPickItems = await getQuickPickItems(transactionProvider);
+    const transactionProvider = new TransactionProvider(web3, contractBuildDir);
+    const txHashesAsQuickPickItems = await getQuickPickItems(transactionProvider);
 
-      const txHashSelection = await showQuickPick(txHashesAsQuickPickItems, {
-        ignoreFocusOut: true,
-        placeHolder: 'Enter the transaction hash to debug',
-      });
+    const txHashSelection = await showQuickPick(txHashesAsQuickPickItems, {
+      ignoreFocusOut: true,
+      placeHolder: 'Enter the transaction hash to debug',
+    });
 
-      const txHash = txHashSelection.detail || txHashSelection.label;
+    const txHash = txHashSelection.detail || txHashSelection.label;
 
-      await startDebugging(txHash, workingDirectory, providerUrl);
-    } else {
-      // if remote network then require txHash
-      const placeHolder = 'Type the transaction hash you want to debug (0x...)';
-      const txHash = await showInputBox({placeHolder});
+    // TODO: Add a way to select if the user wants to fetch external contracts. For now, we will keep it as false.
+    const fetchExternal = false;
 
-      if (txHash) {
-        await startDebugging(txHash, workingDirectory, providerUrl);
-      }
-    }
+    await startDebugging(txHash, workingDirectory, providerUrl, fetchExternal);
   }
 }
 
@@ -66,10 +58,19 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
   });
 }
 
-export function generateDebugAdapterConfig(
+/**
+ * This function is reponsible to generate the debug configuration adapter with the given parameters.
+ *
+ * @param txHash A transaction hash.
+ * @param workingDirectory The working directory of the project.
+ * @param providerUrl The network provider url.
+ * @param fetchExternal Indicates if the debugger should fetch external contracts.
+ */
+function generateDebugAdapterConfig(
   txHash: string,
   workingDirectory: string,
-  providerUrl: string
+  providerUrl: string,
+  fetchExternal: boolean
 ): DebugConfiguration {
   return {
     files: [],
@@ -80,12 +81,26 @@ export function generateDebugAdapterConfig(
     type: DEBUG_TYPE,
     workingDirectory,
     timeout: 30000,
+    fetchExternal,
   } as DebugConfiguration;
 }
 
-export async function startDebugging(txHash: string, workingDirectory: string, providerUrl: string): Promise<void> {
+/**
+ * This functions is responsible for starting the solidity debugger with the given parameters.
+ *
+ * @param txHash A transaction hash.
+ * @param workingDirectory The working directory of the project.
+ * @param providerUrl The network provider url.
+ * @param fetchExternal Indicates if the debugger should fetch external contracts.
+ */
+export async function startDebugging(
+  txHash: string,
+  workingDirectory: string,
+  providerUrl: string,
+  fetchExternal: boolean
+): Promise<void> {
   const workspaceFolder = workspace.getWorkspaceFolder(Uri.parse(workingDirectory));
-  const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl);
+  const config = generateDebugAdapterConfig(txHash, workingDirectory, providerUrl, fetchExternal);
 
   debug.startDebugging(workspaceFolder, config).then(() => {
     Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandFinished');
