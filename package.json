@@ -605,7 +605,7 @@
               },
               "disableFetchExternal": {
                 "type": "boolean",
-                "description": "When set, do not try to fetch external contract sources when debugging a forked network instance.",
+                "description": "When set, do not try to fetch external contract sources when debugging a forked network instance. When the network is not being forked, this flag is ignored.",
                 "default": false
               }
             }
