@@ -17,18 +17,29 @@ export namespace DebuggerTypes {
     column: number;
   }
 
+  /**
+   * Represents the arguments needed to initiate a new Truffle `DebugSession` request.
+   *
+   * All properties in this interface are defined as optional given that the Debugger
+   * can be started from a [launch configuration](https://code.visualstudio.com/docs/editor/debugging#_launch-configurations),
+   * where any property might be missing.
+   */
+  export interface DebugArgs {
+    txHash?: string;
+    workingDirectory?: string;
+    providerUrl?: string;
+    disableFetchExternal?: boolean;
+  }
+
   // The interface should always match schema in the package.json.
-  export interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
+  export interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments, DebugArgs {
+    // TODO: Are these attributes being used? If not we should remove it in a future PR.
     // Automatically stop target after launch. If not specified, target does not stop.
     stopOnEntry?: boolean;
     // enable logging the Debug Adapter Protocol
     trace?: boolean;
     host?: string;
-    txHash: string;
     files?: string[];
-    workingDirectory: string;
-    providerUrl: string;
-    fetchExternal?: boolean;
   }
 
   export class LaunchedEvent implements DebugProtocol.Event {

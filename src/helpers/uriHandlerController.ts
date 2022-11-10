@@ -1,7 +1,7 @@
 import {startDebugging} from '@/commands';
 import {Constants} from '@/Constants';
-import {DebuggerTypes} from '@/debugAdapter/models/debuggerTypes';
 import {Uri, UriHandler, window} from 'vscode';
+
 /**
  * This enum is used to identify the different types of commands that can be executed.
  */
@@ -25,23 +25,16 @@ export class UriHandlerController implements UriHandler {
       const searchParams = new URLSearchParams(uri.query);
 
       // Convert the URI parameters to a TDebugInformation object.
-      const launchRequest: DebuggerTypes.ILaunchRequestArguments = {
-        txHash: searchParams.get('txHash')!,
-        workingDirectory: searchParams.get('workingDirectory')!,
-        providerUrl: searchParams.get('providerUrl')!,
-        fetchExternal: searchParams.get('fetchExternal')! === 'true',
-      };
+      const txHash = searchParams.get('txHash')!;
+      const workingDirectory = searchParams.get('workingDirectory')!;
+      const providerUrl = searchParams.get('providerUrl')!;
+      const disableFetchExternal = !!searchParams.get('disableFetchExternal');
 
       // Checks the command and executes the corresponding action.
       switch (command) {
         case Commands.debug:
           // Calls the debugger with the given parameters.
-          await startDebugging(
-            launchRequest.txHash,
-            launchRequest.workingDirectory,
-            launchRequest.providerUrl,
-            launchRequest.fetchExternal!
-          );
+          await startDebugging(txHash, workingDirectory, providerUrl, disableFetchExternal);
           break;
       }
     } catch (error) {

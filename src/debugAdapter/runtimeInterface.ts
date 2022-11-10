@@ -134,27 +134,25 @@ export default class RuntimeInterface extends EventEmitter {
   /**
    * This function attaches the debugger and starts the debugging process.
    *
-   * @param txHash The transaction hash to debug.
-   * @param workingDirectory The workspace path where the truffle project is located.
-   * @param providerUrl The url provider where the contracts were deployed.
+   * @param args The `DebugArgs` to initialize the `DebugSession` this `RuntimeInterface` belong to.
    * @returns
    */
-  public async attach(txHash: string, workingDirectory: string, providerUrl: string): Promise<void> {
+  public async attach(args: Required<DebuggerTypes.DebugArgs>): Promise<void> {
     // Gets the contracts compilation
-    const result = await prepareContracts(workingDirectory);
+    const result = await prepareContracts(args.workingDirectory);
 
     // Sets the properties to use during the debugger process
     this._mappedSources = result.mappedSources;
-    const networkId = this.getNetworkId(providerUrl);
+    const networkId = args.disableFetchExternal ? undefined : this.getNetworkId(args.providerUrl);
 
     // Sets the truffle debugger options
     const options: truffleDebugger.DebuggerOptions = {
-      provider: providerUrl,
+      provider: args.providerUrl,
       compilations: result.shimCompilations,
       lightMode: networkId !== undefined,
     };
 
-    this._session = await this.generateSession(txHash, networkId, options);
+    this._session = await this.generateSession(args.txHash, networkId, options);
     this.serializeExternalSources();
 
     this._isDebuggerAttached = true;

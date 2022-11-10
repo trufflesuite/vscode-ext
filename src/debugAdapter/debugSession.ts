@@ -101,18 +101,33 @@ export class SolidityDebugSession extends LoggingDebugSession {
     args: DebuggerTypes.ILaunchRequestArguments
   ): Promise<void> {
     await this.sendErrorIfFailed(response, async () => {
+      validateRequiredArg(args.txHash, `txHash`);
+      validateRequiredArg(args.workingDirectory, `workingDirectory`);
+      validateRequiredArg(args.providerUrl, `providerUrl`);
+
+      if (args.disableFetchExternal === undefined) {
+        args.disableFetchExternal = false;
+      }
+
       // make sure to 'Stop' the buffered logging if 'trace' is not set
       // logger.setup enable logs in client
       logger.setup(args.noDebug ? Logger.LogLevel.Verbose : Logger.LogLevel.Stop, false);
 
       // start the program in the runtime
-      await this._runtime.attach(args.txHash, args.workingDirectory, args.providerUrl);
+      // This cast is only necessary because TypeScript does not narrow types in properties
+      await this._runtime.attach(<Required<DebuggerTypes.DebugArgs>>args);
       await this._runtime.processInitialBreakPoints();
 
       // Events order is important
       this.sendEvent(new DebuggerTypes.LaunchedEvent());
       this.sendEvent(new StoppedEvent(EVENT_REASONS.breakpoint, MAIN_THREAD.id));
     });
+
+    function validateRequiredArg(arg: string | undefined | null, name: string) {
+      if (!arg) {
+        throw new Error(`\`${name}\` must be specified to initiate the Truffle Debugger`);
+      }
+    }
   }
 
   protected async disconnectRequest(

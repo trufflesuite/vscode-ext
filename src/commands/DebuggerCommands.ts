@@ -12,6 +12,7 @@ import {Web3Wrapper} from '@/debugAdapter/web3Wrapper';
 import {getTruffleWorkspace, getPathByPlatform} from '@/helpers/workspace';
 import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
 import {Telemetry} from '@/TelemetryClient';
+import {DebuggerTypes} from '@/debugAdapter/models/debuggerTypes';
 
 const TX_REGEX = /^(?:0x)?[0-9a-fA-F]{64}$/;
 
@@ -68,7 +69,7 @@ export namespace DebuggerCommands {
       txHash = txHashSelection.detail || txHashSelection.label;
     }
 
-    await startDebugging(txHash, workingDirectory, providerUrl);
+    await startDebugging(txHash, workingDirectory, providerUrl, false);
   }
 }
 
@@ -96,19 +97,19 @@ export async function startDebugging(
   txHash: string,
   workingDirectory: string,
   providerUrl: string,
-  fetchExternal?: boolean
+  disableFetchExternal: boolean
 ): Promise<void> {
   const workspaceFolder = workspace.getWorkspaceFolder(Uri.parse(workingDirectory));
-  const config: DebugConfiguration = {
-    files: [],
-    name: 'Debug Transactions',
-    providerUrl,
-    request: 'launch',
-    txHash,
+  const config: DebugConfiguration & DebuggerTypes.ILaunchRequestArguments = {
     type: DEBUG_TYPE,
-    workingDirectory,
+    name: 'Debug Transactions',
+    request: 'launch',
     timeout: 30000,
-    fetchExternal,
+    files: [],
+    providerUrl,
+    txHash,
+    workingDirectory,
+    disableFetchExternal,
   };
 
   debug.startDebugging(workspaceFolder, config).then(() => {

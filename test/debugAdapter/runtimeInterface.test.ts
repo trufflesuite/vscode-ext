@@ -82,7 +82,8 @@ const baseSessionMock: truffleDebugger.Session = {
 
 async function initMockRuntime() {
   const runtimeInterface = new RuntimeInterface();
-  await runtimeInterface.attach('', '', '');
+  const args = {txHash: '', workingDirectory: '', providerUrl: '', disableFetchExternal: false};
+  await runtimeInterface.attach(args);
   return runtimeInterface;
 }
 
