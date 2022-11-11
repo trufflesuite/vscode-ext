@@ -69,7 +69,7 @@ export namespace DebuggerCommands {
       txHash = txHashSelection.detail || txHashSelection.label;
     }
 
-    await startDebugging(txHash, workingDirectory, providerUrl, false);
+    await startDebugging({txHash, workingDirectory, providerUrl, disableFetchExternal: false});
   }
 }
 
@@ -86,30 +86,23 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
 }
 
 /**
- * This functions is responsible for starting the solidity debugger with the given parameters.
- *
- * @param txHash A transaction hash.
- * @param workingDirectory The working directory of the project.
- * @param providerUrl The network provider url.
- * @param fetchExternal Indicates if the debugger should fetch external contracts.
+ * Responsible for starting the Solidity debugger with the given arguments.
+ * 
+   @param args The `DebugArgs` to initialize the `DebugSession`.
  */
-export async function startDebugging(
-  txHash: string,
-  workingDirectory: string,
-  providerUrl: string,
-  disableFetchExternal: boolean
-): Promise<void> {
-  const workspaceFolder = workspace.getWorkspaceFolder(Uri.parse(workingDirectory));
+export async function startDebugging(args: DebuggerTypes.DebugArgs): Promise<void> {
+  const workspaceFolder =
+    args.workingDirectory === undefined ? undefined : workspace.getWorkspaceFolder(Uri.parse(args.workingDirectory));
   const config: DebugConfiguration & DebuggerTypes.ILaunchRequestArguments = {
     type: DEBUG_TYPE,
     name: 'Debug Transactions',
     request: 'launch',
+
+    // TODO: are these `timeout` and `files` properties used?
     timeout: 30000,
     files: [],
-    providerUrl,
-    txHash,
-    workingDirectory,
-    disableFetchExternal,
+
+    ...args,
   };
 
   debug.startDebugging(workspaceFolder, config).then(() => {

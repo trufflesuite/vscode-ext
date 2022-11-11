@@ -123,7 +123,7 @@ export class SolidityDebugSession extends LoggingDebugSession {
       this.sendEvent(new StoppedEvent(EVENT_REASONS.breakpoint, MAIN_THREAD.id));
     });
 
-    function validateRequiredArg(arg: string | undefined | null, name: string) {
+    function validateRequiredArg(arg: string | undefined, name: string) {
       if (!arg) {
         throw new Error(`\`${name}\` must be specified to initiate the Truffle Debugger`);
       }

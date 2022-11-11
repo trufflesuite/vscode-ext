@@ -24,18 +24,24 @@ export class UriHandlerController implements UriHandler {
       const command = uri.path.replace('/', '');
       const searchParams = new URLSearchParams(uri.query);
 
-      // Convert the URI parameters to a TDebugInformation object.
-      const txHash = searchParams.get('txHash')!;
-      const workingDirectory = searchParams.get('workingDirectory')!;
-      const providerUrl = searchParams.get('providerUrl')!;
-      const disableFetchExternal = !!searchParams.get('disableFetchExternal');
-
       // Checks the command and executes the corresponding action.
       switch (command) {
-        case Commands.debug:
+        case Commands.debug: {
+          // Convert the URI parameters to a `DebugArgs` object.
+          // The `??` operator converts `null` to `undefined`.
+          const args = {
+            txHash: searchParams.get('txHash') ?? undefined,
+            workingDirectory: searchParams.get('workingDirectory') ?? undefined,
+            providerUrl: searchParams.get('providerUrl') ?? undefined,
+            disableFetchExternal: !!searchParams.get('disableFetchExternal'),
+          };
+
           // Calls the debugger with the given parameters.
-          await startDebugging(txHash, workingDirectory, providerUrl, disableFetchExternal);
+          await startDebugging(args);
           break;
+        }
+        default:
+          window.showWarningMessage(`Unrecognized action to handle \`${command}\``);
       }
     } catch (error) {
       // Display an error message if something went wrong.
