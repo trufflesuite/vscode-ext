@@ -2,8 +2,9 @@
 // Licensed under the MIT license.
 
 import abiDecoder from 'abi-decoder';
-import {TRANSACTION_DEFAULT_METHOD_NAME} from '../constants/transaction';
 import {ITransactionInputData} from '../models/ITransactionInputData';
+
+const TRANSACTION_DEFAULT_METHOD_NAME = 'constructor';
 
 export class TransactionInputDataDecoder {
   public addContractAbi(abi: []) {
