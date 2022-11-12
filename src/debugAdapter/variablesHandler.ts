@@ -9,7 +9,7 @@ import {IExpressionEval} from './models/IExpressionEval';
 import RuntimeInterface from './runtimeInterface';
 
 /**
- * > **NOTE**. This is only `export`ed to be used in tests.
+ * > **NOTE**. _This is only `export`ed to be used in tests._
  */
 export const SCOPES = {
   all: {
@@ -22,7 +22,7 @@ export const SCOPES = {
 };
 
 /**
- * > **NOTE**. This is only `export`ed to be used in tests.
+ * > **NOTE**. _This is only `export`ed to be used in tests._
  */
 export const OBJECT_VARIABLE_DISPLAY_NAME = 'Object';
 
