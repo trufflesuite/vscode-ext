@@ -85,26 +85,18 @@ describe('DebuggerCommands mock tests', () => {
 
 describe('DebuggerCommands unit tests', () => {
   it('should `shortenHash` for a transaction hash', async () => {
-    {
-      const label = shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e');
-      assert.strictEqual(label, '0xa50f...d81e');
-    }
-
-    {
-      const label = shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e', 2);
-      assert.strictEqual(label, '0xa5...1e');
-    }
-
-    {
-      const label = shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e', 0);
-      assert.strictEqual(label, '0x...');
-    }
+    assert.strictEqual(
+      shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e'),
+      '0xa50f...d81e'
+    );
+    assert.strictEqual(
+      shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e', 2),
+      '0xa5...1e'
+    );
+    assert.strictEqual(shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e', 0), '0x...');
   });
 
   it('should `shortenHash` for an address hash', async () => {
-    {
-      const label = shortenHash('0xc448123202fda0547aa8587b496ea87fa479e7e8');
-      assert.strictEqual(label, '0xc448...e7e8');
-    }
+    assert.strictEqual(shortenHash('0xc448123202fda0547aa8587b496ea87fa479e7e8'), '0xc448...e7e8');
   });
 });
