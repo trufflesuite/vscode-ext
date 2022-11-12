@@ -6,7 +6,6 @@ import {debug, DebugConfiguration, QuickPickItem, Uri, QuickPickItemKind, worksp
 
 import {DEBUG_TYPE} from '@/debugAdapter/constants/debugAdapter';
 import {DebugNetwork} from '@/debugAdapter/debugNetwork';
-import {shortenHash} from '@/debugAdapter/functions';
 import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvider';
 import {Web3Wrapper} from '@/debugAdapter/web3Wrapper';
 import {getTruffleWorkspace, getPathByPlatform} from '@/helpers/workspace';
@@ -114,4 +113,23 @@ export async function startDebugging(args: DebuggerTypes.DebugArgs): Promise<voi
 function generateDescription(contractName?: string, methodName?: string) {
   const contractNameWithoutExt = path.basename(contractName || '', '.json');
   return `${contractNameWithoutExt}.${methodName}()`;
+}
+
+/**
+ * Shorten the checksummed version of the input `hash` to have `0x + chars ... chars` characters.
+ * It assumes that `hash` starts with the prefix `0x`.
+ *
+ * > **NOTE**. _This is only `export`ed to be used in tests._
+ *
+ * @param hash the hash to shorten.
+ * @param chars the desired length to append both at the start and at the end.
+ * @returns the shortened `hash`.
+ */
+export function shortenHash(hash: string, chars = 4): string {
+  try {
+    const parsed = hash;
+    return `${parsed.substring(0, chars + 2)}...${parsed.substring(parsed.length - chars)}`;
+  } catch (error) {
+    throw Error(`Invalid 'address' parameter '${hash}'.`);
+  }
 }

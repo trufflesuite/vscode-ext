@@ -14,12 +14,13 @@ import * as userInteraction from '../../src/helpers/userInteraction';
 import {TestConstants} from '../TestConstants';
 
 import * as helpers from '@/helpers/workspace';
+import {shortenHash} from '@/commands/DebuggerCommands';
 
 const truffleWorkspace = new helpers.TruffleWorkspace(
   path.join(__dirname, TestConstants.truffleCommandTestDataFolder, 'truffle-config.js')
 );
 
-describe('DebuggerCommands unit tests', () => {
+describe('DebuggerCommands mock tests', () => {
   let mockGetTxHashes: sinon.SinonStub<[(number | undefined)?], Promise<string[]>>;
   let mockGetTxInfos: sinon.SinonStub<[string[]], Promise<ITransactionResponse[]>>;
   let debugCommands: any;
@@ -79,5 +80,31 @@ describe('DebuggerCommands unit tests', () => {
     assert.strictEqual(mockGetTxHashes.calledOnce, true, 'getLastTransactionHashes should be called');
     assert.strictEqual(mockGetTxInfos.calledOnce, true, 'getTransactionsInfo should be called');
     assert.strictEqual(createQuickPickFn.called, true, 'createQuickPic should be called');
+  });
+});
+
+describe('DebuggerCommands unit tests', () => {
+  it('should `shortenHash` for a transaction hash', async () => {
+    {
+      const label = shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e');
+      assert.strictEqual(label, '0xa50f...d81e');
+    }
+
+    {
+      const label = shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e', 2);
+      assert.strictEqual(label, '0xa5...1e');
+    }
+
+    {
+      const label = shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e', 0);
+      assert.strictEqual(label, '0x...');
+    }
+  });
+
+  it('should `shortenHash` for an address hash', async () => {
+    {
+      const label = shortenHash('0xc448123202fda0547aa8587b496ea87fa479e7e8');
+      assert.strictEqual(label, '0xc448...e7e8');
+    }
   });
 });
