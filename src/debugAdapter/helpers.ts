@@ -134,7 +134,7 @@ function createResult(
  * If the value can't be transformed then the raw version is returned.
  * @returns the formatted value.
  */
-export function translate(variable: Format.Values.Result, breaklength = 20): TranslatedResult {
+function translate(variable: Format.Values.Result, breaklength = 20): TranslatedResult {
   switch (variable.kind) {
     case 'value':
       if (!_.has(variable, 'type.typeClass')) {
