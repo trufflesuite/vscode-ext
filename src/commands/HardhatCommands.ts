@@ -13,7 +13,7 @@ import {commands, Uri} from 'vscode';
 
 export async function buildContracts(ws: AbstractWorkspace, uri?: Uri): Promise<void> {
   Telemetry.sendEvent('HardhatCommands.buildContracts.commandStarted');
-  if (!(await required.checkAppsSilent(OptionalApps.hardhat))) {
+  if (!(await required.checkAppsSilentForUri(ws.workspace, OptionalApps.hardhat))) {
     Telemetry.sendEvent('HardhatCommands.buildContracts.hardhatInstallationMissing');
     await showNotification({
       message: 'Hardhat is not installed, please install to continue...',

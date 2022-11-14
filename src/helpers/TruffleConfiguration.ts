@@ -1,3 +1,6 @@
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
+// Licensed under the MIT license.
+
 import {Constants} from '@/Constants';
 import {MnemonicRepository} from '@/services';
 import {Telemetry} from '@/TelemetryClient';
@@ -13,7 +16,7 @@ import path from 'path';
 import {Uri} from 'vscode';
 import {ICommandResult, tryExecuteCommandInFork} from './command';
 import {IConfiguration, INetwork, INetworkOption, IProvider, notAllowedSymbols} from './ConfigurationReader';
-import {getPathByPlatform, getWorkspaceRoot} from './workspace';
+import {getPathByPlatform, getWorkspaceRoot} from './WorkspaceHelpers';
 
 export class EvalTruffleConfigError extends Error {
   constructor(message: string, readonly reason: string) {

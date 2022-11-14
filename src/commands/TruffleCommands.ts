@@ -15,7 +15,7 @@ import {outputCommandHelper, telemetryHelper, vscodeEnvironment} from '../helper
 import {required} from '@/helpers/required';
 
 import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from '@/helpers/userInteraction';
-import {getPathByPlatform} from '@/helpers/workspace';
+import {getPathByPlatform} from '@/helpers/WorkspaceHelpers';
 
 import {IDeployDestination, ItemType} from '@/Models';
 import {NetworkForContractItem} from '@/Models/QuickPickItems';
@@ -195,7 +195,7 @@ export namespace TruffleCommands {
    * If `folderUri` is provided, the new contract will be created in that folder.
    * It **must** represent a folder URI.
    *
-   * Otherwise, it uses {@link getTruffleWorkspace} to select the
+   * Otherwise, it uses {@link getWorkspaceForUri} to select the
    * Truffle workspace to place the new contract.
    *
    * Once the new contract file has been created,

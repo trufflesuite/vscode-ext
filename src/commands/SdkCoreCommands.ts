@@ -21,7 +21,6 @@ class SdkCoreCommands {
     }
     // let's initialise it otherwise
     const adapter = this.initExtensionAdapter(sdkVal);
-    // console.log(`getExtensionAdapter: `, {adapter, sdkVal});
     adapter.validateExtension().then(
       (_) => {
         Output.outputLine(
@@ -46,7 +45,6 @@ class SdkCoreCommands {
     const ws = await getWorkspaceForUri(contractUri);
     const buildUri = contractUri ? contractUri : ws.workspace;
     const adapter = await this.getExtensionAdapter(ws.workspaceType);
-    console.debug(`build:debug::`, {ws, buildUri, adapter});
     return adapter!.build(ws, buildUri);
   }
 

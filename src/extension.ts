@@ -38,7 +38,7 @@ import {registerHelpView} from './views/HelpView';
 import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 import {registerGanacheDetails} from './pages/GanacheDetails';
 import {registerLogView} from './views/LogView';
-import {saveTextDocument} from './helpers/workspace';
+import {saveTextDocument} from './helpers/WorkspaceHelpers';
 import {StatusBarItems} from './Models/StatusBarItems/Contract';
 import {Output} from './Output';
 

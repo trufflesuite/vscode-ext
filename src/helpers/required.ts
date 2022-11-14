@@ -1,14 +1,13 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {getWorkspaceForUri} from '@/helpers/AbstractWorkspace';
 import {getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
-import {commands, ProgressLocation, window} from 'vscode';
+import {commands, ProgressLocation, Uri, window} from 'vscode';
 import {Constants, RequiredApps, OptionalApps, AppTypes} from '@/Constants';
-import {getPathByPlatform, getWorkspaceRoot} from '@/helpers/workspace';
+import {getPathByPlatform, getWorkspaceFolder, getWorkspaceRoot} from '@/helpers/WorkspaceHelpers';
 import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '@/TelemetryClient';
 import {executeCommand, tryExecuteCommand} from './command';
@@ -87,7 +86,12 @@ export namespace required {
   }
 
   export async function checkAppsSilent(...apps: AppTypes[]): Promise<boolean> {
-    const versions = await getExactlyVersions(...apps);
+    const rootWorkspace = getWorkspaceFolder();
+    return checkAppsSilentForUri(rootWorkspace!.uri, ...apps);
+  }
+
+  export async function checkAppsSilentForUri(workspaceUri: Uri, ...apps: AppTypes[]): Promise<boolean> {
+    const versions = await getExactlyVersions(workspaceUri, ...apps);
     const invalid = versions
       .filter((version) => apps.includes(version.app as AppTypes))
       .some((version) => !version.isValid);
@@ -155,10 +159,11 @@ export namespace required {
   }
 
   export async function getAllVersions(): Promise<IRequiredVersion[]> {
-    return getExactlyVersions(...requiredApps, ...auxiliaryApps);
+    const rootWorkspace = getWorkspaceFolder();
+    return getExactlyVersions(rootWorkspace!.uri, ...requiredApps, ...auxiliaryApps);
   }
 
-  export async function getExactlyVersions(...apps: AppTypes[]): Promise<IRequiredVersion[]> {
+  export async function getExactlyVersions(workspaceUri: Uri, ...apps: AppTypes[]): Promise<IRequiredVersion[]> {
     Output.outputLine(OutputLabel.requirements, `Get version for required apps: ${apps.join(',')}`);
 
     if (apps.includes(RequiredApps.node)) {
@@ -181,7 +186,7 @@ export namespace required {
     if (apps.includes(OptionalApps.hardhat)) {
       currentState.hardhat =
         currentState.hardhat ||
-        (await createRequiredVersion(OptionalApps.hardhat, getNpmPackageVersion(OptionalApps.hardhat)));
+        (await createRequiredVersion(OptionalApps.hardhat, getNpmPackageVersion(workspaceUri, OptionalApps.hardhat)));
     }
 
     return Object.values(currentState);
@@ -189,18 +194,19 @@ export namespace required {
 
   /**
    * Run an NPM ls command to see if a specific package is installed within the NPM system in this project.
+   * @param workspaceUri - the uri of the workspace we want the npm package call to be run in.
    * @param packageName - the npm specific name
    */
-  const getNpmPackageVersion: (packageName: string) => VersionCallback = (packageName: string) => async () => {
-    const workspace = await getWorkspaceForUri();
-    const platformPath = getPathByPlatform(workspace.workspace);
-    return await getVersionWithArgs(
-      platformPath,
-      RequiredApps.npm,
-      ['ls', '--pareseable', '--long', '--depth=0', packageName],
-      new RegExp(`${packageName}@(\\d+.\\d+.\\d+)`)
-    );
-  };
+  const getNpmPackageVersion: (workspaceUri: Uri, packageName: string) => VersionCallback =
+    (workspaceUri: Uri, packageName: string) => async () => {
+      const platformPath = getPathByPlatform(workspaceUri);
+      return await getVersionWithArgs(
+        platformPath,
+        RequiredApps.npm,
+        ['ls', '--pareseable', '--long', '--depth=0', packageName],
+        new RegExp(`${packageName}@(\\d+.\\d+.\\d+)`)
+      );
+    };
 
   export async function getNodeVersion(): Promise<string> {
     return await getVersion(RequiredApps.node, '--version', /v(\d+.\d+.\d+)/);

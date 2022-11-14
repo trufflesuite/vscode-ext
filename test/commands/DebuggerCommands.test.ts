@@ -1,29 +1,30 @@
-// Copyright (c) Consensys Software Inc. All rights reserved.
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {DebugNetwork} from '@/debugAdapter/debugNetwork';
+import {ITransactionResponse} from '@/debugAdapter/models/ITransactionResponse';
+import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvider';
+import {AbstractWorkspace, WorkspaceType} from '@/helpers/AbstractWorkspace';
+
+import * as aw from '@/helpers/AbstractWorkspace';
 import assert from 'assert';
 import path from 'path';
 import sinon from 'sinon';
 import {debug, QuickPickItem, Uri, workspace} from 'vscode';
 
-import {DebugNetwork} from '@/debugAdapter/debugNetwork';
-import {ITransactionResponse} from '@/debugAdapter/models/ITransactionResponse';
-import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvider';
-
 import * as userInteraction from '../../src/helpers/userInteraction';
 import {TestConstants} from '../TestConstants';
 
-import * as helpers from '@/helpers/workspace';
-
-const truffleWorkspace = new helpers.TruffleWorkspace(
-  path.join(__dirname, TestConstants.truffleCommandTestDataFolder, 'truffle-config.js')
+const truffleWorkspace = new AbstractWorkspace(
+  path.join(__dirname, TestConstants.truffleCommandTestDataFolder, 'truffle-config.js'),
+  WorkspaceType.TRUFFLE
 );
 
 describe('DebuggerCommands unit tests', () => {
   let mockGetTxHashes: sinon.SinonStub<[(number | undefined)?], Promise<string[]>>;
   let mockGetTxInfos: sinon.SinonStub<[string[]], Promise<ITransactionResponse[]>>;
   let debugCommands: any;
-  let getWorkspacesMock: sinon.SinonStub<[contractUri?: Uri], Promise<helpers.TruffleWorkspace>>;
+  let getWorkspacesMock: sinon.SinonStub<[contractUri?: Uri], Promise<AbstractWorkspace>>;
 
   beforeEach(() => {
     mockGetTxHashes = sinon.stub(TransactionProvider.prototype, 'getLastTransactionHashes');
@@ -31,7 +32,7 @@ describe('DebuggerCommands unit tests', () => {
     mockGetTxInfos = sinon.stub(TransactionProvider.prototype, 'getTransactionsInfo');
     mockGetTxInfos.resolves([]);
 
-    getWorkspacesMock = sinon.stub(helpers, 'getTruffleWorkspace');
+    getWorkspacesMock = sinon.stub(aw, 'getWorkspaceForUri');
     getWorkspacesMock.returns(Promise.resolve(truffleWorkspace));
 
     sinon.stub(debug, 'startDebugging').resolves();

@@ -16,7 +16,6 @@ describe('SDK Core Commands', () => {
 
   let globStub: any;
   let fsStub: any;
-  let quickPickStub: any;
   let truffleBuildStub: any;
   let hardhatBuildStub: any;
 
@@ -53,62 +52,12 @@ describe('SDK Core Commands', () => {
     });
 
     globStub = sandbox.stub(glob, 'sync');
-    // this will trigger on the last test...
-    quickPickStub = sandbox.stub(AW, 'selectConfigFromQuickPick');
-    quickPickStub.onFirstCall().returns({workspace: undefined});
-
     extensionAdapterSpy = sandbox.spy(sdkCoreCommands, 'getExtensionAdapter');
   });
 
   afterEach(async () => {
     sandbox.restore();
     workspace.workspaceFolders = [];
-  });
-
-  describe('WorkspaceForUri Tests', () => {
-    it('will resolve workspace correctly - in a truffle folder.', async function () {
-      //given - I have the default value set to goto truffle.
-      const wsFolder = 'truffle-test';
-      setupTestScenario(wsFolder, AW.TRUFFLE_CONFIG_GLOB);
-
-      // when I call
-      const workspaceRet = await AW.getWorkspaceForUri(Uri.file(wsFolder));
-
-      // then the workspace will be correct
-      expect(workspaceRet.dirName).to.be.eq(wsFolder);
-      expect(workspaceRet.workspaceType).to.be.eq(AW.WorkspaceType.TRUFFLE);
-    });
-
-    it('will resolve workspace correctly - in a hardhat folder.', async function () {
-      //given - I have the default value set to goto truffle.
-      const wsFolder = 'hardhat-test';
-      setupTestScenario(wsFolder, AW.HARDHAT_CONFIG_GLOB);
-
-      // when I call the workspace resolver...
-      const workspaceRet = await AW.getWorkspaceForUri(Uri.file(wsFolder));
-
-      // then the Truffle Instances will be called.
-      expect(workspaceRet.dirName).to.be.eq(wsFolder);
-      expect(workspaceRet.workspaceType).to.be.eq(AW.WorkspaceType.HARDHAT);
-    });
-
-    it("will do nothing when it can't find a directory.", async function () {
-      // given this base folder...
-      const wsFolder = 'some-empty-folder';
-      workspace.workspaceFolders?.push({
-        uri: Uri.file(wsFolder),
-        index: 0,
-        name: wsFolder + '-name',
-      });
-      // return 0 workspaces with actual configs in them.
-      globStub.withArgs().returns([]);
-
-      // when I call the workspace resolver...
-      const workspaceRet = await AW.getWorkspaceForUri();
-      // then
-      expect(workspaceRet.dirName).to.be.eq(wsFolder);
-      expect(workspaceRet.workspaceType).to.be.eq(AW.WorkspaceType.UNKNOWN);
-    });
   });
 
   describe('SDK Commands - Project Resolution', () => {

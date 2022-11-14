@@ -96,24 +96,6 @@ export const findWorkspaces = (workspaceRootPath: string): AbstractWorkspace[] =
   );
 };
 
-export async function getWorkspaceForUri(contractUri?: Uri): Promise<AbstractWorkspace> {
-  const workspaces = contractUri
-    ? findWorkspaces(workspace.getWorkspaceFolder(contractUri)!.uri.fsPath)
-    : resolveAllWorkspaces();
-  // console.log(`getWorkspaceForUri: `, {workspaces});
-  if (workspaces.length === 0) {
-    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root'));
-    Telemetry.sendException(error);
-    throw error;
-  }
-
-  if (workspaces.length === 1) {
-    return workspaces[0];
-  }
-
-  return await selectConfigFromQuickPick(workspaces);
-}
-
 /**
  * Shows the list of `workspaces` in a quick pick so the user can select
  * the correct config file to use.
@@ -135,6 +117,22 @@ export async function selectConfigFromQuickPick(workspaces: AbstractWorkspace[])
     ignoreFocusOut: true,
     placeHolder: `Select a config file to use`,
   });
-
   return result.workspace;
+}
+
+export async function getWorkspaceForUri(contractUri?: Uri): Promise<AbstractWorkspace> {
+  const workspaces = contractUri
+    ? findWorkspaces(workspace.getWorkspaceFolder(contractUri)!.uri.fsPath)
+    : resolveAllWorkspaces();
+  if (workspaces.length === 0) {
+    const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root'));
+    Telemetry.sendException(error);
+    throw error;
+  }
+
+  if (workspaces.length === 1) {
+    return workspaces[0];
+  }
+
+  return await selectConfigFromQuickPick(workspaces);
 }

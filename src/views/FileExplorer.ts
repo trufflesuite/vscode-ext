@@ -3,13 +3,13 @@
 
 import {Constants} from '@/Constants';
 import {AbstractWorkspace, resolveAllWorkspaces, WorkspaceType} from '@/helpers/AbstractWorkspace';
+import {getWorkspaceFolder} from '@/helpers/WorkspaceHelpers';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as vscode from 'vscode';
 import {FileType, TreeItem} from 'vscode';
-import {getWorkspaceFolder} from './Utils';
 
 //#region Utilities
 

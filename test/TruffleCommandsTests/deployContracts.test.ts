@@ -39,10 +39,6 @@ const options: TLocalProjectOptions = {
   url: '',
 };
 
-// const truffleWorkspace = new helpers.TruffleWorkspace(
-//   path.join(__dirname, TestConstants.truffleCommandTestDataFolder, 'truffle-config.js')
-// );
-
 describe('TruffleCommands', () => {
   describe('Integration test', async () => {
     describe('deployContracts', () => {

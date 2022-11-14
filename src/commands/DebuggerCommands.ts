@@ -1,23 +1,23 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import path from 'path';
-import {debug, DebugConfiguration, QuickPickItem, workspace} from 'vscode';
-
 import {DEBUG_TYPE} from '@/debugAdapter/constants/debugAdapter';
 import {DebugNetwork} from '@/debugAdapter/debugNetwork';
 import {shortenHash} from '@/debugAdapter/functions';
 import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvider';
 import {Web3Wrapper} from '@/debugAdapter/web3Wrapper';
-import {getTruffleWorkspace, getPathByPlatform} from '@/helpers/workspace';
+import {getWorkspaceForUri} from '@/helpers/AbstractWorkspace';
 import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
+import {getPathByPlatform} from '@/helpers/WorkspaceHelpers';
 import {Telemetry} from '@/TelemetryClient';
+import path from 'path';
+import {debug, DebugConfiguration, QuickPickItem, workspace} from 'vscode';
 
 export namespace DebuggerCommands {
   export async function startSolidityDebugger() {
     Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandStarted');
 
-    const workspaceUri = (await getTruffleWorkspace()).workspace;
+    const workspaceUri = (await getWorkspaceForUri()).workspace;
     const workingDirectory = getPathByPlatform(workspaceUri);
     const debugNetwork = new DebugNetwork(workingDirectory);
     await debugNetwork.load();

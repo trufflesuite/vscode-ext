@@ -7,7 +7,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import {HttpService} from '..';
 import {Constants} from '@/Constants';
-import {getPathByPlatform, getWorkspaceRoot} from '@/helpers/workspace';
+import {getPathByPlatform, getWorkspaceRoot} from '@/helpers/WorkspaceHelpers';
 import {Telemetry} from '@/TelemetryClient';
 import {Contract} from './Contract';
 
