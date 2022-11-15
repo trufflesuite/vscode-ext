@@ -1,5 +1,6 @@
 import {startDebugging} from '@/commands';
 import {Constants} from '@/Constants';
+import {DebuggerTypes} from '@/debugAdapter/models/debuggerTypes';
 import {Uri, UriHandler, window} from 'vscode';
 
 /**
@@ -32,9 +33,8 @@ export class UriHandlerController implements UriHandler {
           const args = {
             txHash: searchParams.get('txHash') ?? undefined,
             workingDirectory: searchParams.get('workingDirectory') ?? undefined,
-            providerUrl: searchParams.get('providerUrl') ?? undefined,
             disableFetchExternal: !!searchParams.get('disableFetchExternal'),
-          };
+          } as DebuggerTypes.DebugArgs;
 
           // Calls the debugger with the given parameters.
           await startDebugging(args);

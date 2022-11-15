@@ -103,7 +103,6 @@ export class SolidityDebugSession extends LoggingDebugSession {
     await this.sendErrorIfFailed(response, async () => {
       validateRequiredArg(args.txHash, `txHash`);
       validateRequiredArg(args.workingDirectory, `workingDirectory`);
-      validateRequiredArg(args.providerUrl, `providerUrl`);
 
       if (args.disableFetchExternal === undefined) {
         args.disableFetchExternal = false;

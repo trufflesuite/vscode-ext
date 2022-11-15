@@ -10,10 +10,8 @@ import {ICallInfo} from './models/ICallInfo';
 import {IInstruction} from './models/IInstruction';
 import {mkdirpSync, writeFileSync} from 'fs-extra';
 import {fetchAndCompileForDebugger} from '@truffle/fetch-and-compile';
-import {LocalNetworkNode, LocalProject} from '@/Models/TreeItems';
-import {getChainId} from '@/functions/explorer';
-import {TreeManager} from '@/services/tree/TreeManager';
-import {ItemType} from '@/Models';
+import Config from '@truffle/config';
+import {Environment} from '@truffle/environment';
 import * as os from 'os';
 import * as path from 'path';
 
@@ -138,16 +136,22 @@ export default class RuntimeInterface extends EventEmitter {
    * @returns
    */
   public async attach(args: Required<DebuggerTypes.DebugArgs>): Promise<void> {
+    // Retreives the truffle configuration file
+    const config = Config.detect({workingDirectory: args.workingDirectory});
+
+    // Retreives the environment configuration
+    await Environment.detect(config);
+
     // Gets the contracts compilation
-    const result = await prepareContracts(args.workingDirectory);
+    const result = await prepareContracts(config);
 
     // Sets the properties to use during the debugger process
     this._mappedSources = result.mappedSources;
-    const networkId = args.disableFetchExternal ? undefined : this.getNetworkId(args.providerUrl);
+    const networkId = args.disableFetchExternal ? undefined : config.network_id;
 
     // Sets the truffle debugger options
     const options: truffleDebugger.DebuggerOptions = {
-      provider: args.providerUrl,
+      provider: config.provider.host,
       compilations: result.shimCompilations,
       lightMode: networkId !== undefined,
     };
@@ -192,28 +196,6 @@ export default class RuntimeInterface extends EventEmitter {
         this._mappedSources.set(compilation.sourcePath, sourcePath);
       }
     }
-  }
-
-  /**
-   * Retrieves the chain id of the `providerUrl`.
-   *
-   * @param providerUrl the url to get chain id from.
-   * @returns the chain id of the given `providerUrl`.
-   */
-  private getNetworkId(providerUrl: string) {
-    const services = TreeManager.getItem(ItemType.LOCAL_SERVICE);
-
-    if (!services || !services.getChildren()) {
-      return undefined;
-    }
-
-    const projects = services.getChildren() as LocalProject[];
-    const project = projects.find((project) => {
-      const network = project.getChildren().at(0) as LocalNetworkNode;
-      return `${network.url.protocol}//${network.url.host}` === providerUrl;
-    });
-
-    return project ? getChainId(project.options.forkedNetwork) : undefined;
   }
 
   public currentLine(): DebuggerTypes.IFrame {

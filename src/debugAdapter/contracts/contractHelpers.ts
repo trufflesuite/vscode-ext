@@ -2,15 +2,15 @@
 // Licensed under the MIT license.
 
 import Compiler from '@truffle/workflow-compile';
-import Config from '@truffle/config';
 import {Compilations} from '@truffle/codec';
 import path from 'path';
 import {Source} from '@truffle/compile-common';
+import TruffleConfig from '@truffle/config';
 
 /**
  * Represents the return from the compilation of contracts.
  */
-export type ContractData = {
+type ContractData = {
   /**
    * A list of mapped files so debug can open.
    */
@@ -25,14 +25,11 @@ export type ContractData = {
  * This function compiles all contracts and returns an object with
  * mapped file sources and builds (shim).
  *
- * @param workingDirectory The workspace path where the truffle project is located.
- * @returns A object (ContractData) with the mapped source files and
+ * @param config The truffle configuration file.
+ * @returns A object (ContractData) Environmentwith the mapped source files and
  * the contract compilations (shim).
  */
-export async function prepareContracts(workingDirectory: any): Promise<ContractData> {
-  // Retreives the truffle configuration file
-  const config = Config.detect({workingDirectory: workingDirectory});
-
+export async function prepareContracts(config: TruffleConfig): Promise<ContractData> {
   // Sets the properties for the compilation
   config.all = true;
   config.quiet = true;
@@ -42,7 +39,7 @@ export async function prepareContracts(workingDirectory: any): Promise<ContractD
   const shimCompilations = Compilations.Utils.shimCompilations(compilations);
 
   // Retrieves sources path so the debug can open them
-  const mappedSources = await getContractSourcePath(workingDirectory, compilations[0].sources);
+  const mappedSources = await getContractSourcePath(config.working_directory, compilations[0].sources);
 
   // Return the ContractData object
   return {
