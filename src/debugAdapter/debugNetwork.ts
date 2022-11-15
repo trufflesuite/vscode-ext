@@ -3,7 +3,6 @@
 
 import path from 'path';
 import {IConfiguration, INetwork, INetworkOption} from '@/helpers/ConfigurationReader';
-import {TRUFFLE_CONFIG_NAME} from './constants/truffleConfig';
 import {TreeManager} from '@/services/tree/TreeManager';
 import {ItemType} from '@/Models/ItemType';
 import {Constants} from '@/Constants';
@@ -13,6 +12,11 @@ import {QuickPickItem} from 'vscode';
 import {LocalProject} from '@/Models/TreeItems/LocalProject';
 import {LocalNetworkNode} from '@/Models/TreeItems';
 import {ConfigurationReader} from '../helpers/debugConfigurationReader';
+
+/**
+ * TODO: We should removed this hardcoded name since there might be multiple Truffle config files in the same workspace.
+ */
+const TRUFFLE_CONFIG_NAME = 'truffle-config.js';
 
 export class DebugNetwork {
   public workingDirectory: string;

@@ -567,7 +567,11 @@
         "runtime": "node",
         "configurationAttributes": {
           "launch": {
-            "required": [],
+            "required": [
+              "txHash",
+              "workingDirectory",
+              "providerUrl"
+            ],
             "properties": {
               "stopOnEntry": {
                 "type": "boolean",
@@ -581,23 +585,28 @@
               },
               "txHash": {
                 "type": "string",
-                "description": "Transaction hash to debug",
+                "description": "The transaction hash to debug.",
                 "default": "0x"
               },
               "files": {
                 "type": "string[]",
-                "description": "Array of file paths of solidity files to debug",
+                "description": "Array of file paths of solidity files to debug.",
                 "default": []
               },
               "workingDirectory": {
                 "type": "string",
-                "description": "Directory of truffle project",
+                "description": "Directory of the Truffle project where to find the Truffle config file.",
                 "default": "${workspaceFolder}"
               },
               "providerUrl": {
                 "type": "string",
-                "description": "URL of provider",
+                "description": "Provider's URL of the Ethereum network to connect to.",
                 "default": "http://127.0.0.1:8545"
+              },
+              "disableFetchExternal": {
+                "type": "boolean",
+                "description": "When set, do not try to fetch external contract sources when debugging a forked network instance. When the network is not being forked, this flag is ignored.",
+                "default": false
               }
             }
           }
@@ -611,7 +620,8 @@
             "txHash": "0x",
             "files": [],
             "workingDirectory": "${workspaceFolder}",
-            "providerUrl": "http://127.0.0.1:8545"
+            "providerUrl": "http://127.0.0.1:8545",
+            "disableFetchExternal": false
           }
         ],
         "configurationSnippets": [
@@ -625,8 +635,9 @@
               "stopOnEntry": false,
               "txHash": "0x",
               "files": [],
-              "workingDirectory": "^\"\\${workspaceFolder}/",
-              "providerUrl": "http://127.0.0.1:8545"
+              "workingDirectory": "^\"\\${workspaceFolder}\"",
+              "providerUrl": "http://127.0.0.1:8545",
+              "disableFetchExternal": false
             }
           }
         ],

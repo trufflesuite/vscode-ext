@@ -17,18 +17,47 @@ export namespace DebuggerTypes {
     column: number;
   }
 
+  /**
+   * Represents the arguments needed to initiate a new Truffle `DebugSession` request.
+   *
+   * All properties in this interface are defined as optional given that the Debugger
+   * can be started from a [launch configuration](https://code.visualstudio.com/docs/editor/debugging#_launch-configurations),
+   * where any property might be missing.
+   *
+   * `package.json` also defines these properties.
+   */
+  export interface DebugArgs {
+    /**
+     * The transaction hash to debug.
+     */
+    txHash?: string;
+
+    /**
+     * Directory of the Truffle project where to find the Truffle config file.
+     */
+    workingDirectory?: string;
+
+    /**
+     * Provider's URL of the Ethereum network to connect to.
+     */
+    providerUrl?: string;
+
+    /**
+     * When set, do not try to fetch external contract sources when debugging a forked network instance.
+     * When the network is not being forked, this flag is ignored.
+     */
+    disableFetchExternal?: boolean;
+  }
+
   // The interface should always match schema in the package.json.
-  export interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments {
+  export interface ILaunchRequestArguments extends DebugProtocol.LaunchRequestArguments, DebugArgs {
+    // TODO: Are these attributes being used? If not we should remove it in a future PR.
     // Automatically stop target after launch. If not specified, target does not stop.
     stopOnEntry?: boolean;
     // enable logging the Debug Adapter Protocol
     trace?: boolean;
     host?: string;
-    txHash: string;
     files?: string[];
-    workingDirectory: string;
-    providerUrl: string;
-    fetchExternal?: boolean;
   }
 
   export class LaunchedEvent implements DebugProtocol.Event {
