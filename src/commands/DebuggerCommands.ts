@@ -27,6 +27,7 @@ export namespace DebuggerCommands {
 
     const debugNetworkOptions = debugNetwork.getNetwork();
     const web3 = new Web3Wrapper(debugNetworkOptions!.options);
+    const providerUrl = web3.getProviderUrl();
 
     // if local service then provide last transactions to choose
     const transactionProvider = new TransactionProvider(web3, contractBuildDir);
@@ -71,6 +72,7 @@ export namespace DebuggerCommands {
     const args = {
       txHash,
       workingDirectory,
+      providerUrl,
       network: debugNetworkOptions?.name,
       disableFetchExternal: false,
     } as DebuggerTypes.DebugArgs;
