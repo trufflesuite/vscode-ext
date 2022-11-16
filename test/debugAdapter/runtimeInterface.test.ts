@@ -92,7 +92,13 @@ const baseSessionMock: truffleDebugger.Session = {
 
 async function initMockRuntime() {
   const runtimeInterface = new RuntimeInterface();
-  const args = {txHash: '', workingDirectory: '', providerUrl: '', network: '', disableFetchExternal: false};
+  const args = {
+    txHash: '',
+    workingDirectory: '',
+    providerUrl: 'http://127.0.0.1:8545',
+    network: 'development',
+    disableFetchExternal: false,
+  };
   await runtimeInterface.attach(args);
   return runtimeInterface;
 }
