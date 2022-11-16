@@ -12,7 +12,7 @@ import {Uri, workspace} from 'vscode';
  * The [glob](https://github.com/isaacs/node-glob#glob-primer) pattern to match Truffle/Other config file names.
  */
 export const TRUFFLE_CONFIG_GLOB = 'truffle-config{,.*}.js';
-export const HARDHAT_CONFIG_GLOB = 'hardhat.config{,.*}.ts';
+export const HARDHAT_CONFIG_GLOB = 'hardhat.config{,.*}.{js,ts}';
 
 class ResolverConfig {
   constructor(public type: WorkspaceType, public glob: string) {}
