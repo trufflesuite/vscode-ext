@@ -25,8 +25,8 @@ export namespace DebuggerCommands {
     await debugNetwork.load();
     const contractBuildDir = debugNetwork.getTruffleConfiguration()!.contracts_build_directory;
 
-    const debugNetworkOptions = debugNetwork.getNetwork();
-    const web3 = new Web3Wrapper(debugNetworkOptions!.options);
+    const debugNetworkOptions = debugNetwork.getNetwork()!.options;
+    const web3 = new Web3Wrapper(debugNetworkOptions);
     const providerUrl = web3.getProviderUrl();
 
     // if local service then provide last transactions to choose
@@ -73,7 +73,6 @@ export namespace DebuggerCommands {
       txHash,
       workingDirectory,
       providerUrl,
-      network: debugNetworkOptions?.name,
       disableFetchExternal: false,
     };
 

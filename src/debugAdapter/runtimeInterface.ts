@@ -290,16 +290,22 @@ export default class RuntimeInterface extends EventEmitter {
    * @returns
    */
   private validateNetwork(config: Config, args: Required<DebuggerTypes.DebugArgs>): void {
-    if (args.network && !args.providerUrl) {
-      // Sets the network to get the provider url
-      config.network = args.network;
-    } else {
+    if (args.providerUrl) {
       // Adds a temporary network to get the provider url
       config.network = 'temp_network';
       config.networks.temp_network = {
         url: args.providerUrl,
         network_id: '*',
       };
+      return;
     }
+
+    // Check if the network exists inside the truffle configuration file
+    if (!config.networks.hasOwnProperty(args.network)) {
+      throw new Error(`Network '${args.network}' does not exist in your truffle configuration file.`);
+    }
+
+    // Sets the network to get the provider url
+    config.network = args.network;
   }
 }
