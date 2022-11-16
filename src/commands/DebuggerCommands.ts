@@ -25,8 +25,8 @@ export namespace DebuggerCommands {
     await debugNetwork.load();
     const contractBuildDir = debugNetwork.getTruffleConfiguration()!.contracts_build_directory;
 
-    const debugNetworkOptions = debugNetwork.getNetwork()!.options;
-    const web3 = new Web3Wrapper(debugNetworkOptions);
+    const debugNetworkOptions = debugNetwork.getNetwork();
+    const web3 = new Web3Wrapper(debugNetworkOptions!.options);
 
     // if local service then provide last transactions to choose
     const transactionProvider = new TransactionProvider(web3, contractBuildDir);
@@ -67,7 +67,16 @@ export namespace DebuggerCommands {
       txHash = txHashSelection.detail || txHashSelection.label;
     }
 
-    await startDebugging({txHash, workingDirectory, disableFetchExternal: false});
+    // Sets the parameters for the debug session
+    const args = {
+      txHash,
+      workingDirectory,
+      network: debugNetworkOptions?.name,
+      disableFetchExternal: false,
+    } as DebuggerTypes.DebugArgs;
+
+    // Starts the debugger
+    await startDebugging(args);
   }
 }
 

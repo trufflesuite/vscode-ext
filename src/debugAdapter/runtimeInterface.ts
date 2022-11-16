@@ -139,6 +139,9 @@ export default class RuntimeInterface extends EventEmitter {
     // Retreives the truffle configuration file
     const config = Config.detect({workingDirectory: args.workingDirectory});
 
+    // Validate the network parameter
+    this.validateNetwork(config, args);
+
     // Retreives the environment configuration
     await Environment.detect(config);
 
@@ -275,6 +278,28 @@ export default class RuntimeInterface extends EventEmitter {
   private validateSession() {
     if (!this._session) {
       throw new Error('Debug session is undefined');
+    }
+  }
+
+  /**
+   * Validate if the network parameter was set. Case the network is empty,
+   * a temp network is created to generate a provider url
+   *
+   * @param config Represents the truffle configuration file.
+   * @param args Represents the arguments needed to initiate a new Truffle `DebugSession` request.
+   * @returns
+   */
+  private validateNetwork(config: Config, args: Required<DebuggerTypes.DebugArgs>): void {
+    if (args.network && !args.providerUrl) {
+      // Sets the network to get the provider url
+      config.network = args.network;
+    } else {
+      // Adds a temporary network to get the provider url
+      config.network = 'temp_network';
+      config.networks.temp_network = {
+        url: args.providerUrl,
+        network_id: '*',
+      };
     }
   }
 }
