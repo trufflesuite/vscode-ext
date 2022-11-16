@@ -75,7 +75,7 @@ export namespace DebuggerCommands {
       providerUrl,
       network: debugNetworkOptions?.name,
       disableFetchExternal: false,
-    } as DebuggerTypes.DebugArgs;
+    };
 
     // Starts the debugger
     await startDebugging(args);
