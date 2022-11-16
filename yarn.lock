@@ -1135,7 +1135,7 @@
     "@truffle/error" "^0.1.1"
     colors "1.4.0"
 
-"@truffle/compile-solidity@^6.0.31":
+"@truffle/compile-solidity@^6.0.31", "@truffle/compile-solidity@^6.0.44":
   version "6.0.44"
   resolved "https://registry.yarnpkg.com/@truffle/compile-solidity/-/compile-solidity-6.0.44.tgz#e66a1a787c3a840ed9a25f368157a345a4cb9d22"
   integrity sha512-4ZGshtdRhJUGCxb2E0DLx3+3PQ+HJzjNPWZgFqCqMwl5xxtNqsrZtAoJcsWOFrfhq7HVE8aLv3De0PbOQOHdbQ==
@@ -1524,6 +1524,19 @@
     glob "^7.1.6"
     web3-utils "1.7.4"
 
+"@truffle/fetch-and-compile@^0.5.19":
+  version "0.5.19"
+  resolved "https://registry.yarnpkg.com/@truffle/fetch-and-compile/-/fetch-and-compile-0.5.19.tgz#36364fa416e5d9d4a49f349cf189ea2aa3c56618"
+  integrity sha512-WZrxG6POZ8b2sS4vKjGWoxWHQkRC5EYSmZdCa8nnNbt31z/Us12Ie+nKlxBKFjSbtD/t8zVb3OfcFpLly/Xwpg==
+  dependencies:
+    "@truffle/codec" "^0.14.5"
+    "@truffle/compile-solidity" "^6.0.44"
+    "@truffle/config" "^1.3.38"
+    "@truffle/source-fetcher" "^1.0.17"
+    debug "^4.3.2"
+    semver "7.3.7"
+    web3-utils "1.7.4"
+
 "@truffle/interface-adapter@^0.5.21":
   version "0.5.21"
   resolved "https://registry.npmjs.org/@truffle/interface-adapter/-/interface-adapter-0.5.21.tgz"
@@ -1666,6 +1679,17 @@
     fs-extra "^9.1.0"
     get-installed-path "^4.0.8"
     glob "^7.1.6"
+    web3-utils "1.7.4"
+
+"@truffle/source-fetcher@^1.0.17":
+  version "1.0.17"
+  resolved "https://registry.yarnpkg.com/@truffle/source-fetcher/-/source-fetcher-1.0.17.tgz#068c29f32ba9051422951c14b844cc59fdc249f7"
+  integrity sha512-QZYjnhIqvcTEwRO1rIwiCMYLjYHcNwt0/ElLbsZGWUnpX0MMP2Nxlnvjmd4xStmenLcF8HUQexC8OCSfsy0fSg==
+  dependencies:
+    async-retry "^1.3.1"
+    axios "0.27.2"
+    debug "^4.3.1"
+    node-abort-controller "^3.0.1"
     web3-utils "1.7.4"
 
 "@truffle/source-map-utils@^1.3.88", "@truffle/source-map-utils@^1.3.96":
@@ -2950,7 +2974,7 @@ async-limiter@~1.0.0:
   resolved "https://registry.npmjs.org/async-limiter/-/async-limiter-1.0.1.tgz"
   integrity sha512-csOlWGAcRFJaI6m+F2WKdnMKr4HhdhFVBk0H/QbJFMCr+uO2kwohwXQPxw/9OCxp05r5ghVBFSyioixx3gfkNQ==
 
-async-retry@^1.2.1:
+async-retry@^1.2.1, async-retry@^1.3.1:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/async-retry/-/async-retry-1.3.3.tgz#0e7f36c04d8478e7a58bdbed80cedf977785f280"
   integrity sha512-wfr/jstw9xNi/0teMHrRW7dsz3Lt5ARhYNZ2ewpadnhaIp5mbALhOAP+EAdsC7t4Z6wqsDVv9+W6gm1Dk9mEyw==

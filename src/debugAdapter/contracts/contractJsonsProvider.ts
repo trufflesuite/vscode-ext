@@ -3,7 +3,6 @@
 
 import fs from 'fs-extra';
 import path from 'path';
-import {CONTRACT_JSON_ENCODING} from '../constants/contractJson';
 import {IContractJsonModel} from '../models/IContractJsonModel';
 
 export class ContractJsonsProvider {
@@ -11,7 +10,7 @@ export class ContractJsonsProvider {
   private contractJsonEncoding: string;
   private _cachedContractJsons: {[fileName: string]: IContractJsonModel} | undefined;
 
-  constructor(contractBuildDirectory: string, contractJsonEncoding = CONTRACT_JSON_ENCODING) {
+  constructor(contractBuildDirectory: string, contractJsonEncoding = 'utf-8') {
     this.contractBuildDirectory = contractBuildDirectory;
     this.contractJsonEncoding = contractJsonEncoding;
   }

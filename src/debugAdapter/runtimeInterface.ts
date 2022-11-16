@@ -8,6 +8,14 @@ import {TranslatedResult, translateTruffleVariables} from './helpers';
 import {DebuggerTypes} from './models/debuggerTypes';
 import {ICallInfo} from './models/ICallInfo';
 import {IInstruction} from './models/IInstruction';
+import {mkdirpSync, writeFileSync} from 'fs-extra';
+import {fetchAndCompileForDebugger} from '@truffle/fetch-and-compile';
+import {LocalNetworkNode, LocalProject} from '@/Models/TreeItems';
+import {getChainId} from '@/functions/explorer';
+import {TreeManager} from '@/services/tree/TreeManager';
+import {ItemType} from '@/Models';
+import * as os from 'os';
+import * as path from 'path';
 
 export default class RuntimeInterface extends EventEmitter {
   private _isDebuggerAttached: boolean;
@@ -126,25 +134,86 @@ export default class RuntimeInterface extends EventEmitter {
   /**
    * This function attaches the debugger and starts the debugging process.
    *
-   * @param txHash The transaction hash to debug.
-   * @param workingDirectory The workspace path where the truffle project is located.
-   * @param providerUrl The url provider where the contracts were deployed.
+   * @param args The `DebugArgs` to initialize the `DebugSession` this `RuntimeInterface` belong to.
    * @returns
    */
-  public async attach(txHash: string, workingDirectory: string, providerUrl: string): Promise<void> {
+  public async attach(args: Required<DebuggerTypes.DebugArgs>): Promise<void> {
     // Gets the contracts compilation
-    const result = await prepareContracts(workingDirectory);
-
-    // Sets the truffle debugger options
-    const options: truffleDebugger.DebuggerOptions = {
-      provider: providerUrl,
-      compilations: result.shimCompilations,
-    };
+    const result = await prepareContracts(args.workingDirectory);
 
     // Sets the properties to use during the debugger process
     this._mappedSources = result.mappedSources;
-    this._session = await this.generateSession(txHash, options);
+    const networkId = args.disableFetchExternal ? undefined : this.getNetworkId(args.providerUrl);
+
+    // Sets the truffle debugger options
+    const options: truffleDebugger.DebuggerOptions = {
+      provider: args.providerUrl,
+      compilations: result.shimCompilations,
+      lightMode: networkId !== undefined,
+    };
+
+    this._session = await this.generateSession(args.txHash, networkId, options);
+    this.serializeExternalSources();
+
     this._isDebuggerAttached = true;
+  }
+
+  /**
+   * Serialize any (fetched) external sources into a temporary folder
+   * to be later opened by VS Code editor.
+   *
+   * Whenever this `Session` has been already initialized with fetch external sources,
+   * _i.e._, `fetchAndCompileForDebugger`,
+   * the corresponding sources are stored in this `Session`'s state.
+   * This method serialize these Session's sources into a temporary folder
+   * (as returned by `os.tmpdir()`).
+   *
+   * > Moreover, if the source path of a contract being serialized is a nested path,
+   * > _.e.g._, `/@openzeppelin/contracts/access/Ownable.sol`,
+   * this method creates the full folder path.
+   */
+  private serializeExternalSources() {
+    const byId = this._session!.view(this._selectors.sourcemapping.info.sources).byId;
+
+    // TODO: This guard is used so far in tests, not sure if `byId` can be undefined when running the extension.
+    if (byId === undefined) {
+      return;
+    }
+
+    for (const compilation of Object.values(byId) as {compilationId: string; source: string; sourcePath: string}[]) {
+      if (compilation.compilationId.startsWith('externalFor')) {
+        const tmp = os.tmpdir();
+        const sourcePath = path.join(tmp, compilation.sourcePath);
+
+        const sourceDir = path.dirname(sourcePath);
+        mkdirpSync(sourceDir);
+
+        writeFileSync(sourcePath, compilation.source);
+        this._mappedSources.set(compilation.sourcePath, sourcePath);
+      }
+    }
+  }
+
+  /**
+   * Retrieves the chain id of the `providerUrl`.
+   *
+   * @param providerUrl the url to get chain id from.
+   * @returns the chain id of the given `providerUrl`.
+   */
+  private getNetworkId(providerUrl: string) {
+    const services = TreeManager.getItem(ItemType.LOCAL_SERVICE);
+
+    if (!services || !services.getChildren()) {
+      return undefined;
+    }
+
+    const projects = services.getChildren() as LocalProject[];
+    const project = projects.find((project) => {
+      const network = project.getChildren().at(0) as LocalNetworkNode;
+      return `${network.url.protocol}//${network.url.host}` === providerUrl;
+    });
+
+    return project ? getChainId(project.options.forkedNetwork) : undefined;
   }
 
   public currentLine(): DebuggerTypes.IFrame {
@@ -193,8 +262,31 @@ export default class RuntimeInterface extends EventEmitter {
     }
   }
 
-  private async generateSession(txHash: string, options: truffleDebugger.DebuggerOptions) {
+  /**
+   * Generates the Truffle Debugger `Session`.
+   *
+   * `networkId` indicates which network this `Session`'s provider is forking from, if any.
+   * When `networkId` is defined,
+   * the Truffle `fetch-and-compile` module is used to fetch external sources,
+   * currently from Etherscan.
+   *
+   * @param txHash
+   * @param networkId
+   * @param options
+   * @returns
+   */
+  private async generateSession(
+    txHash: string,
+    networkId: string | number | undefined,
+    options: truffleDebugger.DebuggerOptions
+  ) {
     const bugger = await truffleDebugger.forTx(txHash, options);
+
+    if (networkId) {
+      await fetchAndCompileForDebugger(bugger, {network: {networkId: networkId as any}}); //Note: mutates bugger!!
+      await (bugger as any).startFullMode();
+    }
+
     return bugger.connect();
   }
 

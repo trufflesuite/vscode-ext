@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 import {Constants} from '@/Constants';
-import {TRANSACTION_NUMBER_TO_SHOW} from '../constants/transaction';
 import {ContractJsonsProvider} from '../contracts/contractJsonsProvider';
 import {groupBy} from '../helpers';
 import {IContractJsonModel} from '../models/IContractJsonModel';
@@ -10,6 +9,8 @@ import {ITransactionInputData} from '../models/ITransactionInputData';
 import {ITransactionResponse} from '../models/ITransactionResponse';
 import {Web3Wrapper} from '../web3Wrapper';
 import {TransactionInputDataDecoder} from './transactionInputDataDecoder';
+
+const TRANSACTION_NUMBER_TO_SHOW = 5;
 
 export class TransactionProvider {
   private _web3: Web3Wrapper;

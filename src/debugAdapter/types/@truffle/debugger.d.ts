@@ -37,6 +37,7 @@ declare module '@truffle/debugger' {
   type DebuggerOptions = {
     provider: Web3Provider;
     compilations?: Array<any>;
+    lightMode: boolean;
   };
 
   /**
