@@ -1,4 +1,4 @@
-// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import assert from 'assert';
@@ -7,10 +7,10 @@ import {join as pathJoin} from 'path';
 import sinon from 'sinon';
 import {StoppedEvent} from '@vscode/debugadapter';
 import {DebugProtocol} from '@vscode/debugprotocol';
-import {GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS} from '../../src/debugAdapter/constants/debugSessionCommands';
-import {SolidityDebugSession} from '../../src/debugAdapter/debugSession';
-import {DebuggerTypes} from '../../src/debugAdapter/models/debuggerTypes';
-import {IInstruction} from '../../src/debugAdapter/models/IInstruction';
+import {GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS} from '@/debugAdapter/constants/debugSessionCommands';
+import {SolidityDebugSession} from '@/debugAdapter/debugSession';
+import {DebuggerTypes} from '@/debugAdapter/models/debuggerTypes';
+import {IInstruction} from '@/debugAdapter/models/IInstruction';
 import RuntimeInterface from '../../src/debugAdapter/runtimeInterface';
 import {SolidityDebugSessionClient} from './SolidityDebugSessionClient';
 

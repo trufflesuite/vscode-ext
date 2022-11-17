@@ -1,6 +1,3 @@
-// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
-// Licensed under the MIT license.
-
 import vscode, {WorkspaceFolder} from 'vscode';
 import type {CancellationToken, Progress, ProgressOptions} from 'vscode';
 

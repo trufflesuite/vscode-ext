@@ -1,19 +1,12 @@
-// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
-// Licensed under the MIT license.
-import {Constants} from '@/Constants';
-
-import {AbstractWorkspace, resolveAllWorkspaces, WorkspaceType} from '@/helpers/AbstractWorkspace';
-import {getWorkspaceFolder} from '@/helpers/WorkspaceHelpers';
-// import {getAllTruffleWorkspaces} from '@/helpers/workspace';
+import {resolveAllWorkspaces, WorkspaceType} from '@/helpers/AbstractWorkspace';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as vscode from 'vscode';
 import {ThemeColor, ThemeIcon, Uri} from 'vscode';
-import {Constants} from '../Constants';
+import {Constants} from '@/Constants';
 import {ContractService} from '@/services/contract/ContractService';
-import {FileType, TreeItem} from 'vscode';
 
 //#region Utilities
 
@@ -193,29 +186,28 @@ export type Entry = vscode.Uri & {
   iconPath: vscode.ThemeIcon;
   description?: string;
   contextValue?: string;
+  workspaceType: WorkspaceType;
 };
 
-export type EntryOld = vscode.Uri & {type: vscode.FileType; workspaceType?: WorkspaceType};
-
-/**
- * Represents a top-level `TreeItem` for our file view...
- *
- * This gives us a few more free items in terms of customisation over the original view item.
- */
-class TreeItemEntry extends TreeItem {
-  constructor(
-    path: string,
-    uri: vscode.Uri,
-    public readonly type: FileType,
-    description?: string,
-    icon?: vscode.ThemeIcon
-  ) {
-    super(path);
-    this.resourceUri = uri;
-    if (icon) this.iconPath = icon;
-    if (description) this.description = description;
-  }
-}
+// /**
+//  * Represents a top-level `TreeItem` for our file view...
+//  *
+//  * This gives us a few more free items in terms of customisation over the original view item.
+//  */
+// class TreeItemEntry extends TreeItem {
+//   constructor(
+//     path: string,
+//     uri: vscode.Uri,
+//     public readonly type: FileType,
+//     description?: string,
+//     icon?: vscode.ThemeIcon
+//   ) {
+//     super(path);
+//     this.resourceUri = uri;
+//     if (icon) this.iconPath = icon;
+//     if (description) this.description = description;
+//   }
+// }
 
 export type TElementTypes = {
   contextValue: string;
@@ -404,6 +396,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
       return children.map(([name, type]) =>
         Object.assign(vscode.Uri.file(path.join(element.fsPath, name)), {
           type,
+          workspaceType: element.workspaceType,
           label: name,
           iconPath: type === vscode.FileType.Directory ? new ThemeIcon('file-directory') : new ThemeIcon('file-code'),
           contextValue: this.getTreeItemContextValue(type, false),
@@ -414,8 +407,10 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
     // The tree view elements
     const elements: Entry[] = [];
 
-    // Gets the truffle workspaces
-    const workspaces = await getAllTruffleWorkspaces();
+    // Gets the workspaces
+    const workspaces = resolveAllWorkspaces();
+
+    // FIXME: this error? needed?
 
     // Checks if there are any truffle workspaces
     if (workspaces.length === 0) {
@@ -444,9 +439,10 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
             elements.push(
               Object.assign(Uri.parse(contractFolder), {
                 type: vscode.FileType.Directory,
+                workspaceType: workspace.workspaceType,
                 label: path.basename(contractFolder),
                 iconPath: new ThemeIcon('file-directory'),
-                description: path.basename(path.dirname(contractFolder)),
+                description: path.basename(path.dirname(contractFolder)) + ' - ' + workspace.workspaceType.toString(),
                 contextValue: this.getTreeItemContextValue(vscode.FileType.Directory, true),
               })
             );

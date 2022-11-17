@@ -1,4 +1,4 @@
-// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 export * from './IExtensionAdapter';

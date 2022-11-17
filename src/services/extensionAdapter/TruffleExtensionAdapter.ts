@@ -1,4 +1,4 @@
-// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
+// Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
 import {TruffleCommands} from '@/commands';
@@ -12,7 +12,6 @@ export class TruffleExtensionAdapter implements IExtensionAdapter {
   };
 
   public build = async (ws: AbstractWorkspace, contractUri?: Uri): Promise<void> => {
-    // TODO: rework this code to work with the workspace details.
     return TruffleCommands.buildContracts(ws, contractUri);
   };
 

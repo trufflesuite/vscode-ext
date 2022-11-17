@@ -84,8 +84,7 @@
           "scope": "Core SDK for extensions backend",
           "default": "Truffle",
           "enum": [
-            "Truffle",
-            "Hardhat"
+            "Truffle"
           ]
         }
       }
@@ -419,7 +418,7 @@
         },
         {
           "command": "truffle-vscode.buildContracts",
-          "when": "view == truffle-vscode.views.explorer",
+          "when": "view == truffle-vscode.views.explorer && viewItem == root",
           "group": "truffle-0@1"
         },
         {

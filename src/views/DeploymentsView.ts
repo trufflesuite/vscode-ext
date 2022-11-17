@@ -1,6 +1,3 @@
-// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
-// Licensed under the MIT license.
-
 import {getChain, getExplorerLink} from '@/functions/explorer';
 import {AbstractWorkspace, resolveAllWorkspaces, WorkspaceType} from '@/helpers/AbstractWorkspace';
 import {EvalTruffleConfigError} from '@/helpers/TruffleConfiguration';
