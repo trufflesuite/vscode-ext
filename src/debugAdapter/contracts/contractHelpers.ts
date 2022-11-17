@@ -10,7 +10,7 @@ import TruffleConfig from '@truffle/config';
 /**
  * Represents the return from the compilation of contracts.
  */
-type ContractData = {
+export type ContractData = {
   /**
    * A list of mapped files so debug can open.
    */

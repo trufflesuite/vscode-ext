@@ -140,7 +140,7 @@ export default class RuntimeInterface extends EventEmitter {
     const config = Config.detect({workingDirectory: args.workingDirectory});
 
     // Validate the network parameter
-    this.validateNetwork(config, args);
+    RuntimeInterface.validateNetwork(config, args);
 
     // Retreives the environment configuration
     await Environment.detect(config);
@@ -154,7 +154,7 @@ export default class RuntimeInterface extends EventEmitter {
 
     // Sets the truffle debugger options
     const options: truffleDebugger.DebuggerOptions = {
-      provider: config.provider.host,
+      provider: config.provider,
       compilations: result.shimCompilations,
       lightMode: networkId !== undefined,
     };
@@ -289,7 +289,7 @@ export default class RuntimeInterface extends EventEmitter {
    * @param args Represents the arguments needed to initiate a new Truffle `DebugSession` request.
    * @returns
    */
-  private validateNetwork(config: Config, args: Required<DebuggerTypes.DebugArgs>): void {
+  private static validateNetwork(config: Config, args: Required<DebuggerTypes.DebugArgs>): void {
     if (args.providerUrl) {
       // Adds a temporary network to get the provider url
       config.network = 'temp_network';
@@ -300,9 +300,9 @@ export default class RuntimeInterface extends EventEmitter {
       return;
     }
 
-    // Check if the network exists inside the truffle configuration file
+    // Check if the network exists inside the Truffle configuration file
     if (!config.networks.hasOwnProperty(args.network)) {
-      throw new Error(`Network '${args.network}' does not exist in your truffle configuration file.`);
+      throw new Error(`Network '${args.network}' does not exist in your Truffle configuration file.`);
     }
 
     // Sets the network to get the provider url
