@@ -75,7 +75,7 @@ describe('SDK Core Commands', () => {
       expect(hardhatBuildStub.notCalled).to.be.true;
       expect(truffleBuildStub.calledOnce).to.be.true;
       // console.log(`args: `, {args: truffleBuildStub.firstCall.args}); // WORKSPACE args[0]
-      expect(truffleBuildStub.firstCall.args[0].dirName).to.be.eq(wsFolder);
+      expect(truffleBuildStub.firstCall.args[0].path).to.be.eq('/truffle-project-1');
     });
 
     it('will find correct command to build - hardhat', async function () {
@@ -92,7 +92,7 @@ describe('SDK Core Commands', () => {
       expect(truffleBuildStub.notCalled).to.be.true;
       expect(hardhatBuildStub.calledOnce).to.be.true;
       // console.log(`args: `, {args: hardhatBuildStub.firstCall.args}); // WORKSPACE args[0]
-      expect(hardhatBuildStub.firstCall.args[0].dirName).to.be.eq(wsFolder);
+      expect(hardhatBuildStub.firstCall.args[1].path).to.be.eq('/hardhat-project-1');
     });
 
     it('will find correct command to build - unknown', async function () {

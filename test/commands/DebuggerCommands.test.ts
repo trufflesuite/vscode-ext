@@ -17,7 +17,7 @@ import {TestConstants} from '../TestConstants';
 
 import {shortenHash} from '@/commands/DebuggerCommands';
 
-const truffleWorkspace = new AbstractWorkspace(
+const truffleWorkspace = AbstractWorkspace.createWorkspaceFromConfigPath(
   path.join(__dirname, TestConstants.truffleCommandTestDataFolder, 'truffle-config.js'),
   WorkspaceType.TRUFFLE
 );

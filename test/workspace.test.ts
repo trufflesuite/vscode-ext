@@ -32,8 +32,11 @@ describe('Workspace - WorkspaceForUri Tests', () => {
   let fsStub: sinon.SinonStub<any[], any>;
   let quickPickStub: sinon.SinonStub<any[], Promise<QuickPickItem>>;
 
-  const aw1 = new AW.AbstractWorkspace('unknown-aw1/bleh.conf.js', WorkspaceType.UNKNOWN);
-  const aw2 = new AW.AbstractWorkspace('truffle-aw2/bleh2.conf.js', WorkspaceType.TRUFFLE);
+  const aw1 = AW.AbstractWorkspace.createUnknownWorkspace(Uri.file('/dev/unknown-aw1'));
+  const aw2 = AW.AbstractWorkspace.createWorkspaceFromConfigPath(
+    '/dev/truffle-aw2/bleh2.conf.js',
+    WorkspaceType.TRUFFLE
+  );
 
   beforeEach(async () => {
     //setup the mockery...
@@ -66,54 +69,54 @@ describe('Workspace - WorkspaceForUri Tests', () => {
 
   it('will resolve workspace correctly - in a truffle folder.', async function () {
     //given - I have the default value set.
-    const wsFolder = 'truffle-test';
+    const wsFolder = '/dev/some/thing/truffle-test';
     setupTestScenario(wsFolder, AW.TRUFFLE_CONFIG_GLOB);
 
     // when I call
     const workspaceRet = await AW.getWorkspaceForUri(Uri.file(wsFolder));
-
     // then the workspace will be correct
-    expect(workspaceRet.dirName).to.be.eq(wsFolder);
+    expect(workspaceRet.dirName).to.be.eq('truffle-test');
     expect(workspaceRet.workspaceType).to.be.eq(AW.WorkspaceType.TRUFFLE);
   });
 
   it('will resolve workspace correctly - in a hardhat folder.', async function () {
     //given - I have the default value set.
-    const wsFolder = 'hardhat-test';
+    const wsFolder = '/dev/blah/blah/hardhat-test';
     setupTestScenario(wsFolder, AW.HARDHAT_CONFIG_GLOB);
 
     // when I call the workspace resolver...
     const workspaceRet = await AW.getWorkspaceForUri(Uri.file(wsFolder));
 
     // then the Truffle Instances will be called.
-    expect(workspaceRet.dirName).to.be.eq(wsFolder);
+    expect(workspaceRet.dirName).to.be.eq('hardhat-test');
     expect(workspaceRet.workspaceType).to.be.eq(AW.WorkspaceType.HARDHAT);
   });
 
   it("will do nothing when it can't find a directory.", async function () {
     // given this base folder...
-    const wsFolder = 'some-empty-folder';
+    const wsFolder = '/dev/some-empty-folder';
     pushWorkspace(wsFolder);
 
     // when I call the workspace resolver...
     const workspaceRet = await AW.getWorkspaceForUri();
     // then
-    expect(workspaceRet.dirName).to.be.eq(wsFolder);
+    expect(workspaceRet.dirName).to.be.eq('some-empty-folder');
     expect(workspaceRet.workspaceType).to.be.eq(AW.WorkspaceType.UNKNOWN);
   });
 
   it('will show quickpick if multiple workspace found - URI passed in.', async function () {
     // given we get no workspaces back
-    const wsFolder = 'some-empty-folder';
+    const wsFolder = '/blah/shmah/some-empty-folder';
     pushWorkspace(wsFolder);
     sandbox.stub(AW, 'findWorkspaces').returns([aw1, aw2]);
     quickPickStub.resolves({workspace: aw1} as QuickPickType);
 
     // when I try and get the workspace
     const workspaceRet = await AW.getWorkspaceForUri(Uri.file(wsFolder));
-
     // then I am going to hit the quickpick and return the one from there...
     expect(workspaceRet).to.be.not.undefined;
+    expect(workspaceRet.workspace.path).to.be.eq('/dev/unknown-aw1');
+    expect(workspaceRet.dirName).to.be.eq('unknown-aw1');
     expect(workspaceRet.workspaceType).to.be.eq(WorkspaceType.UNKNOWN);
     expect(workspaceRet.configName).to.be.eq(aw1.configName);
     expect(quickPickStub.calledOnce).to.be.true;

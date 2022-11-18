@@ -1,7 +1,6 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {AbstractWorkspace, getWorkspaceForUri} from '@/helpers/AbstractWorkspace';
 import {INetwork} from '@/helpers/ConfigurationReader';
 import {TruffleConfig} from '@/helpers/TruffleConfiguration';
 import {mnemonicToSeed} from 'bip39';
@@ -11,7 +10,7 @@ import path from 'path';
 import {QuickPickItem, Uri, window, commands, QuickPickItemKind} from 'vscode';
 import {Constants, RequiredApps} from '@/Constants';
 import {outputCommandHelper, telemetryHelper, vscodeEnvironment} from '../helpers';
-// import {getTruffleWorkspace} from '@/helpers/workspace';
+import {getTruffleWorkspace} from '@/helpers/workspace';
 import {required} from '@/helpers/required';
 
 import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from '@/helpers/userInteraction';
@@ -56,11 +55,10 @@ export namespace TruffleCommands {
   /**
    * Triggers the Truffle command line compiler using `npx`.
    *
-   * @param ws the workspace we are building in
    * @param contractUri if provided, compiles only `contractUri`.
    * @returns
    */
-  export async function buildContracts(ws: AbstractWorkspace, contractUri?: Uri): Promise<void> {
+  export async function buildContracts(contractUri?: Uri): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.buildContracts.commandStarted');
 
     if (!(await required.checkAppsSilent(RequiredApps.truffle))) {
@@ -69,10 +67,10 @@ export namespace TruffleCommands {
       return;
     }
 
-    const workspace = ws.workspace;
-
+    const truffleWorkspace = await getTruffleWorkspace(contractUri);
+    const workspace = truffleWorkspace.workspace;
     const contractDirectory = getPathByPlatform(workspace);
-    const args: string[] = [RequiredApps.truffle, 'compile', '--config', ws.configName];
+    const args: string[] = [RequiredApps.truffle, 'compile', '--config', truffleWorkspace.truffleConfigName];
 
     if (contractUri) {
       if (fs.lstatSync(contractUri.fsPath).isFile()) args.push(path.basename(contractUri.fsPath));
@@ -93,16 +91,19 @@ export namespace TruffleCommands {
    * Triggers the `migrate` option of the Truffle command line interface
    * using `npx`.
    *
-   * @param ws the workspace we are deploying from.
+   * @param contractUri FIXME: Is this used?
    */
-  export async function deployContracts(ws: AbstractWorkspace) {
+  export async function deployContracts(contractUri?: Uri) {
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandStarted');
 
-    const truffleConfigUri = getPathByPlatform(ws.configPath);
+    const truffleWorkspace = await getTruffleWorkspace(contractUri);
+    const truffleConfigUri = getPathByPlatform(truffleWorkspace.truffleConfig);
 
     const deployDestinations = [];
     deployDestinations.push(...getDefaultDeployDestinations(truffleConfigUri));
-    deployDestinations.push(...(await getTruffleDeployDestinations(truffleConfigUri, ws.configName)));
+    deployDestinations.push(
+      ...(await getTruffleDeployDestinations(truffleConfigUri, truffleWorkspace.truffleConfigName))
+    );
     deployDestinations.push(...(await getTreeDeployDestinations(truffleConfigUri)));
 
     const uniqueDestinations = removeDuplicateNetworks(deployDestinations);
@@ -195,7 +196,7 @@ export namespace TruffleCommands {
    * If `folderUri` is provided, the new contract will be created in that folder.
    * It **must** represent a folder URI.
    *
-   * Otherwise, it uses {@link getWorkspaceForUri} to select the
+   * Otherwise, it uses {@link getTruffleWorkspace} to select the
    * Truffle workspace to place the new contract.
    *
    * Once the new contract file has been created,
@@ -207,7 +208,7 @@ export namespace TruffleCommands {
     let folderPath: string;
 
     if (folderUri === undefined) {
-      const truffleWorkspace = await getWorkspaceForUri(folderUri);
+      const truffleWorkspace = await getTruffleWorkspace();
       try {
         folderPath = await ContractService.getContractsFolderPath(truffleWorkspace);
       } catch (err) {

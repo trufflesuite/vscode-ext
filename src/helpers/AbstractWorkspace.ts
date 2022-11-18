@@ -11,8 +11,8 @@ import {Uri, workspace} from 'vscode';
 /**
  * The [glob](https://github.com/isaacs/node-glob#glob-primer) pattern to match Truffle/Other config file names.
  */
-export const TRUFFLE_CONFIG_GLOB = 'truffle-config{,.*}.js';
-export const HARDHAT_CONFIG_GLOB = 'hardhat.config{,.*}.{js,ts}';
+export const TRUFFLE_CONFIG_GLOB = 'truffle-config*.js';
+export const HARDHAT_CONFIG_GLOB = 'hardhat.config*.{js,ts}';
 
 class ResolverConfig {
   constructor(public type: WorkspaceType, public glob: string) {}
@@ -35,15 +35,43 @@ export const WorkspaceResolvers: Array<ResolverConfig> = [
 
 export class AbstractWorkspace {
   /**
-   * Creates a `Workspace` of varying Type.
+   * Create an {WorkspaceType.UNKNOWN} workspace. Usually a root with no known
+   * framework in it.
    *
-   * @param configPath the full path of the config file.
-   * @param workspaceType - the type of config we have found.
+   * @param path - the folder root path
    */
-  constructor(configPath: string, public readonly workspaceType: WorkspaceType) {
+  static createUnknownWorkspace(path: Uri): AbstractWorkspace {
+    return new AbstractWorkspace(path, '', WorkspaceType.UNKNOWN);
+  }
+
+  /**
+   * Create a workspace from a config path. Will try to adapt the path to get workspace root.
+   * @param configPath - The config file, which can drive things later on.
+   * @param type - The {WorkspaceType} type. This will generally not be an {WorkspaceType.UNKNOWN}
+   * @throws Error when you attempt to use {WorkspaceType.UNKNOWN} as the type.
+   */
+  static createWorkspaceFromConfigPath(configPath: string, type: WorkspaceType): AbstractWorkspace {
+    if (type === WorkspaceType.UNKNOWN) throw new Error('Cannot use UNKNOWN workspace type with this constructor.');
+    const workspacePath = Uri.parse(path.dirname(configPath));
+    return new AbstractWorkspace(workspacePath, configPath, type);
+  }
+
+  /**
+   * Constructor to derive the workspace based on either the dirName (which is the root) or the config
+   * file location (from the glob). This also allows us to make Unknown or generic workspace types
+   * to help with config/reconciling commands etc.
+   *
+   * @param workspaceUri - the directory this workspace is in
+   * @param configPath - the path (optionally) to the config
+   * @param workspaceType - the type of workspace we are dealing with.
+   * @private - use the static constructors above.
+   */
+  private constructor(workspaceUri: Uri, configPath: string, public readonly workspaceType: WorkspaceType) {
+    //this.dirName = path.dirname(dirName).split(path.sep).pop()!.toString();
+    // or path.basename(path.dirname(filename))
+    this.workspace = workspaceUri;
+    this.dirName = configPath !== '' ? path.basename(path.dirname(configPath)) : path.basename(workspaceUri.path);
     this.configName = path.basename(configPath);
-    this.dirName = path.dirname(configPath).split(path.sep).pop()!.toString();
-    this.workspace = Uri.parse(path.dirname(configPath));
     this.configPath = Uri.parse(configPath);
   }
 
@@ -58,7 +86,7 @@ export class AbstractWorkspace {
   readonly dirName: string;
 
   /**
-   * The `Uri` path of the directory where this config file is located.
+   * The `Uri` root of the workspace or where hte config resides. Usually the same.
    */
   readonly workspace: Uri;
 
@@ -79,8 +107,7 @@ export function resolveAllWorkspaces(includeUnknown = true): AbstractWorkspace[]
     const foundWs = findWorkspaces(ws.uri.fsPath);
     // patch in the unknown ones.
     if (includeUnknown && foundWs?.length === 0) {
-      const configPath = path.join(ws.uri.fsPath, 'UNKNOWN');
-      foundWs.push(new AbstractWorkspace(configPath, WorkspaceType.UNKNOWN));
+      foundWs.push(AbstractWorkspace.createUnknownWorkspace(ws.uri));
     }
     return foundWs;
   });
@@ -92,7 +119,7 @@ export const findWorkspaces = (workspaceRootPath: string): AbstractWorkspace[] =
       .sync(`${workspaceRootPath}/**/${r.glob}`, {
         ignore: Constants.workspaceIgnoredFolders,
       })
-      .map((f) => new AbstractWorkspace(f, r.type))
+      .map((f) => AbstractWorkspace.createWorkspaceFromConfigPath(f, r.type))
   );
 };
 

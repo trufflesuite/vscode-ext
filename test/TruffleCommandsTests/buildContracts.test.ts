@@ -1,37 +1,46 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {TruffleCommands} from '@/commands';
-import {AbstractWorkspace, WorkspaceType} from '@/helpers/AbstractWorkspace';
-import * as commands from '@/helpers/command';
-import {required} from '@/helpers/required';
 import assert from 'assert';
-import {mock, restore, SinonExpectation, SinonMock, SinonStub, stub} from 'sinon';
+import {SinonMock, SinonExpectation, SinonStub, mock, stub, restore} from 'sinon';
 import uuid from 'uuid';
-import {CancellationToken, Progress, ProgressOptions, window} from 'vscode';
+import {CancellationToken, Progress, ProgressOptions, Uri, window} from 'vscode';
+import {TruffleCommands} from '@/commands';
+import * as helpers from '@/helpers/workspace';
+import * as commands from '../../src/helpers/command';
+import {required} from '@/helpers/required';
 import {TestConstants} from '../TestConstants';
+import {TruffleWorkspace} from '@/helpers/workspace';
 
 describe('BuildContracts Command', () => {
   describe('Integration test', async () => {
     let requiredMock: SinonMock;
+    let getWorkspacesMock: sinon.SinonStub<[contractUri?: Uri], Promise<helpers.TruffleWorkspace>>;
     let checkAppsSilent: SinonExpectation;
     let installTruffle: SinonExpectation;
     let commandContextMock: SinonMock;
     let executeCommandMock: SinonExpectation;
     let withProgressStub: SinonStub<[ProgressOptions, (progress: Progress<any>, token: CancellationToken) => any], any>;
 
-    let defaultWs: AbstractWorkspace;
+    const root: Uri = Uri.parse(__dirname);
+    const truffleWorkspace: TruffleWorkspace = {
+      truffleConfigName: 'truffle-config.js',
+      dirName: 'xpto',
+      workspace: root,
+      truffleConfig: Uri.parse(`${root.fsPath}/truffle-config.js`),
+    };
 
     beforeEach(() => {
       requiredMock = mock(required);
+
+      getWorkspacesMock = stub(helpers, 'getTruffleWorkspace');
+      getWorkspacesMock.returns(Promise.resolve(truffleWorkspace));
 
       checkAppsSilent = requiredMock.expects('checkAppsSilent');
       installTruffle = requiredMock.expects('installTruffle');
 
       commandContextMock = mock(commands);
       executeCommandMock = commandContextMock.expects('executeCommand');
-
-      defaultWs = new AbstractWorkspace('project/truffle-config.js', WorkspaceType.TRUFFLE);
 
       withProgressStub = stub(window, 'withProgress');
       withProgressStub.callsFake(async (...args: any[]) => {
@@ -49,10 +58,11 @@ describe('BuildContracts Command', () => {
       executeCommandMock.returns(uuid.v4());
 
       // Act
-      await TruffleCommands.buildContracts(defaultWs);
+      await TruffleCommands.buildContracts();
 
       // Assert
       assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+      assert.strictEqual(getWorkspacesMock.calledOnce, true, 'getWorkspacesMock should be called once');
       assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
       assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
     });
@@ -63,10 +73,11 @@ describe('BuildContracts Command', () => {
       executeCommandMock.returns(uuid.v4());
 
       // Act
-      await TruffleCommands.buildContracts(defaultWs);
+      await TruffleCommands.buildContracts();
 
       // Assert
       assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+      assert.strictEqual(getWorkspacesMock.calledOnce, false, 'getWorkspacesMock be should called once');
       assert.strictEqual(installTruffle.calledOnce, true, 'installTruffle should be called once');
       assert.strictEqual(executeCommandMock.called, false, 'executeCommand should be called');
     });
@@ -77,8 +88,9 @@ describe('BuildContracts Command', () => {
       executeCommandMock.throws(TestConstants.testError);
 
       // Act and assert
-      await assert.rejects(TruffleCommands.buildContracts(defaultWs), Error, TestConstants.testError);
+      await assert.rejects(TruffleCommands.buildContracts(), Error, TestConstants.testError);
       assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+      assert.strictEqual(getWorkspacesMock.calledOnce, true, 'getWorkspacesMock should be called once');
       assert.strictEqual(installTruffle.called, false, 'installTruffle should not be called');
       assert.strictEqual(executeCommandMock.called, true, 'executeCommand should be called');
     });
@@ -90,8 +102,9 @@ describe('BuildContracts Command', () => {
       installTruffle.throws(TestConstants.testError);
 
       // Act and assert
-      await assert.rejects(TruffleCommands.buildContracts(defaultWs), Error, TestConstants.testError);
+      await assert.rejects(TruffleCommands.buildContracts(), Error, TestConstants.testError);
       assert.strictEqual(checkAppsSilent.calledOnce, true, 'checkAppsSilent should be called once');
+      assert.strictEqual(getWorkspacesMock.called, false, 'getWorkspacesMock should not be called');
       assert.strictEqual(installTruffle.called, true, 'installTruffle should be called');
       assert.strictEqual(executeCommandMock.called, false, 'executeCommand should not be called');
     });

@@ -1,25 +1,25 @@
-import {getChain, getExplorerLink} from '@/functions/explorer';
-import {AbstractWorkspace, resolveAllWorkspaces, WorkspaceType} from '@/helpers/AbstractWorkspace';
-import {EvalTruffleConfigError} from '@/helpers/TruffleConfiguration';
-import {Output, OutputLabel} from '@/Output';
-import {ContractService} from '@/services/contract/ContractService';
 import fs from 'fs';
 import paths from 'path';
 import {
-  Command,
-  commands,
-  Event,
-  EventEmitter,
-  ThemeColor,
   ThemeIcon,
   TreeDataProvider,
   TreeItem,
-  TreeItemCollapsibleState,
-  TreeView,
   Uri,
+  Event,
+  TreeView,
   window,
+  EventEmitter,
+  commands,
+  TreeItemCollapsibleState,
+  Command,
+  ThemeColor,
 } from 'vscode';
+import {getChain, getExplorerLink} from '@/functions/explorer';
 import {OpenUrlTreeItem} from './lib/OpenUrlTreeItem';
+import {ContractService} from '@/services/contract/ContractService';
+import {getAllTruffleWorkspaces, TruffleWorkspace} from '@/helpers/workspace';
+import {EvalTruffleConfigError} from '@/helpers/TruffleConfiguration';
+import {Output, OutputLabel} from '@/Output';
 
 /**
  * Represents a compiled or deployed contract.
@@ -129,10 +129,10 @@ interface TreeParentItem {
  * as `label` and `description` for the `TreeItem` respectively.
  */
 class TruffleWorkspaceTreeItem extends TreeItem implements TreeParentItem {
-  constructor(workspace: AbstractWorkspace, private readonly items: TreeItem[]) {
-    super(workspace.dirName);
+  constructor(truffleWorkspace: TruffleWorkspace, private readonly items: TreeItem[]) {
+    super(truffleWorkspace.dirName);
     this.iconPath = new ThemeIcon('target');
-    this.description = workspace.configName;
+    this.description = truffleWorkspace.truffleConfigName;
     this.collapsibleState = TreeItemCollapsibleState.Expanded;
   }
 
@@ -300,15 +300,17 @@ class DeploymentsView implements TreeDataProvider<TreeItem> {
       return (element as TreeParentItem).loadChildren();
     }
 
-    // just the truffle ones maam.
-    const workspaces = resolveAllWorkspaces().filter((ws) => ws.workspaceType === WorkspaceType.TRUFFLE);
-    if (workspaces.length === 0) {
+    // TODO: just the truffle ones maam.
+    // const workspaces = resolveAllWorkspaces().filter((ws) => ws.workspaceType === WorkspaceType.TRUFFLE);
+
+    const truffleWorkspaces = getAllTruffleWorkspaces();
+    if (truffleWorkspaces.length === 0) {
       return [];
-    } else if (workspaces.length === 1) {
-      return await getContractDeployments(workspaces[0]);
+    } else if (truffleWorkspaces.length === 1) {
+      return await getContractDeployments(truffleWorkspaces[0]);
     } else {
       return await Promise.all(
-        workspaces.map(async (ws) => new TruffleWorkspaceTreeItem(ws, await getContractDeployments(ws)))
+        truffleWorkspaces.map(async (ws) => new TruffleWorkspaceTreeItem(ws, await getContractDeployments(ws)))
       );
     }
   }
@@ -319,19 +321,19 @@ class DeploymentsView implements TreeDataProvider<TreeItem> {
  * It follows the `contracts_build_directory` property in the Truffle config file
  * to look for compiled artifacts.
  *
- * @param workspace the Truffle config file where to look for compiled contracts.
+ * @param truffleWorkspace the Truffle config file where to look for compiled contracts.
  * @returns an array of `TreeItem` that represents the compiled contracts.
  */
-async function getContractDeployments(workspace: AbstractWorkspace): Promise<TreeItem[]> {
+async function getContractDeployments(truffleWorkspace: TruffleWorkspace): Promise<TreeItem[]> {
   let buildPath: string;
 
   try {
-    buildPath = await ContractService.getBuildFolderPath(workspace);
+    buildPath = await ContractService.getBuildFolderPath(truffleWorkspace);
   } catch (err) {
     if (err instanceof EvalTruffleConfigError) {
       Output.outputLine(
         OutputLabel.truffleForVSCode,
-        `Error while loading Deployments from ${workspace.dirName}:${workspace.configName}. Reason:`
+        `Error while loading Deployments from ${truffleWorkspace.dirName}:${truffleWorkspace.truffleConfigName}. Reason:`
       );
       Output.outputLine(OutputLabel.truffleForVSCode, err.reason);
     }
@@ -340,7 +342,7 @@ async function getContractDeployments(workspace: AbstractWorkspace): Promise<Tre
       {
         label: error.message,
         iconPath: new ThemeIcon('warning', new ThemeColor('errorForeground')),
-        command: openFileCommand(workspace.configPath),
+        command: openFileCommand(truffleWorkspace.truffleConfig),
       },
     ];
   }

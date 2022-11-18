@@ -3,7 +3,6 @@
 
 import {TruffleCommands} from '@/commands';
 import {Constants} from '@/Constants';
-import {getWorkspaceForUri} from '@/helpers/AbstractWorkspace';
 import {Telemetry} from '@/TelemetryClient';
 import * as path from 'path';
 import {Memento, TextDocument, Uri, workspace, WorkspaceFolder} from 'vscode';
@@ -49,7 +48,7 @@ export async function saveTextDocument(globalState: Memento, document: TextDocum
 
       // If enabled, calls the function that performs the deployment
       if (isAutoDeployOnSaveEnabled) {
-        await TruffleCommands.deployContracts(await getWorkspaceForUri(Uri.parse(document.fileName)));
+        await TruffleCommands.deployContracts(Uri.parse(document.fileName));
       }
       break;
     }

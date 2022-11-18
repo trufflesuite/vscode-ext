@@ -11,12 +11,12 @@ export class TruffleExtensionAdapter implements IExtensionAdapter {
     // throw new Error("Method not implemented.");
   };
 
-  public build = async (ws: AbstractWorkspace, contractUri?: Uri): Promise<void> => {
-    return TruffleCommands.buildContracts(ws, contractUri);
+  public build = async (_: AbstractWorkspace, contractUri?: Uri): Promise<void> => {
+    return TruffleCommands.buildContracts(contractUri);
   };
 
-  public deploy = async (ws: AbstractWorkspace): Promise<void> => {
-    return TruffleCommands.deployContracts(ws);
+  public deploy = async (_: AbstractWorkspace): Promise<void> => {
+    return TruffleCommands.deployContracts();
   };
 
   extensionType: WorkspaceType = WorkspaceType.TRUFFLE;

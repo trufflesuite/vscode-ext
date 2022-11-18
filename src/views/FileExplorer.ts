@@ -1,4 +1,4 @@
-import {resolveAllWorkspaces, WorkspaceType} from '@/helpers/AbstractWorkspace';
+import {getAllTruffleWorkspaces} from '@/helpers/workspace';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as path from 'path';
@@ -186,7 +186,6 @@ export type Entry = vscode.Uri & {
   iconPath: vscode.ThemeIcon;
   description?: string;
   contextValue?: string;
-  workspaceType: WorkspaceType;
 };
 
 // /**
@@ -396,7 +395,6 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
       return children.map(([name, type]) =>
         Object.assign(vscode.Uri.file(path.join(element.fsPath, name)), {
           type,
-          workspaceType: element.workspaceType,
           label: name,
           iconPath: type === vscode.FileType.Directory ? new ThemeIcon('file-directory') : new ThemeIcon('file-code'),
           contextValue: this.getTreeItemContextValue(type, false),
@@ -407,10 +405,9 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
     // The tree view elements
     const elements: Entry[] = [];
 
-    // Gets the workspaces
-    const workspaces = resolveAllWorkspaces();
-
-    // FIXME: this error? needed?
+    // Gets the truffle workspaces
+    const workspaces = getAllTruffleWorkspaces();
+    console.log(`getChildren: `, {workspaces, element});
 
     // Checks if there are any truffle workspaces
     if (workspaces.length === 0) {
@@ -439,10 +436,9 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
             elements.push(
               Object.assign(Uri.parse(contractFolder), {
                 type: vscode.FileType.Directory,
-                workspaceType: workspace.workspaceType,
                 label: path.basename(contractFolder),
                 iconPath: new ThemeIcon('file-directory'),
-                description: path.basename(path.dirname(contractFolder)) + ' - ' + workspace.workspaceType.toString(),
+                description: `${path.basename(path.dirname(contractFolder))} - (${workspace.truffleConfigName})`,
                 contextValue: this.getTreeItemContextValue(vscode.FileType.Directory, true),
               })
             );

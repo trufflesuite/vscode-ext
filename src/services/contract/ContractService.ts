@@ -1,13 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {AbstractWorkspace} from '@/helpers/AbstractWorkspace';
 import {getTruffleConfiguration} from '@/helpers/TruffleConfiguration';
 import fs from 'fs-extra';
 import path from 'path';
 import {HttpService} from '..';
 import {Constants} from '@/Constants';
-import {getPathByPlatform, getWorkspaceRoot} from '@/helpers/WorkspaceHelpers';
+import {getPathByPlatform, getWorkspaceRoot, TruffleWorkspace} from '@/helpers/workspace';
 import {Telemetry} from '@/TelemetryClient';
 import {Contract} from './Contract';
 
@@ -27,16 +26,16 @@ export namespace ContractService {
     });
   }
 
-  export async function getContractsFolderPath(workspace: AbstractWorkspace): Promise<string> {
-    return getPathDirectory('contracts_directory', workspace);
+  export async function getContractsFolderPath(truffleWorkspace: TruffleWorkspace): Promise<string> {
+    return getPathDirectory('contracts_directory', truffleWorkspace);
   }
 
   export async function getMigrationFolderPath(): Promise<string> {
     return getPathDirectory('migrations_directory');
   }
 
-  export async function getBuildFolderPath(workspace?: AbstractWorkspace): Promise<string> {
-    return getPathDirectory('contracts_build_directory', workspace);
+  export async function getBuildFolderPath(truffleWorkspace?: TruffleWorkspace): Promise<string> {
+    return getPathDirectory('contracts_build_directory', truffleWorkspace);
   }
 
   export async function getDeployedBytecodeByAddress(host: string, address: string): Promise<string> {
@@ -87,9 +86,9 @@ export namespace ContractService {
       .filter((file) => fs.lstatSync(file).isFile());
   }
 
-  async function getPathDirectory(directory: PathDirectoryKey, workspace?: AbstractWorkspace): Promise<string> {
-    const [workDir, name] = workspace
-      ? [getPathByPlatform(workspace.workspace), workspace.configName]
+  async function getPathDirectory(directory: PathDirectoryKey, truffleWorkspace?: TruffleWorkspace): Promise<string> {
+    const [workDir, name] = truffleWorkspace
+      ? [getPathByPlatform(truffleWorkspace.workspace), truffleWorkspace.truffleConfigName]
       : [getWorkspaceRoot()!, undefined];
     const configuration = await getTruffleConfiguration(workDir, name);
 
@@ -101,4 +100,19 @@ export namespace ContractService {
 
     return path.join(workDir, dir);
   }
+
+  // async function getPathDirectoryAW(directory: PathDirectoryKey, workspace?: AbstractWorkspace): Promise<string> {
+  //   const [workDir, name] = workspace
+  //     ? [getPathByPlatform(workspace.workspace), workspace.configName]
+  //     : [getWorkspaceRoot()!, undefined];
+  //   const configuration = await getTruffleConfiguration(workDir, name);
+  //
+  //   const dir = (configuration as any)[directory];
+  //
+  //   if (dir && path.isAbsolute(dir)) {
+  //     return dir;
+  //   }
+  //
+  //   return path.join(workDir, dir);
+  // }
 }
