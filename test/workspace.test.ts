@@ -9,7 +9,7 @@ import chai_as_promised from 'chai-as-promised';
 import fs from 'fs';
 import glob from 'glob';
 import sinon from 'sinon';
-import {Uri, workspace, QuickPickItem, WorkspaceFolder} from 'vscode';
+import {QuickPickItem, Uri, workspace, WorkspaceFolder} from 'vscode';
 
 chai.use(chai_as_promised);
 const expect = chai.expect;
@@ -163,7 +163,6 @@ describe('Workspace - WorkspaceForUri Tests', () => {
     // then I am going to hit the quickpick and return the one from there...
     expect(workspaceRet).to.be.not.undefined;
     expect(workspaceRet.workspaceType).to.be.eq(WorkspaceType.HARDHAT);
-    expect(workspaceRet.workspace.fsPath).to.be.eq('/dev/hardhat-test');
     expect(quickPickStub.notCalled).to.be.true;
   });
 
@@ -193,7 +192,7 @@ describe('Workspace - WorkspaceForUri Tests', () => {
     pushWorkspace('/dev/test-folder-2');
     // map one to be truffle
     globStub
-      .withArgs(`/dev/test-folder-2/**/${AW.TRUFFLE_CONFIG_GLOB}`)
+      .withArgs(sinon.match((arg: string) => new RegExp('.*?test-folder-2.*?truffle-config.*').test(arg)))
       .returns(['test-folder-2/gosh-this-is-hard.js']);
     globStub.returns([]);
 
@@ -216,7 +215,7 @@ describe('Workspace - WorkspaceForUri Tests', () => {
     pushWorkspace('/dev/test-folder-2');
     // map one to be truffle
     globStub
-      .withArgs(`/dev/test-folder-2/**/${AW.TRUFFLE_CONFIG_GLOB}`)
+      .withArgs(sinon.match((arg: string) => new RegExp('.*?test-folder-2.*?truffle-config.*').test(arg)))
       .returns(['test-folder-2/gosh-this-is-hard.js']);
     globStub.returns([]);
 
