@@ -27,7 +27,7 @@ module.exports = {
       // We do not want to include `ganache` in the bundle, since it has two major drawbacks:
       // bundle size and loaders issue related to native code.
       // Thus, setting `ganache` as external allows to exclude it from the bundle.
-      // See PR https://github.com/trufflesuite/vscode-ext/pull/261 for more details .
+      // See PR https://github.com/trufflesuite/vscode-ext/pull/261 for more details.
       return callback(null, 'require ("' + request + '")');
     } else if (/^electron$/.test(request)) {
       return callback(null, 'require ("' + request + '")');
