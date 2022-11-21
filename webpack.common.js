@@ -20,6 +20,8 @@ module.exports = {
   externals: function ({context, request}, callback) {
     if (/^vscode$/.test(request)) {
       return callback(null, 'commonjs ' + request);
+    } else if (/^ganache$/.test(request)) {
+      return callback(null, 'require ("' + request + '")');
     } else if (/^electron$/.test(request)) {
       return callback(null, 'require ("' + request + '")');
     }
