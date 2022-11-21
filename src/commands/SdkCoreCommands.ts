@@ -44,7 +44,7 @@ class SdkCoreCommands {
   public async build(contractUri?: Uri): Promise<void> {
     const ws = await getWorkspaceForUri(contractUri);
     const buildUri = contractUri ? contractUri : ws.workspace;
-    const adapter = await this.getExtensionAdapter(ws.workspaceType);
+    const adapter = this.getExtensionAdapter(ws.workspaceType);
     return adapter!.build(ws, buildUri);
   }
 
@@ -56,7 +56,7 @@ class SdkCoreCommands {
   public async deploy(contractUri?: Uri): Promise<void> {
     const ws = await getWorkspaceForUri(contractUri);
     const deployUri = contractUri ? contractUri : ws.workspace;
-    const adapter = await this.getExtensionAdapter(ws.workspaceType);
+    const adapter = this.getExtensionAdapter(ws.workspaceType);
     return adapter!.deploy(ws, deployUri);
   }
 

@@ -7,7 +7,7 @@ import glob from 'glob';
 import fs from 'fs';
 import sinon from 'sinon';
 import {sdkCoreCommands} from '@/commands/SdkCoreCommands';
-import {Uri, workspace} from '../vscode';
+import {Uri, workspace, WorkspaceFolder} from 'vscode';
 import {TruffleCommands} from '@/commands/TruffleCommands';
 import * as HardhatCommands from '@/commands/HardhatCommands';
 
@@ -18,10 +18,11 @@ describe('SDK Core Commands', () => {
   let fsStub: any;
   let truffleBuildStub: any;
   let hardhatBuildStub: any;
+  let workspaces: WorkspaceFolder[] = [];
 
   const setupTestScenario = function (testFolderName: string, globPattern: any) {
     const foundFile = testFolderName + '/someconfig.file';
-    workspace.workspaceFolders?.push({
+    workspaces.push({
       uri: Uri.file(testFolderName),
       index: 0,
       name: testFolderName + '-name',
@@ -36,7 +37,11 @@ describe('SDK Core Commands', () => {
 
   beforeEach(async () => {
     //setup the mockery...
-    workspace.workspaceFolders = [];
+    const getWorkspsaceFolderStub = sandbox.stub(workspace, 'getWorkspaceFolder');
+    getWorkspsaceFolderStub.callsFake((_uri) => workspaces[0]);
+
+    const workspaceFolders = sandbox.stub(workspace, 'workspaceFolders');
+    workspaceFolders.value(workspaces);
 
     truffleBuildStub = sandbox.stub(TruffleCommands, 'buildContracts');
     truffleBuildStub.returns();
@@ -56,8 +61,8 @@ describe('SDK Core Commands', () => {
   });
 
   afterEach(async () => {
+    workspaces = [];
     sandbox.restore();
-    workspace.workspaceFolders = [];
   });
 
   describe('SDK Commands - Project Resolution', () => {
@@ -98,7 +103,7 @@ describe('SDK Core Commands', () => {
     it('will find correct command to build - unknown', async function () {
       const wsFolder = 'some-empty-folder';
       const buildFolder = Uri.file(wsFolder);
-      workspace.workspaceFolders?.push({
+      workspaces.push({
         uri: buildFolder,
         index: 0,
         name: wsFolder + '-name',
