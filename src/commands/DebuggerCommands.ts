@@ -68,7 +68,16 @@ export namespace DebuggerCommands {
       txHash = txHashSelection.detail || txHashSelection.label;
     }
 
-    await startDebugging({txHash, workingDirectory, providerUrl, disableFetchExternal: false});
+    // Sets the parameters for the debug session
+    const args = {
+      txHash,
+      workingDirectory,
+      providerUrl,
+      disableFetchExternal: false,
+    };
+
+    // Starts the debugger
+    await startDebugging(args);
   }
 }
 

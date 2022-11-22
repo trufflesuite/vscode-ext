@@ -20,6 +20,15 @@ module.exports = {
   externals: function ({context, request}, callback) {
     if (/^vscode$/.test(request)) {
       return callback(null, 'commonjs ' + request);
+    } else if (/^ganache$/.test(request)) {
+      // The Debugger uses `Environment.detect` to set the proper chain Id among other things.
+      // However, `@truffle/environment` depends on `ganache` to implement other methods,
+      // but it is not used in `detect`.
+      // We do not want to include `ganache` in the bundle, since it has two major drawbacks:
+      // bundle size and loaders issue related to native code.
+      // Thus, setting `ganache` as external allows to exclude it from the bundle.
+      // See PR https://github.com/trufflesuite/vscode-ext/pull/261 for more details.
+      return callback(null, 'require ("' + request + '")');
     } else if (/^electron$/.test(request)) {
       return callback(null, 'require ("' + request + '")');
     }
