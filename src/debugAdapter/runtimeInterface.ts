@@ -10,10 +10,8 @@ import {ICallInfo} from './models/ICallInfo';
 import {IInstruction} from './models/IInstruction';
 import {mkdirpSync, writeFileSync} from 'fs-extra';
 import {fetchAndCompileForDebugger} from '@truffle/fetch-and-compile';
-import {LocalNetworkNode, LocalProject} from '@/Models/TreeItems';
-import {getChainId} from '@/functions/explorer';
-import {TreeManager} from '@/services/tree/TreeManager';
-import {ItemType} from '@/Models';
+import Config from '@truffle/config';
+import {Environment} from '@truffle/environment';
 import * as os from 'os';
 import * as path from 'path';
 
@@ -138,16 +136,25 @@ export default class RuntimeInterface extends EventEmitter {
    * @returns
    */
   public async attach(args: Required<DebuggerTypes.DebugArgs>): Promise<void> {
+    // Retreives the truffle configuration file
+    const config = Config.detect({workingDirectory: args.workingDirectory});
+
+    // Validate the network parameter
+    RuntimeInterface.validateNetwork(config, args);
+
+    // Retreives the environment configuration
+    await Environment.detect(config);
+
     // Gets the contracts compilation
-    const result = await prepareContracts(args.workingDirectory);
+    const result = await prepareContracts(config);
 
     // Sets the properties to use during the debugger process
     this._mappedSources = result.mappedSources;
-    const networkId = args.disableFetchExternal ? undefined : this.getNetworkId(args.providerUrl);
+    const networkId = args.disableFetchExternal ? undefined : config.network_id;
 
     // Sets the truffle debugger options
     const options: truffleDebugger.DebuggerOptions = {
-      provider: args.providerUrl,
+      provider: config.provider,
       compilations: result.shimCompilations,
       lightMode: networkId !== undefined,
     };
@@ -192,28 +199,6 @@ export default class RuntimeInterface extends EventEmitter {
         this._mappedSources.set(compilation.sourcePath, sourcePath);
       }
     }
-  }
-
-  /**
-   * Retrieves the chain id of the `providerUrl`.
-   *
-   * @param providerUrl the url to get chain id from.
-   * @returns the chain id of the given `providerUrl`.
-   */
-  private getNetworkId(providerUrl: string) {
-    const services = TreeManager.getItem(ItemType.LOCAL_SERVICE);
-
-    if (!services || !services.getChildren()) {
-      return undefined;
-    }
-
-    const projects = services.getChildren() as LocalProject[];
-    const project = projects.find((project) => {
-      const network = project.getChildren().at(0) as LocalNetworkNode;
-      return `${network.url.protocol}//${network.url.host}` === providerUrl;
-    });
-
-    return project ? getChainId(project.options.forkedNetwork) : undefined;
   }
 
   public currentLine(): DebuggerTypes.IFrame {
@@ -294,5 +279,33 @@ export default class RuntimeInterface extends EventEmitter {
     if (!this._session) {
       throw new Error('Debug session is undefined');
     }
+  }
+
+  /**
+   * Validate if the network parameter was set. Case the network is empty,
+   * a temp network is created to generate a provider url
+   *
+   * @param config Represents the truffle configuration file.
+   * @param args Represents the arguments needed to initiate a new Truffle `DebugSession` request.
+   * @returns
+   */
+  private static validateNetwork(config: Config, args: Required<DebuggerTypes.DebugArgs>): void {
+    if (args.providerUrl) {
+      // Adds a temporary network to get the provider url
+      config.network = 'temp_network';
+      config.networks.temp_network = {
+        url: args.providerUrl,
+        network_id: '*',
+      };
+      return;
+    }
+
+    // Check if the network exists inside the Truffle configuration file
+    if (!config.networks.hasOwnProperty(args.network)) {
+      throw new Error(`Network '${args.network}' does not exist in your Truffle configuration file.`);
+    }
+
+    // Sets the network to get the provider url
+    config.network = args.network;
   }
 }
