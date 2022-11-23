@@ -603,6 +603,11 @@
                 "description": "Provider's URL of the Ethereum network to connect to.",
                 "default": "http://127.0.0.1:8545"
               },
+              "network": {
+                "type": "string",
+                "description": "Name of the Ethereum network to connect to. The network name should be a key in the `networks` object in your Truffle config file.",
+                "default": "development"
+              },
               "disableFetchExternal": {
                 "type": "boolean",
                 "description": "When set, do not try to fetch external contract sources when debugging a forked network instance. When the network is not being forked, this flag is ignored.",
@@ -637,6 +642,21 @@
               "files": [],
               "workingDirectory": "^\"\\${workspaceFolder}\"",
               "providerUrl": "http://127.0.0.1:8545",
+              "disableFetchExternal": false
+            }
+          },
+          {
+            "label": "Truffle - Debugger Launch using config network",
+            "description": "Runs the Truffle debugger (truffle) and attaches to a TestRPC instance",
+            "body": {
+              "type": "truffle",
+              "request": "launch",
+              "name": "Debug Transaction with Truffle",
+              "stopOnEntry": false,
+              "txHash": "0x",
+              "files": [],
+              "workingDirectory": "^\"\\${workspaceFolder}\"",
+              "network": "development",
               "disableFetchExternal": false
             }
           }
