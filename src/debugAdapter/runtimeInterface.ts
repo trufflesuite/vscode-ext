@@ -147,13 +147,13 @@ export default class RuntimeInterface extends EventEmitter {
       /**/
     }
 
-    // Retreives the truffle configuration file
+    // Retrieves the truffle configuration file
     const config = Config.detect({workingDirectory: args.workingDirectory});
 
     // Validate the network parameter
     RuntimeInterface.validateNetwork(config, args);
 
-    // Retreives the environment configuration
+    // Retrieves the environment configuration
     await Environment.detect(config);
 
     // Gets the contracts compilation
