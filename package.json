@@ -569,8 +569,7 @@
           "launch": {
             "required": [
               "txHash",
-              "workingDirectory",
-              "providerUrl"
+              "workingDirectory"
             ],
             "properties": {
               "stopOnEntry": {
