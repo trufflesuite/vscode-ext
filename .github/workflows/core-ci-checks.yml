@@ -28,5 +28,7 @@ jobs:
       - name: Tests
         run: yarn test:int
 
-      - name: Package
+      - name: Build smoke check package
         run: yarn package
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
