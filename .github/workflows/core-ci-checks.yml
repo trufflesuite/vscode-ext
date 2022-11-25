@@ -27,3 +27,6 @@ jobs:
 
       - name: Tests
         run: yarn test:int
+
+      - name: Package
+        run: yarn package
