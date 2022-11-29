@@ -67,6 +67,10 @@ export const referenceConfiguration = {
       },
     },
   ],
+  provider: {
+    host: 'localhost',
+  },
+  network_id: 1,
 };
 
 export const testModuleWithoutDirectories = {

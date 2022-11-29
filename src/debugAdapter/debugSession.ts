@@ -103,7 +103,11 @@ export class SolidityDebugSession extends LoggingDebugSession {
     await this.sendErrorIfFailed(response, async () => {
       validateRequiredArg(args.txHash, `txHash`);
       validateRequiredArg(args.workingDirectory, `workingDirectory`);
-      validateRequiredArg(args.providerUrl, `providerUrl`);
+
+      // Validate if both network and providerUrl are not set
+      if (!args.network && !args.providerUrl) {
+        throw new Error(`network or providerUrl must be specified to initiate the Truffle Debugger`);
+      }
 
       if (args.disableFetchExternal === undefined) {
         args.disableFetchExternal = false;

@@ -33,6 +33,7 @@ export class UriHandlerController implements UriHandler {
             txHash: searchParams.get('txHash') ?? undefined,
             workingDirectory: searchParams.get('workingDirectory') ?? undefined,
             providerUrl: searchParams.get('providerUrl') ?? undefined,
+            network: searchParams.get('network') ?? undefined,
             disableFetchExternal: !!searchParams.get('disableFetchExternal'),
           };
 

@@ -43,6 +43,11 @@ export namespace DebuggerTypes {
     providerUrl?: string;
 
     /**
+     * Network name of the Ethereum network to connect to.
+     */
+    network?: string;
+
+    /**
      * When set, do not try to fetch external contract sources when debugging a forked network instance.
      * When the network is not being forked, this flag is ignored.
      */
