@@ -34,5 +34,5 @@ jobs:
       # Increase memory with https://nodejs.org/api/cli.html#--max-old-space-sizesize-in-megabytes
       - name: Build smoke check package
         run: yarn package
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
+        # env:
+        #   NODE_OPTIONS: --max_old_space_size=4096
