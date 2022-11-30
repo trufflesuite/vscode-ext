@@ -28,11 +28,5 @@ jobs:
       - name: Tests
         run: yarn test:int
 
-      # Not sure why, but setting `devtool: false` in `webpack.prod.js` with no increased memory gives
-      # Error [ERR_WORKER_OUT_OF_MEMORY]: Worker terminated due to reaching memory limit: JS heap out of memory
-      #
-      # Increase memory with https://nodejs.org/api/cli.html#--max-old-space-sizesize-in-megabytes
       - name: Build smoke check package
         run: yarn package
-        # env:
-        #   NODE_OPTIONS: --max_old_space_size=4096
