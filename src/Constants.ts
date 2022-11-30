@@ -104,7 +104,7 @@ export class Constants {
       min: '1.0.17',
     },
     [RequiredApps.node]: {
-      max: '17.0.0',
+      max: '19.0.0',
       min: '14.0.0',
     },
     [RequiredApps.npm]: {
