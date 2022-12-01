@@ -631,7 +631,7 @@
         "configurationSnippets": [
           {
             "label": "Truffle - Debugger Launch",
-            "description": "Runs the Truffle debugger (truffle) and attaches to a TestRPC instance",
+            "description": "Runs the Truffle debugger (truffle) and attaches to a Ganache instance",
             "body": {
               "type": "truffle",
               "request": "launch",
@@ -646,7 +646,7 @@
           },
           {
             "label": "Truffle - Debugger Launch using config network",
-            "description": "Runs the Truffle debugger (truffle) and attaches to a TestRPC instance",
+            "description": "Runs the Truffle debugger (truffle) and attaches to a Ganache instance",
             "body": {
               "type": "truffle",
               "request": "launch",
