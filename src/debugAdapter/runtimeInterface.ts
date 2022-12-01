@@ -12,6 +12,7 @@ import {mkdirpSync, writeFileSync} from 'fs-extra';
 import {fetchAndCompileForDebugger} from '@truffle/fetch-and-compile';
 import Config from '@truffle/config';
 import {Environment} from '@truffle/environment';
+import Module from 'module';
 import * as os from 'os';
 import * as path from 'path';
 
@@ -136,13 +137,23 @@ export default class RuntimeInterface extends EventEmitter {
    * @returns
    */
   public async attach(args: Required<DebuggerTypes.DebugArgs>): Promise<void> {
-    // Retreives the truffle configuration file
+    try {
+      const originalRequire = eval('require');
+      // Mimics the behavior of `Config.detect` until https://github.com/trufflesuite/truffle/pull/5728 gets merged.
+      const file = path.join(args.workingDirectory, 'truffle-config.js');
+      const resolvedFileName = (Module as any)._resolveFilename(file, module);
+      delete originalRequire.cache[resolvedFileName];
+    } catch {
+      /**/
+    }
+
+    // Retrieves the truffle configuration file
     const config = Config.detect({workingDirectory: args.workingDirectory});
 
     // Validate the network parameter
     RuntimeInterface.validateNetwork(config, args);
 
-    // Retreives the environment configuration
+    // Retrieves the environment configuration
     await Environment.detect(config);
 
     // Gets the contracts compilation
