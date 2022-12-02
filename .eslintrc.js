@@ -9,7 +9,8 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     // Adding this in future would be good but its problematic.
-    // "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    // We add this, but warn/off specific rules.
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
     'prettier',
   ],
   ignorePatterns: ['ui-test/**/*.ts', '.eslintrc.js', 'webpack*.js'],
@@ -49,5 +50,26 @@ module.exports = {
     'no-undef': 'off',
     // FIXME: rework this eventually. Tech-debt - 8 Errors right now. Needs investigation.
     // '@typescript-eslint/ban-ts-comment': 'off',
+
+    // The following two blocks come from `@typescript-eslint/recommended-requiring-type-checking`.
+
+    // FIXME: We need to take care of this.
+    '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
+    '@typescript-eslint/await-thenable': 'warn',
+    '@typescript-eslint/require-await': 'warn',
+    '@typescript-eslint/restrict-template-expressions': 'warn',
+    '@typescript-eslint/no-floating-promises': 'warn',
+    '@typescript-eslint/restrict-plus-operands': 'warn',
+    '@typescript-eslint/no-misused-promises': 'warn',
+    '@typescript-eslint/unbound-method': ['warn', {ignoreStatic: true}],
+
+    // FIXME: Most of these rules appears in tests, we need a major test refactor to enable these checks.
+    // They are disable because otherwise they become too annoying.
+    // Once we solve the rest, we can come back and solve these.
+    '@typescript-eslint/no-unsafe-call': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
+    '@typescript-eslint/no-unsafe-return': 'off',
+    '@typescript-eslint/no-unsafe-argument': 'off',
   },
 };
