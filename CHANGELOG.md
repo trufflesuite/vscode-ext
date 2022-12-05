@@ -2,6 +2,28 @@
 
 All notable changes to the "Truffle for VSCode" extension will be documented in this file.
 
+## 2.7.0 - _Aranha_ 🕷️
+
+This release brings some new exciting features regarding the debugger,
+namely it allows you to fetch external sources when debugging external transactions,
+reuse your `truffle-config.js` networks to debug a transaction and trigger the visual debugger from the command line.
+It also includes a fix that removes deprecated networks after the merge and a range of smaller fixes and improvements.
+
+Give it a try and let us know what you think!
+
+### What's Changed
+
+- Clarify Ganache CLI usage in `Requirements Page` [\#274](https://github.com/trufflesuite/vscode-ext/pull/274) ([acuarica](https://github.com/acuarica))
+- Allow Node v18 in Required Apps [\#272](https://github.com/trufflesuite/vscode-ext/pull/272) ([acuarica](https://github.com/acuarica))
+- Declare `network` option in launch configuration [\#267](https://github.com/trufflesuite/vscode-ext/pull/267) ([acuarica](https://github.com/acuarica))
+- Include `disableFetchExternal` flag to avoid debugging with fetching external sources [\#255](https://github.com/trufflesuite/vscode-ext/pull/255) ([acuarica](https://github.com/acuarica))
+- Running truffle debug with appropriate flag `--vscode` triggers debugger to launch in VS Code [\#231](https://github.com/trufflesuite/vscode-ext/pull/231) and [\#254](https://github.com/trufflesuite/vscode-ext/pull/254) ([xhulz](https://github.com/xhulz))
+- Invalidate `require` cache of `truffle-config.js` when debugging [\#265](https://github.com/trufflesuite/vscode-ext/pull/265) ([acuarica](https://github.com/acuarica))
+- Support network option in addition to providerUrl when debugging [\#261](https://github.com/trufflesuite/vscode-ext/pull/261) ([xhulz](https://github.com/xhulz))
+- Fetch external sources when debugging a forked network [\#252](https://github.com/trufflesuite/vscode-ext/pull/252) ([acuarica](https://github.com/acuarica))
+- Contracts not detected [\#251](https://github.com/trufflesuite/vscode-ext/pull/251) ([xhulz](https://github.com/xhulz))
+- Remove deprecated networks [\#250](https://github.com/trufflesuite/vscode-ext/pull/250) ([michaeljohnbennett](https://github.com/michaeljohnbennett))
+
 ## 2.6.0 - _Arbequina_ 🌳
 
 This release brings a number of new features including an improved new project workflow, an information tab for your locally running Ganache instances, and a dedicated panel for all logging out from Truffle, Ganache and Dashboard. It also includes a fix for the debugger wherein it was unable to find the source files (resulting in a 'No source file" error) and range of smaller fixes and optimizations.
