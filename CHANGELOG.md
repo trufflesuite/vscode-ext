@@ -4,10 +4,7 @@ All notable changes to the "Truffle for VSCode" extension will be documented in 
 
 ## 2.7.0 - _Aranha_ 🕷️
 
-This release brings some new exciting features regarding the debugger,
-namely it allows you to fetch external sources when debugging external transactions,
-reuse your `truffle-config.js` networks to debug a transaction and trigger the visual debugger from the command line.
-It also includes a fix that removes deprecated networks after the merge and a range of smaller fixes and improvements.
+This release brings some new exciting features regarding the debugger, namely it allows you to fetch external sources when debugging external transactions, reuse your `truffle-config.js` networks to debug a transaction and trigger the visual debugger from the command line. It also includes a fix that removes deprecated networks after the merge and a range of smaller fixes and improvements.
 
 Give it a try and let us know what you think!
 
