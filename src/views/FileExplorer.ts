@@ -5,7 +5,7 @@ import * as path from 'path';
 import * as rimraf from 'rimraf';
 import * as vscode from 'vscode';
 import {ThemeColor, ThemeIcon, Uri} from 'vscode';
-import {Constants} from '../Constants';
+import {Constants} from '@/Constants';
 import {ContractService} from '@/services/contract/ContractService';
 
 //#region Utilities
@@ -188,6 +188,26 @@ export type Entry = vscode.Uri & {
   contextValue?: string;
 };
 
+// /**
+//  * Represents a top-level `TreeItem` for our file view...
+//  *
+//  * This gives us a few more free items in terms of customisation over the original view item.
+//  */
+// class TreeItemEntry extends TreeItem {
+//   constructor(
+//     path: string,
+//     uri: vscode.Uri,
+//     public readonly type: FileType,
+//     description?: string,
+//     icon?: vscode.ThemeIcon
+//   ) {
+//     super(path);
+//     this.resourceUri = uri;
+//     if (icon) this.iconPath = icon;
+//     if (description) this.description = description;
+//   }
+// }
+
 export type TElementTypes = {
   contextValue: string;
   type: vscode.FileType;
@@ -256,9 +276,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
       {recursive: options.recursive},
       async (event: string, filename: string | Buffer) => {
         const filepath = path.join(uri.fsPath, _.normalizeNFC(filename.toString()));
-
         // TODO support excludes (using minimatch library?)
-
         this._onDidChangeFile.fire([
           {
             type:
@@ -364,7 +382,6 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
     if (!parentExists) {
       await _.mkdir(path.dirname(newUri.fsPath));
     }
-
     return _.rename(oldUri.fsPath, newUri.fsPath);
   }
 
@@ -389,7 +406,8 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
     const elements: Entry[] = [];
 
     // Gets the truffle workspaces
-    const workspaces = await getAllTruffleWorkspaces();
+    const workspaces = getAllTruffleWorkspaces();
+    console.log(`getChildren: `, {workspaces, element});
 
     // Checks if there are any truffle workspaces
     if (workspaces.length === 0) {
@@ -420,7 +438,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
                 type: vscode.FileType.Directory,
                 label: path.basename(contractFolder),
                 iconPath: new ThemeIcon('file-directory'),
-                description: path.basename(path.dirname(contractFolder)),
+                description: `${path.basename(path.dirname(contractFolder))} - (${workspace.truffleConfigName})`,
                 contextValue: this.getTreeItemContextValue(vscode.FileType.Directory, true),
               })
             );
@@ -475,7 +493,7 @@ export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscod
   }
 
   /**
-   * Gets the context value from element according on the type: root, folder, or file.
+   * Gets the context value from element according to the type: root, folder, or file.
    * The `context Value` offers a filter on the file explorer menu that filters action alternatives such as:
    * `Create Contract`, `Build Contracts`, `Build This Contract`, `Deploy Contracts` and `Debug Transaction`.
    *

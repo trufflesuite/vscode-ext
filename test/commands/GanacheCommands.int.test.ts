@@ -1,18 +1,18 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import {GanacheCommands} from '@/commands';
+import {IExtensionItem, LocalProject, LocalService, Service, TLocalProjectOptions} from '@/Models/TreeItems';
+import {TreeManager} from '@/services';
+import {ProjectView} from '@/ViewItems';
 import assert from 'assert';
 import cp, {ChildProcess} from 'child_process';
 import rp from 'request-promise';
 import sinon from 'sinon';
 import stream from 'stream';
 import * as vscode from 'vscode';
-import {GanacheCommands} from '../../src/commands';
 import * as commands from '../../src/helpers/command';
 import * as shell from '../../src/helpers/shell';
-import {IExtensionItem, LocalProject, LocalService, Service, TLocalProjectOptions} from '../../src/Models/TreeItems';
-import {TreeManager} from '../../src/services';
-import {ProjectView} from '../../src/ViewItems';
 
 describe('Integration tests GanacheCommands', () => {
   const defaultPort = 8545;
@@ -20,6 +20,7 @@ describe('Integration tests GanacheCommands', () => {
   let serviceItems: Service[];
   let loadStateMock: sinon.SinonStub<[], IExtensionItem[]>;
   let projectView: ProjectView;
+  let workspaceMock: any;
 
   const description = '';
 
@@ -57,6 +58,15 @@ describe('Integration tests GanacheCommands', () => {
     getItemsMock.returns(serviceItems);
     loadStateMock = sinon.stub(TreeManager, 'loadState');
     loadStateMock.returns(serviceItems);
+    // is this enough?
+    workspaceMock = sinon.stub(vscode.workspace, 'workspaceFolders');
+    workspaceMock.value([
+      {
+        uri: vscode.Uri.file('testy'),
+        index: 0,
+        name: 'name',
+      },
+    ]);
 
     projectView = new ProjectView(new LocalProject('test consortium', defaultPort, options, description));
 
@@ -65,6 +75,7 @@ describe('Integration tests GanacheCommands', () => {
   });
 
   afterEach(() => {
+    // workspaceMock.restore();
     sinon.restore();
   });
 

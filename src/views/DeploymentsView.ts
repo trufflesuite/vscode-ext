@@ -14,7 +14,7 @@ import {
   Command,
   ThemeColor,
 } from 'vscode';
-import {getChain, getExplorerLink} from '../functions/explorer';
+import {getChain, getExplorerLink} from '@/functions/explorer';
 import {OpenUrlTreeItem} from './lib/OpenUrlTreeItem';
 import {ContractService} from '@/services/contract/ContractService';
 import {getAllTruffleWorkspaces, TruffleWorkspace} from '@/helpers/workspace';
@@ -300,7 +300,10 @@ class DeploymentsView implements TreeDataProvider<TreeItem> {
       return (element as TreeParentItem).loadChildren();
     }
 
-    const truffleWorkspaces = await getAllTruffleWorkspaces();
+    // TODO: just the truffle ones maam.
+    // const workspaces = resolveAllWorkspaces().filter((ws) => ws.workspaceType === WorkspaceType.TRUFFLE);
+
+    const truffleWorkspaces = getAllTruffleWorkspaces();
     if (truffleWorkspaces.length === 0) {
       return [];
     } else if (truffleWorkspaces.length === 1) {

@@ -14,7 +14,7 @@ import {getTruffleWorkspace} from '@/helpers/workspace';
 import {required} from '@/helpers/required';
 
 import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from '@/helpers/userInteraction';
-import {getPathByPlatform} from '@/helpers/workspace';
+import {getPathByPlatform} from '@/helpers/WorkspaceHelpers';
 
 import {IDeployDestination, ItemType} from '@/Models';
 import {NetworkForContractItem} from '@/Models/QuickPickItems';
@@ -573,7 +573,7 @@ async function readCompiledContract(uri: Uri): Promise<any> {
   return JSON.parse(data.toString());
 }
 
-function ensureFileIsContractJson(filePath: string) {
+function ensureFileIsContractJson(filePath: string): void {
   if (path.extname(filePath) !== Constants.contract.configuration.extension.json) {
     const error = new Error(Constants.errorMessageStrings.InvalidContract);
     Telemetry.sendException(error);

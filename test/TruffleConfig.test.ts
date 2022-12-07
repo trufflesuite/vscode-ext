@@ -7,7 +7,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import sinon from 'sinon';
 import {Constants} from '@/Constants';
-import * as helpers from '@/helpers/workspace';
+import * as helpers from '@/helpers/WorkspaceHelpers';
 import * as commands from '../src/helpers/command';
 import {ICommandResult} from '@/helpers/command';
 import {getTruffleConfiguration, getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';

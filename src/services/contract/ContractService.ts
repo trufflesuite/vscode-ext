@@ -100,4 +100,19 @@ export namespace ContractService {
 
     return path.join(workDir, dir);
   }
+
+  // async function getPathDirectoryAW(directory: PathDirectoryKey, workspace?: AbstractWorkspace): Promise<string> {
+  //   const [workDir, name] = workspace
+  //     ? [getPathByPlatform(workspace.workspace), workspace.configName]
+  //     : [getWorkspaceRoot()!, undefined];
+  //   const configuration = await getTruffleConfiguration(workDir, name);
+  //
+  //   const dir = (configuration as any)[directory];
+  //
+  //   if (dir && path.isAbsolute(dir)) {
+  //     return dir;
+  //   }
+  //
+  //   return path.join(workDir, dir);
+  // }
 }

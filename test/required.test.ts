@@ -6,9 +6,10 @@ import rewire from 'rewire';
 import sinon from 'sinon';
 import uuid from 'uuid';
 import * as vscode from 'vscode';
-import {RequiredApps} from '../src/Constants';
-import * as helpers from '@/helpers/workspace';
-import * as commands from '../src/helpers/command';
+//import * as vscode from './vscode';
+import {RequiredApps} from '@/Constants';
+import * as helpers from '@/helpers/WorkspaceHelpers';
+import * as commands from '@/helpers/command';
 import {TestConstants} from './TestConstants';
 
 const nodeValidVersion: commands.ICommandResult = {
@@ -47,6 +48,19 @@ describe('Required helper', () => {
     let executeCommandMock: any;
 
     beforeEach(() => {
+      const workspaces = [
+        {
+          uri: vscode.Uri.file('testiy'),
+          index: 0,
+          name: 'name',
+        },
+      ];
+      const getWorkspsaceFolderStub = sinon.stub(vscode.workspace, 'getWorkspaceFolder');
+      getWorkspsaceFolderStub.callsFake((_uri) => workspaces[0]);
+
+      const workspaceFolders = sinon.stub(vscode.workspace, 'workspaceFolders');
+      workspaceFolders.value(workspaces);
+
       requiredRewire = rewire('../src/helpers/required');
       tryExecuteCommandMock = sinon.stub(commands, 'tryExecuteCommand');
       getWorkspaceRootMock = sinon.stub(helpers, 'getWorkspaceRoot');

@@ -7,10 +7,10 @@ import {join as pathJoin} from 'path';
 import sinon from 'sinon';
 import {StoppedEvent} from '@vscode/debugadapter';
 import {DebugProtocol} from '@vscode/debugprotocol';
-import {GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS} from '../../src/debugAdapter/constants/debugSessionCommands';
-import {SolidityDebugSession} from '../../src/debugAdapter/debugSession';
-import {DebuggerTypes} from '../../src/debugAdapter/models/debuggerTypes';
-import {IInstruction} from '../../src/debugAdapter/models/IInstruction';
+import {GET_CURRENT_INSTRUCTION, GET_INSTRUCTIONS} from '@/debugAdapter/constants/debugSessionCommands';
+import {SolidityDebugSession} from '@/debugAdapter/debugSession';
+import {DebuggerTypes} from '@/debugAdapter/models/debuggerTypes';
+import {IInstruction} from '@/debugAdapter/models/IInstruction';
 import RuntimeInterface from '../../src/debugAdapter/runtimeInterface';
 import {SolidityDebugSessionClient} from './SolidityDebugSessionClient';
 
@@ -22,7 +22,7 @@ describe('DebugSession unit tests', () => {
   it("shouldn't contain vscode module as a dependency", (done) => {
     // vscode module can be resolved inside of the extension without any issues
     // that's why we should spawn independent node process to check
-    const debugSessionModule = pathJoin(__dirname, '../../src/debugAdapter/debugSession.js');
+    const debugSessionModule = pathJoin(__dirname, '../../src/debugAdapter/debugSession.ts');
     const debugSessionResolvingProcess = spawn(process.execPath, [debugSessionModule]);
     debugSessionResolvingProcess.on('close', () => {
       done();

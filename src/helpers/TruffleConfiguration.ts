@@ -13,7 +13,7 @@ import path from 'path';
 import {Uri} from 'vscode';
 import {ICommandResult, tryExecuteCommandInFork} from './command';
 import {IConfiguration, INetwork, INetworkOption, IProvider, notAllowedSymbols} from './ConfigurationReader';
-import {getPathByPlatform, getWorkspaceRoot} from './workspace';
+import {getPathByPlatform, getWorkspaceRoot} from './WorkspaceHelpers';
 
 export class EvalTruffleConfigError extends Error {
   constructor(message: string, readonly reason: string) {

@@ -13,6 +13,8 @@ export enum OutputLabel {
   requirements = 'Truffle: Requirements',
   telemetryClient = 'Truffle: Telemetry Client',
   treeManager = 'Truffle: Service Tree Manager',
+  sdkCoreCommands = 'Truffle: SDK Commands',
+  hardhatCommands = 'Truffle: Hardhat Commands',
 }
 
 export class Output {

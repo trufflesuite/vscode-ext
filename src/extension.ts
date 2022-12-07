@@ -38,7 +38,7 @@ import {registerHelpView} from './views/HelpView';
 import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 import {registerGanacheDetails} from './pages/GanacheDetails';
 import {registerLogView} from './views/LogView';
-import {saveTextDocument} from './helpers/workspace';
+import {saveTextDocument} from './helpers/WorkspaceHelpers';
 import {StatusBarItems} from './Models/StatusBarItems/Contract';
 import {UriHandlerController} from './helpers/uriHandlerController';
 import {Output} from './Output';
@@ -78,7 +78,6 @@ export async function activate(context: ExtensionContext) {
   MnemonicRepository.initialize(context.globalState);
   TreeManager.initialize(context.globalState);
   TreeService.initialize('truffle-vscode.truffle');
-  await sdkCoreCommands.initialize(context.globalState);
 
   // Starts the status bar item for automatic deploy
   const contractStatusBarItem = new StatusBarItems.Contract(context.globalState);
@@ -231,11 +230,12 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region workspace subscriptions
-  const changeCoreSdkConfigurationListener = workspace.onDidChangeConfiguration(async (event) => {
-    if (event.affectsConfiguration(Constants.userSettings.coreSdkSettingsKey)) {
-      await sdkCoreCommands.initialize(context.globalState);
-    }
-  });
+  // I think this isn't needed anymore.
+  // const changeCoreSdkConfigurationListener = workspace.onDidChangeConfiguration(async (event) => {
+  //   if (event.affectsConfiguration(Constants.userSettings.coreSdkSettingsKey)) {
+  //     await sdkCoreCommands.initialize(context.globalState);
+  //   }
+  // });
   const didSaveTextDocumentListener = workspace.onDidSaveTextDocument(async (event) => {
     // Calls the action that listens for the save files event
     await saveTextDocument(context.globalState, event);
@@ -274,7 +274,6 @@ export async function activate(context: ExtensionContext) {
     signInToInfuraAccount,
     signOutOfInfuraAccount,
     showProjectsFromInfuraAccount,
-    changeCoreSdkConfigurationListener,
     didSaveTextDocumentListener,
     // new view - main views
     fileExplorerView,

@@ -147,7 +147,7 @@ export const workspace = {
     } as any;
   },
 
-  getWorkspaceFolder: function (_uri: Uri): WorkspaceFolder | undefined {
+  getWorkspaceFolder(_uri: Uri): WorkspaceFolder | undefined {
     return workspace.workspaceFolders![0];
   },
 

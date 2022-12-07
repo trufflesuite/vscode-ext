@@ -18,6 +18,11 @@ export enum RequiredApps {
   dashboard = 'dashboard',
 }
 
+export enum OptionalApps {
+  hardhat = 'hardhat',
+}
+export type AppTypes = RequiredApps | OptionalApps;
+
 export enum NotificationOptions {
   error = 'error',
   info = 'info',
@@ -118,6 +123,10 @@ export class Constants {
     [RequiredApps.dashboard]: {
       max: '',
       min: '5.5.0',
+    },
+    [OptionalApps.hardhat]: {
+      max: '',
+      min: '2.9.0',
     },
   };
 
@@ -607,6 +616,8 @@ export class Constants {
     FetchingBoxesHasFailed: 'An error occurred while fetching boxes',
     ContractFolderNotExists: 'There is no contract directory in this workspace',
     UriHandlerError: 'Badly formatted. Ensure that the command and arguments are described correctly',
+    HHNoDefaultDeploy:
+      'Hardhat has no default deploy command. Consider using the HardHat Deploy Plugin: [hardhat-deploy](https://github.com/wighawag/hardhat-deploy)',
   };
 
   public static informationMessage = {
@@ -678,11 +689,11 @@ export class Constants {
   };
   public static userSettings = {
     coreSdkSettingsKey: 'truffle-vscode.coreSDK',
-    storageAccountUserSettingsKey: 'truffle-vscode.storageAccount.name',
   };
 
   public static coreSdk = {
     truffle: 'Truffle',
+    hardhat: 'Hardhat',
   };
 
   public static initialize(context: ExtensionContext) {

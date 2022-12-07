@@ -1,20 +1,39 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Memento, window, Uri} from 'vscode';
-import {Constants} from '@/Constants';
-import {userSettings} from '../helpers';
-import {IExtensionAdapter, TruffleExtensionAdapter} from '@/services/extensionAdapter';
+import {getWorkspaceForUri, WorkspaceType} from '@/helpers/AbstractWorkspace';
+import {Output, OutputLabel} from '@/Output';
+
+import {
+  HardHatExtensionAdapter,
+  IExtensionAdapter,
+  TruffleExtensionAdapter,
+  UnknownExtensionAdapter,
+} from '@/services/extensionAdapter';
+import {Uri, window} from 'vscode';
 
 class SdkCoreCommands {
-  private extensionAdapter!: IExtensionAdapter;
+  private extensionAdapters = new Map<string, IExtensionAdapter>();
 
-  public async initialize(_globalState: Memento): Promise<void> {
-    const sdk = await this.getCoreSdk();
-    this.extensionAdapter = this.getExtensionAdapter(sdk.userValue ? sdk.userValue : sdk.defaultValue);
-    this.extensionAdapter.validateExtension().catch((error) => {
-      window.showErrorMessage(error.message);
-    });
+  public getExtensionAdapter(sdkVal: WorkspaceType): IExtensionAdapter | undefined {
+    if (this.extensionAdapters.has(sdkVal)) {
+      return this.extensionAdapters.get(sdkVal);
+    }
+    // let's initialise it otherwise
+    const adapter = this.initExtensionAdapter(sdkVal);
+    adapter.validateExtension().then(
+      (_) => {
+        Output.outputLine(
+          OutputLabel.sdkCoreCommands,
+          `Configuration Initialized. SdkCoreProvider: ${adapter.constructor.name}`
+        );
+      },
+      (error) => {
+        window.showErrorMessage(error.message);
+      }
+    );
+    this.extensionAdapters.set(sdkVal, adapter);
+    return adapter;
   }
 
   /**
@@ -23,7 +42,10 @@ class SdkCoreCommands {
    * @param contractUri if provided, it is the `Uri` of the smart contract to be compiled.
    */
   public async build(contractUri?: Uri): Promise<void> {
-    return this.extensionAdapter.build(contractUri);
+    const ws = await getWorkspaceForUri(contractUri);
+    const buildUri = contractUri ? contractUri : ws.workspace;
+    const adapter = this.getExtensionAdapter(ws.workspaceType);
+    return adapter!.build(ws, buildUri);
   }
 
   /**
@@ -32,17 +54,20 @@ class SdkCoreCommands {
    * @param contractUri FIXME: Is this used?
    */
   public async deploy(contractUri?: Uri): Promise<void> {
-    return this.extensionAdapter.deploy(contractUri);
+    const ws = await getWorkspaceForUri(contractUri);
+    const deployUri = contractUri ? contractUri : ws.workspace;
+    const adapter = this.getExtensionAdapter(ws.workspaceType);
+    return adapter!.deploy(ws, deployUri);
   }
 
-  private async getCoreSdk() {
-    return userSettings.getConfigurationAsync(Constants.userSettings.coreSdkSettingsKey);
-  }
-
-  private getExtensionAdapter(sdk: string): IExtensionAdapter {
+  private initExtensionAdapter(sdk: WorkspaceType): IExtensionAdapter {
     switch (sdk) {
-      default:
+      case WorkspaceType.HARDHAT:
+        return new HardHatExtensionAdapter();
+      case WorkspaceType.TRUFFLE:
         return new TruffleExtensionAdapter();
+      default:
+        return new UnknownExtensionAdapter();
     }
   }
 }

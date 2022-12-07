@@ -5,9 +5,9 @@ import {getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration
 import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
-import {commands, ProgressLocation, window} from 'vscode';
-import {Constants, RequiredApps} from '@/Constants';
-import {getWorkspaceRoot} from '@/helpers/workspace';
+import {commands, ProgressLocation, Uri, window} from 'vscode';
+import {Constants, RequiredApps, OptionalApps, AppTypes} from '@/Constants';
+import {getPathByPlatform, getWorkspaceFolder, getWorkspaceRoot} from '@/helpers/WorkspaceHelpers';
 import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '@/TelemetryClient';
 import {executeCommand, tryExecuteCommand} from './command';
@@ -24,6 +24,8 @@ export namespace required {
     locally = 1,
     global = 0,
   }
+
+  type VersionCallback = () => Promise<string>;
 
   const currentState: {[key: string]: IRequiredVersion} = {};
 
@@ -83,10 +85,15 @@ export namespace required {
     return valid;
   }
 
-  export async function checkAppsSilent(...apps: RequiredApps[]): Promise<boolean> {
-    const versions = await getExactlyVersions(...apps);
+  export async function checkAppsSilent(...apps: AppTypes[]): Promise<boolean> {
+    const rootWorkspace = getWorkspaceFolder();
+    return checkAppsSilentForUri(rootWorkspace!.uri, ...apps);
+  }
+
+  export async function checkAppsSilentForUri(workspaceUri: Uri, ...apps: AppTypes[]): Promise<boolean> {
+    const versions = await getExactlyVersions(workspaceUri, ...apps);
     const invalid = versions
-      .filter((version) => apps.includes(version.app as RequiredApps))
+      .filter((version) => apps.includes(version.app as AppTypes))
       .some((version) => !version.isValid);
 
     Output.outputLine(
@@ -152,10 +159,11 @@ export namespace required {
   }
 
   export async function getAllVersions(): Promise<IRequiredVersion[]> {
-    return getExactlyVersions(...requiredApps, ...auxiliaryApps);
+    const rootWorkspace = getWorkspaceFolder();
+    return getExactlyVersions(rootWorkspace!.uri, ...requiredApps, ...auxiliaryApps);
   }
 
-  export async function getExactlyVersions(...apps: RequiredApps[]): Promise<IRequiredVersion[]> {
+  export async function getExactlyVersions(workspaceUri: Uri, ...apps: AppTypes[]): Promise<IRequiredVersion[]> {
     Output.outputLine(OutputLabel.requirements, `Get version for required apps: ${apps.join(',')}`);
 
     if (apps.includes(RequiredApps.node)) {
@@ -175,9 +183,30 @@ export namespace required {
       currentState.ganache =
         currentState.ganache || (await createRequiredVersion(RequiredApps.ganache, getGanacheVersion));
     }
+    if (apps.includes(OptionalApps.hardhat)) {
+      currentState.hardhat =
+        currentState.hardhat ||
+        (await createRequiredVersion(OptionalApps.hardhat, getNpmPackageVersion(workspaceUri, OptionalApps.hardhat)));
+    }
 
     return Object.values(currentState);
   }
+
+  /**
+   * Run an NPM ls command to see if a specific package is installed within the NPM system in this project.
+   * @param workspaceUri - the uri of the workspace we want the npm package call to be run in.
+   * @param packageName - the npm specific name
+   */
+  const getNpmPackageVersion: (workspaceUri: Uri, packageName: string) => VersionCallback =
+    (workspaceUri: Uri, packageName: string) => async () => {
+      const platformPath = getPathByPlatform(workspaceUri);
+      return await getVersionWithArgs(
+        platformPath,
+        RequiredApps.npm,
+        ['ls', '--pareseable', '--long', '--depth=0', packageName],
+        new RegExp(`${packageName}@(\\d+.\\d+.\\d+)`)
+      );
+    };
 
   export async function getNodeVersion(): Promise<string> {
     return await getVersion(RequiredApps.node, '--version', /v(\d+.\d+.\d+)/);
@@ -275,7 +304,7 @@ export namespace required {
     return false;
   }
 
-  async function createRequiredVersion(appName: string, versionFunc: () => Promise<string>): Promise<IRequiredVersion> {
+  async function createRequiredVersion(appName: string, versionFunc: VersionCallback): Promise<IRequiredVersion> {
     const version = await versionFunc();
     const requiredVersion = Constants.requiredVersions[appName];
     const minRequiredVersion = typeof requiredVersion === 'string' ? requiredVersion : requiredVersion.min;
@@ -318,13 +347,21 @@ export namespace required {
   }
 
   async function getVersion(program: string, command: string, matcher: RegExp): Promise<string> {
+    return getVersionWithArgs(undefined, program, [command], matcher);
+  }
+
+  async function getVersionWithArgs(
+    workingDirectory: string | undefined,
+    program: string,
+    commands: string[],
+    matcher: RegExp
+  ): Promise<string> {
     try {
-      const result = await tryExecuteCommand(undefined, program, command);
+      const result = await tryExecuteCommand(workingDirectory, program, ...commands);
       if (result.code === 0) {
         const output = result.cmdOutput || result.cmdOutputIncludingStderr;
         const installedVersion = output.match(matcher);
         const version = semver.clean(installedVersion ? installedVersion[1] : '');
-
         return version || '';
       }
     } catch (error) {

@@ -6,12 +6,12 @@ import fs from 'fs-extra';
 import rewire from 'rewire';
 import sinon from 'sinon';
 import {CancellationToken, Progress, ProgressOptions, window, workspace} from 'vscode';
-import {Constants, RequiredApps} from '../../src/Constants';
+import {Constants, RequiredApps} from '@/Constants';
 import * as helpers from '../../src/helpers/';
-import {required} from '../../src/helpers/required';
+import {required} from '@/helpers/required';
 import * as userInteraction from '../../src/helpers/userInteraction';
-import {CancellationEvent} from '../../src/Models';
-import {Output} from '../../src/Output';
+import {CancellationEvent} from '@/Models';
+import {Output} from '@/Output';
 import * as vscode from 'vscode';
 
 enum ProjectType {

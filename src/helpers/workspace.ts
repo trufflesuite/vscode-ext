@@ -1,18 +1,17 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Memento, TextDocument, Uri, workspace} from 'vscode';
 import {Constants} from '@/Constants';
-import {Telemetry} from '@/TelemetryClient';
-import * as path from 'path';
-import glob from 'glob';
 import {showQuickPick} from '@/helpers/userInteraction';
-import {TruffleCommands} from '@/commands';
+import {Telemetry} from '@/TelemetryClient';
+import glob from 'glob';
+import * as path from 'path';
+import {Uri, workspace} from 'vscode';
 
 /**
  * The [glob](https://github.com/isaacs/node-glob#glob-primer) pattern to match Truffle config file names.
  */
-const TRUFFLE_CONFIG_GLOB = 'truffle-config{,.*}.js';
+const TRUFFLE_CONFIG_GLOB = 'truffle-config*.js';
 
 /**
  * A Truffle workspace is defined by the presence of a Truffle config file.
@@ -127,20 +126,11 @@ export function getPathByPlatform(workspace: Uri): string {
  *
  * @returns all Truffle config files found wrapped in {@link TruffleWorkspace}.
  */
-export async function getAllTruffleWorkspaces(): Promise<TruffleWorkspace[]> {
+export function getAllTruffleWorkspaces(): TruffleWorkspace[] {
   if (workspace.workspaceFolders === undefined) {
     return [];
   }
-
-  const workspaces: TruffleWorkspace[] = [];
-
-  await Promise.all(
-    workspace.workspaceFolders.map(async (ws) => {
-      workspaces.push(...(await findTruffleWorkspaces(ws.uri.fsPath)));
-    })
-  );
-
-  return workspaces;
+  return workspace.workspaceFolders.flatMap((ws) => findTruffleWorkspaces(ws.uri.fsPath));
 }
 
 /**
@@ -154,11 +144,10 @@ export async function getAllTruffleWorkspaces(): Promise<TruffleWorkspace[]> {
  * @param workspaceRootPath the root path where to look for Truffle config files.
  * @returns all Truffle config files found wrapped in `TruffleWorkspace`.
  */
-async function findTruffleWorkspaces(workspaceRootPath: string): Promise<TruffleWorkspace[]> {
+function findTruffleWorkspaces(workspaceRootPath: string): TruffleWorkspace[] {
   const files = glob.sync(`${workspaceRootPath}/**/${TRUFFLE_CONFIG_GLOB}`, {
     ignore: Constants.workspaceIgnoredFolders,
   });
-
   return files.map((file) => new TruffleWorkspace(file));
 }
 
@@ -185,26 +174,4 @@ async function selectTruffleConfigFromQuickPick(workspaces: TruffleWorkspace[]):
   });
 
   return result.truffleWorkspace;
-}
-
-/**
- * Every time the `workspace.onDidSaveTextDocument` listener emits a notification,
- * this function receives, identifies the file extension and calls the corresponding function.
- *
- * @param globalState A memento object that stores state independent of the current opened workspace.
- * @param document Represents a text document, such as a source file.
- */
-export async function saveTextDocument(globalState: Memento, document: TextDocument): Promise<void> {
-  switch (path.extname(document.fileName)) {
-    case '.sol': {
-      // Gets the current state of the status bar item
-      const isAutoDeployOnSaveEnabled = globalState.get<boolean>(Constants.globalStateKeys.contractAutoDeployOnSave);
-
-      // If enabled, calls the function that performs the deployment
-      if (isAutoDeployOnSaveEnabled) await TruffleCommands.deployContracts(Uri.parse(document.fileName));
-      break;
-    }
-    default:
-      break;
-  }
 }

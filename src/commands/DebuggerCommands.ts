@@ -8,8 +8,9 @@ import {DEBUG_TYPE} from '@/debugAdapter/constants/debugAdapter';
 import {DebugNetwork} from '@/debugAdapter/debugNetwork';
 import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvider';
 import {Web3Wrapper} from '@/debugAdapter/web3Wrapper';
-import {getTruffleWorkspace, getPathByPlatform} from '@/helpers/workspace';
+import {getWorkspaceForUri} from '@/helpers/AbstractWorkspace';
 import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
+import {getPathByPlatform} from '@/helpers/WorkspaceHelpers';
 import {Telemetry} from '@/TelemetryClient';
 import {DebuggerTypes} from '@/debugAdapter/models/debuggerTypes';
 
@@ -19,7 +20,7 @@ export namespace DebuggerCommands {
   export async function startSolidityDebugger() {
     Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandStarted');
 
-    const workspaceUri = (await getTruffleWorkspace()).workspace;
+    const workspaceUri = (await getWorkspaceForUri()).workspace;
     const workingDirectory = getPathByPlatform(workspaceUri);
     const debugNetwork = new DebugNetwork(workingDirectory);
     await debugNetwork.load();
@@ -95,7 +96,7 @@ async function getQuickPickItems(txProvider: TransactionProvider) {
 
 /**
  * Responsible for starting the Solidity debugger with the given arguments.
- * 
+ *
    @param args The `DebugArgs` to initialize the `DebugSession`.
  */
 export async function startDebugging(args: DebuggerTypes.DebugArgs): Promise<void> {
