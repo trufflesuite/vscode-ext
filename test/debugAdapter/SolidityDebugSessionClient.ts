@@ -7,7 +7,7 @@ const baseDebugAdapterResponseMock = {request_seq: 1, success: true, command: ''
 
 export class SolidityDebugSessionClient extends SolidityDebugSession {
   public execProtectedLaunchRequest() {
-    const mockArgs = {txHash: '', workingDirectory: '', files: [], providerUrl: ''};
+    const mockArgs = {txHash: '0x', workingDirectory: '/path', files: [], providerUrl: 'http://127.0.0.1:8545'};
     return this.launchRequest(baseDebugAdapterResponseMock, mockArgs);
   }
 

@@ -1,4 +1,7 @@
-import {ChainId} from '../Constants';
+// Copyright (c) 2022. Consensys Software Inc. All rights reserved.
+// Licensed under the MIT license.
+
+import {ChainId} from '@/Constants';
 
 const explorers = {
   etherscan: (link: string, data: string, type: 'transaction' | 'token' | 'address' | 'block') => {
@@ -33,24 +36,14 @@ const chains: Chains = {
     link: 'https://etherscan.io',
     builder: explorers.etherscan,
   },
-  [ChainId.ROPSTEN]: {
-    name: 'Ropsten',
-    link: 'https://ropsten.etherscan.io',
-    builder: explorers.etherscan,
-  },
-  [ChainId.RINKEBY]: {
-    name: 'Rinkeby',
-    link: 'https://rinkeby.etherscan.io',
-    builder: explorers.etherscan,
-  },
-  [ChainId.GÖRLI]: {
+  [ChainId.GOERLI]: {
     name: 'Goerli',
     link: 'https://goerli.etherscan.io',
     builder: explorers.etherscan,
   },
-  [ChainId.KOVAN]: {
-    name: 'Kovan',
-    link: 'https://kovan.etherscan.io',
+  [ChainId.SEPOLIA]: {
+    name: 'Sepolia',
+    link: 'https://sepolia.etherscan.io',
     builder: explorers.etherscan,
   },
   [ChainId.MATIC]: {
@@ -73,11 +66,11 @@ const chains: Chains = {
     link: 'https://testnet.ftmscan.com',
     builder: explorers.etherscan,
   },
-  [ChainId.KILN]: {
-    name: 'Kiln',
-    link: 'https://explorer.kiln.themerge.dev/',
-    builder: explorers.etherscan,
-  },
+  //   [ChainId.KILN]: {
+  //     name: 'Kiln',
+  //     link: 'https://explorer.kiln.themerge.dev/',
+  //     builder: explorers.etherscan,
+  //   },
   //   [ChainId.BSC]: {
   //     link: 'https://bscscan.com',
   //     builder: explorers.etherscan,
@@ -121,3 +114,7 @@ export const getChain = (chainId: number | undefined): ChainObject => {
   if (!chainId) return UnknownChain;
   return chains[chainId] ? chains[chainId] : UnknownChain;
 };
+
+export function getChainId(networkName: string): string | undefined {
+  return Object.entries(chains).find((chain) => chain[1].name === networkName)?.[0];
+}

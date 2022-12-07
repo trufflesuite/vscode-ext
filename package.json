@@ -67,7 +67,8 @@
     "onCommand:truffle-vscode.views.dashboard.restartDashboardServer",
     "onCommand:truffle-vscode.views.dashboard.openDashboard",
     "onCommand:truffle-vscode.views.dashboard.copyRPCEndpointAddress",
-    "onDebug"
+    "onDebug",
+    "onUri"
   ],
   "contributes": {
     "configuration": {
@@ -566,7 +567,10 @@
         "runtime": "node",
         "configurationAttributes": {
           "launch": {
-            "required": [],
+            "required": [
+              "txHash",
+              "workingDirectory"
+            ],
             "properties": {
               "stopOnEntry": {
                 "type": "boolean",
@@ -580,23 +584,33 @@
               },
               "txHash": {
                 "type": "string",
-                "description": "Transaction hash to debug",
+                "description": "The transaction hash to debug.",
                 "default": "0x"
               },
               "files": {
                 "type": "string[]",
-                "description": "Array of file paths of solidity files to debug",
+                "description": "Array of file paths of solidity files to debug.",
                 "default": []
               },
               "workingDirectory": {
                 "type": "string",
-                "description": "Directory of truffle project",
+                "description": "Directory of the Truffle project where to find the Truffle config file.",
                 "default": "${workspaceFolder}"
               },
               "providerUrl": {
                 "type": "string",
-                "description": "URL of provider",
+                "description": "Provider's URL of the Ethereum network to connect to.",
                 "default": "http://127.0.0.1:8545"
+              },
+              "network": {
+                "type": "string",
+                "description": "Name of the Ethereum network to connect to. The network name should be a key in the `networks` object in your Truffle config file.",
+                "default": "development"
+              },
+              "disableFetchExternal": {
+                "type": "boolean",
+                "description": "When set, do not try to fetch external contract sources when debugging a forked network instance. When the network is not being forked, this flag is ignored.",
+                "default": false
               }
             }
           }
@@ -610,13 +624,14 @@
             "txHash": "0x",
             "files": [],
             "workingDirectory": "${workspaceFolder}",
-            "providerUrl": "http://127.0.0.1:8545"
+            "providerUrl": "http://127.0.0.1:8545",
+            "disableFetchExternal": false
           }
         ],
         "configurationSnippets": [
           {
             "label": "Truffle - Debugger Launch",
-            "description": "Runs the Truffle debugger (truffle) and attaches to a TestRPC instance",
+            "description": "Runs the Truffle debugger (truffle) and attaches to a Ganache instance",
             "body": {
               "type": "truffle",
               "request": "launch",
@@ -624,8 +639,24 @@
               "stopOnEntry": false,
               "txHash": "0x",
               "files": [],
-              "workingDirectory": "^\"\\${workspaceFolder}/",
-              "providerUrl": "http://127.0.0.1:8545"
+              "workingDirectory": "^\"\\${workspaceFolder}\"",
+              "providerUrl": "http://127.0.0.1:8545",
+              "disableFetchExternal": false
+            }
+          },
+          {
+            "label": "Truffle - Debugger Launch using config network",
+            "description": "Runs the Truffle debugger (truffle) and attaches to a Ganache instance",
+            "body": {
+              "type": "truffle",
+              "request": "launch",
+              "name": "Debug Transaction with Truffle",
+              "stopOnEntry": false,
+              "txHash": "0x",
+              "files": [],
+              "workingDirectory": "^\"\\${workspaceFolder}\"",
+              "network": "development",
+              "disableFetchExternal": false
             }
           }
         ],
@@ -810,7 +841,9 @@
     "@truffle/compile-solidity": "^6.0.31",
     "@truffle/config": "1.3.38",
     "@truffle/debug-utils": "^6.0.26",
-    "@truffle/debugger": "^10.0.14",
+    "@truffle/debugger": "^11.0.17",
+    "@truffle/environment": "^0.2.130",
+    "@truffle/fetch-and-compile": "^0.5.19",
     "@truffle/resolver": "^9.0.4",
     "@truffle/workflow-compile": "^4.0.36",
     "abi-decoder": "^2.4.0",

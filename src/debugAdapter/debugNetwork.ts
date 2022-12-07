@@ -3,7 +3,6 @@
 
 import path from 'path';
 import {IConfiguration, INetwork, INetworkOption} from '@/helpers/ConfigurationReader';
-import {TRUFFLE_CONFIG_NAME} from './constants/truffleConfig';
 import {TreeManager} from '@/services/tree/TreeManager';
 import {ItemType} from '@/Models/ItemType';
 import {Constants} from '@/Constants';
@@ -13,6 +12,11 @@ import {QuickPickItem} from 'vscode';
 import {LocalProject} from '@/Models/TreeItems/LocalProject';
 import {LocalNetworkNode} from '@/Models/TreeItems';
 import {ConfigurationReader} from '../helpers/debugConfigurationReader';
+
+/**
+ * TODO: We should removed this hardcoded name since there might be multiple Truffle config files in the same workspace.
+ */
+const TRUFFLE_CONFIG_NAME = 'truffle-config.js';
 
 export class DebugNetwork {
   public workingDirectory: string;
@@ -35,15 +39,6 @@ export class DebugNetwork {
 
   public getNetwork() {
     return this._networkForDebug;
-  }
-
-  // Port and host are defined
-  public isLocalNetwork() {
-    if (!this._networkForDebug || !this._networkForDebug.options) {
-      throw new Error('Network is not defined. Try to call this.load()');
-    }
-    const options = this._networkForDebug.options;
-    return !!(options.host && options.port);
   }
 
   private async loadConfiguration(): Promise<IConfiguration> {
@@ -69,11 +64,13 @@ export class DebugNetwork {
   private async loadNetworkForDebug(providerUrl?: string): Promise<INetwork> {
     const projects = this.getProjects();
     const host = await this.getHost(projects, providerUrl);
+    const projectOptions = (host.getParent() as LocalProject).options;
 
     const networkOptionsForDebug: INetworkOption = {
       host: host.url.hostname,
       network_id: host.networkId,
       port: host.port,
+      isForked: projectOptions.isForked,
     };
 
     const networkForDebug: INetwork = {

@@ -4,10 +4,27 @@
 import {Handles, Scope} from '@vscode/debugadapter';
 import {DebugProtocol} from '@vscode/debugprotocol';
 import _ from 'lodash';
-import {OBJECT_VARIABLE_DISPLAY_NAME, SCOPES} from './constants/variablesView';
 import {TranslatedResult} from './helpers';
 import {IExpressionEval} from './models/IExpressionEval';
 import RuntimeInterface from './runtimeInterface';
+
+/**
+ * > **NOTE**. _This is only `export`ed to be used in tests._
+ */
+export const SCOPES = {
+  all: {
+    name: 'All',
+    ref: 1,
+  },
+  dynamicVariables: {
+    ref: 2,
+  },
+};
+
+/**
+ * > **NOTE**. _This is only `export`ed to be used in tests._
+ */
+export const OBJECT_VARIABLE_DISPLAY_NAME = 'Object';
 
 export default class VariablesHandler {
   private _runtime: RuntimeInterface;

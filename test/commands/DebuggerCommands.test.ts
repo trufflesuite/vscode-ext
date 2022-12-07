@@ -14,12 +14,13 @@ import * as userInteraction from '../../src/helpers/userInteraction';
 import {TestConstants} from '../TestConstants';
 
 import * as helpers from '@/helpers/workspace';
+import {shortenHash} from '@/commands/DebuggerCommands';
 
 const truffleWorkspace = new helpers.TruffleWorkspace(
   path.join(__dirname, TestConstants.truffleCommandTestDataFolder, 'truffle-config.js')
 );
 
-describe('DebuggerCommands unit tests', () => {
+describe('DebuggerCommands mock tests', () => {
   let mockGetTxHashes: sinon.SinonStub<[(number | undefined)?], Promise<string[]>>;
   let mockGetTxInfos: sinon.SinonStub<[string[]], Promise<ITransactionResponse[]>>;
   let debugCommands: any;
@@ -54,9 +55,22 @@ describe('DebuggerCommands unit tests', () => {
     sinon.restore();
   });
 
-  it('should generate and show quickPick when debugNetwork.isLocalNetwork() is true', async () => {
+  it('should `showinputBox` when no more txs', async () => {
     // Arrange
-    sinon.stub(DebugNetwork.prototype, 'isLocalNetwork').returns(true);
+    const showInputBoxFn = sinon.stub(userInteraction, 'showInputBox').resolves('');
+
+    // Act
+    await debugCommands.DebuggerCommands.startSolidityDebugger();
+
+    // Assert
+    assert.strictEqual(mockGetTxHashes.calledOnce, true, 'getLastTransactionHashes should be called');
+    assert.strictEqual(mockGetTxInfos.calledOnce, true, 'getTransactionsInfo should be called');
+    assert.strictEqual(showInputBoxFn.called, true, 'showInputBox should be called');
+  });
+
+  it('should `showQuickPick` when there are more txs', async () => {
+    // Arrange
+    mockGetTxInfos.resolves([{hash: '0x1234', contractName: 'MetaCoin', methodName: 'constructor()'}]);
     const createQuickPickFn = sinon.stub(userInteraction, 'showQuickPick').resolves({} as QuickPickItem);
 
     // Act
@@ -67,18 +81,22 @@ describe('DebuggerCommands unit tests', () => {
     assert.strictEqual(mockGetTxInfos.calledOnce, true, 'getTransactionsInfo should be called');
     assert.strictEqual(createQuickPickFn.called, true, 'createQuickPic should be called');
   });
+});
 
-  it('should show inputBox when debugNetwork.isLocalNetwork() is false', async () => {
-    // Arrange
-    sinon.stub(DebugNetwork.prototype, 'isLocalNetwork').returns(false);
-    const showInputBoxFn = sinon.stub(userInteraction, 'showInputBox').resolves('');
+describe('DebuggerCommands unit tests', () => {
+  it('should `shortenHash` for a transaction hash', async () => {
+    assert.strictEqual(
+      shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e'),
+      '0xa50f...d81e'
+    );
+    assert.strictEqual(
+      shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e', 2),
+      '0xa5...1e'
+    );
+    assert.strictEqual(shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e', 0), '0x...');
+  });
 
-    // Act
-    await debugCommands.DebuggerCommands.startSolidityDebugger();
-
-    // Assert
-    assert.strictEqual(showInputBoxFn.called, true, 'showInputBox should be called');
-    assert.strictEqual(mockGetTxHashes.calledOnce, false, "getLastTransactionHashes shouldn't be called");
-    assert.strictEqual(mockGetTxInfos.calledOnce, false, "getTransactionsInfo shouldn't be called");
+  it('should `shortenHash` for an address hash', async () => {
+    assert.strictEqual(shortenHash('0xc448123202fda0547aa8587b496ea87fa479e7e8'), '0xc448...e7e8');
   });
 });

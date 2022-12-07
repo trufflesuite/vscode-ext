@@ -1,11 +1,14 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
+import TruffleConfig from '@truffle/config';
 import truffleDebugger from '@truffle/debugger';
+import {Environment} from '@truffle/environment';
 import assert from 'assert';
 import sinon from 'sinon';
 import * as contractHelpers from '../../src/debugAdapter/contracts/contractHelpers';
 import RuntimeInterface from '../../src/debugAdapter/runtimeInterface';
+import {referenceConfiguration} from '../testData/truffleConfigTestdata';
 
 describe('RuntimeInterface unit tests', () => {
   let runtimeInterface: RuntimeInterface;
@@ -27,13 +30,16 @@ describe('RuntimeInterface unit tests', () => {
       return {};
     };
     const sessionMock = buildSessionMock(sessionSelectorView);
-    sinon.stub(RuntimeInterface.prototype, 'generateSession' as any).resolves(sessionMock);
     const currentDebugLine = {column: 1, file: contractSourcePathMock, line: 1};
+
+    sinon.stub(TruffleConfig, 'detect' as any).returns(referenceConfiguration);
+    sinon.stub(Environment, 'detect' as any).returns(referenceConfiguration);
+    sinon.stub(RuntimeInterface.prototype, 'generateSession' as any).resolves(sessionMock);
     sinon.stub(RuntimeInterface.prototype, 'currentLine').returns({column: 1, file: contractSourcePathMock, line: 1});
 
     // Act
     runtimeInterface = await initMockRuntime();
-    const callStack = await runtimeInterface.callStack();
+    const callStack = runtimeInterface.callStack();
 
     // Assert
     assert.strictEqual(
@@ -56,7 +62,11 @@ describe('RuntimeInterface unit tests', () => {
       return {};
     };
     const sessionMock = buildSessionMock(sessionSelectorView);
+
+    sinon.stub(TruffleConfig, 'detect' as any).returns(referenceConfiguration);
+    sinon.stub(Environment, 'detect' as any).returns(referenceConfiguration);
     sinon.stub(RuntimeInterface.prototype, 'generateSession' as any).resolves(sessionMock);
+
     // Act
     runtimeInterface = await initMockRuntime();
 
@@ -82,7 +92,14 @@ const baseSessionMock: truffleDebugger.Session = {
 
 async function initMockRuntime() {
   const runtimeInterface = new RuntimeInterface();
-  await runtimeInterface.attach('', '', '');
+  const args = {
+    txHash: '',
+    workingDirectory: '',
+    providerUrl: 'http://127.0.0.1:8545',
+    network: 'development',
+    disableFetchExternal: false,
+  };
+  await runtimeInterface.attach(args);
   return runtimeInterface;
 }
 
