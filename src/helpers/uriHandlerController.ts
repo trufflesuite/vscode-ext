@@ -1,5 +1,5 @@
 import {startDebugging} from '@/commands';
-import {Constants} from '@/Constants';
+import {Telemetry} from '@/TelemetryClient';
 import {Uri, UriHandler, window} from 'vscode';
 
 /**
@@ -42,11 +42,13 @@ export class UriHandlerController implements UriHandler {
           break;
         }
         default:
-          window.showWarningMessage(`Unrecognized action to handle \`${command}\``);
+          void window.showWarningMessage(`Unrecognized action to handle \`${command}\``);
       }
+
+      Telemetry.sendEvent('UriHandler.handleUri', {command});
     } catch (error) {
       // Display an error message if something went wrong.
-      window.showErrorMessage(Constants.errorMessageStrings.UriHandlerError);
+      void window.showErrorMessage('Badly formatted. Ensure that the command and arguments are described correctly');
     }
   }
 }
