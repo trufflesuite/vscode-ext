@@ -19,36 +19,31 @@ export class UriHandlerController implements UriHandler {
    * @param uri The URI to handle.
    */
   async handleUri(uri: Uri): Promise<void> {
-    try {
-      // Parse the URI to get the command and the parameters.
-      const command = uri.path.replace('/', '');
-      const searchParams = new URLSearchParams(uri.query);
+    // Parse the URI to get the command and the parameters.
+    const command = uri.path.replace('/', '');
+    const searchParams = new URLSearchParams(uri.query);
 
-      // Checks the command and executes the corresponding action.
-      switch (command) {
-        case Commands.debug: {
-          // Convert the URI parameters to a `DebugArgs` object.
-          // The `??` operator converts `null` to `undefined`.
-          const args = {
-            txHash: searchParams.get('txHash') ?? undefined,
-            workingDirectory: searchParams.get('workingDirectory') ?? undefined,
-            providerUrl: searchParams.get('providerUrl') ?? undefined,
-            network: searchParams.get('network') ?? undefined,
-            disableFetchExternal: !!searchParams.get('disableFetchExternal'),
-          };
+    // Checks the command and executes the corresponding action.
+    switch (command) {
+      case Commands.debug: {
+        // Convert the URI parameters to a `DebugArgs` object.
+        // The `??` operator converts `null` to `undefined`.
+        const args = {
+          txHash: searchParams.get('txHash') ?? undefined,
+          workingDirectory: searchParams.get('workingDirectory') ?? undefined,
+          providerUrl: searchParams.get('providerUrl') ?? undefined,
+          network: searchParams.get('network') ?? undefined,
+          disableFetchExternal: !!searchParams.get('disableFetchExternal'),
+        };
 
-          // Calls the debugger with the given parameters.
-          await startDebugging(args);
-          break;
-        }
-        default:
-          void window.showWarningMessage(`Unrecognized action to handle \`${command}\``);
+        // Calls the debugger with the given parameters.
+        await startDebugging(args);
+        break;
       }
-
-      Telemetry.sendEvent('UriHandler.handleUri', {command});
-    } catch (error) {
-      // Display an error message if something went wrong.
-      void window.showErrorMessage('Badly formatted. Ensure that the command and arguments are described correctly');
+      default:
+        void window.showWarningMessage(`Unrecognized action to handle \`${command}\``);
     }
+
+    Telemetry.sendEvent('UriHandler.handleUri', {command});
   }
 }
