@@ -8,8 +8,6 @@ Truffle for VS Code simplifies how you create, build, debug and deploy smart con
 
 ## Native IDE Debugging
 
-_Please note that this is a beta release of the IDE debugger and there are some known (and possibly unknown) issues that we are actively resolving. Feel free to review status and / or open any new issues or feature requests [here](https://github.com/trufflesuite/vscode-ext/issues)._
-
 Truffle for VS Code also offers comprehensive native IDE [Solidity](https://docs.soliditylang.org/) debugging support, taking advantage of VS Code's great debugging features such variables, watches, and breakpoints. No more jumping between differents tools or windows during your edit, compile, deploy, transact, debug loop.
 
 ![in-ide debugging example](images/ide-debugging.png)
