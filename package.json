@@ -3,7 +3,6 @@
   "displayName": "Truffle for VS Code",
   "description": "Build, debug and deploy smart contracts on Ethereum and EVM-compatible blockchains.",
   "publisher": "trufflesuite-csi",
-  "preview": true,
   "icon": "images/TruffleLogo.png",
   "version": "2.3.5",
   "repository": {
