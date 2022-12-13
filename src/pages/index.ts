@@ -3,6 +3,5 @@
 
 import {ChangelogPage} from './Changelog';
 import {RequirementsPage} from './Requirements';
-import {WelcomePage} from './Welcome';
 
-export {ChangelogPage, RequirementsPage, WelcomePage};
+export {ChangelogPage, RequirementsPage};

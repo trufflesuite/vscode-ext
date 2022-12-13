@@ -166,12 +166,6 @@ export class Constants {
       title: 'Truffle for VSCode Requirements',
       viewType: 'requirementsPage',
     },
-    welcome: {
-      path: '',
-      showOnStartup: 'showOnStartupWelcomePage',
-      title: 'Welcome to Truffle',
-      viewType: 'welcomePage',
-    },
   };
 
   public static networkProtocols = {
@@ -687,7 +681,6 @@ export class Constants {
   public static initialize(context: ExtensionContext) {
     this.temporaryDirectory = context.storageUri ? context.storageUri.fsPath : os.tmpdir();
     this.webViewPages.contractUI.path = context.asAbsolutePath(path.join('resources', 'drizzle', 'index.html'));
-    this.webViewPages.welcome.path = context.asAbsolutePath(path.join('resources', 'welcome', 'index.html'));
     this.webViewPages.requirements.path = context.asAbsolutePath(path.join('resources', 'welcome', 'prereqs.html'));
     this.webViewPages.changelog.path = context.asAbsolutePath(path.join('resources', 'welcome', 'changelog.html'));
     this.webViewPages.changelog.changelogPath = context.asAbsolutePath(path.join('CHANGELOG.md'));
