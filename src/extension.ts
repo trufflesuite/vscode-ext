@@ -18,7 +18,7 @@ import {Constants} from './Constants';
 import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
 import {required} from '@/helpers/required';
 import {CancellationEvent} from './Models';
-import {ChangelogPage, RequirementsPage, WelcomePage} from './pages';
+import {ChangelogPage, RequirementsPage} from './pages';
 import {
   AdapterType,
   ContractDB,
@@ -85,11 +85,9 @@ export async function activate(context: ExtensionContext) {
   //#endregion
 
   //#region trufflesuite pages
-  const welcomePage = new WelcomePage(context);
   const requirementsPage = new RequirementsPage(context);
   const changelogPage = new ChangelogPage(context);
 
-  await welcomePage.checkAndShow();
   await changelogPage.checkAndShow();
   //#endregion
 
@@ -98,9 +96,6 @@ export async function activate(context: ExtensionContext) {
   //#region trufflesuite extension commands
   const refresh = commands.registerCommand('truffle-vscode.refresh', (element) => {
     TreeService.refresh(element);
-  });
-  const showWelcomePage = commands.registerCommand('truffle-vscode.showWelcomePage', async () => {
-    return welcomePage.show();
   });
   const showRequirementsPage = commands.registerCommand(
     'truffle-vscode.showRequirementsPage',
@@ -254,7 +249,6 @@ export async function activate(context: ExtensionContext) {
 
   const subscriptions = [
     uriHandler,
-    showWelcomePage,
     showRequirementsPage,
     refresh,
     newSolidityProject,
