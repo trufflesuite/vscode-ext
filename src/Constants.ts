@@ -606,7 +606,6 @@ export class Constants {
     DashboardVersionError: 'Please upgrade to the latest version of Truffle to use this feature',
     FetchingBoxesHasFailed: 'An error occurred while fetching boxes',
     ContractFolderNotExists: 'There is no contract directory in this workspace',
-    UriHandlerError: 'Badly formatted. Ensure that the command and arguments are described correctly',
   };
 
   public static informationMessage = {
