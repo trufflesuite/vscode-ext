@@ -18,7 +18,8 @@ import {Constants} from './Constants';
 import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
 import {required} from '@/helpers/required';
 import {CancellationEvent} from './Models';
-import {ChangelogPage, RequirementsPage} from './pages';
+import {ChangelogPage} from '@/pages/Changelog';
+import {RequirementsPage} from '@/pages/Requirements';
 import {
   AdapterType,
   ContractDB,
