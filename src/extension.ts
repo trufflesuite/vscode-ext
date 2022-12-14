@@ -185,7 +185,7 @@ export async function activate(context: ExtensionContext) {
     Constants.contract.configuration.statusBar.command,
     async () => {
       // Calls the action that enables/disables auto-deployment when saving a .sol file
-      await tryExecute(() => ContractCommands.setEnableOrDisableAutoDeploy(contractStatusBarItem));
+      await tryExecute(() => Promise.resolve(ContractCommands.setEnableOrDisableAutoDeploy(contractStatusBarItem)));
     }
   );
   //#endregion
@@ -302,6 +302,6 @@ async function tryExecute(func: () => Promise<any>, errorMessage: string | null 
     if (error instanceof CancellationEvent) {
       return;
     }
-    window.showErrorMessage(errorMessage || (error as Error).message);
+    void window.showErrorMessage(errorMessage || (error as Error).message);
   }
 }
