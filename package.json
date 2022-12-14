@@ -38,7 +38,6 @@
     "onView:truffle-vscode.truffle",
     "onView:truffle-vscode.explorer-view",
     "onView:truffle-vscode.panel.log",
-    "onCommand:truffle-vscode.showWelcomePage",
     "onCommand:truffle-vscode.showRequirementsPage",
     "onCommand:truffle-vscode.refresh",
     "onCommand:truffle-vscode.copyByteCode",
@@ -93,11 +92,6 @@
       }
     },
     "commands": [
-      {
-        "command": "truffle-vscode.showWelcomePage",
-        "title": "Show Welcome Page",
-        "category": "Truffle"
-      },
       {
         "command": "truffle-vscode.showRequirementsPage",
         "title": "Show Requirements Page",
@@ -325,10 +319,6 @@
         }
       ],
       "view/title": [
-        {
-          "command": "truffle-vscode.showWelcomePage",
-          "when": "view == truffle-vscode.truffle"
-        },
         {
           "command": "truffle-vscode.createProject",
           "when": "view == truffle-vscode.truffle"

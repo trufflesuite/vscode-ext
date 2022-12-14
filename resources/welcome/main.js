@@ -1,49 +1,17 @@
-$(function () {
-  main();
-});
-
-function main() {
+document.addEventListener('DOMContentLoaded', function () {
   const vscode = acquireVsCodeApi();
 
-  $('a').click(function () {
-    if (this.href) {
-      vscode.postMessage({command: 'openLink', value: this.href});
-    } else {
-      vscode.postMessage({command: 'executeCommand', value: this.id});
-    }
+  document.querySelectorAll('a').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      vscode.postMessage(a.href ? {command: 'openLink', value: a.href} : {command: 'executeCommand', value: a.id});
 
-    if ($(this).hasClass('action')) {
-      $(this.closest('.required-app')).toggleClass('disabled');
-    }
+      if (a.classList.contains('action')) {
+        a.closest('.required-app').classList.toggle('disabled');
+      }
+    });
   });
 
-  $('.interactive').click(function (event) {
-    if (!$(event.target).is('a') && !$(event.target).is('.detail') && $(event.target).parents('.detail').length === 0) {
-      $(event.currentTarget).find('.detail').toggle(1000);
-      $(event.currentTarget).find('.arrow').toggleClass('arrow-up');
-
-      vscode.postMessage({
-        command: 'toggleInteractive',
-        value: `toggle:${$(event.currentTarget).attr('id')}`,
-      });
-    }
-  });
-
-  $(window).scroll(function () {
-    let offset = 250;
-    let duration = 600;
-    if ($(this).scrollTop() >= offset) {
-      $('#back-to-top').fadeIn(duration);
-    } else {
-      $('#back-to-top').fadeOut(duration);
-    }
-  });
-
-  $(document).ready(() => {
-    vscode.postMessage({command: 'documentReady'});
-  });
-
-  $('#showOnStartup').change(function () {
+  document.querySelector('#showOnStartup').addEventListener('change', function () {
     vscode.postMessage({command: 'toggleShowPage', value: this.checked});
   });
 
@@ -53,15 +21,20 @@ function main() {
       const versions = message.value;
       if (Array.isArray(versions)) {
         versions.forEach((version) => {
-          const element = $(`#${version.app}`);
-          const spinner = $(`#${version.app} .spinner`);
-          element.toggleClass('disabled', version.isValid);
-          spinner.toggleClass('spinner', false);
+          const element = document.querySelector(`#${version.app}`);
+          const spinner = document.querySelector(`#${version.app} .spinner`);
+          element.classList.toggle('disabled', version.isValid);
+          spinner.classList.toggle('spinner', false);
         });
       }
-    }
-    if (message.command === 'showOnStartup') {
-      $('#showOnStartup').attr('checked', !!message.value);
+    } else if (message.command === 'showOnStartup') {
+      if (!!message.value) {
+        document.querySelector('#showOnStartup').setAttribute('checked', '');
+      } else {
+        document.querySelector('#showOnStartup').removeAttribute('checked');
+      }
     }
   });
-}
+
+  vscode.postMessage({command: 'documentReady'});
+});
