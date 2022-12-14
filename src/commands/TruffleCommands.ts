@@ -9,7 +9,7 @@ import hdkey from 'hdkey';
 import path from 'path';
 import {QuickPickItem, Uri, window, commands, QuickPickItemKind} from 'vscode';
 import {Constants, RequiredApps} from '@/Constants';
-import {outputCommandHelper, telemetryHelper, vscodeEnvironment} from '../helpers';
+import {outputCommandHelper} from '@/helpers';
 import {getTruffleWorkspace} from '@/helpers/workspace';
 import {required} from '@/helpers/required';
 
@@ -33,6 +33,8 @@ import {
 import {Telemetry} from '@/TelemetryClient';
 import {NetworkNodeView} from '@/ViewItems';
 import {ServiceCommands} from './ServiceCommands';
+import {mapNetworkName} from '@/helpers/telemetry';
+import {writeToClipboard} from '@/helpers/vscodeEnvironment';
 
 interface IDeployDestinationItem {
   cmd: () => Promise<void>;
@@ -133,17 +135,17 @@ export namespace TruffleCommands {
 
   export async function writeAbiToBuffer(uri: Uri): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.writeAbiToBuffer.commandStarted');
-    const contract = await readCompiledContract(uri);
+    const contract = readCompiledContract(uri);
 
-    await vscodeEnvironment.writeToClipboard(JSON.stringify(contract[Constants.contract.configuration.properties.abi]));
+    await writeToClipboard(JSON.stringify(contract[Constants.contract.configuration.properties.abi]));
     Telemetry.sendEvent('TruffleCommands.writeAbiToBuffer.commandFinished');
   }
 
   export async function writeBytecodeToBuffer(uri: Uri): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandStarted');
-    const contract = await readCompiledContract(uri);
+    const contract = readCompiledContract(uri);
 
-    await vscodeEnvironment.writeToClipboard(contract[Constants.contract.configuration.properties.bytecode]);
+    await writeToClipboard(contract[Constants.contract.configuration.properties.bytecode]);
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
   }
 
@@ -179,12 +181,12 @@ export namespace TruffleCommands {
         networkItem.contractAddress
       );
 
-      window.showInformationMessage(Constants.informationMessage.transactionBytecodeWasCopiedToClipboard);
+      void window.showInformationMessage(Constants.informationMessage.transactionBytecodeWasCopiedToClipboard);
 
-      await vscodeEnvironment.writeToClipboard(deployedBytecode);
+      await writeToClipboard(deployedBytecode);
     } catch (ex) {
       Telemetry.sendException(ex as Error);
-      window.showErrorMessage(Constants.errorMessageStrings.FetchingDeployedBytecodeIsFailed);
+      void window.showErrorMessage(Constants.errorMessageStrings.FetchingDeployedBytecodeIsFailed);
     }
 
     Telemetry.sendEvent('TruffleCommands.writeBytecodeToBuffer.commandFinished');
@@ -232,16 +234,16 @@ export namespace TruffleCommands {
       });
 
       if (rpcEndpointAddress) {
-        await vscodeEnvironment.writeToClipboard(rpcEndpointAddress);
-        window.showInformationMessage(Constants.informationMessage.rpcEndpointCopiedToClipboard);
+        await writeToClipboard(rpcEndpointAddress);
+        void window.showInformationMessage(Constants.informationMessage.rpcEndpointCopiedToClipboard);
       } else {
-        window.showInformationMessage(
+        void window.showInformationMessage(
           Constants.informationMessage.networkIsNotReady(networkNodeView.extensionItem.constructor.name)
         );
       }
     } catch (error) {
       Telemetry.sendException(error as Error);
-      window.showErrorMessage(
+      void window.showErrorMessage(
         Constants.errorMessageStrings.BlockchainItemIsUnavailable(networkNodeView.extensionItem.constructor.name)
       );
     }
@@ -260,7 +262,7 @@ export namespace TruffleCommands {
 
     if (mnemonicItems.length === 0) {
       Telemetry.sendEvent('TruffleCommands.getPrivateKeyFromMnemonic.thereAreNoMnemonics');
-      window.showErrorMessage(Constants.errorMessageStrings.ThereAreNoMnemonics);
+      void window.showErrorMessage(Constants.errorMessageStrings.ThereAreNoMnemonics);
       return;
     }
 
@@ -272,7 +274,7 @@ export namespace TruffleCommands {
     const mnemonic = mnemonicItem.extended;
     if (!mnemonic) {
       Telemetry.sendEvent('TruffleCommands.getPrivateKeyFromMnemonic.mnemonicFileHaveNoText');
-      window.showErrorMessage(Constants.errorMessageStrings.MnemonicFileHaveNoText);
+      void window.showErrorMessage(Constants.errorMessageStrings.MnemonicFileHaveNoText);
       return;
     }
 
@@ -281,11 +283,11 @@ export namespace TruffleCommands {
       const key = hdkey.fromMasterSeed(buffer);
       const childKey = key.derive("m/44'/60'/0'/0/0");
       const privateKey = childKey.privateKey.toString('hex');
-      await vscodeEnvironment.writeToClipboard(privateKey);
-      window.showInformationMessage(Constants.informationMessage.privateKeyWasCopiedToClipboard);
+      await writeToClipboard(privateKey);
+      void window.showInformationMessage(Constants.informationMessage.privateKeyWasCopiedToClipboard);
     } catch (error) {
       Telemetry.sendException(error as Error);
-      window.showErrorMessage(Constants.errorMessageStrings.InvalidMnemonic);
+      void window.showErrorMessage(Constants.errorMessageStrings.InvalidMnemonic);
     }
     Telemetry.sendEvent('TruffleCommands.getPrivateKeyFromMnemonic.commandFinished');
   }
@@ -532,12 +534,12 @@ async function deployToNetwork(networkName: string, truffleConfigPath: string): 
 
       Output.outputLine(OutputLabel.truffleForVSCode, Constants.informationMessage.deploySucceeded);
       Telemetry.sendEvent('TruffleCommands.deployToNetwork.deployedSuccessfully', {
-        destination: telemetryHelper.mapNetworkName(networkName),
+        destination: mapNetworkName(networkName),
       });
     } catch (error) {
       Output.outputLine(OutputLabel.truffleForVSCode, Constants.informationMessage.deployFailed);
       Telemetry.sendEvent('TruffleCommands.deployToNetwork.deployedFailed', {
-        destination: telemetryHelper.mapNetworkName(networkName),
+        destination: mapNetworkName(networkName),
       });
       throw error;
     }
@@ -566,7 +568,7 @@ async function deployToDashboard(truffleConfigPath: string): Promise<void> {
   await deployToNetwork(RequiredApps.dashboard, truffleConfigPath);
 }
 
-async function readCompiledContract(uri: Uri): Promise<any> {
+function readCompiledContract(uri: Uri): any {
   ensureFileIsContractJson(uri.fsPath);
   const data = fs.readFileSync(uri.fsPath, null);
 

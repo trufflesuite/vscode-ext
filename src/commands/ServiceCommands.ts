@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import {Constants} from '@/Constants';
+import {mapItemType} from '@/helpers/telemetry';
 import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
 import {ItemType} from '@/Models';
 import {
@@ -21,7 +22,6 @@ import {GanacheService, TreeManager} from '@/services';
 import {Telemetry} from '@/TelemetryClient';
 import {ProjectView} from '@/ViewItems';
 import {QuickPickItem} from 'vscode';
-import {telemetryHelper} from '../helpers';
 
 interface IServiceDestination {
   cmd: (service: Service) => Promise<Project>;
@@ -61,7 +61,7 @@ export namespace ServiceCommands {
     const project = await execute(serviceDestinations);
 
     Telemetry.sendEvent('ServiceCommands.createProject.commandFinished', {
-      itemType: telemetryHelper.mapItemType(project.itemType),
+      itemType: mapItemType(project.itemType),
     });
 
     return project;
@@ -90,7 +90,7 @@ export namespace ServiceCommands {
     const project = await execute(serviceDestinations);
 
     Telemetry.sendEvent('ServiceCommands.connectProject.commandFinished', {
-      itemType: telemetryHelper.mapItemType(project.itemType),
+      itemType: mapItemType(project.itemType),
     });
 
     return project;

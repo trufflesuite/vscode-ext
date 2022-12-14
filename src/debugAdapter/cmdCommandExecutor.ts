@@ -17,81 +17,19 @@ interface IForkMessage {
   };
 }
 
-export interface ICommandResult {
+interface ICommandResult {
   code: number;
   cmdOutput: string;
   cmdOutputIncludingStderr: string;
   messages?: Array<{[key: string]: any}>;
 }
 
-export interface ICommandExecute {
+interface ICommandExecute {
   childProcess: cp.ChildProcess;
   result: Promise<ICommandResult>;
 }
 
-export async function executeCommand(
-  workingDirectory: string | undefined,
-  commands: string,
-  ...args: string[]
-): Promise<string> {
-  const result: ICommandResult = await tryExecuteCommand(workingDirectory, commands, ...args);
-
-  if (result.code !== 0) {
-    throw new Error('Error while execution command: ' + commands.concat(' ', ...args.join(' ')));
-  }
-
-  return result.cmdOutput;
-}
-
-async function tryExecuteCommand(
-  workingDirectory: string | undefined,
-  commands: string,
-  ...args: string[]
-): Promise<ICommandResult> {
-  return new Promise((resolve: (res: any) => void, reject: (error: Error) => void): void => {
-    let cmdOutput = '';
-    let cmdOutputIncludingStderr = '';
-
-    const options: cp.SpawnOptions = {cwd: workingDirectory || os.tmpdir(), shell: true};
-    const childProcess: cp.ChildProcess = cp.spawn(commands, args, options);
-
-    childProcess.stdout!.on('data', (data: string | Buffer) => {
-      data = data.toString();
-      cmdOutput = cmdOutput.concat(data);
-      cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
-    });
-
-    childProcess.stderr!.on('data', (data: string | Buffer) => {
-      data = data.toString();
-      cmdOutputIncludingStderr = cmdOutputIncludingStderr.concat(data);
-    });
-
-    childProcess.on('error', reject);
-    childProcess.on('close', (code: number) => {
-      resolve({
-        cmdOutput,
-        cmdOutputIncludingStderr,
-        code,
-      });
-    });
-  });
-}
-
-export async function executeCommandInFork(
-  workingDirectory: string | undefined,
-  modulePath: string,
-  ...args: string[]
-): Promise<string> {
-  const result: ICommandResult = await tryExecuteCommandInFork(workingDirectory, modulePath, ...args);
-
-  if (result.code !== 0) {
-    throw new Error(`Failed to run script - ${modulePath}. More details in output`);
-  }
-
-  return result.cmdOutput;
-}
-
-export function forkProcess(workingDirectory: string | undefined, modulePath: string, args: string[]): cp.ChildProcess {
+function forkProcess(workingDirectory: string | undefined, modulePath: string, args: string[]): cp.ChildProcess {
   const options: cp.ForkOptions = {cwd: workingDirectory || os.tmpdir(), silent: true};
   return cp.fork(modulePath, args, options);
 }
@@ -106,7 +44,7 @@ export async function tryExecuteCommandInFork(
   return result;
 }
 
-export function tryExecuteCommandInForkAsync(
+function tryExecuteCommandInForkAsync(
   workingDirectory: string | undefined,
   modulePath: string,
   ...args: string[]

@@ -1,12 +1,12 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-export interface HttpHeader {
+interface HttpHeader {
   name: string;
   value: string;
 }
 
-export interface ProviderOptions {
+interface ProviderOptions {
   host?: string;
   protocol?: string;
   timeout?: number;

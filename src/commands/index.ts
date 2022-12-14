@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 export * from './ContractCommands';
-export * from './DebuggerCommands';
 export * from './GanacheCommands';
 export * from './InfuraCommands';
 export * from './ProjectCommands';

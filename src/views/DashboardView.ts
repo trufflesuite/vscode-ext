@@ -1,4 +1,4 @@
-import vscode, {
+import {
   commands,
   ProviderResult,
   ThemeIcon,
@@ -8,11 +8,13 @@ import vscode, {
   TreeDataProvider,
   TreeItemCollapsibleState,
   TreeView,
+  env,
+  window,
 } from 'vscode';
 import {DashboardCommands} from '../commands';
 import {DashboardService} from '../services';
 import {Constants} from '../Constants';
-import {vscodeEnvironment} from '../helpers';
+import {writeToClipboard} from '@/helpers/vscodeEnvironment';
 
 class DashboardTreeItem extends TreeItem {
   constructor(
@@ -80,16 +82,16 @@ export function registerDashboardView(viewId = 'truffle-vscode.views.dashboard')
 
     if (portStatus === DashboardService.PortStatus.FREE) return await DashboardCommands.startDashboardCmd();
 
-    await vscode.env.openExternal(vscode.Uri.parse(dashboardUrl));
+    await env.openExternal(Uri.parse(dashboardUrl));
   });
   commands.registerCommand(`${viewId}.copyRPCEndpointAddress`, async () => {
     const rpc = `${dashboardUrl}/rpc`;
-    await vscodeEnvironment.writeToClipboard(rpc);
+    await writeToClipboard(rpc);
 
-    vscode.window.showInformationMessage(Constants.informationMessage.rpcEndpointCopiedToClipboard);
+    void window.showInformationMessage(Constants.informationMessage.rpcEndpointCopiedToClipboard);
   });
 
-  return vscode.window.createTreeView(viewId, {
+  return window.createTreeView(viewId, {
     treeDataProvider: new DashboardTreeDataProvider(),
   });
 }

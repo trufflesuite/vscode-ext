@@ -1,4 +1,4 @@
-import {startDebugging} from '@/commands';
+import {startDebugging} from '@/commands/DebuggerCommands';
 import {Telemetry} from '@/TelemetryClient';
 import {Uri, UriHandler, window} from 'vscode';
 

@@ -9,7 +9,7 @@ import * as vscode from 'vscode';
 import {window} from 'vscode';
 import {TruffleCommands} from '@/commands';
 import {Constants} from '@/Constants';
-import {vscodeEnvironment} from '../../src/helpers';
+import * as vscodeEnvironment from '@/helpers/vscodeEnvironment';
 import {EnumStorage} from '@/Models';
 import {ContractDB, ContractInstanceWithMetadata, ContractService} from '@/services';
 import {Contract} from '@/services/contract/Contract';

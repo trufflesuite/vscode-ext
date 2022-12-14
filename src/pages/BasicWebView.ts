@@ -23,7 +23,7 @@ export interface IWebViewConfig {
   viewType: string;
 }
 
-export interface IWebViewMessage {
+interface IWebViewMessage {
   command: string;
   value: any;
 }

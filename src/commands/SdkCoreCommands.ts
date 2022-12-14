@@ -3,7 +3,7 @@
 
 import {Memento, window, Uri} from 'vscode';
 import {Constants} from '@/Constants';
-import {userSettings} from '../helpers';
+import {getConfigurationAsync} from '@/helpers/userSettings';
 import {IExtensionAdapter, TruffleExtensionAdapter} from '@/services/extensionAdapter';
 
 class SdkCoreCommands {
@@ -13,7 +13,7 @@ class SdkCoreCommands {
     const sdk = await this.getCoreSdk();
     this.extensionAdapter = this.getExtensionAdapter(sdk.userValue ? sdk.userValue : sdk.defaultValue);
     this.extensionAdapter.validateExtension().catch((error) => {
-      window.showErrorMessage(error.message);
+      void window.showErrorMessage(error.message);
     });
   }
 
@@ -36,7 +36,7 @@ class SdkCoreCommands {
   }
 
   private async getCoreSdk() {
-    return userSettings.getConfigurationAsync(Constants.userSettings.coreSdkSettingsKey);
+    return getConfigurationAsync(Constants.userSettings.coreSdkSettingsKey);
   }
 
   private getExtensionAdapter(sdk: string): IExtensionAdapter {

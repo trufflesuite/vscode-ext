@@ -119,7 +119,7 @@ namespace _ {
   }
 }
 
-export class FileStat implements vscode.FileStat {
+class FileStat implements vscode.FileStat {
   constructor(private fsStat: fs.Stats) {}
 
   get type(): vscode.FileType {
@@ -180,7 +180,7 @@ export class FileStat implements vscode.FileStat {
  * Therefore, by using a `Uri` intersection type,
  * the same commands can be invoked from both the File Explorer and the Contract Explorer.
  */
-export type Entry = vscode.Uri & {
+type Entry = vscode.Uri & {
   type: vscode.FileType;
   label: string;
   iconPath: vscode.ThemeIcon;
@@ -188,7 +188,7 @@ export type Entry = vscode.Uri & {
   contextValue?: string;
 };
 
-export type TElementTypes = {
+type TElementTypes = {
   contextValue: string;
   type: vscode.FileType;
   isWorkspaceFolder: boolean;
@@ -196,7 +196,7 @@ export type TElementTypes = {
 
 //#endregion
 
-export class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscode.FileSystemProvider {
+class FileSystemProvider implements vscode.TreeDataProvider<Entry>, vscode.FileSystemProvider {
   private _onDidChangeFile: vscode.EventEmitter<vscode.FileChangeEvent[]>;
   private _onDidChangeTree: vscode.EventEmitter<Entry[] | void | null>;
   private _elementTypes: TElementTypes[];

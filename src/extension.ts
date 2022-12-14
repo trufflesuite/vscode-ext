@@ -3,7 +3,6 @@
 
 import {commands, ExtensionContext, Uri, window, workspace} from 'vscode';
 import {
-  DebuggerCommands,
   GanacheCommands,
   InfuraCommands,
   ProjectCommands,
@@ -13,6 +12,7 @@ import {
   GenericCommands,
   ContractCommands,
 } from './commands';
+import {DebuggerCommands} from '@/commands/DebuggerCommands';
 import {Constants} from './Constants';
 
 import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
@@ -44,6 +44,7 @@ import {StatusBarItems} from './Models/StatusBarItems/Contract';
 import {UriHandlerController} from './helpers/uriHandlerController';
 import {Output} from './Output';
 
+// ts-prune-ignore-next
 export async function activate(context: ExtensionContext) {
   const uriHandler = window.registerUriHandler(new UriHandlerController());
 
@@ -283,6 +284,7 @@ export async function activate(context: ExtensionContext) {
   Telemetry.sendEvent(Constants.telemetryEvents.extensionActivated);
 }
 
+// ts-prune-ignore-next
 export async function deactivate(): Promise<void> {
   // This method is called when your extension is deactivated
   // To dispose of all extensions, vscode provides 5 sec.

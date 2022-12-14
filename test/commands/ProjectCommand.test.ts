@@ -8,6 +8,7 @@ import sinon from 'sinon';
 import {CancellationToken, Progress, ProgressOptions, window, workspace} from 'vscode';
 import {Constants, RequiredApps} from '../../src/Constants';
 import * as helpers from '../../src/helpers/';
+import * as gitHelper from '@/helpers/git';
 import {required} from '../../src/helpers/required';
 import * as userInteraction from '../../src/helpers/userInteraction';
 import {CancellationEvent} from '../../src/Models';
@@ -228,7 +229,7 @@ describe('ProjectCommands', () => {
         updateWorkspaceFoldersMock = workspaceMock.expects('updateWorkspaceFolders');
         fsMock = sinon.mock(fs);
         emptyDirSyncMock = fsMock.expects('emptyDirSync');
-        gitHelperMock = sinon.mock(helpers.gitHelper);
+        gitHelperMock = sinon.mock(gitHelper);
         gitInitMock = gitHelperMock.expects('gitInit').returns(() => undefined);
       });
 
@@ -761,7 +762,7 @@ describe('ProjectCommands', () => {
       helpersMock = sinon.mock(helpers);
       userInteractionMock = sinon.mock(userInteraction);
       showQuickPickMock = userInteractionMock.expects('showQuickPick');
-      gitHelperMock = sinon.mock(helpers.gitHelper);
+      gitHelperMock = sinon.mock(gitHelper);
       gitInitMock = gitHelperMock.expects('gitInit').returns(() => undefined);
       requiredMock = sinon.mock(required);
       checkRequiredAppsMock = requiredMock.expects('checkRequiredApps');
