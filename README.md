@@ -159,7 +159,7 @@ There are more docs online at the VS Code website on how to develop plugins at t
 
 When running `yarn` commands, you may notice the message `warning truffle-vscode@2.3.5: The engine "vscode" appears to be invalid`.
 This is because, when developing a extension, the [`engines`](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#engines) field needs to be set to a valid [`vscode` version](https://code.visualstudio.com/api/references/extension-manifest).
-However, this is not recognized by `yarn`, but we can still safely ignore this warning.
+The engine `vscode` is not recognized by `yarn`, but we can still safely ignore this warning.
 If you want to omit it, run
 
 ```sh
