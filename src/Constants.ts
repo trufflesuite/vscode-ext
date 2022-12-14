@@ -81,8 +81,6 @@ export class Constants {
       },
       extension: {
         json: '.json',
-        sol: '.sol',
-        txt: '.txt',
       },
       properties: {
         abi: 'abi',
@@ -153,12 +151,6 @@ export class Constants {
       showOnStartup: 'showOnStartupChangelog',
       title: 'Truffle for VSCode Changelog',
       viewType: 'changelog',
-    },
-    contractUI: {
-      path: '',
-      showOnStartup: 'showOnStartupContractUI',
-      title: 'Smart Contract UI',
-      viewType: 'contractUIPage',
     },
     requirements: {
       path: '',
@@ -606,7 +598,6 @@ export class Constants {
     cancelButton: 'Cancel',
     compileAndDeployButton: 'Compile and deploy',
     contractNotDeployed: 'Contract not deployed yet.',
-    deployButton: 'Deploy',
     deployFailed: 'Deploy failed',
     deploySucceeded: 'Deploy succeeded',
     detailsButton: 'Details',
@@ -680,7 +671,6 @@ export class Constants {
 
   public static initialize(context: ExtensionContext) {
     this.temporaryDirectory = context.storageUri ? context.storageUri.fsPath : os.tmpdir();
-    this.webViewPages.contractUI.path = context.asAbsolutePath(path.join('resources', 'drizzle', 'index.html'));
     this.webViewPages.requirements.path = context.asAbsolutePath(path.join('resources', 'welcome', 'prereqs.html'));
     this.webViewPages.changelog.path = context.asAbsolutePath(path.join('resources', 'welcome', 'changelog.html'));
     this.webViewPages.changelog.changelogPath = context.asAbsolutePath(path.join('CHANGELOG.md'));
