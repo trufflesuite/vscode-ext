@@ -15,7 +15,7 @@ export abstract class ExtensionView<T extends IExtensionItem> implements IExtens
 
   public getChildren(): ProviderResult<IExtensionView[]> {
     const children = this.extensionItem.getChildren().map((item) => ViewItemFactory.create(item));
-    children.forEach((child) => child.setParent(this));
+    children.forEach((child) => void child.setParent(this));
     return children;
   }
 

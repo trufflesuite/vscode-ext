@@ -28,6 +28,10 @@ import {TreeService} from '@/services/tree/TreeService';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {DashboardService} from '@/services/dashboard/DashboardService';
 import {Telemetry} from './TelemetryClient';
+
+// TODO: needs to refactored to avoid importing with side-effects
+import './ViewItems';
+
 import {NetworkNodeView} from './ViewItems/NetworkNodeView';
 import {ProjectView} from './ViewItems/ProjectView';
 import {registerDashboardView} from './views/DashboardView';
