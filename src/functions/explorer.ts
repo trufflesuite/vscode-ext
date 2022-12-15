@@ -114,7 +114,3 @@ export const getChain = (chainId: number | undefined): ChainObject => {
   if (!chainId) return UnknownChain;
   return chains[chainId] ? chains[chainId] : UnknownChain;
 };
-
-export function getChainId(networkName: string): string | undefined {
-  return Object.entries(chains).find((chain) => chain[1].name === networkName)?.[0];
-}

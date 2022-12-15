@@ -13,10 +13,6 @@ import {Contract} from './Contract';
 export namespace ContractService {
   type PathDirectoryKey = 'contracts_directory' | 'migrations_directory' | 'contracts_build_directory';
 
-  export function getContractNameBySolidityFile(solidityFilePath: string): string {
-    return path.basename(solidityFilePath, Constants.contract.configuration.extension.sol);
-  }
-
   export async function getCompiledContractsMetadata(): Promise<Contract[]> {
     const contractPaths = await getCompiledContractsPathsFromBuildDirectory();
     const contractsMetadata = contractPaths.map((contractPath) => getCompiledContractMetadataByPath(contractPath));
@@ -28,10 +24,6 @@ export namespace ContractService {
 
   export async function getContractsFolderPath(truffleWorkspace: TruffleWorkspace): Promise<string> {
     return getPathDirectory('contracts_directory', truffleWorkspace);
-  }
-
-  export async function getMigrationFolderPath(): Promise<string> {
-    return getPathDirectory('migrations_directory');
   }
 
   export async function getBuildFolderPath(truffleWorkspace?: TruffleWorkspace): Promise<string> {
