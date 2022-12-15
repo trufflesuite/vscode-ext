@@ -11,7 +11,7 @@ import {ItemType} from '../../../src/Models';
 import {LocalService} from '@/Models/TreeItems/LocalService';
 import {InfuraProject} from '@/Models/TreeItems/InfuraProject';
 import {Project} from '@/Models/TreeItems/Project';
-import {InfuraResourceExplorer} from '../../../src/resourceExplorers';
+import {InfuraResourceExplorer} from '@/resourceExplorers/InfuraResourceExplorer';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {TreeManager} from '@/services/tree/TreeManager';
 

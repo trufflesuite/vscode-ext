@@ -1,4 +1,4 @@
-import {GanacheCommands} from '@/commands';
+import {GanacheCommands} from '@/commands/GanacheCommands';
 import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
 import {LocalNetworkNode} from '@/Models/TreeItems/LocalNetworkNode';
 import {GanacheService} from '@/services/ganache/GanacheService';

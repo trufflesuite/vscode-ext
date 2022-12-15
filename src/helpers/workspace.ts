@@ -7,7 +7,7 @@ import {Telemetry} from '@/TelemetryClient';
 import * as path from 'path';
 import glob from 'glob';
 import {showQuickPick} from '@/helpers/userInteraction';
-import {TruffleCommands} from '@/commands';
+import {TruffleCommands} from '@/commands/TruffleCommands';
 
 /**
  * The [glob](https://github.com/isaacs/node-glob#glob-primer) pattern to match Truffle config file names.

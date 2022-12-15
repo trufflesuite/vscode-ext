@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {extractEnumsInfoSafe} from '../../helpers';
+import {extractEnumsInfoSafe} from '@/helpers/enumExtractor';
 import {EnumStorage} from '../../Models';
 import {Contract} from './Contract';
 import {ContractInstance} from './ContractInstance';

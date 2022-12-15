@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import stream from 'stream';
 import {OutputChannel, window} from 'vscode';
 import {Constants} from '../../src/Constants';
-import * as outputCommandHelper from '../../src/helpers';
+import * as outputCommandHelper from '@/helpers/command';
 import * as shell from '../../src/helpers/shell';
 import {TLocalProjectOptions} from '../../src/Models/TreeItems/LocalProject';
 import {GanacheService} from '@/services/ganache/GanacheService';

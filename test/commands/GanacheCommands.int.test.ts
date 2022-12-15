@@ -7,7 +7,7 @@ import rp from 'request-promise';
 import sinon from 'sinon';
 import stream from 'stream';
 import * as vscode from 'vscode';
-import {GanacheCommands} from '../../src/commands';
+import {GanacheCommands} from '@/commands/GanacheCommands';
 import * as commands from '../../src/helpers/command';
 import * as shell from '../../src/helpers/shell';
 import {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';

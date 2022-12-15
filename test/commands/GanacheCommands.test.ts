@@ -5,7 +5,7 @@ import assert from 'assert';
 import {ChildProcess} from 'child_process';
 import sinon from 'sinon';
 import {commands, OutputChannel, QuickPickItem, window} from 'vscode';
-import {GanacheCommands} from '../../src/commands';
+import {GanacheCommands} from '@/commands/GanacheCommands';
 import {Constants, RequiredApps} from '../../src/Constants';
 import * as userInteraction from '../../src/helpers/userInteraction';
 import {required} from '../../src/helpers/required';

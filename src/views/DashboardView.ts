@@ -11,7 +11,7 @@ import {
   env,
   window,
 } from 'vscode';
-import {DashboardCommands} from '../commands';
+import {DashboardCommands} from '@/commands/DashboardCommands';
 import {DashboardService} from '@/services/dashboard/DashboardService';
 import {Constants} from '../Constants';
 import {writeToClipboard} from '@/helpers/vscodeEnvironment';

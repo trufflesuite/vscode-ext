@@ -7,7 +7,7 @@ import path from 'path';
 import sinon, {stub} from 'sinon';
 import uuid from 'uuid';
 import * as vscode from 'vscode';
-import {TruffleCommands} from '@/commands';
+import {TruffleCommands} from '@/commands/TruffleCommands';
 import {Constants} from '@/Constants';
 import * as helpers from '@/helpers/workspace';
 import * as requiredHelpers from '../../src/helpers/required';

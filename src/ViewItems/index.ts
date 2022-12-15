@@ -2,14 +2,12 @@
 // Licensed under the MIT license.
 
 import {ItemType} from '../Models';
-import {
-  GroupViewCreator,
-  NetworkNodeViewCreator,
-  NullableViewCreator,
-  ProjectViewCreator,
-  ServiceViewCreator,
-  LayerViewCreator,
-} from './ViewCreators';
+import {GroupViewCreator} from './ViewCreators/GroupViewCreator';
+import {NetworkNodeViewCreator} from './ViewCreators/NetworkNodeViewCreator';
+import {NullableViewCreator} from './ViewCreators/NullableViewCreator';
+import {ProjectViewCreator} from './ViewCreators/ProjectViewCreator';
+import {ServiceViewCreator} from './ViewCreators/ServiceViewCreator';
+import {LayerViewCreator} from './ViewCreators/LayerViewCreator';
 import {ViewItemFactory} from './ViewItemFactory';
 
 ViewItemFactory.register(ItemType.COMMAND, new ServiceViewCreator());

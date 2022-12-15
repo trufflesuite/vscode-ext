@@ -5,8 +5,8 @@ import {Output, OutputLabel} from '@/Output';
 import {ChildProcess} from 'child_process';
 import {OutputChannel, window} from 'vscode';
 import {Constants, RequiredApps} from '../../Constants';
-import {shell, spawnProcess} from '../../helpers';
-import {findPid, killPid} from '../../helpers/shell';
+import {spawnProcess} from '@/helpers/command';
+import * as shell from '@/helpers/shell';
 import {Telemetry} from '../../TelemetryClient';
 import {UrlValidator} from '../../validators/UrlValidator';
 import {isDashboardRunning, waitDashboardStarted} from './DashboardServiceClient';
@@ -59,7 +59,7 @@ export namespace DashboardService {
     }
 
     if (portStatus === PortStatus.RUNNING) {
-      const pid = await findPid(port);
+      const pid = await shell.findPid(port);
       dashboardProcesses[port] = dashboardProcesses[port] ? dashboardProcesses[port] : {pid, port};
     }
 
@@ -106,7 +106,7 @@ export namespace DashboardService {
     try {
       addAllListeners(output, port, process);
       await waitDashboardStarted(port, Constants.dashboardRetryAttempts);
-      dashboardProcess.pid = await findPid(port);
+      dashboardProcess.pid = await shell.findPid(port);
     } catch (error) {
       Telemetry.sendException(error as Error);
       await stopDashboardProcess(dashboardProcess, true);
@@ -137,7 +137,7 @@ export namespace DashboardService {
     }
 
     if (pid && (killOutOfBand ? true : !!process)) {
-      return killPid(pid);
+      return shell.killPid(pid);
     }
   }
 

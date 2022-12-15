@@ -9,7 +9,7 @@ import hdkey from 'hdkey';
 import path from 'path';
 import {QuickPickItem, Uri, window, commands, QuickPickItemKind} from 'vscode';
 import {Constants, RequiredApps} from '@/Constants';
-import {outputCommandHelper} from '@/helpers';
+import * as outputCommandHelper from '@/helpers/command';
 import {getTruffleWorkspace} from '@/helpers/workspace';
 import {required} from '@/helpers/required';
 

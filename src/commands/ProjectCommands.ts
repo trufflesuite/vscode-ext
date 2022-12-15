@@ -11,7 +11,7 @@ import {Telemetry} from '@/TelemetryClient';
 import fs from 'fs-extra';
 import requestPromise from 'request-promise';
 import {QuickPickItem, Uri, window, workspace} from 'vscode';
-import {outputCommandHelper} from '../helpers';
+import * as outputCommandHelper from '@/helpers/command';
 
 /**
  * Represents the project type for creating a new project.

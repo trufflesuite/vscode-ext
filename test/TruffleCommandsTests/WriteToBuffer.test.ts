@@ -7,7 +7,7 @@ import path from 'path';
 import sinon from 'sinon';
 import * as vscode from 'vscode';
 import {window} from 'vscode';
-import {TruffleCommands} from '@/commands';
+import {TruffleCommands} from '@/commands/TruffleCommands';
 import {Constants} from '@/Constants';
 import * as vscodeEnvironment from '@/helpers/vscodeEnvironment';
 import {EnumStorage} from '@/Models';

@@ -6,7 +6,7 @@ import {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
 import {Nullable} from '@/Models/TreeItems/Nullable';
 import {Telemetry} from '../TelemetryClient';
 import {ExtensionView} from './ExtensionView';
-import {ViewCreator} from './ViewCreators';
+import {ViewCreator} from './ViewCreators/ViewCreator';
 
 export namespace ViewItemFactory {
   const registeredTypes: {[key: number]: ViewCreator} = {};

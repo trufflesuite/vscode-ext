@@ -5,7 +5,7 @@ import assert from 'assert';
 import {SinonMock, SinonExpectation, SinonStub, mock, stub, restore} from 'sinon';
 import uuid from 'uuid';
 import {CancellationToken, Progress, ProgressOptions, Uri, window} from 'vscode';
-import {TruffleCommands} from '@/commands';
+import {TruffleCommands} from '@/commands/TruffleCommands';
 import * as helpers from '@/helpers/workspace';
 import * as commands from '../../src/helpers/command';
 import {required} from '@/helpers/required';

@@ -2,17 +2,17 @@
 // Licensed under the MIT license.
 
 import {commands, ExtensionContext, Uri, window, workspace} from 'vscode';
-import {
-  GanacheCommands,
-  InfuraCommands,
-  ProjectCommands,
-  sdkCoreCommands,
-  ServiceCommands,
-  TruffleCommands,
-  GenericCommands,
-  ContractCommands,
-} from './commands';
+
+import {ContractCommands} from '@/commands/ContractCommands';
+import {GanacheCommands} from '@/commands/GanacheCommands';
+import {InfuraCommands} from '@/commands/InfuraCommands';
+import {ProjectCommands} from '@/commands/ProjectCommands';
+import {ServiceCommands} from '@/commands/ServiceCommands';
+import {TruffleCommands} from '@/commands/TruffleCommands';
+import {sdkCoreCommands} from '@/commands/SdkCoreCommands';
+import {GenericCommands} from '@/commands/GenericCommands';
 import {DebuggerCommands} from '@/commands/DebuggerCommands';
+
 import {Constants} from './Constants';
 
 import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
