@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Group} from '../../Models/TreeItems';
+import {Group} from '../../Models/TreeItems/Group';
 import {GroupView} from '../GroupView';
 import {ViewCreator} from './ViewCreator';
 

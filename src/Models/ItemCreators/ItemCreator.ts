@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {Telemetry} from '../../TelemetryClient';
-import {IExtensionItem} from '../TreeItems';
+import {IExtensionItem} from '../TreeItems/IExtensionItem';
 
 export abstract class ItemCreator {
   public create(obj: {[key: string]: any}): IExtensionItem {

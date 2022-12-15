@@ -3,8 +3,9 @@
 
 import {Constants} from '@/Constants';
 import {showInputBox} from '@/helpers/userInteraction';
-import {LocalNetworkNode, LocalProject, TLocalProjectOptions} from '@/Models/TreeItems';
-import {GanacheService} from '@/services';
+import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {LocalNetworkNode} from '@/Models/TreeItems/LocalNetworkNode';
+import {GanacheService} from '@/services/ganache/GanacheService';
 import {Telemetry} from '@/TelemetryClient';
 import {DialogResultValidator} from '@/validators/DialogResultValidator';
 import {UrlValidator} from '@/validators/UrlValidator';
@@ -17,7 +18,7 @@ export class LocalResourceExplorer {
   ): Promise<LocalProject> {
     Telemetry.sendEvent('LocalResourceExplorer.createProject');
 
-    return this.getOrCreateLocalProject(
+    return getOrCreateLocalProject(
       existingProjects,
       existingPorts,
       GanacheService.PortStatus.FREE,
@@ -33,7 +34,7 @@ export class LocalResourceExplorer {
   ): Promise<LocalProject> {
     Telemetry.sendEvent('LocalResourceExplorer.selectProject');
 
-    const localProject = await this.getOrCreateLocalProject(
+    const localProject = await getOrCreateLocalProject(
       existingProjects,
       existingPorts,
       GanacheService.PortStatus.GANACHE,
@@ -45,98 +46,97 @@ export class LocalResourceExplorer {
 
     return localProject;
   }
+}
+async function getOrCreateLocalProject(
+  existingProjects: string[],
+  existingPorts: number[],
+  portStatus: GanacheService.PortStatus,
+  validateMessage: string,
+  options: TLocalProjectOptions
+): Promise<LocalProject> {
+  const port: number = await getLocalProjectPort(existingPorts, portStatus, validateMessage);
+  const label: string = await getLocalProjectName(existingProjects);
+  const description: string = getDescription(port, options);
 
-  private async getOrCreateLocalProject(
-    existingProjects: string[],
-    existingPorts: number[],
-    portStatus: GanacheService.PortStatus,
-    validateMessage: string,
-    options: TLocalProjectOptions
-  ): Promise<LocalProject> {
-    const port: number = await this.getLocalProjectPort(existingPorts, portStatus, validateMessage);
-    const label: string = await this.getLocalProjectName(existingProjects);
-    const description: string = await this.getDescription(port, options);
+  return getLocalProject(label, port, options, description);
+}
 
-    return this.getLocalProject(label, port, options, description);
-  }
+function getLocalProject(
+  label: string,
+  port: number,
+  options: TLocalProjectOptions,
+  description: string
+): LocalProject {
+  const localProject = new LocalProject(label, port, options, description);
+  const url = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
+  const networkNode = new LocalNetworkNode(label, url, '*');
 
-  private async getLocalProject(
-    label: string,
-    port: number,
-    options: TLocalProjectOptions,
-    description: string
-  ): Promise<LocalProject> {
-    const localProject = new LocalProject(label, port, options, description);
-    const url = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
-    const networkNode = new LocalNetworkNode(label, url, '*');
+  localProject.addChild(networkNode);
 
-    localProject.addChild(networkNode);
+  return localProject;
+}
 
-    return localProject;
-  }
+async function getLocalProjectName(existingProjects: string[]): Promise<string> {
+  return showInputBox({
+    ignoreFocusOut: true,
+    prompt: Constants.paletteLabels.enterLocalProjectName,
+    validateInput: (value: string) => {
+      const validationError = DialogResultValidator.validateLocalNetworkName(value);
+      if (validationError) {
+        return validationError;
+      }
 
-  private async getLocalProjectName(existingProjects: string[]): Promise<string> {
-    return showInputBox({
-      ignoreFocusOut: true,
-      prompt: Constants.paletteLabels.enterLocalProjectName,
-      validateInput: (value: string) => {
-        const validationError = DialogResultValidator.validateLocalNetworkName(value);
-        if (validationError) {
-          return validationError;
-        }
+      if (existingProjects.some((existName) => existName === value)) {
+        return Constants.validationMessages.nameAlreadyInUse;
+      }
 
-        if (existingProjects.some((existName) => existName === value)) {
-          return Constants.validationMessages.nameAlreadyInUse;
-        }
+      return null;
+    },
+    value: existingProjects.includes(Constants.localhostName) ? '' : Constants.localhostName,
+  });
+}
 
-        return null;
-      },
-      value: existingProjects.includes(Constants.localhostName) ? '' : Constants.localhostName,
-    });
-  }
+async function getLocalProjectPort(
+  existingPorts: number[],
+  portStatus: GanacheService.PortStatus,
+  validateMessage: string
+): Promise<number> {
+  const port = await showInputBox({
+    ignoreFocusOut: true,
+    prompt: Constants.paletteLabels.enterLocalProjectPort,
+    validateInput: async (value: string) => {
+      const validationError = UrlValidator.validatePort(value);
+      if (validationError) {
+        return validationError;
+      }
 
-  private async getLocalProjectPort(
-    existingPorts: number[],
-    portStatus: GanacheService.PortStatus,
-    validateMessage: string
-  ): Promise<number> {
-    const port = await showInputBox({
-      ignoreFocusOut: true,
-      prompt: Constants.paletteLabels.enterLocalProjectPort,
-      validateInput: async (value: string) => {
-        const validationError = UrlValidator.validatePort(value);
-        if (validationError) {
-          return validationError;
-        }
+      if (existingPorts.some((existPort) => existPort + '' === value)) {
+        return Constants.validationMessages.projectAlreadyExists;
+      }
 
-        if (existingPorts.some((existPort) => existPort + '' === value)) {
-          return Constants.validationMessages.projectAlreadyExists;
-        }
+      if ((await GanacheService.getPortStatus(value)) !== portStatus) {
+        return validateMessage;
+      }
 
-        if ((await GanacheService.getPortStatus(value)) !== portStatus) {
-          return validateMessage;
-        }
+      return null;
+    },
+    value: existingPorts.includes(Constants.defaultLocalhostPort) ? '' : Constants.defaultLocalhostPort.toString(),
+  });
 
-        return null;
-      },
-      value: existingPorts.includes(Constants.defaultLocalhostPort) ? '' : Constants.defaultLocalhostPort.toString(),
-    });
+  return parseInt(port, 10);
+}
 
-    return parseInt(port, 10);
-  }
+function getDescription(port: number, options: TLocalProjectOptions) {
+  const blockNumber: string = options.blockNumber === 0 ? Constants.latestBlock : options.blockNumber.toString();
+  const forkedNetwork: string = options.url === '' ? options.forkedNetwork : options.url;
 
-  private async getDescription(port: number, options: TLocalProjectOptions) {
-    const blockNumber: string = options.blockNumber === 0 ? Constants.latestBlock : options.blockNumber.toString();
-    const forkedNetwork: string = options.url === '' ? options.forkedNetwork : options.url;
+  let formattedDescription: string;
 
-    let formattedDescription: string;
+  if (options.isForked)
+    formattedDescription = `${forkedNetwork?.toLowerCase()} - ${Constants.networkProtocols.http}${
+      Constants.localhost
+    }:${port} forking ${forkedNetwork?.toLowerCase()}@${blockNumber}`;
+  else formattedDescription = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
 
-    if (options.isForked)
-      formattedDescription = `${forkedNetwork?.toLowerCase()} - ${Constants.networkProtocols.http}${
-        Constants.localhost
-      }:${port} forking ${forkedNetwork?.toLowerCase()}@${blockNumber}`;
-    else formattedDescription = `${Constants.networkProtocols.http}${Constants.localhost}:${port}`;
-
-    return formattedDescription;
-  }
+  return formattedDescription;
 }

@@ -1,7 +1,8 @@
-import {GanacheCommands} from '@/commands';
-import {LocalNetworkNode, LocalProject, TLocalProjectOptions} from '@/Models/TreeItems';
-import {GanacheService} from '@/services';
-import {ProjectView} from '@/ViewItems';
+import {GanacheCommands} from '@/commands/GanacheCommands';
+import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {LocalNetworkNode} from '@/Models/TreeItems/LocalNetworkNode';
+import {GanacheService} from '@/services/ganache/GanacheService';
+import {ProjectView} from '@/ViewItems/ProjectView';
 import * as vscode from 'vscode';
 import fs from 'fs-extra';
 import path from 'path';

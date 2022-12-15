@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {InfuraNetworkNode} from '../TreeItems';
+import {InfuraNetworkNode} from '../TreeItems/InfuraNetworkNode';
 import {NetworkNodeItemCreator} from './NetworkNodeItemCreator';
 
 export class InfuraNetworkNodeItemCreator extends NetworkNodeItemCreator {

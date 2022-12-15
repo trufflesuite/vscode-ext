@@ -4,15 +4,12 @@
 import {Memento} from 'vscode';
 import {Constants} from '../../Constants';
 import {ItemFactory} from '../../Models';
-import {
-  Command,
-  IExtensionItem,
-  InfuraService,
-  LocalService,
-  GenericService,
-  Service,
-  ServiceTypes,
-} from '../../Models/TreeItems';
+import {Command} from '../../Models/TreeItems/Command';
+import {IExtensionItem} from '../../Models/TreeItems/IExtensionItem';
+import {InfuraService} from '../../Models/TreeItems/InfuraService';
+import {LocalService} from '../../Models/TreeItems/LocalService';
+import {GenericService} from '../../Models/TreeItems/GenericService';
+import {Service, ServiceTypes} from '../../Models/TreeItems/Service';
 import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '../../TelemetryClient';
 

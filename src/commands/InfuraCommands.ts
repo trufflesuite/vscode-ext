@@ -3,8 +3,8 @@
 
 import {Constants} from '../Constants';
 import {showQuickPickMany} from '../helpers/userInteraction';
-import {InfuraResourceExplorer} from '../resourceExplorers';
-import {InfuraServiceClient} from '../services';
+import {InfuraResourceExplorer} from '@/resourceExplorers/InfuraResourceExplorer';
+import {InfuraServiceClient} from '@/services/infuraService/InfuraServiceClient';
 
 export namespace InfuraCommands {
   export async function signIn(): Promise<void> {

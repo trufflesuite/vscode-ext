@@ -7,7 +7,7 @@ import path from 'path';
 import sinon, {stub} from 'sinon';
 import uuid from 'uuid';
 import * as vscode from 'vscode';
-import {TruffleCommands} from '@/commands';
+import {TruffleCommands} from '@/commands/TruffleCommands';
 import {Constants} from '@/Constants';
 import * as helpers from '@/helpers/workspace';
 import * as requiredHelpers from '../../src/helpers/required';
@@ -15,18 +15,17 @@ import * as TruffleConfiguration from '@/helpers/TruffleConfiguration';
 import {TruffleConfig} from '@/helpers/TruffleConfiguration';
 import * as commands from '../../src/helpers/command';
 import {CancellationEvent} from '@/Models';
-import {
-  IExtensionItem,
-  InfuraNetworkNode,
-  InfuraProject,
-  InfuraService,
-  LocalNetworkNode,
-  LocalProject,
-  LocalService,
-  Service,
-  TLocalProjectOptions,
-} from '@/Models/TreeItems';
-import {DashboardService, GanacheService, TreeManager} from '@/services';
+import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
+import {InfuraNetworkNode} from '@/Models/TreeItems/InfuraNetworkNode';
+import {InfuraProject} from '@/Models/TreeItems/InfuraProject';
+import {InfuraService} from '@/Models/TreeItems/InfuraService';
+import {LocalService} from '@/Models/TreeItems/LocalService';
+import {LocalNetworkNode} from '@/Models/TreeItems/LocalNetworkNode';
+import {Service} from '@/Models/TreeItems/Service';
+import {DashboardService} from '@/services/dashboard/DashboardService';
+import {GanacheService} from '@/services/ganache/GanacheService';
+import {TreeManager} from '@/services/tree/TreeManager';
 import {TestConstants} from '../TestConstants';
 const {service} = Constants.treeItemData;
 const description = '';

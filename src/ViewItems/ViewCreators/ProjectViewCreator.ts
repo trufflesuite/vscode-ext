@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Project} from '../../Models/TreeItems';
+import {Project} from '../../Models/TreeItems/Project';
 import {ProjectView} from '../ProjectView';
 import {ViewCreator} from './ViewCreator';
 

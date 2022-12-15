@@ -16,7 +16,7 @@ export async function gitInit(workingDirectory: string): Promise<void> {
   }
 }
 
-export async function isRepoExists(workingDirectory: string): Promise<boolean> {
+async function isRepoExists(workingDirectory: string): Promise<boolean> {
   try {
     await executeCommand(workingDirectory, RequiredApps.git, 'rev-parse', '--git-dir');
   } catch (error) {

@@ -5,9 +5,9 @@ import {Output, OutputLabel} from '@/Output';
 import {ChildProcess} from 'child_process';
 import {OutputChannel, window} from 'vscode';
 import {Constants, RequiredApps} from '../../Constants';
-import {shell, spawnProcess} from '../../helpers';
-import {findPid, killPid} from '../../helpers/shell';
-import {TLocalProjectOptions} from '../../Models/TreeItems';
+import {spawnProcess} from '@/helpers/command';
+import * as shell from '@/helpers/shell';
+import {TLocalProjectOptions} from '../../Models/TreeItems/LocalProject';
 import {Telemetry} from '../../TelemetryClient';
 import {UrlValidator} from '../../validators/UrlValidator';
 import {isGanacheServer, waitGanacheStarted} from './GanacheServiceClient';
@@ -61,7 +61,7 @@ export namespace GanacheService {
     }
 
     if (portStatus === PortStatus.GANACHE) {
-      const pid = await findPid(port);
+      const pid = await shell.findPid(port);
       ganacheProcesses[port] = ganacheProcesses[port] ? ganacheProcesses[port] : {pid, port};
     }
 
@@ -118,7 +118,7 @@ export namespace GanacheService {
     try {
       addAllListeners(output, port, process);
       await waitGanacheStarted(port, Constants.ganacheRetryAttempts);
-      ganacheProcess.pid = await findPid(port);
+      ganacheProcess.pid = await shell.findPid(port);
     } catch (error) {
       Telemetry.sendException(error as Error);
       await stopGanacheProcess(ganacheProcess, true);
@@ -149,7 +149,7 @@ export namespace GanacheService {
     }
 
     if (pid && (killOutOfBand ? true : !!process)) {
-      return killPid(pid);
+      return shell.killPid(pid);
     }
   }
 

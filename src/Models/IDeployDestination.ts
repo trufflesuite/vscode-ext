@@ -3,7 +3,7 @@
 
 import {INetwork} from '@/helpers/ConfigurationReader';
 import {ItemType} from './ItemType';
-import {TLocalProjectOptions} from './TreeItems';
+import {TLocalProjectOptions} from './TreeItems/LocalProject';
 
 export interface IDeployDestination {
   description?: string;

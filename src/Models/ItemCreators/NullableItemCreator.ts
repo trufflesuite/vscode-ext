@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Nullable} from '../TreeItems';
+import {Nullable} from '../TreeItems/Nullable';
 import {ItemCreator} from './ItemCreator';
 
 export class NullableItemCreator extends ItemCreator {

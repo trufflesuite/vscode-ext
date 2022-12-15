@@ -4,7 +4,7 @@
 import {ChildProcess} from 'child_process';
 import {OutputChannel} from 'vscode';
 import {Constants} from '../../Constants';
-import {shell} from '../../helpers';
+import * as shell from '@/helpers/shell';
 import {Telemetry} from '../../TelemetryClient';
 import {UrlValidator} from '../../validators/UrlValidator';
 import {isGenericServer, getWeb3ClientVersion} from './GenericServiceClient';

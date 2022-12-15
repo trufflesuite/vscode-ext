@@ -2,17 +2,17 @@
 // Licensed under the MIT license.
 
 import {commands, ExtensionContext, Uri, window, workspace} from 'vscode';
-import {
-  DebuggerCommands,
-  GanacheCommands,
-  InfuraCommands,
-  ProjectCommands,
-  sdkCoreCommands,
-  ServiceCommands,
-  TruffleCommands,
-  GenericCommands,
-  ContractCommands,
-} from './commands';
+
+import {ContractCommands} from '@/commands/ContractCommands';
+import {GanacheCommands} from '@/commands/GanacheCommands';
+import {InfuraCommands} from '@/commands/InfuraCommands';
+import {ProjectCommands} from '@/commands/ProjectCommands';
+import {ServiceCommands} from '@/commands/ServiceCommands';
+import {TruffleCommands} from '@/commands/TruffleCommands';
+import {sdkCoreCommands} from '@/commands/SdkCoreCommands';
+import {GenericCommands} from '@/commands/GenericCommands';
+import {DebuggerCommands} from '@/commands/DebuggerCommands';
+
 import {Constants} from './Constants';
 
 import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
@@ -20,18 +20,20 @@ import {required} from '@/helpers/required';
 import {CancellationEvent} from './Models';
 import {ChangelogPage} from '@/pages/Changelog';
 import {RequirementsPage} from '@/pages/Requirements';
-import {
-  AdapterType,
-  ContractDB,
-  GanacheService,
-  InfuraServiceClient,
-  MnemonicRepository,
-  TreeManager,
-  TreeService,
-  DashboardService,
-} from './services';
+import {AdapterType, ContractDB} from '@/services/contract/ContractDB';
+import {InfuraServiceClient} from '@/services/infuraService/InfuraServiceClient';
+import {MnemonicRepository} from '@/services/MnemonicRepository';
+import {TreeManager} from '@/services/tree/TreeManager';
+import {TreeService} from '@/services/tree/TreeService';
+import {GanacheService} from '@/services/ganache/GanacheService';
+import {DashboardService} from '@/services/dashboard/DashboardService';
 import {Telemetry} from './TelemetryClient';
-import {NetworkNodeView, ProjectView} from './ViewItems';
+
+// TODO: needs to refactored to avoid importing with side-effects
+import './ViewItems';
+
+import {NetworkNodeView} from './ViewItems/NetworkNodeView';
+import {ProjectView} from './ViewItems/ProjectView';
 import {registerDashboardView} from './views/DashboardView';
 import {registerDeploymentView} from './views/DeploymentsView';
 import {registerFileExplorerView} from './views/FileExplorer';
@@ -44,7 +46,8 @@ import {StatusBarItems} from './Models/StatusBarItems/Contract';
 import {UriHandlerController} from './helpers/uriHandlerController';
 import {Output} from './Output';
 
-export async function activate(context: ExtensionContext) {
+// ts-prune-ignore-next
+export async function activate(context: ExtensionContext): Promise<void> {
   const uriHandler = window.registerUriHandler(new UriHandlerController());
 
   /**
@@ -283,15 +286,17 @@ export async function activate(context: ExtensionContext) {
   Telemetry.sendEvent(Constants.telemetryEvents.extensionActivated);
 }
 
-export async function deactivate(): Promise<void> {
+// ts-prune-ignore-next
+export function deactivate(): void {
   // This method is called when your extension is deactivated
   // To dispose of all extensions, vscode provides 5 sec.
   // Therefore, please, call important dispose functions first and don't use await
   // For more information see https://github.com/Microsoft/vscode/issues/47881
-  GanacheService.dispose();
-  DashboardService.dispose();
-  ContractDB.dispose();
-  Telemetry.dispose();
+  void GanacheService.dispose();
+  void DashboardService.dispose();
+  void ContractDB.dispose();
+  void Telemetry.dispose();
+
   TreeManager.dispose();
 }
 

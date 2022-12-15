@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {LocalNetworkNode} from '../TreeItems';
+import {LocalNetworkNode} from '../TreeItems/LocalNetworkNode';
 import {NetworkNodeItemCreator} from './NetworkNodeItemCreator';
 
 export class LocalNetworkNodeItemCreator extends NetworkNodeItemCreator {

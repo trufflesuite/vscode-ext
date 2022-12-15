@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Command} from '../TreeItems';
+import {Command} from '@/Models/TreeItems/Command';
 import {ItemCreator} from './ItemCreator';
 
 export class CommandItemCreator extends ItemCreator {

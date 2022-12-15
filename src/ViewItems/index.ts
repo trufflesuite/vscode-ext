@@ -1,24 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-export * from './ExtensionView';
-export * from './IExtensionView';
-export * from './GroupView';
-export * from './NetworkNodeView';
-export * from './NullableView';
-export * from './ProjectView';
-export * from './ServiceView';
-export * from './ViewItemFactory';
-
 import {ItemType} from '../Models';
-import {
-  GroupViewCreator,
-  NetworkNodeViewCreator,
-  NullableViewCreator,
-  ProjectViewCreator,
-  ServiceViewCreator,
-  LayerViewCreator,
-} from './ViewCreators';
+import {GroupViewCreator} from './ViewCreators/GroupViewCreator';
+import {NetworkNodeViewCreator} from './ViewCreators/NetworkNodeViewCreator';
+import {NullableViewCreator} from './ViewCreators/NullableViewCreator';
+import {ProjectViewCreator} from './ViewCreators/ProjectViewCreator';
+import {ServiceViewCreator} from './ViewCreators/ServiceViewCreator';
+import {LayerViewCreator} from './ViewCreators/LayerViewCreator';
 import {ViewItemFactory} from './ViewItemFactory';
 
 ViewItemFactory.register(ItemType.COMMAND, new ServiceViewCreator());

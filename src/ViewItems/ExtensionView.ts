@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {ProviderResult} from 'vscode';
-import {IExtensionItem} from '../Models/TreeItems';
+import {IExtensionItem} from '../Models/TreeItems/IExtensionItem';
 import {IExtensionView} from './IExtensionView';
 import {ViewItemFactory} from './ViewItemFactory';
 
@@ -15,7 +15,7 @@ export abstract class ExtensionView<T extends IExtensionItem> implements IExtens
 
   public getChildren(): ProviderResult<IExtensionView[]> {
     const children = this.extensionItem.getChildren().map((item) => ViewItemFactory.create(item));
-    children.forEach((child) => child.setParent(this));
+    children.forEach((child) => void child.setParent(this));
     return children;
   }
 

@@ -7,7 +7,8 @@ import rewire from 'rewire';
 import sinon from 'sinon';
 import {CancellationToken, Progress, ProgressOptions, window, workspace} from 'vscode';
 import {Constants, RequiredApps} from '../../src/Constants';
-import * as helpers from '../../src/helpers/';
+import * as outputCommandHelper from '@/helpers/command';
+import * as gitHelper from '@/helpers/git';
 import {required} from '../../src/helpers/required';
 import * as userInteraction from '../../src/helpers/userInteraction';
 import {CancellationEvent} from '../../src/Models';
@@ -25,7 +26,6 @@ describe('ProjectCommands', () => {
     const truffleBoxName = 'truffleBoxName';
 
     describe('newSolidityProject', () => {
-      let helpersMock: sinon.SinonMock;
       let userInteractionMock: sinon.SinonMock;
       let showQuickPickMock: sinon.SinonStub<any[], any>;
       let requiredMock: sinon.SinonMock;
@@ -36,7 +36,6 @@ describe('ProjectCommands', () => {
       >;
 
       beforeEach(() => {
-        helpersMock = sinon.mock(helpers);
         userInteractionMock = sinon.mock(userInteraction);
         showQuickPickMock = userInteractionMock.expects('showQuickPick').returns({
           cmd: () => undefined,
@@ -53,7 +52,6 @@ describe('ProjectCommands', () => {
 
       afterEach(() => {
         requiredMock.restore();
-        helpersMock.restore();
         userInteractionMock.restore();
         withProgressStub.restore();
       });
@@ -222,13 +220,13 @@ describe('ProjectCommands', () => {
       let gitInitMock: sinon.SinonStub<any[], any>;
 
       beforeEach(() => {
-        outputCommandHelperMock = sinon.mock(helpers.outputCommandHelper);
+        outputCommandHelperMock = sinon.mock(outputCommandHelper);
         executeCommandMock = outputCommandHelperMock.expects('executeCommand');
         workspaceMock = sinon.mock(workspace);
         updateWorkspaceFoldersMock = workspaceMock.expects('updateWorkspaceFolders');
         fsMock = sinon.mock(fs);
         emptyDirSyncMock = fsMock.expects('emptyDirSync');
-        gitHelperMock = sinon.mock(helpers.gitHelper);
+        gitHelperMock = sinon.mock(gitHelper);
         gitInitMock = gitHelperMock.expects('gitInit').returns(() => undefined);
       });
 
@@ -729,7 +727,6 @@ describe('ProjectCommands', () => {
   });
 
   describe('Integration tests', () => {
-    let helpersMock: sinon.SinonMock;
     let userInteractionMock: sinon.SinonMock;
     const truffleBoxName = 'truffleBoxName';
     const firstProjectPath = 'firstProjectPath';
@@ -758,14 +755,13 @@ describe('ProjectCommands', () => {
     >;
 
     beforeEach(() => {
-      helpersMock = sinon.mock(helpers);
       userInteractionMock = sinon.mock(userInteraction);
       showQuickPickMock = userInteractionMock.expects('showQuickPick');
-      gitHelperMock = sinon.mock(helpers.gitHelper);
+      gitHelperMock = sinon.mock(gitHelper);
       gitInitMock = gitHelperMock.expects('gitInit').returns(() => undefined);
       requiredMock = sinon.mock(required);
       checkRequiredAppsMock = requiredMock.expects('checkRequiredApps');
-      outputCommandHelperMock = sinon.mock(helpers.outputCommandHelper);
+      outputCommandHelperMock = sinon.mock(outputCommandHelper);
       executeCommandMock = outputCommandHelperMock.expects('executeCommand');
 
       showOpenFolderDialogMock = userInteractionMock.expects('showOpenFolderDialog');
@@ -794,7 +790,6 @@ describe('ProjectCommands', () => {
     afterEach(() => {
       requiredMock.restore();
       gitHelperMock.restore();
-      helpersMock.restore();
       userInteractionMock.restore();
       fsMock.restore();
       windowMock.restore();

@@ -4,10 +4,11 @@
 import {commands, window} from 'vscode';
 import {Constants, RequiredApps} from '../Constants';
 import {required} from '../helpers/required';
-import {GenericProject} from '../Models/TreeItems';
-import {GenericService, TreeManager} from '../services';
+import {GenericProject} from '../Models/TreeItems/GenericProject';
+import {GenericService} from '@/services/generic/GenericService';
+import {TreeManager} from '@/services/tree/TreeManager';
 import {Telemetry} from '../TelemetryClient';
-import {ProjectView} from '../ViewItems';
+import {ProjectView} from '@/ViewItems/ProjectView';
 
 export namespace GenericCommands {
   // Command to bind to UI commands
@@ -16,14 +17,14 @@ export namespace GenericCommands {
 
     if (!(await required.checkApps(RequiredApps.node))) {
       Telemetry.sendEvent('GenericCommands.checkForConnection.nodeIsNotInstalled');
-      commands.executeCommand('truffle-vscode.showRequirementsPage');
+      void commands.executeCommand('truffle-vscode.showRequirementsPage');
       return;
     }
 
     const project: GenericProject = projectView?.extensionItem as GenericProject;
     project.description = await GenericService.getClientVersion(project.port);
 
-    window.showInformationMessage(Constants.genericCommandStrings.serverRunning);
+    void window.showInformationMessage(Constants.genericCommandStrings.serverRunning);
 
     TreeManager.saveState();
     await commands.executeCommand('truffle-vscode.refresh');

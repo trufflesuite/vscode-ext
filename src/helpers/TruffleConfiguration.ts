@@ -1,5 +1,5 @@
 import {Constants} from '@/Constants';
-import {MnemonicRepository} from '@/services';
+import {MnemonicRepository} from '@/services/MnemonicRepository';
 import {Telemetry} from '@/TelemetryClient';
 import * as acorn from 'acorn';
 import {Node} from 'acorn';

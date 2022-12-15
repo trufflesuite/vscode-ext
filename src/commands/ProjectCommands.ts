@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import {Constants, RequiredApps} from '@/Constants';
+import {gitInit} from '@/helpers/git';
 import {required} from '@/helpers/required';
 import {checkTruffleConfigNaming} from '@/helpers/TruffleConfiguration';
 import {showIgnorableNotification, showOpenFolderDialog, showQuickPick} from '@/helpers/userInteraction';
@@ -10,7 +11,7 @@ import {Telemetry} from '@/TelemetryClient';
 import fs from 'fs-extra';
 import requestPromise from 'request-promise';
 import {QuickPickItem, Uri, window, workspace} from 'vscode';
-import {gitHelper, outputCommandHelper} from '../helpers';
+import * as outputCommandHelper from '@/helpers/command';
 
 /**
  * Represents the project type for creating a new project.
@@ -179,7 +180,7 @@ async function createProject(projectType: ProjectType) {
   });
 
   // Starts the git
-  await gitHelper.gitInit(projectPath);
+  await gitInit(projectPath);
 }
 
 /**

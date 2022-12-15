@@ -31,7 +31,7 @@ export function extractEnumsInfoSafe(contractName: string, ast: {[key: string]: 
   return new EnumStorage();
 }
 
-export function extractEnumsInfo(contractName: string, ast: {[key: string]: any}): EnumStorage {
+function extractEnumsInfo(contractName: string, ast: {[key: string]: any}): EnumStorage {
   if (!ast) {
     throw new Error(Constants.errorMessageStrings.AstIsEmpty);
   }

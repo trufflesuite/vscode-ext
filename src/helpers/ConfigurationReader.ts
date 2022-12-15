@@ -61,7 +61,7 @@ export interface INetwork {
   options: INetworkOption;
 }
 
-export interface ISolCompiler {
+interface ISolCompiler {
   /**
    * A version or constraint - Ex. "^0.5.0" . Can also be set to "native" to use a native solc
    */
@@ -85,7 +85,7 @@ export interface ISolCompiler {
   };
 }
 
-export interface IExternalCompiler {
+interface IExternalCompiler {
   command: string;
   workingDirectory: string;
   targets: object[];

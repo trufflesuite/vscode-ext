@@ -5,11 +5,11 @@ import assert from 'assert';
 import {ChildProcess} from 'child_process';
 import sinon from 'sinon';
 import {OutputChannel, window} from 'vscode';
-import {DashboardCommands} from '@/commands';
+import {DashboardCommands} from '@/commands/DashboardCommands';
 import {Constants, RequiredApps} from '@/Constants';
 import {required} from '@/helpers/required';
 import * as shell from '../../src/helpers/shell';
-import {DashboardService} from '@/services';
+import {DashboardService} from '@/services/dashboard/DashboardService';
 import * as DashboardServiceClient from '../../src/services/dashboard/DashboardServiceClient';
 
 describe('Unit tests DashboardCommands', () => {

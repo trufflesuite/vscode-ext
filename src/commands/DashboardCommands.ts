@@ -5,7 +5,7 @@ import {window} from 'vscode';
 import {Constants} from '@/Constants';
 import {required} from '@/helpers/required';
 import {showIgnorableNotification} from '@/helpers/userInteraction';
-import {DashboardService} from '@/services';
+import {DashboardService} from '@/services/dashboard/DashboardService';
 import {Telemetry} from '@/TelemetryClient';
 export namespace DashboardCommands {
   // Command to bind to UI commands
@@ -30,12 +30,12 @@ export namespace DashboardCommands {
 
       if (!dashboardProcess.process) {
         Telemetry.sendEvent('DashboardCommands.startDashboardCmd.serverAlreadyRunning');
-        window.showInformationMessage(Constants.dashboardCommandStrings.serverAlreadyRunning);
+        void window.showInformationMessage(Constants.dashboardCommandStrings.serverAlreadyRunning);
         return;
       }
 
       Telemetry.sendEvent('DashboardCommands.startDashboardCmd.commandFinished');
-      window.showInformationMessage(Constants.dashboardCommandStrings.serverSuccessfullyStarted);
+      void window.showInformationMessage(Constants.dashboardCommandStrings.serverSuccessfullyStarted);
     });
   }
 
@@ -48,13 +48,13 @@ export namespace DashboardCommands {
     if (portStatus === DashboardService.PortStatus.RUNNING) {
       await DashboardService.stopDashboardServer(port);
       Telemetry.sendEvent('DashboardCommands.stopDashboardCmd.isDashboardServer');
-      window.showInformationMessage(Constants.dashboardCommandStrings.serverSuccessfullyStopped);
+      void window.showInformationMessage(Constants.dashboardCommandStrings.serverSuccessfullyStopped);
     } else if (portStatus === DashboardService.PortStatus.FREE) {
       Telemetry.sendEvent('DashboardCommands.stopDashboardCmd.portIsFree');
-      window.showInformationMessage(Constants.dashboardCommandStrings.serverSuccessfullyStopped);
+      void window.showInformationMessage(Constants.dashboardCommandStrings.serverSuccessfullyStopped);
     } else {
       Telemetry.sendEvent('DashboardCommands.stopDashboardCmd.noDashboardServer');
-      window.showWarningMessage(Constants.dashboardCommandStrings.serverCanNotStop);
+      void window.showWarningMessage(Constants.dashboardCommandStrings.serverCanNotStop);
     }
 
     Telemetry.sendEvent('DashboardCommands.stopDashboardCmd.commandFinished');

@@ -8,9 +8,12 @@ import uuid from 'uuid';
 import * as vscode from 'vscode';
 import {Constants} from '../../../src/Constants';
 import {ItemType} from '../../../src/Models';
-import {LocalService, InfuraProject, Project} from '../../../src/Models/TreeItems';
-import {InfuraResourceExplorer} from '../../../src/resourceExplorers';
-import {GanacheService, TreeManager} from '../../../src/services';
+import {LocalService} from '@/Models/TreeItems/LocalService';
+import {InfuraProject} from '@/Models/TreeItems/InfuraProject';
+import {Project} from '@/Models/TreeItems/Project';
+import {InfuraResourceExplorer} from '@/resourceExplorers/InfuraResourceExplorer';
+import {GanacheService} from '@/services/ganache/GanacheService';
+import {TreeManager} from '@/services/tree/TreeManager';
 
 const {project} = Constants.treeItemData;
 

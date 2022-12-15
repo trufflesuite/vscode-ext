@@ -6,10 +6,11 @@ import {Constants, RequiredApps} from '../Constants';
 import {required} from '../helpers/required';
 import {showQuickPick} from '../helpers/userInteraction';
 import {ItemType} from '../Models';
-import {LocalProject, TLocalProjectOptions} from '../Models/TreeItems';
-import {GanacheService, TreeManager} from '../services';
+import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {GanacheService} from '@/services/ganache/GanacheService';
+import {TreeManager} from '@/services/tree/TreeManager';
 import {Telemetry} from '../TelemetryClient';
-import {ProjectView} from '../ViewItems';
+import {ProjectView} from '@/ViewItems/ProjectView';
 
 export namespace GanacheCommands {
   /**
@@ -42,7 +43,7 @@ export namespace GanacheCommands {
 
     if (!(await required.checkApps(RequiredApps.node))) {
       Telemetry.sendEvent('GanacheCommands.startGanacheCmd.nodeIsNotInstalled');
-      commands.executeCommand('truffle-vscode.showRequirementsPage');
+      void commands.executeCommand('truffle-vscode.showRequirementsPage');
       return;
     }
 
@@ -52,12 +53,12 @@ export namespace GanacheCommands {
 
     if (!ganacheProcess.process) {
       Telemetry.sendEvent('GanacheCommands.startGanacheCmd.serverAlreadyRunning');
-      window.showInformationMessage(Constants.ganacheCommandStrings.serverAlreadyRunning);
+      void window.showInformationMessage(Constants.ganacheCommandStrings.serverAlreadyRunning);
       return;
     }
 
     Telemetry.sendEvent('GanacheCommands.startGanacheCmd.commandFinished');
-    window.showInformationMessage(Constants.ganacheCommandStrings.serverSuccessfullyStarted);
+    void window.showInformationMessage(Constants.ganacheCommandStrings.serverSuccessfullyStarted);
   }
 
   /**
@@ -80,13 +81,13 @@ export namespace GanacheCommands {
     if (portStatus === GanacheService.PortStatus.GANACHE) {
       await GanacheService.stopGanacheServer(port);
       Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.isGanacheServer');
-      window.showInformationMessage(Constants.ganacheCommandStrings.serverSuccessfullyStopped);
+      void window.showInformationMessage(Constants.ganacheCommandStrings.serverSuccessfullyStopped);
     } else if (portStatus === GanacheService.PortStatus.FREE) {
       Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.portIsFree');
-      window.showInformationMessage(Constants.ganacheCommandStrings.serverSuccessfullyStopped);
+      void window.showInformationMessage(Constants.ganacheCommandStrings.serverSuccessfullyStopped);
     } else {
       Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.noGanacheServer');
-      window.showWarningMessage(Constants.ganacheCommandStrings.serverCanNotStop);
+      void window.showWarningMessage(Constants.ganacheCommandStrings.serverCanNotStop);
     }
 
     Telemetry.sendEvent('GanacheCommands.stopGanacheCmd.commandFinished');

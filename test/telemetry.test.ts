@@ -3,8 +3,8 @@
 
 import assert from 'assert';
 import uuid from 'uuid';
-import {ItemType} from '..//src/Models';
-import {telemetryHelper} from '../src/helpers';
+import {mapItemType, mapNetworkName} from '@/helpers/telemetry';
+import {ItemType} from '@/Models';
 
 describe('Telemetry helper test', () => {
   const testNetworks = [
@@ -29,7 +29,7 @@ describe('Telemetry helper test', () => {
   testNetworks.forEach((network) => {
     it(`mapNetworkName should return correct result for network '${network.name}'`, () => {
       // Act
-      const result = telemetryHelper.mapNetworkName(network.name);
+      const result = mapNetworkName(network.name);
 
       // Assert
       assert.strictEqual(result, network.expectedResult);
@@ -54,7 +54,7 @@ describe('Telemetry helper test', () => {
   testItemTypes.forEach((testItemType) => {
     it(`mapNetworkName should return correct result for network type '${testItemType.expectedResult}'`, () => {
       // Act
-      const result = telemetryHelper.mapItemType(testItemType.itemType);
+      const result = mapItemType(testItemType.itemType);
 
       // Assert
       assert.strictEqual(result, testItemType.expectedResult);

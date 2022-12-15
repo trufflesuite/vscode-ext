@@ -23,6 +23,8 @@ import {
 import {ItemFactory} from './ItemFactory';
 import {ItemType} from './ItemType';
 
+// TODO: needs to refactored to avoid importing with side-effects
+
 ItemFactory.register(ItemType.COMMAND, new CommandItemCreator());
 ItemFactory.register(ItemType.NULLABLE, new NullableItemCreator());
 

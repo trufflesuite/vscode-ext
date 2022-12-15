@@ -4,7 +4,7 @@
 import {ItemType} from '../ItemType';
 import {ExtensionItem, ExtensionItemData} from './ExtensionItem';
 
-export type LayerTypes = ItemType.INFURA_LAYER;
+type LayerTypes = ItemType.INFURA_LAYER;
 
 export abstract class Layer extends ExtensionItem {
   protected constructor(itemType: LayerTypes, label: string, data: ExtensionItemData, description?: string) {

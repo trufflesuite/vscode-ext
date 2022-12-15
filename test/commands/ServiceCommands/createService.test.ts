@@ -6,11 +6,12 @@ import rewire from 'rewire';
 import sinon from 'sinon';
 import uuid from 'uuid';
 import {QuickPickOptions} from 'vscode';
-import {Constants} from '../../../src/Constants';
-import * as userInteraction from '../../../src/helpers/userInteraction';
-import {ItemType} from '../../../src/Models';
-import {LocalProject, LocalService, TLocalProjectOptions} from '../../../src/Models/TreeItems';
-import {TreeManager} from '../../../src/services';
+import {Constants} from '@/Constants';
+import * as userInteraction from '@/helpers/userInteraction';
+import {ItemType} from '@/Models';
+import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {LocalService} from '@/Models/TreeItems/LocalService';
+import {TreeManager} from '@/services/tree/TreeManager';
 
 const description = '';
 

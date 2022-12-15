@@ -134,6 +134,7 @@ function generateDescription(contractName?: string, methodName?: string) {
  * @param chars the desired length to append both at the start and at the end.
  * @returns the shortened `hash`.
  */
+// ts-prune-ignore-next
 export function shortenHash(hash: string, chars = 4): string {
   try {
     const parsed = hash;

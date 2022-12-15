@@ -5,19 +5,18 @@ import assert from 'assert';
 import sinon from 'sinon';
 import uuid from 'uuid';
 import * as vscode from 'vscode';
-import {ServiceCommands} from '../../../src/commands';
+import {ServiceCommands} from '@/commands/ServiceCommands';
 import {Constants} from '../../../src/Constants';
 import {ItemType} from '../../../src/Models';
-import {
-  IExtensionItem,
-  InfuraProject,
-  InfuraService,
-  LocalService,
-  Project,
-  Service,
-} from '../../../src/Models/TreeItems';
-import {InfuraResourceExplorer} from '../../../src/resourceExplorers';
-import {GanacheService, TreeManager} from '../../../src/services';
+import {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
+import {InfuraProject} from '@/Models/TreeItems/InfuraProject';
+import {InfuraService} from '@/Models/TreeItems/InfuraService';
+import {LocalService} from '@/Models/TreeItems/LocalService';
+import {Project} from '@/Models/TreeItems/Project';
+import {Service} from '@/Models/TreeItems/Service';
+import {InfuraResourceExplorer} from '@/resourceExplorers/InfuraResourceExplorer';
+import {GanacheService} from '@/services/ganache/GanacheService';
+import {TreeManager} from '@/services/tree/TreeManager';
 import {getRandomInt} from '../../testHelpers/Random';
 const {project, service} = Constants.treeItemData;
 

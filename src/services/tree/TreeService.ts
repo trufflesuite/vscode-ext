@@ -2,11 +2,12 @@
 // Licensed under the MIT license.
 
 import {Event, EventEmitter, ProviderResult, TreeDataProvider, window} from 'vscode';
-import {IExtensionItem} from '../../Models/TreeItems';
-import {IExtensionView, ViewItemFactory} from '../../ViewItems';
-import {TreeManager} from './TreeManager';
+import {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
+import {IExtensionView} from '@/ViewItems/IExtensionView';
+import {ViewItemFactory} from '@/ViewItems/ViewItemFactory';
+import {TreeManager} from '@/services/tree/TreeManager';
 
-export class ExtensionTreeService implements TreeDataProvider<IExtensionView> {
+class ExtensionTreeService implements TreeDataProvider<IExtensionView> {
   public readonly onDidChangeTreeData: Event<IExtensionView>;
   private eventEmitter: EventEmitter<IExtensionView>;
 

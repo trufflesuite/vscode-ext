@@ -4,7 +4,7 @@
 import {getTruffleConfiguration} from '@/helpers/TruffleConfiguration';
 import fs from 'fs-extra';
 import path from 'path';
-import {HttpService} from '..';
+import {HttpService} from '@/services/HttpService';
 import {Constants} from '@/Constants';
 import {getPathByPlatform, getWorkspaceRoot, TruffleWorkspace} from '@/helpers/workspace';
 import {Telemetry} from '@/TelemetryClient';

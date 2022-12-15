@@ -7,12 +7,15 @@ import rp from 'request-promise';
 import sinon from 'sinon';
 import stream from 'stream';
 import * as vscode from 'vscode';
-import {GanacheCommands} from '../../src/commands';
+import {GanacheCommands} from '@/commands/GanacheCommands';
 import * as commands from '../../src/helpers/command';
 import * as shell from '../../src/helpers/shell';
-import {IExtensionItem, LocalProject, LocalService, Service, TLocalProjectOptions} from '../../src/Models/TreeItems';
-import {TreeManager} from '../../src/services';
-import {ProjectView} from '../../src/ViewItems';
+import {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
+import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {LocalService} from '@/Models/TreeItems/LocalService';
+import {Service} from '@/Models/TreeItems/Service';
+import {TreeManager} from '@/services/tree/TreeManager';
+import {ProjectView} from '@/ViewItems/ProjectView';
 
 describe('Integration tests GanacheCommands', () => {
   const defaultPort = 8545;

@@ -4,7 +4,7 @@
 import {Telemetry} from '../TelemetryClient';
 import {ItemCreator} from './ItemCreators/ItemCreator';
 import {ItemType} from './ItemType';
-import {IExtensionItem} from './TreeItems';
+import {IExtensionItem} from './TreeItems/IExtensionItem';
 
 export namespace ItemFactory {
   const registeredTypes: {[key: number]: ItemCreator} = {};

@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {GenericProject} from '../TreeItems';
+import {GenericProject} from '@/Models/TreeItems/GenericProject';
 import {ItemCreator} from './ItemCreator';
 
 export class GenericProjectItemCreator extends ItemCreator {

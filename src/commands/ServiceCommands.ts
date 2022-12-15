@@ -2,26 +2,25 @@
 // Licensed under the MIT license.
 
 import {Constants} from '@/Constants';
+import {mapItemType} from '@/helpers/telemetry';
 import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
 import {ItemType} from '@/Models';
-import {
-  GenericProject,
-  GenericService,
-  InfuraProject,
-  InfuraService,
-  LocalProject,
-  LocalService,
-  Project,
-  Service,
-  ServiceTypes,
-  TLocalProjectOptions,
-} from '@/Models/TreeItems';
-import {GenericResourceExplorer, InfuraResourceExplorer, LocalResourceExplorer} from '@/resourceExplorers';
-import {GanacheService, TreeManager} from '@/services';
+import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {GenericProject} from '@/Models/TreeItems/GenericProject';
+import {GenericService} from '@/Models/TreeItems/GenericService';
+import {InfuraProject} from '@/Models/TreeItems/InfuraProject';
+import {InfuraService} from '@/Models/TreeItems/InfuraService';
+import {LocalService} from '@/Models/TreeItems/LocalService';
+import {Project} from '@/Models/TreeItems/Project';
+import {Service, ServiceTypes} from '@/Models/TreeItems/Service';
+import {GenericResourceExplorer} from '@/resourceExplorers/GenericResourceExplorer';
+import {InfuraResourceExplorer} from '@/resourceExplorers/InfuraResourceExplorer';
+import {LocalResourceExplorer} from '@/resourceExplorers/LocalResourceExplorer';
+import {GanacheService} from '@/services/ganache/GanacheService';
+import {TreeManager} from '@/services/tree/TreeManager';
 import {Telemetry} from '@/TelemetryClient';
-import {ProjectView} from '@/ViewItems';
+import {ProjectView} from '@/ViewItems/ProjectView';
 import {QuickPickItem} from 'vscode';
-import {telemetryHelper} from '../helpers';
 
 interface IServiceDestination {
   cmd: (service: Service) => Promise<Project>;
@@ -61,7 +60,7 @@ export namespace ServiceCommands {
     const project = await execute(serviceDestinations);
 
     Telemetry.sendEvent('ServiceCommands.createProject.commandFinished', {
-      itemType: telemetryHelper.mapItemType(project.itemType),
+      itemType: mapItemType(project.itemType),
     });
 
     return project;
@@ -90,7 +89,7 @@ export namespace ServiceCommands {
     const project = await execute(serviceDestinations);
 
     Telemetry.sendEvent('ServiceCommands.connectProject.commandFinished', {
-      itemType: telemetryHelper.mapItemType(project.itemType),
+      itemType: mapItemType(project.itemType),
     });
 
     return project;
