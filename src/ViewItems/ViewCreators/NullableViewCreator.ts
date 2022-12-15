@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Nullable} from '../../Models/TreeItems';
+import {Nullable} from '../../Models/TreeItems/Nullable';
 import {NullableView} from '../NullableView';
 import {ViewCreator} from './ViewCreator';
 

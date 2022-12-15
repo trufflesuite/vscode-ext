@@ -73,21 +73,5 @@ export const referenceConfiguration = {
   network_id: 1,
 };
 
-export const testModuleWithoutDirectories = {
-  compilers: {
-    solc: {
-      version: '0.5.0',
-    },
-  },
-  mocha: {},
-  networks: {
-    development: {
-      host: '127.0.0.1',
-      network_id: '*',
-      port: 8545,
-    },
-  },
-};
-
 const referenceAstPath = path.join(__dirname, 'referenceAstObject.json');
 export const referenceAstObject = JSON.parse(fs.readFileSync(referenceAstPath, 'utf-8').toString());

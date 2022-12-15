@@ -7,7 +7,7 @@ import {OutputChannel, window} from 'vscode';
 import {Constants, RequiredApps} from '../../Constants';
 import {shell, spawnProcess} from '../../helpers';
 import {findPid, killPid} from '../../helpers/shell';
-import {TLocalProjectOptions} from '../../Models/TreeItems';
+import {TLocalProjectOptions} from '../../Models/TreeItems/LocalProject';
 import {Telemetry} from '../../TelemetryClient';
 import {UrlValidator} from '../../validators/UrlValidator';
 import {isGanacheServer, waitGanacheStarted} from './GanacheServiceClient';

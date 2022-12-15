@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Service} from '../../Models/TreeItems';
+import {Service} from '../../Models/TreeItems/Service';
 import {ServiceView} from '../ServiceView';
 import {ViewCreator} from './ViewCreator';
 

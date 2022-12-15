@@ -17,21 +17,21 @@ import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification
 import {getPathByPlatform} from '@/helpers/workspace';
 
 import {IDeployDestination, ItemType} from '@/Models';
-import {NetworkForContractItem} from '@/Models/QuickPickItems';
-import {InfuraProject, LocalProject, LocalService, TLocalProjectOptions} from '@/Models/TreeItems';
-import {Project} from '@/Models/TreeItems';
+import {NetworkForContractItem} from '@/Models/QuickPickItems/NetworkForContractItem';
+import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {InfuraProject} from '@/Models/TreeItems/InfuraProject';
+import {LocalService} from '@/Models/TreeItems/LocalService';
+import {Project} from '@/Models/TreeItems/Project';
 import {Output, OutputLabel} from '@/Output';
-import {
-  ContractDB,
-  ContractInstanceWithMetadata,
-  ContractService,
-  DashboardService,
-  GanacheService,
-  MnemonicRepository,
-  TreeManager,
-} from '@/services';
+import {ContractDB} from '@/services/contract/ContractDB';
+import {TreeManager} from '@/services/tree/TreeManager';
+import {GanacheService} from '@/services/ganache/GanacheService';
+import {DashboardService} from '@/services/dashboard/DashboardService';
+import {ContractInstanceWithMetadata} from '@/services/contract/ContractInstanceWithMetadata';
+import {ContractService} from '@/services/contract/ContractService';
+import {MnemonicRepository} from '@/services/MnemonicRepository';
 import {Telemetry} from '@/TelemetryClient';
-import {NetworkNodeView} from '@/ViewItems';
+import {NetworkNodeView} from '@/ViewItems/NetworkNodeView';
 import {ServiceCommands} from './ServiceCommands';
 import {mapNetworkName} from '@/helpers/telemetry';
 import {writeToClipboard} from '@/helpers/vscodeEnvironment';
@@ -83,7 +83,7 @@ export namespace TruffleCommands {
       Output.show();
 
       await outputCommandHelper.executeCommand(contractDirectory, 'npx', args.join(' '));
-      commands.executeCommand('truffle-vscode.views.deployments.refresh');
+      void commands.executeCommand('truffle-vscode.views.deployments.refresh');
 
       Telemetry.sendEvent('TruffleCommands.buildContracts.commandFinished');
     });

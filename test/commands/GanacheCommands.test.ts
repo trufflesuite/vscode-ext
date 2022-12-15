@@ -10,10 +10,14 @@ import {Constants, RequiredApps} from '../../src/Constants';
 import * as userInteraction from '../../src/helpers/userInteraction';
 import {required} from '../../src/helpers/required';
 import * as shell from '../../src/helpers/shell';
-import {IExtensionItem, LocalProject, LocalService, Service, TLocalProjectOptions} from '../../src/Models/TreeItems';
-import {GanacheService, TreeManager} from '../../src/services';
+import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
+import {LocalService} from '@/Models/TreeItems/LocalService';
+import {Service} from '@/Models/TreeItems/Service';
+import {GanacheService} from '@/services/ganache/GanacheService';
+import {TreeManager} from '@/services/tree/TreeManager';
 import * as GanacheServiceClient from '../../src/services/ganache/GanacheServiceClient';
-import {ProjectView} from '../../src/ViewItems';
+import {ProjectView} from '@/ViewItems/ProjectView';
 import {TestConstants} from '../TestConstants';
 
 const description = '';

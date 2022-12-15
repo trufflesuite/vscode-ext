@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {InfuraProject} from '../TreeItems';
+import {InfuraProject} from '../TreeItems/InfuraProject';
 import {ItemCreator} from './ItemCreator';
 
 export class InfuraProjectItemCreator extends ItemCreator {

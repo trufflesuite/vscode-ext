@@ -9,7 +9,7 @@ import stream from 'stream';
 import {OutputChannel, window} from 'vscode';
 import * as outputCommandHelper from '../../src/helpers';
 import * as shell from '../../src/helpers/shell';
-import {DashboardService} from '../../src/services';
+import {DashboardService} from '@/services/dashboard/DashboardService';
 import * as DashboardServiceClient from '../../src/services/dashboard/DashboardServiceClient';
 import {UrlValidator} from '../../src/validators/UrlValidator';
 

@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {ProviderResult} from 'vscode';
-import {IExtensionItem} from '../Models/TreeItems';
+import {IExtensionItem} from '../Models/TreeItems/IExtensionItem';
 
 export interface IExtensionView {
   getTreeItem(): Promise<IExtensionItem> | IExtensionItem;

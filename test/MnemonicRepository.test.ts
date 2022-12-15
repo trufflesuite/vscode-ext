@@ -8,7 +8,7 @@ import {stub, restore} from 'sinon';
 import uuid from 'uuid';
 import {Memento} from 'vscode';
 import {Constants} from '../src/Constants';
-import {MnemonicRepository} from '../src/services';
+import {MnemonicRepository} from '@/services/MnemonicRepository';
 import {FakeExtensionState} from './FakeExtensionState';
 import {TestConstants} from './TestConstants';
 
@@ -68,7 +68,7 @@ describe('MnemonicRepository', () => {
     it('GetAllMnemonicPaths should return correct paths', () => {
       // Arrange
       const storage: string[] = [uuid.v4(), uuid.v4(), uuid.v4()];
-      globalState.update(Constants.globalStateKeys.mnemonicStorageKey, storage);
+      void globalState.update(Constants.globalStateKeys.mnemonicStorageKey, storage);
 
       // Act
       const result = MnemonicRepository.getAllMnemonicPaths();
@@ -81,7 +81,7 @@ describe('MnemonicRepository', () => {
     it('getExistedMnemonicPaths should return existing paths', () => {
       // Arrange
       const storage: string[] = [uuid.v4(), uuid.v4(), uuid.v4()];
-      globalState.update(Constants.globalStateKeys.mnemonicStorageKey, storage);
+      void globalState.update(Constants.globalStateKeys.mnemonicStorageKey, storage);
       existsSyncMock.onCall(0).callsFake(() => true);
       existsSyncMock.onCall(1).callsFake(() => false);
       existsSyncMock.onCall(2).callsFake(() => true);

@@ -10,7 +10,7 @@ import {Telemetry} from '@/TelemetryClient';
 import {showQuickPick} from '@/helpers/userInteraction';
 import {QuickPickItem} from 'vscode';
 import {LocalProject} from '@/Models/TreeItems/LocalProject';
-import {LocalNetworkNode} from '@/Models/TreeItems';
+import {LocalNetworkNode} from '@/Models/TreeItems/LocalNetworkNode';
 import {ConfigurationReader} from '../helpers/debugConfigurationReader';
 
 /**

@@ -3,8 +3,9 @@
 
 import {Constants} from '@/Constants';
 import {showInputBox} from '@/helpers/userInteraction';
-import {GenericNetworkNode, GenericProject} from '@/Models/TreeItems';
-import {GenericService} from '@/services';
+import {GenericNetworkNode} from '@/Models/TreeItems/GenericNetworkNode';
+import {GenericProject} from '@/Models/TreeItems/GenericProject';
+import {GenericService} from '@/services/generic/GenericService';
 import {Telemetry} from '@/TelemetryClient';
 import {DialogResultValidator} from '@/validators/DialogResultValidator';
 import {UrlValidator} from '@/validators/UrlValidator';

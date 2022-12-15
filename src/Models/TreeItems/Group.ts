@@ -4,7 +4,7 @@
 import {ItemType} from '../ItemType';
 import {ExtensionItem, ExtensionItemData} from './ExtensionItem';
 
-export type GroupTypes = ItemType.MEMBER;
+type GroupTypes = ItemType.MEMBER;
 
 export abstract class Group extends ExtensionItem {
   protected constructor(itemType: GroupTypes, label: string, data: ExtensionItemData) {

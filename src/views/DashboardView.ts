@@ -12,7 +12,7 @@ import {
   window,
 } from 'vscode';
 import {DashboardCommands} from '../commands';
-import {DashboardService} from '../services';
+import {DashboardService} from '@/services/dashboard/DashboardService';
 import {Constants} from '../Constants';
 import {writeToClipboard} from '@/helpers/vscodeEnvironment';
 

@@ -6,7 +6,7 @@ import {generateMnemonic, getTruffleConfigUri, TruffleConfig} from '@/helpers/Tr
 import {window} from 'vscode';
 import {Constants, RequiredApps} from '@/Constants';
 import {showInputBox, showQuickPick, saveTextInFile} from '@/helpers/userInteraction';
-import {MnemonicRepository} from '@/services'; // Should be full path since cycle dependencies
+import {MnemonicRepository} from '@/services/MnemonicRepository'; // Should be full path since cycle dependencies
 import {Telemetry} from '@/TelemetryClient';
 import {NetworkNode} from './NetworkNode';
 
@@ -25,7 +25,7 @@ export abstract class MnemonicNetworkNode extends NetworkNode {
       targetURL = await this.getRPCAddress();
 
       if (!targetURL) {
-        window.showInformationMessage(Constants.informationMessage.networkIsNotReady(this.constructor.name));
+        void window.showInformationMessage(Constants.informationMessage.networkIsNotReady(this.constructor.name));
       }
     } catch (error) {
       Telemetry.sendException(error as Error);

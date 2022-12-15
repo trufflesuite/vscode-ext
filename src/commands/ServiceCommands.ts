@@ -5,22 +5,19 @@ import {Constants} from '@/Constants';
 import {mapItemType} from '@/helpers/telemetry';
 import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
 import {ItemType} from '@/Models';
-import {
-  GenericProject,
-  GenericService,
-  InfuraProject,
-  InfuraService,
-  LocalProject,
-  LocalService,
-  Project,
-  Service,
-  ServiceTypes,
-  TLocalProjectOptions,
-} from '@/Models/TreeItems';
+import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {GenericProject} from '@/Models/TreeItems/GenericProject';
+import {GenericService} from '@/Models/TreeItems/GenericService';
+import {InfuraProject} from '@/Models/TreeItems/InfuraProject';
+import {InfuraService} from '@/Models/TreeItems/InfuraService';
+import {LocalService} from '@/Models/TreeItems/LocalService';
+import {Project} from '@/Models/TreeItems/Project';
+import {Service, ServiceTypes} from '@/Models/TreeItems/Service';
 import {GenericResourceExplorer, InfuraResourceExplorer, LocalResourceExplorer} from '@/resourceExplorers';
-import {GanacheService, TreeManager} from '@/services';
+import {GanacheService} from '@/services/ganache/GanacheService';
+import {TreeManager} from '@/services/tree/TreeManager';
 import {Telemetry} from '@/TelemetryClient';
-import {ProjectView} from '@/ViewItems';
+import {ProjectView} from '@/ViewItems/ProjectView';
 import {QuickPickItem} from 'vscode';
 
 interface IServiceDestination {

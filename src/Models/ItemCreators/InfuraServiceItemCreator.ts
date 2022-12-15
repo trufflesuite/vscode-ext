@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {InfuraService} from '../TreeItems';
+import {InfuraService} from '@/Models/TreeItems/InfuraService';
 import {ItemCreator} from './ItemCreator';
 
 export class InfuraServiceItemCreator extends ItemCreator {

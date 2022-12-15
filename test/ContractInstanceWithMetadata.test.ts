@@ -4,8 +4,8 @@
 import assert from 'assert';
 import fs from 'fs-extra';
 import path from 'path';
-import {ContractInstanceWithMetadata} from '../src/services';
-import {Contract} from '../src/services/contract/Contract';
+import {ContractInstanceWithMetadata} from '@/services/contract/ContractInstanceWithMetadata';
+import {Contract} from '@/services/contract/Contract';
 
 describe('ContractInstanceWithMetadata ExtractEnumsInfo tests', () => {
   const testContractFilePath = path.join(__dirname, 'testData', 'enumTestContract.json');

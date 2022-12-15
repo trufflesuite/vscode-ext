@@ -20,18 +20,16 @@ import {required} from '@/helpers/required';
 import {CancellationEvent} from './Models';
 import {ChangelogPage} from '@/pages/Changelog';
 import {RequirementsPage} from '@/pages/Requirements';
-import {
-  AdapterType,
-  ContractDB,
-  GanacheService,
-  InfuraServiceClient,
-  MnemonicRepository,
-  TreeManager,
-  TreeService,
-  DashboardService,
-} from './services';
+import {AdapterType, ContractDB} from '@/services/contract/ContractDB';
+import {InfuraServiceClient} from '@/services/infuraService/InfuraServiceClient';
+import {MnemonicRepository} from '@/services/MnemonicRepository';
+import {TreeManager} from '@/services/tree/TreeManager';
+import {TreeService} from '@/services/tree/TreeService';
+import {GanacheService} from '@/services/ganache/GanacheService';
+import {DashboardService} from '@/services/dashboard/DashboardService';
 import {Telemetry} from './TelemetryClient';
-import {NetworkNodeView, ProjectView} from './ViewItems';
+import {NetworkNodeView} from './ViewItems/NetworkNodeView';
+import {ProjectView} from './ViewItems/ProjectView';
 import {registerDashboardView} from './views/DashboardView';
 import {registerDeploymentView} from './views/DeploymentsView';
 import {registerFileExplorerView} from './views/FileExplorer';
@@ -45,7 +43,7 @@ import {UriHandlerController} from './helpers/uriHandlerController';
 import {Output} from './Output';
 
 // ts-prune-ignore-next
-export async function activate(context: ExtensionContext) {
+export async function activate(context: ExtensionContext): Promise<void> {
   const uriHandler = window.registerUriHandler(new UriHandlerController());
 
   /**
@@ -285,15 +283,16 @@ export async function activate(context: ExtensionContext) {
 }
 
 // ts-prune-ignore-next
-export async function deactivate(): Promise<void> {
+export function deactivate(): void {
   // This method is called when your extension is deactivated
   // To dispose of all extensions, vscode provides 5 sec.
   // Therefore, please, call important dispose functions first and don't use await
   // For more information see https://github.com/Microsoft/vscode/issues/47881
-  GanacheService.dispose();
-  DashboardService.dispose();
-  ContractDB.dispose();
-  Telemetry.dispose();
+  void GanacheService.dispose();
+  void DashboardService.dispose();
+  void ContractDB.dispose();
+  void Telemetry.dispose();
+
   TreeManager.dispose();
 }
 

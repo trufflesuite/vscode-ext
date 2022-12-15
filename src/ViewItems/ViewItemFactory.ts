@@ -2,7 +2,8 @@
 // Licensed under the MIT license.
 
 import {ItemType} from '../Models';
-import {IExtensionItem, Nullable} from '../Models/TreeItems';
+import {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
+import {Nullable} from '@/Models/TreeItems/Nullable';
 import {Telemetry} from '../TelemetryClient';
 import {ExtensionView} from './ExtensionView';
 import {ViewCreator} from './ViewCreators';

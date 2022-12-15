@@ -1,15 +1,6 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-export * from './ExtensionView';
-export * from './IExtensionView';
-export * from './GroupView';
-export * from './NetworkNodeView';
-export * from './NullableView';
-export * from './ProjectView';
-export * from './ServiceView';
-export * from './ViewItemFactory';
-
 import {ItemType} from '../Models';
 import {
   GroupViewCreator,
