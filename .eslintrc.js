@@ -51,6 +51,8 @@ module.exports = {
     // FIXME: rework this eventually. Tech-debt - 8 Errors right now. Needs investigation.
     // '@typescript-eslint/ban-ts-comment': 'off',
 
+    '@typescript-eslint/explicit-module-boundary-types': 'warn',
+
     // The following two blocks come from `@typescript-eslint/recommended-requiring-type-checking`.
 
     // FIXME: We need to take care of this.
