@@ -11,7 +11,7 @@ import * as outputCommandHelper from '@/helpers/command';
 import * as gitHelper from '@/helpers/git';
 import {required} from '../../src/helpers/required';
 import * as userInteraction from '../../src/helpers/userInteraction';
-import {CancellationEvent} from '../../src/Models';
+import {CancellationEvent} from '@/Models/CancellationEvent';
 import {Output} from '../../src/Output';
 import * as vscode from 'vscode';
 

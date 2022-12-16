@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {ItemType} from '../ItemType';
-import {ExtensionItem, ExtensionItemData} from './ExtensionItem';
+import type {ItemType} from '../ItemType';
+import {ExtensionItem, type ExtensionItemData} from './ExtensionItem';
 
 export type ServiceTypes =
   | ItemType.LOCAL_SERVICE

@@ -10,7 +10,7 @@ import {window} from 'vscode';
 import {TruffleCommands} from '@/commands/TruffleCommands';
 import {Constants} from '@/Constants';
 import * as vscodeEnvironment from '@/helpers/vscodeEnvironment';
-import {EnumStorage} from '@/Models';
+import {EnumStorage} from '@/Models/EnumStorage';
 import {ContractDB} from '@/services/contract/ContractDB';
 import {ContractInstanceWithMetadata} from '@/services/contract/ContractInstanceWithMetadata';
 import {ContractService} from '@/services/contract/ContractService';

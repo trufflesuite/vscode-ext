@@ -4,10 +4,10 @@
 import assert from 'assert';
 import rewire from 'rewire';
 import sinon from 'sinon';
-import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {LocalProject, type TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {TreeManager} from '@/services/tree/TreeManager';
-import {ProjectView} from '@/ViewItems/ProjectView';
+import {ProjectView} from '@/views/NetworksView';
 
 const description = '';
 

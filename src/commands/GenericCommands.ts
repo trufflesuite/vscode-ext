@@ -4,11 +4,11 @@
 import {commands, window} from 'vscode';
 import {Constants, RequiredApps} from '../Constants';
 import {required} from '../helpers/required';
-import {GenericProject} from '../Models/TreeItems/GenericProject';
+import type {GenericProject} from '../Models/TreeItems/GenericProject';
 import {GenericService} from '@/services/generic/GenericService';
 import {TreeManager} from '@/services/tree/TreeManager';
 import {Telemetry} from '../TelemetryClient';
-import {ProjectView} from '@/ViewItems/ProjectView';
+import type {ProjectView} from '@/views/NetworksView';
 
 export namespace GenericCommands {
   // Command to bind to UI commands

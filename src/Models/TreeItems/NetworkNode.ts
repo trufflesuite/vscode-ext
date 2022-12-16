@@ -4,7 +4,7 @@
 import {INetwork} from '@/helpers/ConfigurationReader';
 import {URL} from 'url';
 import {Constants} from '@/Constants';
-import {ItemType} from '@/Models';
+import {ItemType} from '@/Models/ItemType';
 import {ExtensionItem, ExtensionItemData} from './ExtensionItem';
 
 const protocolRegExp = new RegExp(

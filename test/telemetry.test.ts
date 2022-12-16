@@ -4,7 +4,7 @@
 import assert from 'assert';
 import uuid from 'uuid';
 import {mapItemType, mapNetworkName} from '@/helpers/telemetry';
-import {ItemType} from '@/Models';
+import {ItemType} from '@/Models/ItemType';
 
 describe('Telemetry helper test', () => {
   const testNetworks = [

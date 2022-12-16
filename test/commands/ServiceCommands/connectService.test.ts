@@ -7,7 +7,7 @@ import uuid from 'uuid';
 import * as vscode from 'vscode';
 import {ServiceCommands} from '@/commands/ServiceCommands';
 import {Constants} from '../../../src/Constants';
-import {ItemType} from '../../../src/Models';
+import {ItemType} from '@/Models/ItemType';
 import {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
 import {InfuraProject} from '@/Models/TreeItems/InfuraProject';
 import {InfuraService} from '@/Models/TreeItems/InfuraService';

@@ -1,17 +1,17 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Memento} from 'vscode';
-import {Constants} from '../../Constants';
-import {ItemFactory} from '../../Models';
-import {Command} from '../../Models/TreeItems/Command';
-import {IExtensionItem} from '../../Models/TreeItems/IExtensionItem';
-import {InfuraService} from '../../Models/TreeItems/InfuraService';
-import {LocalService} from '../../Models/TreeItems/LocalService';
-import {GenericService} from '../../Models/TreeItems/GenericService';
-import {Service, ServiceTypes} from '../../Models/TreeItems/Service';
+import type {Memento} from 'vscode';
+import {Constants} from '@/Constants';
+import {ItemFactory} from '@/Models/ItemFactory';
+import {Command} from '@/Models/TreeItems/Command';
+import type {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
+import {InfuraService} from '@/Models/TreeItems/InfuraService';
+import {LocalService} from '@/Models/TreeItems/LocalService';
+import {GenericService} from '@/Models/TreeItems/GenericService';
+import {Service, type ServiceTypes} from '@/Models/TreeItems/Service';
 import {Output, OutputLabel} from '@/Output';
-import {Telemetry} from '../../TelemetryClient';
+import {Telemetry} from '@/TelemetryClient';
 
 class ExtensionTreeManager {
   private items: Service[];

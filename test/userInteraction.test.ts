@@ -8,7 +8,7 @@ import uuid from 'uuid';
 import {InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace, WorkspaceConfiguration} from 'vscode';
 import {Constants} from '../src/Constants';
 import * as userInteraction from '../src/helpers/userInteraction';
-import {CancellationEvent} from '../src/Models';
+import {CancellationEvent} from '@/Models/CancellationEvent';
 
 interface ITestItems extends QuickPickItem {
   id: number;

@@ -1,13 +1,13 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {INetwork} from '@/helpers/ConfigurationReader';
+import type {INetwork} from '@/helpers/ConfigurationReader';
 import {TruffleConfig} from '@/helpers/TruffleConfiguration';
 import {mnemonicToSeed} from 'bip39';
 import fs from 'fs-extra';
 import hdkey from 'hdkey';
 import path from 'path';
-import {QuickPickItem, Uri, window, commands, QuickPickItemKind} from 'vscode';
+import {type QuickPickItem, type Uri, window, commands, QuickPickItemKind} from 'vscode';
 import {Constants, RequiredApps} from '@/Constants';
 import * as outputCommandHelper from '@/helpers/command';
 import {getTruffleWorkspace} from '@/helpers/workspace';
@@ -16,22 +16,23 @@ import {required} from '@/helpers/required';
 import {showQuickPick, showConfirmPaidOperationDialog, showIgnorableNotification} from '@/helpers/userInteraction';
 import {getPathByPlatform} from '@/helpers/workspace';
 
-import {IDeployDestination, ItemType} from '@/Models';
+import {ItemType} from '@/Models/ItemType';
+import type {IDeployDestination} from '@/Models/IDeployDestination';
 import {NetworkForContractItem} from '@/Models/QuickPickItems/NetworkForContractItem';
-import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {LocalProject, type TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
 import {InfuraProject} from '@/Models/TreeItems/InfuraProject';
 import {LocalService} from '@/Models/TreeItems/LocalService';
-import {Project} from '@/Models/TreeItems/Project';
+import type {Project} from '@/Models/TreeItems/Project';
 import {Output, OutputLabel} from '@/Output';
 import {ContractDB} from '@/services/contract/ContractDB';
 import {TreeManager} from '@/services/tree/TreeManager';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {DashboardService} from '@/services/dashboard/DashboardService';
-import {ContractInstanceWithMetadata} from '@/services/contract/ContractInstanceWithMetadata';
+import type {ContractInstanceWithMetadata} from '@/services/contract/ContractInstanceWithMetadata';
 import {ContractService} from '@/services/contract/ContractService';
 import {MnemonicRepository} from '@/services/MnemonicRepository';
 import {Telemetry} from '@/TelemetryClient';
-import {NetworkNodeView} from '@/ViewItems/NetworkNodeView';
+import type {NetworkNodeView} from '@/views/NetworksView';
 import {ServiceCommands} from './ServiceCommands';
 import {mapNetworkName} from '@/helpers/telemetry';
 import {writeToClipboard} from '@/helpers/vscodeEnvironment';

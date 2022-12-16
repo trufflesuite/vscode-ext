@@ -14,7 +14,7 @@ import * as requiredHelpers from '../../src/helpers/required';
 import * as TruffleConfiguration from '@/helpers/TruffleConfiguration';
 import {TruffleConfig} from '@/helpers/TruffleConfiguration';
 import * as commands from '../../src/helpers/command';
-import {CancellationEvent} from '@/Models';
+import {CancellationEvent} from '@/Models/CancellationEvent';
 import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
 import {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
 import {InfuraNetworkNode} from '@/Models/TreeItems/InfuraNetworkNode';

@@ -7,7 +7,7 @@ import sinon from 'sinon';
 import uuid from 'uuid';
 import * as vscode from 'vscode';
 import {Constants} from '../../../src/Constants';
-import {ItemType} from '../../../src/Models';
+import {ItemType} from '@/Models/ItemType';
 import {LocalService} from '@/Models/TreeItems/LocalService';
 import {InfuraProject} from '@/Models/TreeItems/InfuraProject';
 import {Project} from '@/Models/TreeItems/Project';

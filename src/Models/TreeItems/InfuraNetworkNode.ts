@@ -5,7 +5,7 @@ import {INetwork} from '@/helpers/ConfigurationReader';
 import {URL} from 'url';
 import {Constants} from '@/Constants';
 import {showInputBox} from '@/helpers/userInteraction';
-import {ItemType} from '@/Models';
+import {ItemType} from '@/Models/ItemType';
 import {MnemonicNetworkNode} from './MnemonicNetworkNode';
 
 export class InfuraNetworkNode extends MnemonicNetworkNode {

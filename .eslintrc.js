@@ -52,6 +52,7 @@ module.exports = {
     // '@typescript-eslint/ban-ts-comment': 'off',
 
     '@typescript-eslint/explicit-module-boundary-types': 'warn',
+    '@typescript-eslint/consistent-type-imports': 'warn',
 
     // The following two blocks come from `@typescript-eslint/recommended-requiring-type-checking`.
 

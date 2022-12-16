@@ -1,14 +1,14 @@
 import {GanacheCommands} from '@/commands/GanacheCommands';
-import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
-import {LocalNetworkNode} from '@/Models/TreeItems/LocalNetworkNode';
+import type {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import type {LocalNetworkNode} from '@/Models/TreeItems/LocalNetworkNode';
 import {GanacheService} from '@/services/ganache/GanacheService';
-import {ProjectView} from '@/ViewItems/ProjectView';
+import type {ProjectView} from '@/views/NetworksView';
 import * as vscode from 'vscode';
 import fs from 'fs-extra';
 import path from 'path';
 import {Constants} from '@/Constants';
 import {Web3Wrapper} from '@/debugAdapter/web3Wrapper';
-import {INetworkOption} from '@/helpers/ConfigurationReader';
+import type {INetworkOption} from '@/helpers/ConfigurationReader';
 
 /**
  * Object that gathers all the information of a project that comes from the Treeview of Networks.
