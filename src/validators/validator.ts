@@ -15,31 +15,27 @@ export class Validator {
 
   public isConfirmationValue(): Validator {
     const yesNoOptions = [Constants.confirmationDialogResult.yes, Constants.confirmationDialogResult.no];
-    return this.validate((value) => {
-      const isConfirmationValue = yesNoOptions.map((option) => option.toLowerCase()).includes(value.toLowerCase());
-      return isConfirmationValue ? null : Constants.validationMessages.invalidConfirmationResult;
-    });
+    return this.validate((value) =>
+      yesNoOptions.map((option) => option.toLowerCase()).includes(value.toLowerCase())
+        ? null
+        : Constants.validationMessages.invalidConfirmationResult
+    );
   }
 
   public isLowerCase(): Validator {
-    return this.validate((value) => {
-      const isLowerCase = value.search(IS_LOWER_CASE) !== -1;
-      return isLowerCase || !value ? null : Constants.validationMessages.onlyLowerCaseAllowed;
-    });
+    return this.validate((value) =>
+      value.search(IS_LOWER_CASE) !== -1 || !value ? null : Constants.validationMessages.onlyLowerCaseAllowed
+    );
   }
 
   public isUrl(): Validator {
-    return this.validate((value) => {
-      const isUrl = value.search(Constants.validationRegexps.isUrl) !== -1;
-      return isUrl ? null : Constants.validationMessages.invalidHostAddress;
-    });
+    return this.validate((value) =>
+      value.search(Constants.validationRegexps.isUrl) !== -1 ? null : Constants.validationMessages.invalidHostAddress
+    );
   }
 
   public hasNoForbiddenChar(forbiddenChars: RegExp, errorMessage: string): Validator {
-    return this.validate((value) => {
-      const hasForbiddenChars = value.search(forbiddenChars) !== -1;
-      return hasForbiddenChars ? errorMessage : null;
-    });
+    return this.validate((value) => (value.search(forbiddenChars) !== -1 ? errorMessage : null));
   }
 
   public isNotEmpty(): Validator {
