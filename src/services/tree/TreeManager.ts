@@ -55,13 +55,13 @@ class ExtensionTreeManager {
 
   public saveState(): void {
     if (this.globalState) {
-      this.globalState.update(Constants.globalStateKeys.serviceResourceKey, JSON.stringify(this.items));
+      void this.globalState.update(Constants.globalStateKeys.serviceResourceKey, JSON.stringify(this.items));
     }
   }
 
   public getItem(itemType: ServiceTypes): Service {
     const findItem = this.items.find((item) => item.itemType === itemType) as Service;
-    return findItem!;
+    return findItem;
   }
 
   public getItems(): Service[] {
