@@ -12,7 +12,7 @@ import type {NetworkNode} from '@/Models/TreeItems/NetworkNode';
 import type {Layer} from '@/Models/TreeItems/Layer';
 import type {Group} from '@/Models/TreeItems/Group';
 
-export interface IExtensionView {
+interface IExtensionView {
   getTreeItem(): Promise<IExtensionItem> | IExtensionItem;
 
   getChildren(): ProviderResult<IExtensionView[]>;
