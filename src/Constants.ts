@@ -343,7 +343,6 @@ export class Constants {
     hasDigits: /(?=.*\d)/g,
     infuraProjectname: /^([a-zA-Z]|\d|\s|[-_:]){3,}$/g,
     isJsonFile: new RegExp(Constants.contract.configuration.extension.json + '$'),
-    isLowerCase: /^[a-z0-9_\-!@$^&()+=?/<>|[\]{}:.\\~ #`*"'%;,]+$/g,
     isUrl: /^(?:http(s)?:\/\/)?[\w:@.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/gim,
     lowerCaseLetter: /(?=.*[a-z]).*/g,
     moduleExportsTemplate: /{(.*)}$/g,
