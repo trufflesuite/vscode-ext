@@ -2,13 +2,13 @@ import fs from 'fs-extra';
 import path from 'path';
 import {OutputLabel} from '@/Output';
 import {
-  CancellationToken,
+  type CancellationToken,
   commands,
-  ExtensionContext,
-  Uri,
-  WebviewView,
-  WebviewViewProvider,
-  WebviewViewResolveContext,
+  type ExtensionContext,
+  type Uri,
+  type WebviewView,
+  type WebviewViewProvider,
+  type WebviewViewResolveContext,
   window,
 } from 'vscode';
 

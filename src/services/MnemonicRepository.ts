@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import {Memento} from 'vscode';
+import type {Memento} from 'vscode';
 import {Constants} from '@/Constants';
 
 class ExtensionMnemonicRepository {

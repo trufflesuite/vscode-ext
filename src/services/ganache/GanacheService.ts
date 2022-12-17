@@ -2,12 +2,12 @@
 // Licensed under the MIT license.
 
 import {Output, OutputLabel} from '@/Output';
-import {ChildProcess} from 'child_process';
-import {OutputChannel, window} from 'vscode';
+import type {ChildProcess} from 'child_process';
+import {type OutputChannel, window} from 'vscode';
 import {Constants, RequiredApps} from '../../Constants';
 import {spawnProcess} from '@/helpers/command';
 import * as shell from '@/helpers/shell';
-import {TLocalProjectOptions} from '../../Models/TreeItems/LocalProject';
+import type {TLocalProjectOptions} from '../../Models/TreeItems/LocalProject';
 import {Telemetry} from '../../TelemetryClient';
 import {UrlValidator} from '../../validators/UrlValidator';
 import {isGanacheServer, waitGanacheStarted} from './GanacheServiceClient';

@@ -1,13 +1,13 @@
 import {
   commands,
-  ProviderResult,
-  ThemeIcon,
+  type ProviderResult,
+  type ThemeIcon,
   TreeItem,
   Uri,
-  Event,
-  TreeDataProvider,
+  type Event,
+  type TreeDataProvider,
   TreeItemCollapsibleState,
-  TreeView,
+  type TreeView,
   env,
   window,
 } from 'vscode';

@@ -1,9 +1,9 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {INetwork} from '@/helpers/ConfigurationReader';
-import {ItemType} from './ItemType';
-import {TLocalProjectOptions} from './TreeItems/LocalProject';
+import type {INetwork} from '@/helpers/ConfigurationReader';
+import type {ItemType} from './ItemType';
+import type {TLocalProjectOptions} from './TreeItems/LocalProject';
 
 export interface IDeployDestination {
   description?: string;

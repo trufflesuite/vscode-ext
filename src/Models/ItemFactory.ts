@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {Telemetry} from '../TelemetryClient';
-import {ItemCreator} from './ItemCreators/ItemCreator';
+import type {ItemCreator} from './ItemCreators/ItemCreator';
 import {CommandItemCreator} from './ItemCreators/CommandItemCreator';
 import {GenericNetworkNodeItemCreator} from './ItemCreators/GenericNetworkNodeItemCreator';
 import {GenericProjectItemCreator} from './ItemCreators/GenericProjectItemCreator';
@@ -16,7 +16,7 @@ import {LocalProjectItemCreator} from './ItemCreators/LocalProjectItemCreator';
 import {LocalServiceItemCreator} from './ItemCreators/LocalServiceItemCreator';
 import {NullableItemCreator} from './ItemCreators/NullableItemCreator';
 import {ItemType} from './ItemType';
-import {IExtensionItem} from './TreeItems/IExtensionItem';
+import type {IExtensionItem} from './TreeItems/IExtensionItem';
 
 export namespace ItemFactory {
   const registeredTypes: {[key: number]: ItemCreator} = {
