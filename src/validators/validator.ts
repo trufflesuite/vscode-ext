@@ -4,6 +4,10 @@ import {Constants} from '@/Constants';
 
 const IS_LOWER_CASE = /^[a-z0-9_\-!@$^&()+=?/<>|[\]{}:.\\~ #`*"'%;,]+$/g;
 
+export const INVALID_CONFIRMATION_RESULT = "'yes' or 'no'";
+
+export const onlyLowerCaseAllowed = 'Only lower case allowed.';
+
 export class Validator {
   private errors: Set<string> = new Set();
 
@@ -18,14 +22,12 @@ export class Validator {
     return this.validate((value) =>
       yesNoOptions.map((option) => option.toLowerCase()).includes(value.toLowerCase())
         ? null
-        : Constants.validationMessages.invalidConfirmationResult
+        : INVALID_CONFIRMATION_RESULT
     );
   }
 
   public isLowerCase(): Validator {
-    return this.validate((value) =>
-      value.search(IS_LOWER_CASE) !== -1 || !value ? null : Constants.validationMessages.onlyLowerCaseAllowed
-    );
+    return this.validate((value) => (value.search(IS_LOWER_CASE) !== -1 || !value ? null : onlyLowerCaseAllowed));
   }
 
   public isUrl(): Validator {
