@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {extractEnumsInfoSafe} from '@/helpers/enumExtractor';
-import {EnumStorage} from '../../Models';
+import {EnumStorage} from '@/Models/EnumStorage';
 import {Contract} from './Contract';
 import {ContractInstance} from './ContractInstance';
 import {Network} from './Network';

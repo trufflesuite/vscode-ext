@@ -2,22 +2,22 @@
 // Licensed under the MIT license.
 
 import assert from 'assert';
-import {ChildProcess} from 'child_process';
+import type {ChildProcess} from 'child_process';
 import sinon from 'sinon';
-import {commands, OutputChannel, QuickPickItem, window} from 'vscode';
+import {commands, type OutputChannel, type QuickPickItem, window} from 'vscode';
 import {GanacheCommands} from '@/commands/GanacheCommands';
 import {Constants, RequiredApps} from '../../src/Constants';
 import * as userInteraction from '../../src/helpers/userInteraction';
 import {required} from '../../src/helpers/required';
 import * as shell from '../../src/helpers/shell';
-import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
-import {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
+import {LocalProject, type TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import type {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
 import {LocalService} from '@/Models/TreeItems/LocalService';
-import {Service} from '@/Models/TreeItems/Service';
+import type {Service} from '@/Models/TreeItems/Service';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {TreeManager} from '@/services/tree/TreeManager';
 import * as GanacheServiceClient from '../../src/services/ganache/GanacheServiceClient';
-import {ProjectView} from '@/ViewItems/ProjectView';
+import {ProjectView} from '@/views/NetworksView';
 import {TestConstants} from '../TestConstants';
 
 const description = '';

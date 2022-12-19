@@ -1,16 +1,16 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {commands, QuickPickItem, window} from 'vscode';
+import {commands, type QuickPickItem, window} from 'vscode';
 import {Constants, RequiredApps} from '../Constants';
 import {required} from '../helpers/required';
 import {showQuickPick} from '../helpers/userInteraction';
-import {ItemType} from '../Models';
-import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {ItemType} from '@/Models/ItemType';
+import {LocalProject, type TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {TreeManager} from '@/services/tree/TreeManager';
 import {Telemetry} from '../TelemetryClient';
-import {ProjectView} from '@/ViewItems/ProjectView';
+import type {ProjectView} from '@/views/NetworksView';
 
 export namespace GanacheCommands {
   /**

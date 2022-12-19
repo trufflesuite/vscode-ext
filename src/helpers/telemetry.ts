@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from '../Constants';
-import {ItemType} from '../Models';
+import {Constants} from '@/Constants';
+import {ItemType} from '@/Models/ItemType';
 
 export function mapItemType(itemType: ItemType) {
   switch (itemType) {

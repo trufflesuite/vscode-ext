@@ -2,22 +2,22 @@ import fs from 'fs';
 import paths from 'path';
 import {
   ThemeIcon,
-  TreeDataProvider,
+  type TreeDataProvider,
   TreeItem,
   Uri,
-  Event,
-  TreeView,
+  type Event,
+  type TreeView,
   window,
   EventEmitter,
   commands,
   TreeItemCollapsibleState,
-  Command,
+  type Command,
   ThemeColor,
 } from 'vscode';
 import {getChain, getExplorerLink} from '../functions/explorer';
 import {OpenUrlTreeItem} from './lib/OpenUrlTreeItem';
 import {ContractService} from '@/services/contract/ContractService';
-import {getAllTruffleWorkspaces, TruffleWorkspace} from '@/helpers/workspace';
+import {getAllTruffleWorkspaces, type TruffleWorkspace} from '@/helpers/workspace';
 import {EvalTruffleConfigError} from '@/helpers/TruffleConfiguration';
 import {Output, OutputLabel} from '@/Output';
 

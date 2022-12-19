@@ -4,23 +4,23 @@
 import {Constants} from '@/Constants';
 import {mapItemType} from '@/helpers/telemetry';
 import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
-import {ItemType} from '@/Models';
-import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
-import {GenericProject} from '@/Models/TreeItems/GenericProject';
-import {GenericService} from '@/Models/TreeItems/GenericService';
-import {InfuraProject} from '@/Models/TreeItems/InfuraProject';
-import {InfuraService} from '@/Models/TreeItems/InfuraService';
-import {LocalService} from '@/Models/TreeItems/LocalService';
-import {Project} from '@/Models/TreeItems/Project';
-import {Service, ServiceTypes} from '@/Models/TreeItems/Service';
+import {ItemType} from '@/Models/ItemType';
+import {LocalProject, type TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import type {GenericProject} from '@/Models/TreeItems/GenericProject';
+import type {GenericService} from '@/Models/TreeItems/GenericService';
+import type {InfuraProject} from '@/Models/TreeItems/InfuraProject';
+import type {InfuraService} from '@/Models/TreeItems/InfuraService';
+import type {LocalService} from '@/Models/TreeItems/LocalService';
+import type {Project} from '@/Models/TreeItems/Project';
+import type {Service, ServiceTypes} from '@/Models/TreeItems/Service';
 import {GenericResourceExplorer} from '@/resourceExplorers/GenericResourceExplorer';
 import {InfuraResourceExplorer} from '@/resourceExplorers/InfuraResourceExplorer';
 import {LocalResourceExplorer} from '@/resourceExplorers/LocalResourceExplorer';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {TreeManager} from '@/services/tree/TreeManager';
 import {Telemetry} from '@/TelemetryClient';
-import {ProjectView} from '@/ViewItems/ProjectView';
-import {QuickPickItem} from 'vscode';
+import type {ProjectView} from '@/views/NetworksView';
+import type {QuickPickItem} from 'vscode';
 
 interface IServiceDestination {
   cmd: (service: Service) => Promise<Project>;

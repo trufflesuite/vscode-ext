@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {commands, ExtensionContext, Uri, window, workspace} from 'vscode';
+import {commands, type ExtensionContext, type Uri, window, workspace} from 'vscode';
 
 import {ContractCommands} from '@/commands/ContractCommands';
 import {GanacheCommands} from '@/commands/GanacheCommands';
@@ -17,28 +17,22 @@ import {Constants} from './Constants';
 
 import {DebuggerConfiguration} from './debugAdapter/configuration/debuggerConfiguration';
 import {required} from '@/helpers/required';
-import {CancellationEvent} from './Models';
+import {CancellationEvent} from './Models/CancellationEvent';
 import {ChangelogPage} from '@/pages/Changelog';
 import {RequirementsPage} from '@/pages/Requirements';
 import {AdapterType, ContractDB} from '@/services/contract/ContractDB';
 import {InfuraServiceClient} from '@/services/infuraService/InfuraServiceClient';
 import {MnemonicRepository} from '@/services/MnemonicRepository';
 import {TreeManager} from '@/services/tree/TreeManager';
-import {TreeService} from '@/services/tree/TreeService';
+import {NetworksView, type ProjectView, type NetworkNodeView} from '@/views/NetworksView';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {DashboardService} from '@/services/dashboard/DashboardService';
 import {Telemetry} from './TelemetryClient';
-
-// TODO: needs to refactored to avoid importing with side-effects
-import './ViewItems';
-
-import {NetworkNodeView} from './ViewItems/NetworkNodeView';
-import {ProjectView} from './ViewItems/ProjectView';
 import {registerDashboardView} from './views/DashboardView';
 import {registerDeploymentView} from './views/DeploymentsView';
 import {registerFileExplorerView} from './views/FileExplorer';
 import {registerHelpView} from './views/HelpView';
-import {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
+import type {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 import {registerGanacheDetails} from './pages/GanacheDetails';
 import {registerLogView} from './views/LogView';
 import {saveTextDocument} from './helpers/workspace';
@@ -81,7 +75,10 @@ export async function activate(context: ExtensionContext): Promise<void> {
   await InfuraServiceClient.initialize(context.globalState);
   MnemonicRepository.initialize(context.globalState);
   TreeManager.initialize(context.globalState);
-  TreeService.initialize('truffle-vscode.truffle');
+
+  const networksView = new NetworksView();
+  window.registerTreeDataProvider('truffle-vscode.truffle', networksView);
+
   await sdkCoreCommands.initialize(context.globalState);
 
   // Starts the status bar item for automatic deploy
@@ -99,7 +96,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   //#region trufflesuite extension commands
   const refresh = commands.registerCommand('truffle-vscode.refresh', (element) => {
-    TreeService.refresh(element);
+    networksView.refresh(element);
   });
   const showRequirementsPage = commands.registerCommand(
     'truffle-vscode.showRequirementsPage',

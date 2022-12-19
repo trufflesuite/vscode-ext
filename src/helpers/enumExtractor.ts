@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {Constants} from '../Constants';
-import {EnumStorage} from '../Models';
+import {EnumStorage} from '@/Models/EnumStorage';
 import {Output, OutputLabel} from '@/Output';
 import {Telemetry} from '../TelemetryClient';
 

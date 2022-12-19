@@ -1,4 +1,4 @@
-import {Event, ProviderResult, TreeDataProvider, TreeView, TreeItem, window} from 'vscode';
+import {type Event, type ProviderResult, type TreeDataProvider, type TreeView, type TreeItem, window} from 'vscode';
 import {OpenUrlTreeItem} from './lib/OpenUrlTreeItem';
 
 /**

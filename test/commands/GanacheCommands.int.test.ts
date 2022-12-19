@@ -2,20 +2,20 @@
 // Licensed under the MIT license.
 
 import assert from 'assert';
-import cp, {ChildProcess} from 'child_process';
+import cp, {type ChildProcess} from 'child_process';
 import rp from 'request-promise';
 import sinon from 'sinon';
-import stream from 'stream';
+import type stream from 'stream';
 import * as vscode from 'vscode';
 import {GanacheCommands} from '@/commands/GanacheCommands';
 import * as commands from '../../src/helpers/command';
 import * as shell from '../../src/helpers/shell';
-import {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
-import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import type {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
+import {LocalProject, type TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
 import {LocalService} from '@/Models/TreeItems/LocalService';
-import {Service} from '@/Models/TreeItems/Service';
+import type {Service} from '@/Models/TreeItems/Service';
 import {TreeManager} from '@/services/tree/TreeManager';
-import {ProjectView} from '@/ViewItems/ProjectView';
+import {ProjectView} from '@/views/NetworksView';
 
 describe('Integration tests GanacheCommands', () => {
   const defaultPort = 8545;

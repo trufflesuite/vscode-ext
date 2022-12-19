@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {INetwork, INetworkOption} from '@/helpers/ConfigurationReader';
+import type {INetwork, INetworkOption} from '@/helpers/ConfigurationReader';
 import {getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
 import {Constants} from '@/Constants';
-import {Network} from './contract/Network';
-import {Provider} from './contract/Provider';
+import type {Network} from './contract/Network';
+import type {Provider} from './contract/Provider';
 import {HttpService} from './HttpService';
 
 export namespace NetworkService {

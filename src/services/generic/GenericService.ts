@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {ChildProcess} from 'child_process';
-import {OutputChannel} from 'vscode';
+import type {ChildProcess} from 'child_process';
+import type {OutputChannel} from 'vscode';
 import {Constants} from '../../Constants';
 import * as shell from '@/helpers/shell';
 import {Telemetry} from '../../TelemetryClient';

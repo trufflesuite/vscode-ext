@@ -8,7 +8,7 @@ import uuid from 'uuid';
 import {QuickPickOptions} from 'vscode';
 import {Constants} from '@/Constants';
 import * as userInteraction from '@/helpers/userInteraction';
-import {ItemType} from '@/Models';
+import {ItemType} from '@/Models/ItemType';
 import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
 import {LocalService} from '@/Models/TreeItems/LocalService';
 import {TreeManager} from '@/services/tree/TreeManager';

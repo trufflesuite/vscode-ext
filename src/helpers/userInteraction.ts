@@ -4,7 +4,7 @@
 import fs from 'fs';
 import {InputBoxOptions, ProgressLocation, QuickPickItem, QuickPickOptions, Uri, window, workspace} from 'vscode';
 import {Constants, NotificationOptions} from '@/Constants';
-import {CancellationEvent} from '@/Models';
+import {CancellationEvent} from '@/Models/CancellationEvent';
 import {Telemetry} from '@/TelemetryClient';
 import {DialogResultValidator} from '@/validators/DialogResultValidator';
 
