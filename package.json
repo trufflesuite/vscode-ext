@@ -250,7 +250,7 @@
       },
       {
         "command": "truffle-vscode.views.dashboard.copyRPCEndpointAddress",
-        "title": "Copy RPC Endpoint Address",
+        "title": "Copy Dashboard RPC Endpoint Address",
         "category": "Truffle"
       },
       {
