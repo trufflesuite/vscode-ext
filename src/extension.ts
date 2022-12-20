@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {commands, type ExtensionContext, type Uri, window, workspace} from 'vscode';
+import {commands, type ExtensionContext, type Uri, window, workspace, type Disposable} from 'vscode';
 
 import {ContractCommands} from '@/commands/ContractCommands';
 import {GanacheCommands} from '@/commands/GanacheCommands';
@@ -31,7 +31,7 @@ import {Telemetry} from './TelemetryClient';
 import {registerDashboardView} from './views/DashboardView';
 import {registerDeploymentView} from './views/DeploymentsView';
 import {registerFileExplorerView} from './views/FileExplorer';
-import {registerHelpView} from './views/HelpView';
+import {HelpView} from './views/HelpView';
 import type {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 import {registerGanacheDetails} from './pages/GanacheDetails';
 import {registerLogView} from './views/LogView';
@@ -42,7 +42,9 @@ import {Output} from './Output';
 
 // ts-prune-ignore-next
 export async function activate(context: ExtensionContext): Promise<void> {
-  const uriHandler = window.registerUriHandler(new UriHandlerController());
+  function register(disposable: Disposable) {
+    context.subscriptions.push(disposable);
+  }
 
   /**
    * Wrapper around `registerCommand` that pushes the resulting `Disposable`
@@ -51,8 +53,10 @@ export async function activate(context: ExtensionContext): Promise<void> {
    * See `subscriptions` property in https://code.visualstudio.com/api/references/vscode-api#ExtensionContext.
    */
   function registerCommand(commandId: string, action: (...args: any[]) => any) {
-    context.subscriptions.push(commands.registerCommand(commandId, action));
+    register(commands.registerCommand(commandId, action));
   }
+
+  register(window.registerUriHandler(new UriHandlerController()));
 
   if (process.env.CODE_TEST) {
     return;
@@ -95,58 +99,43 @@ export async function activate(context: ExtensionContext): Promise<void> {
   registerCommand('truffle-vscode.openUrl', (node: OpenUrlTreeItem) => node.openUrl());
 
   //#region trufflesuite extension commands
-  const refresh = commands.registerCommand('truffle-vscode.refresh', (element) => {
+  registerCommand('truffle-vscode.refresh', (element) => {
     networksView.refresh(element);
   });
-  const showRequirementsPage = commands.registerCommand(
-    'truffle-vscode.showRequirementsPage',
-    async (checkShowOnStartup: boolean) => {
-      return checkShowOnStartup ? await requirementsPage.checkAndShow() : await requirementsPage.show();
-    }
-  );
+  registerCommand('truffle-vscode.showRequirementsPage', async (checkShowOnStartup: boolean) => {
+    return checkShowOnStartup ? await requirementsPage.checkAndShow() : await requirementsPage.show();
+  });
   //#endregion
 
   //#region Ganache extension commands
-  const startGanacheServer = commands.registerCommand(
-    'truffle-vscode.startGanacheServer',
-    async (viewItem?: ProjectView) => {
-      await tryExecute(() =>
-        GanacheCommands.startGanacheCmd(() => GanacheCommands.selectGanachePortAndOptions(viewItem))
-      );
-    }
-  );
+  registerCommand('truffle-vscode.startGanacheServer', async (viewItem?: ProjectView) => {
+    await tryExecute(() =>
+      GanacheCommands.startGanacheCmd(() => GanacheCommands.selectGanachePortAndOptions(viewItem))
+    );
+  });
 
-  const stopGanacheServer = commands.registerCommand(
-    'truffle-vscode.stopGanacheServer',
-    async (viewItem?: ProjectView) => {
-      await tryExecute(() => GanacheCommands.stopGanacheCmd(viewItem));
-    }
-  );
+  registerCommand('truffle-vscode.stopGanacheServer', async (viewItem?: ProjectView) => {
+    await tryExecute(() => GanacheCommands.stopGanacheCmd(viewItem));
+  });
 
-  const resartGanacheServer = commands.registerCommand(
-    'truffle-vscode.restartGanacheServer',
-    async (viewItem?: ProjectView) => {
-      await tryExecute(async function () {
-        const portAndOptions = await GanacheCommands.stopGanacheCmd(viewItem);
-        await GanacheCommands.startGanacheCmd(() => Promise.resolve(portAndOptions));
-      });
-    }
-  );
+  registerCommand('truffle-vscode.restartGanacheServer', async (viewItem?: ProjectView) => {
+    await tryExecute(async function () {
+      const portAndOptions = await GanacheCommands.stopGanacheCmd(viewItem);
+      await GanacheCommands.startGanacheCmd(() => Promise.resolve(portAndOptions));
+    });
+  });
 
   await registerGanacheDetails(context);
   //#endregion
 
   //#region Generic extension commands
-  const checkForConnection = commands.registerCommand(
-    'truffle-vscode.checkForConnection',
-    async (viewItem?: ProjectView) => {
-      await tryExecute(() => GenericCommands.checkForConnection(viewItem));
-    }
-  );
+  registerCommand('truffle-vscode.checkForConnection', async (viewItem?: ProjectView) => {
+    await tryExecute(() => GenericCommands.checkForConnection(viewItem));
+  });
   //#endregion
 
   //#region truffle commands
-  const newSolidityProject = commands.registerCommand('truffle-vscode.newSolidityProject', async () => {
+  registerCommand('truffle-vscode.newSolidityProject', async () => {
     await tryExecute(() => ProjectCommands.newSolidityProject());
   });
 
@@ -163,123 +152,84 @@ export async function activate(context: ExtensionContext): Promise<void> {
     await tryExecute(() => TruffleCommands.createContract(folderUri));
   });
 
-  const copyByteCode = commands.registerCommand('truffle-vscode.copyByteCode', async (uri: Uri) => {
+  registerCommand('truffle-vscode.copyByteCode', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeBytecodeToBuffer(uri));
   });
-  const copyDeployedByteCode = commands.registerCommand('truffle-vscode.copyDeployedByteCode', async (uri: Uri) => {
+  registerCommand('truffle-vscode.copyDeployedByteCode', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeDeployedBytecodeToBuffer(uri));
   });
-  const copyABI = commands.registerCommand('truffle-vscode.copyABI', async (uri: Uri) => {
+  registerCommand('truffle-vscode.copyABI', async (uri: Uri) => {
     await tryExecute(() => TruffleCommands.writeAbiToBuffer(uri));
   });
-  const copyRPCEndpointAddress = commands.registerCommand(
-    'truffle-vscode.copyRPCEndpointAddress',
-    async (viewItem: NetworkNodeView) => {
-      await tryExecute(() => TruffleCommands.writeRPCEndpointAddressToBuffer(viewItem));
-    }
-  );
-  const getPrivateKeyFromMnemonic = commands.registerCommand('truffle-vscode.getPrivateKey', async () => {
+  registerCommand('truffle-vscode.copyRPCEndpointAddress', async (viewItem: NetworkNodeView) => {
+    await tryExecute(() => TruffleCommands.writeRPCEndpointAddressToBuffer(viewItem));
+  });
+  registerCommand('truffle-vscode.getPrivateKey', async () => {
     await tryExecute(() => TruffleCommands.getPrivateKeyFromMnemonic());
   });
-  const deployContractsOnSave = commands.registerCommand(
-    Constants.contract.configuration.statusBar.command,
-    async () => {
-      // Calls the action that enables/disables auto-deployment when saving a .sol file
-      await tryExecute(() => Promise.resolve(ContractCommands.setEnableOrDisableAutoDeploy(contractStatusBarItem)));
-    }
-  );
+  registerCommand(Constants.contract.configuration.statusBar.command, async () => {
+    // Calls the action that enables/disables auto-deployment when saving a .sol file
+    await tryExecute(() => Promise.resolve(ContractCommands.setEnableOrDisableAutoDeploy(contractStatusBarItem)));
+  });
   //#endregion
 
   //#region services with dialog
-  const createProject = commands.registerCommand('truffle-vscode.createProject', async () => {
+  registerCommand('truffle-vscode.createProject', async () => {
     await tryExecute(() => ServiceCommands.createProject());
   });
-  const connectProject = commands.registerCommand('truffle-vscode.connectProject', async () => {
+  registerCommand('truffle-vscode.connectProject', async () => {
     await tryExecute(() => ServiceCommands.connectProject());
   });
-  const disconnectProject = commands.registerCommand(
-    'truffle-vscode.disconnectProject',
-    async (viewItem: ProjectView) => {
-      await tryExecute(() => ServiceCommands.disconnectProject(viewItem));
-    }
-  );
+  registerCommand('truffle-vscode.disconnectProject', async (viewItem: ProjectView) => {
+    await tryExecute(() => ServiceCommands.disconnectProject(viewItem));
+  });
   //#endregion
 
   //#region Infura commands
-  const signInToInfuraAccount = commands.registerCommand('truffle-vscode.signInToInfuraAccount', async () => {
+  registerCommand('truffle-vscode.signInToInfuraAccount', async () => {
     await tryExecute(() => InfuraCommands.signIn());
   });
-  const signOutOfInfuraAccount = commands.registerCommand('truffle-vscode.signOutOfInfuraAccount', async () => {
+  registerCommand('truffle-vscode.signOutOfInfuraAccount', async () => {
     await tryExecute(() => InfuraCommands.signOut());
   });
-  const showProjectsFromInfuraAccount = commands.registerCommand(
-    'truffle-vscode.showProjectsFromInfuraAccount',
-    async () => {
-      await tryExecute(() => InfuraCommands.showProjectsFromAccount());
-    }
-  );
+  registerCommand('truffle-vscode.showProjectsFromInfuraAccount', async () => {
+    await tryExecute(() => InfuraCommands.showProjectsFromAccount());
+  });
   //#endregion
 
   //#region debugger commands
-  const startDebugger = commands.registerCommand('truffle-vscode.debugTransaction', async () => {
+  registerCommand('truffle-vscode.debugTransaction', async () => {
     await tryExecute(() => DebuggerCommands.startSolidityDebugger());
   });
   //#endregion
 
   //#region workspace subscriptions
-  const changeCoreSdkConfigurationListener = workspace.onDidChangeConfiguration(async (event) => {
-    if (event.affectsConfiguration(Constants.userSettings.coreSdkSettingsKey)) {
-      await sdkCoreCommands.initialize(context.globalState);
-    }
-  });
-  const didSaveTextDocumentListener = workspace.onDidSaveTextDocument(async (event) => {
-    // Calls the action that listens for the save files event
-    await saveTextDocument(context.globalState, event);
-  });
+  register(
+    workspace.onDidChangeConfiguration(async (event) => {
+      if (event.affectsConfiguration(Constants.userSettings.coreSdkSettingsKey)) {
+        await sdkCoreCommands.initialize(context.globalState);
+      }
+    })
+  );
+  register(
+    workspace.onDidSaveTextDocument(async (event) => {
+      // Calls the action that listens for the save files event
+      await saveTextDocument(context.globalState, event);
+    })
+  );
   //#endregion
 
   //#region truffle views
 
-  const fileExplorerView = registerFileExplorerView('truffle-vscode', 'views.explorer');
-  const helpView = registerHelpView('truffle-vscode.views.help');
+  register(registerFileExplorerView('truffle-vscode', 'views.explorer'));
+  register(
+    window.createTreeView('truffle-vscode.views.help', {treeDataProvider: new HelpView(), canSelectMany: false})
+  );
 
-  const deploymentView = registerDeploymentView('truffle-vscode.views.deployments');
-  const dashboardView = registerDashboardView();
+  register(registerDeploymentView('truffle-vscode.views.deployments'));
+  register(registerDashboardView());
 
   // #endregion
-
-  const subscriptions = [
-    uriHandler,
-    showRequirementsPage,
-    refresh,
-    newSolidityProject,
-    createProject,
-    connectProject,
-    disconnectProject,
-    copyByteCode,
-    copyDeployedByteCode,
-    copyABI,
-    copyRPCEndpointAddress,
-    startDebugger,
-    startGanacheServer,
-    stopGanacheServer,
-    resartGanacheServer,
-    getPrivateKeyFromMnemonic,
-    deployContractsOnSave,
-    signInToInfuraAccount,
-    signOutOfInfuraAccount,
-    showProjectsFromInfuraAccount,
-    changeCoreSdkConfigurationListener,
-    didSaveTextDocumentListener,
-    // new view - main views
-    fileExplorerView,
-    helpView,
-    deploymentView,
-    dashboardView,
-    checkForConnection,
-  ];
-  context.subscriptions.push(...subscriptions);
-
   Telemetry.sendEvent(Constants.telemetryEvents.extensionActivated);
 }
 
