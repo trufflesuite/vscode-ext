@@ -2,18 +2,18 @@
 // Licensed under the MIT license.
 
 import assert from 'assert';
-import {SinonMock, SinonExpectation, SinonStub, mock, stub, restore} from 'sinon';
+import {type SinonMock, type SinonExpectation, type SinonStub, mock, stub, restore} from 'sinon';
 import uuid from 'uuid';
-import {CancellationToken, Progress, ProgressOptions, Uri, window} from 'vscode';
+import {type CancellationToken, type Progress, type ProgressOptions, Uri, window} from 'vscode';
 import {TruffleCommands} from '@/commands/TruffleCommands';
 import * as helpers from '@/helpers/workspace';
 import * as commands from '../../src/helpers/command';
 import {required} from '@/helpers/required';
 import {TestConstants} from '../TestConstants';
-import {TruffleWorkspace} from '@/helpers/workspace';
+import {type TruffleWorkspace} from '@/helpers/workspace';
 
 describe('BuildContracts Command', () => {
-  describe('Integration test', async () => {
+  describe('Integration test', () => {
     let requiredMock: SinonMock;
     let getWorkspacesMock: sinon.SinonStub<[contractUri?: Uri], Promise<helpers.TruffleWorkspace>>;
     let checkAppsSilent: SinonExpectation;
