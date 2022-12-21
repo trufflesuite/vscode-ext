@@ -835,6 +835,7 @@
     "@truffle/fetch-and-compile": "^0.5.19",
     "@truffle/resolver": "^9.0.4",
     "@truffle/workflow-compile": "^4.0.36",
+    "@vscode/extension-telemetry": "^0.7.3-preview",
     "abi-decoder": "^2.4.0",
     "acorn": "^8.7.1",
     "acorn-walk": "^8.2.0",
@@ -852,7 +853,6 @@
     "semver": "^6.0.0",
     "solidity-parser-antlr": "^0.4.11",
     "uuid": "^3.3.2",
-    "vscode-extension-telemetry": "^0.4.5",
     "web3": "1.7.4"
   },
   "extensionDependencies": [
