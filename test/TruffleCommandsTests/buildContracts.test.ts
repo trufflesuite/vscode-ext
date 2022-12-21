@@ -15,7 +15,10 @@ import {type TruffleWorkspace} from '@/helpers/workspace';
 describe('BuildContracts Command', () => {
   describe('Integration test', () => {
     let requiredMock: SinonMock;
-    let getWorkspacesMock: sinon.SinonStub<[contractUri?: Uri], Promise<helpers.TruffleWorkspace>>;
+    let getWorkspacesMock: sinon.SinonStub<
+      Parameters<typeof helpers.getTruffleWorkspace>,
+      Promise<helpers.TruffleWorkspace>
+    >;
     let checkAppsSilent: SinonExpectation;
     let installTruffle: SinonExpectation;
     let commandContextMock: SinonMock;

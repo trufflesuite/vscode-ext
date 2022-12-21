@@ -51,7 +51,10 @@ describe('TruffleCommands', () => {
       let checkHdWalletProviderVersionMock: sinon.SinonExpectation;
       let installTruffleHdWalletProviderMock: sinon.SinonExpectation;
 
-      let getWorkspacesMock: sinon.SinonStub<[contractUri?: vscode.Uri], Promise<helpers.TruffleWorkspace>>;
+      let getWorkspacesMock: sinon.SinonStub<
+        Parameters<typeof helpers.getTruffleWorkspace>,
+        Promise<helpers.TruffleWorkspace>
+      >;
 
       let showQuickPickMock: sinon.SinonStub;
       let showInputBoxMock: sinon.SinonStub;
