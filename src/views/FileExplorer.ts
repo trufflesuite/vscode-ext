@@ -5,7 +5,6 @@ import * as rimraf from 'rimraf';
 import {getAllTruffleWorkspaces, type TruffleWorkspace} from '@/helpers/workspace';
 import {
   type CancellationToken,
-  commands,
   type Disposable,
   type Event,
   EventEmitter,
@@ -18,9 +17,7 @@ import {
   type TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
-  type TreeView,
   Uri,
-  window,
 } from 'vscode';
 import {Constants} from '@/Constants';
 import {ContractService} from '@/services/contract/ContractService';
@@ -218,7 +215,7 @@ type TElementTypes = {
   isWorkspaceFolder: boolean;
 };
 
-class FileSystemProvider implements TreeDataProvider<Entry | TreeItem> {
+export class FileSystemProvider implements TreeDataProvider<Entry | TreeItem> {
   private _onDidChangeFile: EventEmitter<FileChangeEvent[]>;
   private _onDidChangeTree: EventEmitter<(Entry | TreeItem)[] | void | null>;
 
@@ -484,16 +481,4 @@ class FileSystemProvider implements TreeDataProvider<Entry | TreeItem> {
 
     return treeItem;
   }
-}
-
-export function registerFileExplorerView(
-  commandPrefix = 'truffle-vscode',
-  viewName = 'views.explorer'
-): TreeView<Entry | TreeItem> {
-  const openFileCommand = `${commandPrefix}.openFile`;
-  const refreshExplorerCommand = `${commandPrefix}.${viewName}.refreshExplorer`;
-  const treeDataProvider = new FileSystemProvider(openFileCommand);
-  commands.registerCommand(openFileCommand, (resource: Uri) => window.showTextDocument(resource));
-  commands.registerCommand(refreshExplorerCommand, (_) => treeDataProvider.refresh());
-  return window.createTreeView(`${commandPrefix}.${viewName}`, {treeDataProvider});
 }

@@ -30,7 +30,7 @@ import {DashboardService} from '@/services/dashboard/DashboardService';
 import {Telemetry} from './TelemetryClient';
 import {registerDashboardView} from './views/DashboardView';
 import {registerDeploymentView} from './views/DeploymentsView';
-import {registerFileExplorerView} from './views/FileExplorer';
+import {FileSystemProvider} from './views/FileExplorer';
 import {HelpView} from './views/HelpView';
 import type {OpenUrlTreeItem} from './views/lib/OpenUrlTreeItem';
 import {registerGanacheDetails} from './pages/GanacheDetails';
@@ -220,8 +220,14 @@ export async function activate(context: ExtensionContext): Promise<void> {
   //#endregion
 
   //#region truffle views
+  {
+    const openFileCommand = `truffle-vscode.openFile`;
+    const treeDataProvider = new FileSystemProvider(openFileCommand);
+    registerCommand(openFileCommand, (resource: Uri) => window.showTextDocument(resource));
+    registerCommand('truffle-vscode.views.explorer.refreshExplorer', () => treeDataProvider.refresh());
+    register(window.createTreeView('truffle-vscode.views.explorer', {treeDataProvider}));
+  }
 
-  register(registerFileExplorerView('truffle-vscode', 'views.explorer'));
   register(
     window.createTreeView('truffle-vscode.views.help', {treeDataProvider: new HelpView(), canSelectMany: false})
   );
