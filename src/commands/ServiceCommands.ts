@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 import {Constants} from '@/Constants';
-import {mapItemType} from '@/helpers/telemetry';
 import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
 import {ItemType} from '@/Models/ItemType';
 import {LocalProject, type TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
@@ -300,4 +299,15 @@ async function addChild(service: Service, child: Project): Promise<void> {
     type: Telemetry.obfuscate(child.itemType.toString()),
     url: Telemetry.obfuscate(JSON.stringify(await child.getRPCAddress())),
   });
+}
+
+export function mapItemType(itemType: ItemType) {
+  switch (itemType) {
+    case ItemType.LOCAL_PROJECT:
+      return Constants.treeItemData.service.local.prefix;
+    case ItemType.INFURA_PROJECT:
+      return Constants.treeItemData.service.infura.prefix;
+    default:
+      return 'other';
+  }
 }

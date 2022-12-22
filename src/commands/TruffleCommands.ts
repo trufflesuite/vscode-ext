@@ -34,7 +34,6 @@ import {MnemonicRepository} from '@/services/MnemonicRepository';
 import {Telemetry} from '@/Telemetry';
 import type {NetworkNodeView} from '@/views/NetworksView';
 import {ServiceCommands} from './ServiceCommands';
-import {mapNetworkName} from '@/helpers/telemetry';
 import {writeToClipboard} from '@/helpers/vscodeEnvironment';
 
 interface IDeployDestinationItem {
@@ -96,7 +95,7 @@ export namespace TruffleCommands {
    *
    * @param contractUri FIXME: Is this used?
    */
-  export async function deployContracts(contractUri?: Uri) {
+  export async function deployContracts(contractUri?: Uri): Promise<void> {
     Telemetry.sendEvent('TruffleCommands.deployContracts.commandStarted');
 
     const truffleWorkspace = await getTruffleWorkspace(contractUri);
@@ -163,7 +162,7 @@ export namespace TruffleCommands {
     });
 
     if (!contractInstancesWithNetworkInfo.length) {
-      window.showInformationMessage(Constants.informationMessage.contractNotDeployed);
+      void window.showInformationMessage(Constants.informationMessage.contractNotDeployed);
       return;
     }
 
@@ -581,5 +580,21 @@ function ensureFileIsContractJson(filePath: string) {
     const error = new Error(Constants.errorMessageStrings.InvalidContract);
     Telemetry.sendException(error);
     throw error;
+  }
+}
+
+export function mapNetworkName(networkName: string): string {
+  const prefix = networkName
+    .replace(new RegExp(`(${Constants.treeItemData.service.infura.prefix})_(.*)`), '$1')
+    .replace(new RegExp(`(${Constants.treeItemData.service.local.prefix})_(.*)`), '$1')
+    .replace(new RegExp(`(${Constants.localhostName})_(.*)`), '$1');
+  switch (prefix) {
+    case Constants.treeItemData.service.local.prefix:
+    case Constants.localhostName:
+      return Constants.treeItemData.service.local.prefix;
+    case Constants.treeItemData.service.infura.prefix:
+      return Constants.treeItemData.service.infura.prefix;
+    default:
+      return 'other';
   }
 }
