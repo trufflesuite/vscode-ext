@@ -4,7 +4,7 @@
 import assert from 'assert';
 import sinon from 'sinon';
 import {workspace} from 'vscode';
-import {getTruffleWorkspace, getWorkspaceRoot} from '@/helpers/workspace';
+import {getTruffleWorkspace, getWorkspaceRoot, TruffleWorkspace} from '@/helpers/workspace';
 
 describe('workspace', () => {
   const testWorkspaceFolder: any[] = [
@@ -20,7 +20,7 @@ describe('workspace', () => {
     },
   ];
 
-  let workspaceMock: sinon.SinonStub<any[], any>;
+  let workspaceMock: sinon.SinonStub<any[], typeof workspace.workspaceFolders>;
 
   beforeEach(() => {
     workspaceMock = sinon.stub(workspace, 'workspaceFolders');
@@ -85,7 +85,6 @@ describe('workspace', () => {
     it('should reject when no workspace is opened', async () => {
       // Arrange
       workspaceMock.value(undefined);
-
       // Act and assert
       await assert.rejects(getTruffleWorkspace, /Workspace root should be defined/);
     });
@@ -93,9 +92,18 @@ describe('workspace', () => {
     it('should reject when workspace is empty', async () => {
       // Arrange
       workspaceMock.value([]);
-
       // Act and assert
       await assert.rejects(getTruffleWorkspace, /Workspace root should be defined/);
+    });
+
+    it('should return `truffleWorkspace` is included in `contractUri`', async () => {
+      // Arrange
+      workspaceMock.value(undefined);
+      // Act
+      const truffleWorkspace = new TruffleWorkspace('some/path');
+      const result = await getTruffleWorkspace({truffleWorkspace});
+      // Assert
+      assert.deepEqual(result, truffleWorkspace);
     });
   });
 });
