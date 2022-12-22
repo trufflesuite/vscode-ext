@@ -3,7 +3,6 @@
 
 import crypto from 'crypto';
 import os from 'os';
-import {workspace} from 'vscode';
 import TelemetryReporter, {
   type TelemetryEventMeasurements,
   type TelemetryEventProperties,
@@ -11,24 +10,20 @@ import TelemetryReporter, {
 import {Constants} from './Constants';
 import {Output, OutputLabel} from './Output';
 
-class ExtensionTelemetry {
+export const Telemetry = new (class {
   private readonly reporter?: TelemetryReporter;
 
   private readonly defaultProperties: {[key: string]: any} = {};
 
   constructor() {
-    const isEnableTelemetry = workspace.getConfiguration('telemetry').get('enableTelemetry') || true;
-    // make testing easier.
     const extensionKey = process.env.AIKEY || Constants.extensionKey;
-    if (isEnableTelemetry) {
-      try {
-        this.reporter = new TelemetryReporter(extensionKey);
-        // set default values for machine/session ids
-        this.defaultProperties['common.vscodemachineid'] = generateMachineId();
-        this.defaultProperties['common.vscodesessionid'] = generateSessionId();
-      } catch (error) {
-        Output.outputLine(OutputLabel.telemetryClient, `Initialize done with error: ${(error as Error).message}`);
-      }
+    try {
+      this.reporter = new TelemetryReporter(Constants.extensionName, Constants.extensionVersion, extensionKey);
+      // set default values for machine/session ids
+      this.defaultProperties['common.vscodemachineid'] = generateMachineId();
+      this.defaultProperties['common.vscodesessionid'] = generateSessionId();
+    } catch (err) {
+      Output.outputLine(OutputLabel.telemetryClient, `Initialize done with error: ${(err as Error).message}`);
     }
   }
 
@@ -66,7 +61,7 @@ class ExtensionTelemetry {
       await this.reporter.dispose();
     }
   }
-}
+})();
 
 function generateMachineId(): string {
   return crypto.createHash('sha256').update(os.hostname()).digest('base64');
@@ -75,5 +70,3 @@ function generateMachineId(): string {
 function generateSessionId(): string {
   return crypto.randomBytes(16).toString('hex');
 }
-
-export const Telemetry = new ExtensionTelemetry();
