@@ -12,9 +12,9 @@ import {Constants} from '@/Constants';
 import * as vscodeEnvironment from '@/helpers/vscodeEnvironment';
 import {EnumStorage} from '@/Models/EnumStorage';
 import {ContractDB} from '@/services/contract/ContractDB';
-import {ContractInstanceWithMetadata} from '@/services/contract/ContractInstanceWithMetadata';
+import type {ContractInstanceWithMetadata} from '@/services/contract/ContractInstanceWithMetadata';
 import {ContractService} from '@/services/contract/ContractService';
-import {Contract} from '@/services/contract/Contract';
+import type {Contract} from '@/services/contract/Contract';
 
 describe('TruffleCommands - Write To Buffer', () => {
   const fileUri = {
@@ -101,7 +101,7 @@ describe('TruffleCommands - Write To Buffer', () => {
           items: readonly vscode.QuickPickItem[] | Thenable<readonly vscode.QuickPickItem[]>
         ) {
           if (items instanceof Array) {
-            return items.find((arg: any) => arg.label === selectedNetworkName);
+            return Promise.resolve(items.find((arg: any) => arg.label === selectedNetworkName));
           }
           //
           return undefined;

@@ -2,17 +2,16 @@
 // Licensed under the MIT license.
 
 import assert from 'assert';
-import uuid from 'uuid';
-import {Constants} from '../../src/Constants';
-import {Validator} from '../../src/validators/validator';
-import {TestConstants} from '../TestConstants';
+import {Constants} from '@/Constants';
+import {INVALID_CONFIRMATION_RESULT, onlyLowerCaseAllowed, Validator} from '@/validators/validator';
+import {TEST_DIALOG_ANSWERS} from './test-dialog-answers';
 
-describe('Validator', () => {
+describe('validators::validator', () => {
   describe('Unit test', () => {
     describe('isConfirmationValue', () => {
       it('should fail when string is not "yes" or "no"', () => {
         // Arrange
-        const testString = uuid.v4();
+        const testString = 'some string';
 
         // Act
         const result = new Validator(testString).isConfirmationValue();
@@ -20,12 +19,12 @@ describe('Validator', () => {
         // Assert
         assert.strictEqual(
           result.getErrors(),
-          Constants.validationMessages.invalidConfirmationResult,
-          `validation result should be equal to "${Constants.validationMessages.invalidConfirmationResult}"`
+          INVALID_CONFIRMATION_RESULT,
+          `validation result should be equal to "${INVALID_CONFIRMATION_RESULT}"`
         );
       });
 
-      TestConstants.testDialogAnswers.forEach((answer) => {
+      TEST_DIALOG_ANSWERS.forEach((answer) => {
         it(`should pass when answer is ${answer}`, () => {
           // Act
           const result = new Validator(answer).isConfirmationValue();
@@ -47,8 +46,8 @@ describe('Validator', () => {
         // Assert
         assert.strictEqual(
           result.getErrors(),
-          Constants.validationMessages.onlyLowerCaseAllowed,
-          `validation result should be equal to "${Constants.validationMessages.onlyLowerCaseAllowed}"`
+          onlyLowerCaseAllowed,
+          `validation result should be equal to "${onlyLowerCaseAllowed}"`
         );
       });
 
@@ -110,7 +109,7 @@ describe('Validator', () => {
     describe('isUrl', () => {
       it('should fail when string is not url', () => {
         // Arrange
-        const testString = uuid.v4();
+        const testString = 'some other string';
 
         // Act
         const result = new Validator(testString).isUrl();

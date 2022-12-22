@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Memento, TextDocument, Uri, workspace} from 'vscode';
+import {type Memento, type TextDocument, Uri, workspace} from 'vscode';
 import {Constants} from '@/Constants';
 import {Telemetry} from '@/TelemetryClient';
 import * as path from 'path';
@@ -99,10 +99,16 @@ export function getWorkspaceRoot(ignoreException = false): string | undefined {
  * @param contractUri when present, only look for Truffle config files in the workspace where it belongs.
  * @returns the {@link TruffleWorkspace} representing the selected Truffle config file.
  */
-export async function getTruffleWorkspace(contractUri?: Uri): Promise<TruffleWorkspace> {
-  const workspaces = await (contractUri
+export async function getTruffleWorkspace(
+  contractUri?: Uri | {truffleWorkspace: TruffleWorkspace}
+): Promise<TruffleWorkspace> {
+  if (contractUri && 'truffleWorkspace' in contractUri) {
+    return contractUri.truffleWorkspace;
+  }
+
+  const workspaces = contractUri
     ? findTruffleWorkspaces(workspace.getWorkspaceFolder(contractUri)!.uri.fsPath)
-    : getAllTruffleWorkspaces());
+    : getAllTruffleWorkspaces();
 
   if (workspaces.length === 0) {
     const error = new Error(Constants.errorMessageStrings.VariableShouldBeDefined('Workspace root'));
@@ -127,18 +133,15 @@ export function getPathByPlatform(workspace: Uri): string {
  *
  * @returns all Truffle config files found wrapped in {@link TruffleWorkspace}.
  */
-export async function getAllTruffleWorkspaces(): Promise<TruffleWorkspace[]> {
+export function getAllTruffleWorkspaces(): TruffleWorkspace[] {
   if (workspace.workspaceFolders === undefined) {
     return [];
   }
 
   const workspaces: TruffleWorkspace[] = [];
-
-  await Promise.all(
-    workspace.workspaceFolders.map(async (ws) => {
-      workspaces.push(...(await findTruffleWorkspaces(ws.uri.fsPath)));
-    })
-  );
+  workspace.workspaceFolders.map((ws) => {
+    workspaces.push(...findTruffleWorkspaces(ws.uri.fsPath));
+  });
 
   return workspaces;
 }
@@ -154,7 +157,7 @@ export async function getAllTruffleWorkspaces(): Promise<TruffleWorkspace[]> {
  * @param workspaceRootPath the root path where to look for Truffle config files.
  * @returns all Truffle config files found wrapped in `TruffleWorkspace`.
  */
-async function findTruffleWorkspaces(workspaceRootPath: string): Promise<TruffleWorkspace[]> {
+function findTruffleWorkspaces(workspaceRootPath: string): TruffleWorkspace[] {
   const files = glob.sync(`${workspaceRootPath}/**/${TRUFFLE_CONFIG_GLOB}`, {
     ignore: Constants.workspaceIgnoredFolders,
   });
@@ -201,7 +204,9 @@ export async function saveTextDocument(globalState: Memento, document: TextDocum
       const isAutoDeployOnSaveEnabled = globalState.get<boolean>(Constants.globalStateKeys.contractAutoDeployOnSave);
 
       // If enabled, calls the function that performs the deployment
-      if (isAutoDeployOnSaveEnabled) await TruffleCommands.deployContracts(Uri.parse(document.fileName));
+      if (isAutoDeployOnSaveEnabled) {
+        await TruffleCommands.deployContracts(Uri.parse(document.fileName));
+      }
       break;
     }
     default:

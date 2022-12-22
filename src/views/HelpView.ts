@@ -1,14 +1,14 @@
-import {type Event, type ProviderResult, type TreeDataProvider, type TreeView, type TreeItem, window} from 'vscode';
+import {type TreeDataProvider, type TreeItem} from 'vscode';
 import {OpenUrlTreeItem} from './lib/OpenUrlTreeItem';
 
 /**
  * Provides the links for the **Help & Feedback** Tree View.
  */
-class HelpView implements TreeDataProvider<TreeItem> {
-  private values: TreeItem[];
+export class HelpView implements TreeDataProvider<TreeItem> {
+  private readonly items: TreeItem[];
 
   constructor() {
-    this.values = [
+    this.items = [
       new OpenUrlTreeItem(
         'Getting Started Guide',
         'https://trufflesuite.com/blog/build-on-web3-with-truffle-vs-code-extension/',
@@ -21,24 +21,11 @@ class HelpView implements TreeDataProvider<TreeItem> {
     ];
   }
 
-  onDidChangeTreeData?: Event<void | TreeItem | TreeItem[] | null | undefined> | undefined;
-
-  getTreeItem(element: TreeItem): TreeItem | Thenable<TreeItem> {
+  getTreeItem(element: TreeItem): TreeItem {
     return element;
   }
 
-  getChildren(_element?: TreeItem | undefined): ProviderResult<TreeItem[]> {
-    return this.values;
+  getChildren(_element?: TreeItem): TreeItem[] {
+    return this.items;
   }
-}
-
-/**
- * Function to register our help view for us.
- *
- * @param viewId the id of the view, defaults
- * @returns The tree view for use/subscribing in the main extension code.
- */
-export function registerHelpView(viewId: string): TreeView<TreeItem> {
-  const treeDataProvider = new HelpView();
-  return window.createTreeView(viewId, {treeDataProvider, canSelectMany: false});
 }

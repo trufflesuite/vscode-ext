@@ -4,10 +4,10 @@
 import assert from 'assert';
 import path from 'path';
 import sinon from 'sinon';
-import {debug, QuickPickItem, Uri, workspace} from 'vscode';
+import {debug, type QuickPickItem, workspace} from 'vscode';
 
 import {DebugNetwork} from '@/debugAdapter/debugNetwork';
-import {ITransactionResponse} from '@/debugAdapter/models/ITransactionResponse';
+import type {ITransactionResponse} from '@/debugAdapter/models/ITransactionResponse';
 import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvider';
 
 import * as userInteraction from '../../src/helpers/userInteraction';
@@ -24,7 +24,10 @@ describe('DebuggerCommands mock tests', () => {
   let mockGetTxHashes: sinon.SinonStub<[(number | undefined)?], Promise<string[]>>;
   let mockGetTxInfos: sinon.SinonStub<[string[]], Promise<ITransactionResponse[]>>;
   let debugCommands: any;
-  let getWorkspacesMock: sinon.SinonStub<[contractUri?: Uri], Promise<helpers.TruffleWorkspace>>;
+  let getWorkspacesMock: sinon.SinonStub<
+    Parameters<typeof helpers.getTruffleWorkspace>,
+    Promise<helpers.TruffleWorkspace>
+  >;
 
   beforeEach(() => {
     mockGetTxHashes = sinon.stub(TransactionProvider.prototype, 'getLastTransactionHashes');
@@ -84,7 +87,7 @@ describe('DebuggerCommands mock tests', () => {
 });
 
 describe('DebuggerCommands unit tests', () => {
-  it('should `shortenHash` for a transaction hash', async () => {
+  it('should `shortenHash` for a transaction hash', () => {
     assert.strictEqual(
       shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e'),
       '0xa50f...d81e'
@@ -96,7 +99,7 @@ describe('DebuggerCommands unit tests', () => {
     assert.strictEqual(shortenHash('0xa50fda6a7e20710d5320cbe7f3a2f8ae9ffeee56fb50e5f0e68a2141d554d81e', 0), '0x...');
   });
 
-  it('should `shortenHash` for an address hash', async () => {
+  it('should `shortenHash` for an address hash', () => {
     assert.strictEqual(shortenHash('0xc448123202fda0547aa8587b496ea87fa479e7e8'), '0xc448...e7e8');
   });
 });
