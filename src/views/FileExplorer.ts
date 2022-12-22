@@ -209,12 +209,6 @@ type Entry = Uri & {
   truffleWorkspace: TruffleWorkspace;
 };
 
-type TElementTypes = {
-  contextValue: string;
-  type: FileType;
-  isWorkspaceFolder: boolean;
-};
-
 export class FileSystemProvider implements TreeDataProvider<Entry | TreeItem> {
   private _onDidChangeFile: EventEmitter<FileChangeEvent[]>;
   private _onDidChangeTree: EventEmitter<(Entry | TreeItem)[] | void | null>;
@@ -230,31 +224,6 @@ export class FileSystemProvider implements TreeDataProvider<Entry | TreeItem> {
   // Refresh full view
   public refresh(): void {
     this._onDidChangeTree.fire();
-  }
-
-  /**
-   * Sets the TreeItem element types.
-   *
-   * @returns An Array of TElementTypes with its properties: ContextValue, Type and IsWorkspace.
-   */
-  getElementTypes(): TElementTypes[] {
-    return [
-      {
-        contextValue: Constants.fileExplorerConfig.contextValue.root,
-        type: FileType.Directory,
-        isWorkspaceFolder: true,
-      },
-      {
-        contextValue: Constants.fileExplorerConfig.contextValue.folder,
-        type: FileType.Directory,
-        isWorkspaceFolder: false,
-      },
-      {
-        contextValue: Constants.fileExplorerConfig.contextValue.file,
-        type: FileType.File,
-        isWorkspaceFolder: false,
-      },
-    ];
   }
 
   get onDidChangeFile(): Event<FileChangeEvent[]> {
@@ -382,21 +351,22 @@ export class FileSystemProvider implements TreeDataProvider<Entry | TreeItem> {
       const children = await this.readDirectory(element);
 
       // Creates a new Entry for each child
-      return children.map(([name, type]) =>
-        Object.assign(Uri.file(path.join(element.fsPath, name)), {
-          truffleWorkspace: element.truffleWorkspace,
-          type,
-          label: name,
-          ...(type === FileType.Directory
-            ? {
-                iconPath: new ThemeIcon('file-directory'),
-                contextValue: Constants.fileExplorerConfig.contextValue.folder,
-              }
-            : {
-                iconPath: new ThemeIcon('file-code'),
-                contextValue: Constants.fileExplorerConfig.contextValue.file,
-              }),
-        })
+      return children.map(
+        ([name, type]): Entry =>
+          Object.assign(Uri.file(path.join(element.fsPath, name)), {
+            truffleWorkspace: element.truffleWorkspace,
+            type,
+            label: name,
+            ...(type === FileType.Directory
+              ? {
+                  iconPath: new ThemeIcon('file-directory'),
+                  contextValue: 'folder' as const,
+                }
+              : {
+                  iconPath: new ThemeIcon('file-code'),
+                  contextValue: 'file' as const,
+                }),
+          })
       );
     }
 
@@ -456,7 +426,7 @@ export class FileSystemProvider implements TreeDataProvider<Entry | TreeItem> {
       return [
         {
           type: FileType.File,
-          label: Constants.errorMessageStrings.ContractFolderNotExists,
+          label: 'There is no contract directory in this workspace',
           iconPath: new ThemeIcon('warning', new ThemeColor('errorForeground')),
         },
       ];
