@@ -2,14 +2,23 @@
 // Licensed under the MIT license.
 
 import assert from 'assert';
-import {Constants} from '../../src/Constants';
-import {UrlValidator} from '../../src/validators/UrlValidator';
+import {INVALID_PORT_MSG, UrlValidator} from '@/validators/UrlValidator';
 import {getRandomInt} from '../testHelpers/Random';
 
-describe('UrlValidator', () => {
+describe('validators::UrlValidator', () => {
   describe('Unit test', () => {
     describe('validatePort', () => {
       const invalidPortList = ['', ' ', '_', 'a1/', '1a', 'port', '0', '01', '65536'];
+
+      invalidPortList.forEach((element) => {
+        it(`port ${element} should be invalid`, () => {
+          // Act
+          const result = UrlValidator.validatePort(element);
+
+          // Assert
+          assert.strictEqual(result, INVALID_PORT_MSG, `validation result should be equal to "${INVALID_PORT_MSG}"`);
+        });
+      });
 
       const validPortList = [
         '1',
@@ -23,21 +32,7 @@ describe('UrlValidator', () => {
         getRandomInt(65535).toString(),
       ];
 
-      invalidPortList.forEach((element: any) => {
-        it(`port ${element} should be invalid`, () => {
-          // Act
-          const result = UrlValidator.validatePort(element);
-
-          // Assert
-          assert.strictEqual(
-            result,
-            Constants.validationMessages.invalidPort,
-            `validation result should be equal to "${Constants.validationMessages.invalidPort}"`
-          );
-        });
-      });
-
-      validPortList.forEach((element: any) => {
+      validPortList.forEach((element) => {
         it(`port ${element} should be valid`, () => {
           // Act
           const result = UrlValidator.validatePort(element);
@@ -64,7 +59,7 @@ describe('UrlValidator', () => {
         `https://${getRandomInt(255)}.${getRandomInt(255)}.${getRandomInt(255)}.${getRandomInt(255)}:${65535}`,
       ];
 
-      invalidUrlList.forEach((element: any) => {
+      invalidUrlList.forEach((element) => {
         it(`hostUrl ${element} should be invalid`, () => {
           // Act
           const result = UrlValidator.validateHostUrl(element);
@@ -74,7 +69,7 @@ describe('UrlValidator', () => {
         });
       });
 
-      validUrlList.forEach((element: any) => {
+      validUrlList.forEach((element) => {
         it(`hostUrl ${element} should be valid`, () => {
           // Act
           const result = UrlValidator.validateHostUrl(element);

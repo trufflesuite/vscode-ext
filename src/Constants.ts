@@ -335,7 +335,6 @@ export class Constants {
     array: /^\[.*]$/g,
     forbiddenChars: {
       dotAtTheEnd: /^(?=.*[.]$).*$/g,
-      networkName: /[^\da-z]/g,
       outboundConnectionName: /^(\d|[a-z])+$/g,
       password: /[#`*"'\-%;,]/g,
       resourceGroupName: /[#`*"'%;,!@$^&+=?/<>|[\]{}:\\~]/g,
@@ -343,13 +342,11 @@ export class Constants {
     hasDigits: /(?=.*\d)/g,
     infuraProjectname: /^([a-zA-Z]|\d|\s|[-_:]){3,}$/g,
     isJsonFile: new RegExp(Constants.contract.configuration.extension.json + '$'),
-    isLowerCase: /^[a-z0-9_\-!@$^&()+=?/<>|[\]{}:.\\~ #`*"'%;,]+$/g,
     isUrl: /^(?:http(s)?:\/\/)?[\w:@.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=]+$/gim,
     lowerCaseLetter: /(?=.*[a-z]).*/g,
     moduleExportsTemplate: /{(.*)}$/g,
     onlyNumber: /^(-\d+|\d+)$/g,
 
-    port: /^([1-9]|[1-8][0-9]|9[0-9]|[1-8][0-9]{2}|9[0-8][0-9]|99[0-9]|[1-8][0-9]{3}|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9]|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/,
     types: {
       simpleArray: /\w+\[]/g,
       simpleMapping: /^\[.+]$/g,
@@ -371,7 +368,6 @@ export class Constants {
     },
     forbiddenChars: {
       dotAtTheEnd: "Input value must not have '.' at the end.",
-      networkName: 'Invalid name. Name can contain only lowercase letters and numbers.',
       outboundConnectionName: 'Outbound connection must contain only lowercase letters and numbers.',
       password: "'#', '`', '*', '\"', ''', '-', '%', ',', ';'",
 
@@ -381,16 +377,13 @@ export class Constants {
     forbiddenSymbols: 'Provided name has forbidden symbols.',
     infuraProjectInvalidName:
       'Project name must be at least 3 characters and should have alphanumeric, space, and the symbols "-", "_", ":".',
-    invalidConfirmationResult: "'yes' or 'no'",
     invalidHostAddress: 'Invalid host address',
-    invalidPort: 'Invalid port.',
     lengthRange: Constants.getMessageLengthRange,
     nameAlreadyInUse: 'This name is already in use. Choose another one.',
     noDigits: 'Password should have at least one digit.',
     noLowerCaseLetter: 'Password should have at least one lowercase letter from a to z.',
     noSpecialChars: 'Password must have 1 special character.',
     noUpperCaseLetter: 'Password should have at least one uppercase letter from A to Z.',
-    onlyLowerCaseAllowed: 'Only lower case allowed.',
     onlyNumberAllowed: "Value after ':' should be a number.",
     portAlreadyInUse: 'This port is already in use. Choose another one.',
     portNotInUseGanache: 'No local ganache service running on port. Please start service or select another port.',
