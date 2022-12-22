@@ -18,9 +18,10 @@ export class Validator {
   }
 
   public isConfirmationValue(): Validator {
-    const yesNoOptions = [Constants.confirmationDialogResult.yes, Constants.confirmationDialogResult.no];
     return this.validate((value) =>
-      yesNoOptions.map((option) => option.toLowerCase()).includes(value.toLowerCase())
+      [Constants.confirmationDialogResult.yes, Constants.confirmationDialogResult.no]
+        .map((option) => option.toLowerCase())
+        .includes(value.toLowerCase())
         ? null
         : INVALID_CONFIRMATION_RESULT
     );
