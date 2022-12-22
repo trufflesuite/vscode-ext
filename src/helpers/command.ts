@@ -5,7 +5,7 @@ import {ChildProcess, fork, ForkOptions, spawn, SpawnOptions} from 'child_proces
 import {tmpdir} from 'os';
 import {Constants} from '@/Constants';
 import {Output, OutputLabel} from '@/Output';
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 
 interface IForkMessage {
   command: string;

@@ -14,7 +14,7 @@ import {
 } from 'vscode';
 import {Constants} from '../Constants';
 import {showNotification} from '../helpers/userInteraction';
-import {Telemetry} from '../TelemetryClient';
+import {Telemetry} from '../Telemetry';
 
 export interface IWebViewConfig {
   path: string;

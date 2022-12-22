@@ -6,7 +6,7 @@ import {IConfiguration, INetwork, INetworkOption} from '@/helpers/ConfigurationR
 import {TreeManager} from '@/services/tree/TreeManager';
 import {ItemType} from '@/Models/ItemType';
 import {Constants} from '@/Constants';
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 import {showQuickPick} from '@/helpers/userInteraction';
 import {QuickPickItem} from 'vscode';
 import {LocalProject} from '@/Models/TreeItems/LocalProject';

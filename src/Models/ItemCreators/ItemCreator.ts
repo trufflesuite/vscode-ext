@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Telemetry} from '../../TelemetryClient';
+import {Telemetry} from '../../Telemetry';
 import {IExtensionItem} from '../TreeItems/IExtensionItem';
 
 export abstract class ItemCreator {

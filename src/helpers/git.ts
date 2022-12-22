@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import {RequiredApps} from '../Constants';
-import {Telemetry} from '../TelemetryClient';
+import {Telemetry} from '../Telemetry';
 import {executeCommand} from './command';
 import {required} from './required';
 

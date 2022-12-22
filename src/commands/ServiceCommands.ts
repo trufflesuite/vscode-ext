@@ -18,7 +18,7 @@ import {InfuraResourceExplorer} from '@/resourceExplorers/InfuraResourceExplorer
 import {LocalResourceExplorer} from '@/resourceExplorers/LocalResourceExplorer';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {TreeManager} from '@/services/tree/TreeManager';
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 import type {ProjectView} from '@/views/NetworksView';
 import type {QuickPickItem} from 'vscode';
 

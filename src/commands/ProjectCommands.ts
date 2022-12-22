@@ -7,7 +7,7 @@ import {required} from '@/helpers/required';
 import {checkTruffleConfigNaming} from '@/helpers/TruffleConfiguration';
 import {showIgnorableNotification, showOpenFolderDialog, showQuickPick} from '@/helpers/userInteraction';
 import {CancellationEvent} from '@/Models/CancellationEvent';
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 import fs from 'fs-extra';
 import requestPromise from 'request-promise';
 import {QuickPickItem, Uri, window, workspace} from 'vscode';

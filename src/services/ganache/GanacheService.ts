@@ -8,7 +8,7 @@ import {Constants, RequiredApps} from '../../Constants';
 import {spawnProcess} from '@/helpers/command';
 import * as shell from '@/helpers/shell';
 import type {TLocalProjectOptions} from '../../Models/TreeItems/LocalProject';
-import {Telemetry} from '../../TelemetryClient';
+import {Telemetry} from '../../Telemetry';
 import {UrlValidator} from '../../validators/UrlValidator';
 import {isGanacheServer, waitGanacheStarted} from './GanacheServiceClient';
 

@@ -7,7 +7,7 @@ import path from 'path';
 import {HttpService} from '@/services/HttpService';
 import {Constants} from '@/Constants';
 import {getPathByPlatform, getWorkspaceRoot, TruffleWorkspace} from '@/helpers/workspace';
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 import {Contract} from './Contract';
 
 export namespace ContractService {

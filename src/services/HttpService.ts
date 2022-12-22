@@ -3,7 +3,7 @@
 
 import requestPromise from 'request-promise';
 import {Constants} from '../Constants';
-import {Telemetry} from '../TelemetryClient';
+import {Telemetry} from '../Telemetry';
 
 const requestTimeout = 10000;
 

@@ -9,7 +9,7 @@ import {ItemType} from '@/Models/ItemType';
 import {LocalProject, type TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {TreeManager} from '@/services/tree/TreeManager';
-import {Telemetry} from '../TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 import type {ProjectView} from '@/views/NetworksView';
 
 export namespace GanacheCommands {

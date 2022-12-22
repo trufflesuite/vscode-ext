@@ -27,7 +27,7 @@ import {TreeManager} from '@/services/tree/TreeManager';
 import {NetworksView, type ProjectView, type NetworkNodeView} from '@/views/NetworksView';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {DashboardService} from '@/services/dashboard/DashboardService';
-import {Telemetry} from './TelemetryClient';
+import {Telemetry} from './Telemetry';
 import {registerDashboardView} from './views/DashboardView';
 import {registerDeploymentView} from './views/DeploymentsView';
 import {ContractExplorerView} from './views/ContractExplorerView';

@@ -7,7 +7,7 @@ import {window} from 'vscode';
 import {Constants, RequiredApps} from '@/Constants';
 import {showInputBox, showQuickPick, saveTextInFile} from '@/helpers/userInteraction';
 import {MnemonicRepository} from '@/services/MnemonicRepository'; // Should be full path since cycle dependencies
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 import {NetworkNode} from './NetworkNode';
 
 export abstract class MnemonicNetworkNode extends NetworkNode {

@@ -4,7 +4,7 @@
 import {Constants} from '../Constants';
 import {EnumStorage} from '@/Models/EnumStorage';
 import {Output, OutputLabel} from '@/Output';
-import {Telemetry} from '../TelemetryClient';
+import {Telemetry} from '../Telemetry';
 
 interface INode {
   id: number;

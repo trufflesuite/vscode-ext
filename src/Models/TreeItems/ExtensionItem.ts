@@ -3,7 +3,7 @@
 
 import {commands, TreeItem, TreeItemCollapsibleState, Uri} from 'vscode';
 import {Constants} from '../../Constants';
-import {Telemetry} from '../../TelemetryClient';
+import {Telemetry} from '../../Telemetry';
 import {ItemType} from '../ItemType';
 import {IExtensionItem} from './IExtensionItem';
 import Timeout = NodeJS.Timeout;

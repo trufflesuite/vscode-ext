@@ -31,7 +31,7 @@ import {DashboardService} from '@/services/dashboard/DashboardService';
 import type {ContractInstanceWithMetadata} from '@/services/contract/ContractInstanceWithMetadata';
 import {ContractService} from '@/services/contract/ContractService';
 import {MnemonicRepository} from '@/services/MnemonicRepository';
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 import type {NetworkNodeView} from '@/views/NetworksView';
 import {ServiceCommands} from './ServiceCommands';
 import {mapNetworkName} from '@/helpers/telemetry';

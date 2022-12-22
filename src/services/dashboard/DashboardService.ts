@@ -7,7 +7,7 @@ import {type OutputChannel, window} from 'vscode';
 import {Constants, RequiredApps} from '../../Constants';
 import {spawnProcess} from '@/helpers/command';
 import * as shell from '@/helpers/shell';
-import {Telemetry} from '../../TelemetryClient';
+import {Telemetry} from '../../Telemetry';
 import {UrlValidator} from '../../validators/UrlValidator';
 import {isDashboardRunning, waitDashboardStarted} from './DashboardServiceClient';
 
