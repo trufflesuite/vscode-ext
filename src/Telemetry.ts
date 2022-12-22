@@ -9,6 +9,7 @@ import TelemetryReporter, {
 } from '@vscode/extension-telemetry';
 import {Constants} from './Constants';
 import {Output, OutputLabel} from './Output';
+import {workspace} from 'vscode';
 
 export const Telemetry = new (class {
   private readonly reporter?: TelemetryReporter;
@@ -16,14 +17,18 @@ export const Telemetry = new (class {
   private readonly defaultProperties: {[key: string]: any} = {};
 
   constructor() {
-    const extensionKey = process.env.AIKEY || Constants.extensionKey;
-    try {
-      this.reporter = new TelemetryReporter(Constants.extensionName, Constants.extensionVersion, extensionKey);
-      // set default values for machine/session ids
-      this.defaultProperties['common.vscodemachineid'] = generateMachineId();
-      this.defaultProperties['common.vscodesessionid'] = generateSessionId();
-    } catch (err) {
-      Output.outputLine(OutputLabel.telemetryClient, `Initialize done with error: ${(err as Error).message}`);
+    const enableTelemetry = workspace.getConfiguration('truffle-vscode').get('enableTelemetry');
+
+    if (enableTelemetry) {
+      const extensionKey = process.env.AIKEY || Constants.extensionKey;
+      try {
+        this.reporter = new TelemetryReporter(Constants.extensionName, Constants.extensionVersion, extensionKey);
+        // set default values for machine/session ids
+        this.defaultProperties['common.vscodemachineid'] = generateMachineId();
+        this.defaultProperties['common.vscodesessionid'] = generateSessionId();
+      } catch (err) {
+        Output.outputLine(OutputLabel.telemetryClient, `Initialize done with error: ${(err as Error).message}`);
+      }
     }
   }
 
