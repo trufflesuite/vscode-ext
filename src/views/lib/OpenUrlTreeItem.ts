@@ -24,7 +24,7 @@ export class OpenUrlTreeItem extends TreeItem {
     if (this.url) {
       await env.openExternal(Uri.parse(this.url));
     } else {
-      window.showWarningMessage(`URL was blank for item: ${this.label}`);
+      void window.showWarningMessage(`URL was blank for item: ${this.label}`);
     }
   }
 }

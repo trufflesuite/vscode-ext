@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {INetwork} from '@/helpers/ConfigurationReader';
+import {type INetwork} from '@/helpers/ConfigurationReader';
 import assert from 'assert';
 import path from 'path';
 import sinon, {stub} from 'sinon';
@@ -15,14 +15,14 @@ import * as TruffleConfiguration from '@/helpers/TruffleConfiguration';
 import {TruffleConfig} from '@/helpers/TruffleConfiguration';
 import * as commands from '../../src/helpers/command';
 import {CancellationEvent} from '@/Models/CancellationEvent';
-import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
-import {IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
+import {LocalProject, type TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {type IExtensionItem} from '@/Models/TreeItems/IExtensionItem';
 import {InfuraNetworkNode} from '@/Models/TreeItems/InfuraNetworkNode';
 import {InfuraProject} from '@/Models/TreeItems/InfuraProject';
 import {InfuraService} from '@/Models/TreeItems/InfuraService';
 import {LocalService} from '@/Models/TreeItems/LocalService';
 import {LocalNetworkNode} from '@/Models/TreeItems/LocalNetworkNode';
-import {Service} from '@/Models/TreeItems/Service';
+import type {Service} from '@/Models/TreeItems/Service';
 import {DashboardService} from '@/services/dashboard/DashboardService';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {TreeManager} from '@/services/tree/TreeManager';
@@ -42,7 +42,7 @@ const truffleWorkspace = new helpers.TruffleWorkspace(
 );
 
 describe('TruffleCommands', () => {
-  describe('Integration test', async () => {
+  describe('Integration test', () => {
     describe('deployContracts', () => {
       let requiredMock: sinon.SinonMock;
       let checkAppsSilentMock: sinon.SinonExpectation;
@@ -51,7 +51,10 @@ describe('TruffleCommands', () => {
       let checkHdWalletProviderVersionMock: sinon.SinonExpectation;
       let installTruffleHdWalletProviderMock: sinon.SinonExpectation;
 
-      let getWorkspacesMock: sinon.SinonStub<[contractUri?: vscode.Uri], Promise<helpers.TruffleWorkspace>>;
+      let getWorkspacesMock: sinon.SinonStub<
+        Parameters<typeof helpers.getTruffleWorkspace>,
+        Promise<helpers.TruffleWorkspace>
+      >;
 
       let showQuickPickMock: sinon.SinonStub;
       let showInputBoxMock: sinon.SinonStub;
@@ -74,7 +77,7 @@ describe('TruffleCommands', () => {
       let commandContextMock: sinon.SinonMock;
       let executeCommandMock: sinon.SinonExpectation;
 
-      beforeEach(async () => {
+      beforeEach(() => {
         getWorkspacesMock = stub(helpers, 'getTruffleWorkspace');
         getWorkspacesMock.returns(Promise.resolve(truffleWorkspace));
 
@@ -100,7 +103,7 @@ describe('TruffleCommands', () => {
 
         getItemsMock = sinon.stub(TreeManager, 'getItems');
         loadStateMock = sinon.stub(TreeManager, 'loadState');
-        servicesItems = await createTestServicesItems();
+        servicesItems = createTestServicesItems();
         getItemsMock.returns(servicesItems);
         loadStateMock.returns(servicesItems);
 
@@ -498,7 +501,7 @@ describe('TruffleCommands', () => {
   });
 });
 
-async function createTestServicesItems(): Promise<Service[]> {
+function createTestServicesItems(): Service[] {
   const services: Service[] = [];
 
   const localService = new LocalService();

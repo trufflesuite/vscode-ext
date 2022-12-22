@@ -3,8 +3,8 @@
 
 import assert from 'assert';
 import sinon from 'sinon';
-import * as vscode from 'vscode';
-import {getTruffleWorkspace, getWorkspaceRoot} from '@/helpers/workspace';
+import {workspace} from 'vscode';
+import {getTruffleWorkspace, getWorkspaceRoot, TruffleWorkspace} from '@/helpers/workspace';
 
 describe('workspace', () => {
   const testWorkspaceFolder: any[] = [
@@ -20,10 +20,10 @@ describe('workspace', () => {
     },
   ];
 
-  let workspaceMock: sinon.SinonStub<any[], any>;
+  let workspaceMock: sinon.SinonStub<any[], typeof workspace.workspaceFolders>;
 
   beforeEach(() => {
-    workspaceMock = sinon.stub(vscode.workspace, 'workspaceFolders');
+    workspaceMock = sinon.stub(workspace, 'workspaceFolders');
   });
 
   afterEach(() => {
@@ -69,7 +69,7 @@ describe('workspace', () => {
       assert.strictEqual(result, undefined);
     });
 
-    it('should return the first workspace root path', async () => {
+    it('should return the first workspace root path', () => {
       // Arrange
       workspaceMock.value(testWorkspaceFolder);
 
@@ -82,20 +82,28 @@ describe('workspace', () => {
   });
 
   describe('getTruffleWorkspace', () => {
-    it('should reject when no workspace is opened', () => {
+    it('should reject when no workspace is opened', async () => {
       // Arrange
       workspaceMock.value(undefined);
-
       // Act and assert
-      assert.rejects(getTruffleWorkspace, /Workspace root should be defined/);
+      await assert.rejects(getTruffleWorkspace, /Workspace root should be defined/);
     });
 
-    it('should reject when workspace is empty', () => {
+    it('should reject when workspace is empty', async () => {
       // Arrange
       workspaceMock.value([]);
-
       // Act and assert
-      assert.rejects(getTruffleWorkspace, /Workspace root should be defined/);
+      await assert.rejects(getTruffleWorkspace, /Workspace root should be defined/);
+    });
+
+    it('should return `truffleWorkspace` is included in `contractUri`', async () => {
+      // Arrange
+      workspaceMock.value(undefined);
+      // Act
+      const truffleWorkspace = new TruffleWorkspace('some/path');
+      const result = await getTruffleWorkspace({truffleWorkspace});
+      // Assert
+      assert.deepEqual(result, truffleWorkspace);
     });
   });
 });

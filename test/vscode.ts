@@ -1,4 +1,4 @@
-import vscode, {WorkspaceFolder} from 'vscode';
+import type vscode from 'vscode';
 import type {CancellationToken, Progress, ProgressOptions} from 'vscode';
 
 export enum ProgressLocation {
@@ -47,7 +47,7 @@ export class Uri implements vscode.Uri {
     this.fragment = fragment || '';
   }
 
-  get fsPath() {
+  get fsPath(): string {
     return this.path;
   }
 
@@ -77,15 +77,15 @@ export class Uri implements vscode.Uri {
     );
   }
 
-  toJSON() {
+  toJSON(): this {
     return this;
   }
 
-  public static file(path: string) {
+  public static file(path: string): Uri {
     return new Uri('file', '', path);
   }
 
-  public static parse(path: string) {
+  public static parse(path: string): Uri {
     // const comps = path.match(/([a-z]+):\/\/([^?#]+)(\?([^#]+)|())(#(.+)|())/)!;
     // return new Uri(comps[1], '', comps[2], comps[4], comps[6]);
 
@@ -128,7 +128,7 @@ export class TreeItem implements TreeItem {
 export class EventEmitter {
   event?: vscode.Event<any>;
 
-  fire(_data: any): void {
+  fire(_data: unknown): void {
     throw new Error('Method not implemented.');
   }
   dispose(): void {
@@ -137,7 +137,7 @@ export class EventEmitter {
 }
 
 export const workspace = {
-  workspaceFolders: undefined as WorkspaceFolder[] | undefined,
+  workspaceFolders: undefined as vscode.WorkspaceFolder[] | undefined,
 
   getConfiguration: function (_section?: string): vscode.WorkspaceConfiguration {
     return {
@@ -147,7 +147,7 @@ export const workspace = {
     } as any;
   },
 
-  getWorkspaceFolder: function (_uri: Uri): WorkspaceFolder | undefined {
+  getWorkspaceFolder: function (_uri: Uri): vscode.WorkspaceFolder | undefined {
     return workspace.workspaceFolders![0];
   },
 
@@ -161,7 +161,7 @@ export const workspace = {
 };
 
 export namespace commands {
-  export const executeCommand = () => Promise.resolve();
+  export const executeCommand = (): Promise<void> => Promise.resolve();
 }
 
 export namespace extensions {
@@ -176,9 +176,12 @@ let clipboardContent = '';
 
 export const env = {
   clipboard: {
-    readText: () => clipboardContent,
-    writeText: (value: string) => (clipboardContent = value),
-  },
+    readText: () => Promise.resolve(clipboardContent),
+    writeText: (value) => {
+      clipboardContent = value;
+      return Promise.resolve();
+    },
+  } as vscode.Clipboard,
 };
 
 export const window = {
@@ -193,12 +196,12 @@ export const window = {
   },
 
   //export function showInputBox(options?: InputBoxOptions, token?: CancellationToken): Thenable<string | undefined>;
-  showInputBox: () => null,
-  showQuickPick: () => null,
-  showOpenDialog: () => null,
-  showSaveDialog: () => null,
-  showErrorMessage: () => null,
-  showInformationMessage: () => null,
+  showInputBox: (): null => null,
+  showQuickPick: (): null => null,
+  showOpenDialog: (): null => null,
+  showSaveDialog: (): null => null,
+  showErrorMessage: (): null => null,
+  showInformationMessage: (): null => null,
   withProgress: function <R>(
     _options: ProgressOptions,
     _task: (progress: Progress<{message?: string; increment?: number}>, _token: CancellationToken) => Thenable<R>
@@ -213,5 +216,5 @@ export const window = {
 };
 
 export const debug = {
-  startDebugging: () => null,
+  startDebugging: (): null => null,
 };

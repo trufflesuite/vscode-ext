@@ -61,14 +61,6 @@ export class Constants {
   public static dashboardRetryTimeout = 2000; // milliseconds
   public static dashboardRetryAttempts = 5;
 
-  public static fileExplorerConfig = {
-    contextValue: {
-      root: 'root',
-      folder: 'folder',
-      file: 'file',
-    },
-  };
-
   public static contract = {
     configuration: {
       statusBar: {
@@ -584,7 +576,6 @@ export class Constants {
     WorkspaceShouldBeOpened: 'Workspace should be opened',
     DashboardVersionError: 'Please upgrade to the latest version of Truffle to use this feature',
     FetchingBoxesHasFailed: 'An error occurred while fetching boxes',
-    ContractFolderNotExists: 'There is no contract directory in this workspace',
   };
 
   public static informationMessage = {
