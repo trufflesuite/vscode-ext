@@ -209,7 +209,7 @@ type Entry = Uri & {
   truffleWorkspace: TruffleWorkspace;
 };
 
-export class FileSystemProvider implements TreeDataProvider<Entry | TreeItem> {
+export class ContractExplorerView implements TreeDataProvider<Entry | TreeItem> {
   private _onDidChangeFile: EventEmitter<FileChangeEvent[]>;
   private _onDidChangeTree: EventEmitter<(Entry | TreeItem)[] | void | null>;
 
