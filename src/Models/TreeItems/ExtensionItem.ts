@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {commands, TreeItem, TreeItemCollapsibleState, Uri} from 'vscode';
-import {Constants} from '../../Constants';
-import {Telemetry} from '../../Telemetry';
-import {ItemType} from '../ItemType';
-import {IExtensionItem} from './IExtensionItem';
+import {commands, TreeItem, TreeItemCollapsibleState, type Uri} from 'vscode';
+import {Constants} from '@/Constants';
+import {Telemetry} from '@/Telemetry';
+import type {ItemType} from '../ItemType';
+import type {IExtensionItem} from './IExtensionItem';
 import Timeout = NodeJS.Timeout;
 
 export interface ExtensionItemData {

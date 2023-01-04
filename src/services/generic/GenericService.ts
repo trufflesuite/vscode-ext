@@ -3,10 +3,10 @@
 
 import type {ChildProcess} from 'child_process';
 import type {OutputChannel} from 'vscode';
-import {Constants} from '../../Constants';
+import {Constants} from '@/Constants';
 import * as shell from '@/helpers/shell';
-import {Telemetry} from '../../Telemetry';
-import {UrlValidator} from '../../validators/UrlValidator';
+import {Telemetry} from '@/Telemetry';
+import {UrlValidator} from '@/validators/UrlValidator';
 import {isGenericServer, getWeb3ClientVersion} from './GenericServiceClient';
 
 export namespace GenericService {

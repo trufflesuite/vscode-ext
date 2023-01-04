@@ -4,11 +4,11 @@
 import {Output, OutputLabel} from '@/Output';
 import type {ChildProcess} from 'child_process';
 import {type OutputChannel, window} from 'vscode';
-import {Constants, RequiredApps} from '../../Constants';
+import {Constants, RequiredApps} from '@/Constants';
 import {spawnProcess} from '@/helpers/command';
 import * as shell from '@/helpers/shell';
-import {Telemetry} from '../../Telemetry';
-import {UrlValidator} from '../../validators/UrlValidator';
+import {Telemetry} from '@/Telemetry';
+import {UrlValidator} from '@/validators/UrlValidator';
 import {isDashboardRunning, waitDashboardStarted} from './DashboardServiceClient';
 
 export namespace DashboardService {

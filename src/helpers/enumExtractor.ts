@@ -1,10 +1,10 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Constants} from '../Constants';
+import {Constants} from '@/Constants';
 import {EnumStorage} from '@/Models/EnumStorage';
 import {Output, OutputLabel} from '@/Output';
-import {Telemetry} from '../Telemetry';
+import {Telemetry} from '@/Telemetry';
 
 interface INode {
   id: number;

@@ -3,10 +3,10 @@
 
 import fs from 'fs-extra';
 import semver from 'semver';
-import {commands, ExtensionContext} from 'vscode';
-import {Constants} from '../Constants';
-import {Telemetry} from '../Telemetry';
-import {BasicWebView, IWebViewConfig} from './BasicWebView';
+import {commands, type ExtensionContext} from 'vscode';
+import {Constants} from '@/Constants';
+import {Telemetry} from '@/Telemetry';
+import {BasicWebView, type IWebViewConfig} from './BasicWebView';
 
 export class ChangelogPage extends BasicWebView {
   protected readonly config: IWebViewConfig;

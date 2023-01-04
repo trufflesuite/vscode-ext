@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {INetwork} from '@/helpers/ConfigurationReader';
+import type {INetwork} from '@/helpers/ConfigurationReader';
 import {generateMnemonic, getTruffleConfigUri, TruffleConfig} from '@/helpers/TruffleConfiguration';
 import {window} from 'vscode';
 import {Constants, RequiredApps} from '@/Constants';

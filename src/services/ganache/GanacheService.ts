@@ -4,12 +4,12 @@
 import {Output, OutputLabel} from '@/Output';
 import type {ChildProcess} from 'child_process';
 import {type OutputChannel, window} from 'vscode';
-import {Constants, RequiredApps} from '../../Constants';
+import {Constants, RequiredApps} from '@/Constants';
 import {spawnProcess} from '@/helpers/command';
 import * as shell from '@/helpers/shell';
-import type {TLocalProjectOptions} from '../../Models/TreeItems/LocalProject';
-import {Telemetry} from '../../Telemetry';
-import {UrlValidator} from '../../validators/UrlValidator';
+import type {TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {Telemetry} from '@/Telemetry';
+import {UrlValidator} from '@/validators/UrlValidator';
 import {isGanacheServer, waitGanacheStarted} from './GanacheServiceClient';
 
 export namespace GanacheService {

@@ -3,18 +3,18 @@
 
 import fs from 'fs-extra';
 import {
-  Disposable,
-  ExtensionContext,
+  type Disposable,
+  type ExtensionContext,
   Uri,
   ViewColumn,
-  WebviewOptions,
-  WebviewPanel,
-  WebviewPanelOptions,
+  type WebviewOptions,
+  type WebviewPanel,
+  type WebviewPanelOptions,
   window,
 } from 'vscode';
-import {Constants} from '../Constants';
-import {showNotification} from '../helpers/userInteraction';
-import {Telemetry} from '../Telemetry';
+import {Constants} from '@/Constants';
+import {showNotification} from '@/helpers/userInteraction';
+import {Telemetry} from '@/Telemetry';
 
 export interface IWebViewConfig {
   path: string;

@@ -3,7 +3,7 @@
 
 import {Constants} from '@/Constants';
 import {showInputBox} from '@/helpers/userInteraction';
-import {LocalProject, TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
+import {LocalProject, type TLocalProjectOptions} from '@/Models/TreeItems/LocalProject';
 import {LocalNetworkNode} from '@/Models/TreeItems/LocalNetworkNode';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {Telemetry} from '@/Telemetry';

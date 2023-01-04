@@ -10,7 +10,7 @@ import {CancellationEvent} from '@/Models/CancellationEvent';
 import {Telemetry} from '@/Telemetry';
 import fs from 'fs-extra';
 import requestPromise from 'request-promise';
-import {QuickPickItem, Uri, window, workspace} from 'vscode';
+import {type QuickPickItem, Uri, window, workspace} from 'vscode';
 import * as outputCommandHelper from '@/helpers/command';
 
 /**
@@ -74,10 +74,10 @@ export namespace ProjectCommands {
     ];
 
     // Displays the QuickPick with the possibilities to choose between project types
-    const command = (await showQuickPick(typeOfSolidityProjectDestination, {
+    const command = await showQuickPick(typeOfSolidityProjectDestination, {
       placeHolder: Constants.placeholders.selectTypeOfSolidityProject,
       ignoreFocusOut: true,
-    })) as IProjectDestination;
+    });
 
     // Creates the project
     await command.cmd(command.projectType);

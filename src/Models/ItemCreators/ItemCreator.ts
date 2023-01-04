@@ -1,8 +1,8 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Telemetry} from '../../Telemetry';
-import {IExtensionItem} from '../TreeItems/IExtensionItem';
+import {Telemetry} from '@/Telemetry';
+import type {IExtensionItem} from '../TreeItems/IExtensionItem';
 
 export abstract class ItemCreator {
   public create(obj: {[key: string]: any}): IExtensionItem {

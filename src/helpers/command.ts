@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {ChildProcess, fork, ForkOptions, spawn, SpawnOptions} from 'child_process';
+import {type ChildProcess, fork, type ForkOptions, spawn, type SpawnOptions} from 'child_process';
 import {tmpdir} from 'os';
 import {Constants} from '@/Constants';
 import {Output, OutputLabel} from '@/Output';
