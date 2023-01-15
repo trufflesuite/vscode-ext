@@ -92,7 +92,7 @@
         "truffle-vscode.enableTelemetry": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "Indicates whether to collect anonymous product usage data. Regardless of this setting, we honor the [`telemetry.telemetryLevel`](https://code.visualstudio.com/docs/getstarted/telemetry#_disable-telemetry-reporting) user setting, _i.e._, if `telemetry.telemetryLevel` is `off` we do not send any data regardless of this setting. See <https://trufflesuite.com/analytics/> for more info"
+          "markdownDescription": "Indicates whether to collect anonymous product usage data. Regardless of this setting, the extension honors the [`telemetry.telemetryLevel`](https://code.visualstudio.com/docs/getstarted/telemetry#_disable-telemetry-reporting) user setting, _i.e._, if `telemetry.telemetryLevel` is `off` the extension does not send any data regardless of this setting. See <https://trufflesuite.com/analytics/> for more info. *Requires reload to take effect.*"
         }
       }
     },
