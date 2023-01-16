@@ -57,16 +57,16 @@ export const Telemetry = new (class {
     }
   }
 
-  public obfuscate(data: string): string {
-    return crypto.createHash('sha256').update(data).digest('base64');
-  }
-
   public async dispose(): Promise<void> {
     if (this.reporter) {
       await this.reporter.dispose();
     }
   }
 })();
+
+export function obfuscate(data: string): string {
+  return crypto.createHash('sha256').update(data).digest('base64');
+}
 
 function generateMachineId(): string {
   return crypto.createHash('sha256').update(os.hostname()).digest('base64');

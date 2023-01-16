@@ -1,18 +1,24 @@
 import {Constants} from '@/Constants';
 import {MnemonicRepository} from '@/services/MnemonicRepository';
-import {Telemetry} from '@/Telemetry';
+import {obfuscate, Telemetry} from '@/Telemetry';
 import * as acorn from 'acorn';
-import {Node} from 'acorn';
+import type {Node} from 'acorn';
 import * as walk from 'acorn-walk';
 import {generate} from 'astring';
 import {entropyToMnemonic} from 'bip39';
 import crypto from 'crypto';
-import ESTree from 'estree';
+import type ESTree from 'estree';
 import fs from 'fs-extra';
 import path from 'path';
-import {Uri} from 'vscode';
-import {ICommandResult, tryExecuteCommandInFork} from './command';
-import {IConfiguration, INetwork, INetworkOption, IProvider, notAllowedSymbols} from './ConfigurationReader';
+import type {Uri} from 'vscode';
+import {type ICommandResult, tryExecuteCommandInFork} from './command';
+import {
+  type IConfiguration,
+  type INetwork,
+  type INetworkOption,
+  type IProvider,
+  notAllowedSymbols,
+} from './ConfigurationReader';
 import {getPathByPlatform, getWorkspaceRoot} from './workspace';
 
 export class EvalTruffleConfigError extends Error {
@@ -491,7 +497,7 @@ export class TruffleConfig {
         const isExist = findProperty(networksNode.value, network.name);
         if (isExist) {
           Telemetry.sendException(
-            new Error(Constants.errorMessageStrings.NetworkAlreadyExist(Telemetry.obfuscate(network.name)))
+            new Error(Constants.errorMessageStrings.NetworkAlreadyExist(obfuscate(network.name)))
           );
           throw new Error(Constants.errorMessageStrings.NetworkAlreadyExist(network.name));
         } else {

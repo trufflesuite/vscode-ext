@@ -17,7 +17,7 @@ import {InfuraResourceExplorer} from '@/resourceExplorers/InfuraResourceExplorer
 import {LocalResourceExplorer} from '@/resourceExplorers/LocalResourceExplorer';
 import {GanacheService} from '@/services/ganache/GanacheService';
 import {TreeManager} from '@/services/tree/TreeManager';
-import {Telemetry} from '@/Telemetry';
+import {obfuscate, Telemetry} from '@/Telemetry';
 import type {ProjectView} from '@/views/NetworksView';
 import type {QuickPickItem} from 'vscode';
 
@@ -295,13 +295,13 @@ async function addChild(service: Service, child: Project): Promise<void> {
   service.addChild(child);
 
   Telemetry.sendEvent('ServiceCommands.execute.newServiceItem', {
-    ruri: Telemetry.obfuscate((child.resourceUri || '').toString()),
-    type: Telemetry.obfuscate(child.itemType.toString()),
-    url: Telemetry.obfuscate(JSON.stringify(await child.getRPCAddress())),
+    ruri: obfuscate((child.resourceUri || '').toString()),
+    type: obfuscate(child.itemType.toString()),
+    url: obfuscate(JSON.stringify(await child.getRPCAddress())),
   });
 }
 
-export function mapItemType(itemType: ItemType) {
+export function mapItemType(itemType: ItemType): string {
   switch (itemType) {
     case ItemType.LOCAL_PROJECT:
       return Constants.treeItemData.service.local.prefix;

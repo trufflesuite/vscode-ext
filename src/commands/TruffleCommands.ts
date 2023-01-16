@@ -31,7 +31,7 @@ import {DashboardService} from '@/services/dashboard/DashboardService';
 import type {ContractInstanceWithMetadata} from '@/services/contract/ContractInstanceWithMetadata';
 import {ContractService} from '@/services/contract/ContractService';
 import {MnemonicRepository} from '@/services/MnemonicRepository';
-import {Telemetry} from '@/Telemetry';
+import {obfuscate, Telemetry} from '@/Telemetry';
 import type {NetworkNodeView} from '@/views/NetworksView';
 import {ServiceCommands} from './ServiceCommands';
 import {writeToClipboard} from '@/helpers/vscodeEnvironment';
@@ -116,7 +116,7 @@ export namespace TruffleCommands {
     });
 
     Telemetry.sendEvent('TruffleCommands.deployContracts.selectedDestination', {
-      url: Telemetry.obfuscate(command.description || ''),
+      url: obfuscate(command.description || ''),
     });
     await command.cmd();
     // notify our deployment view - WHY IS THIS CRASHING
@@ -230,7 +230,7 @@ export namespace TruffleCommands {
     try {
       const rpcEndpointAddress = await networkNodeView.extensionItem.getRPCAddress();
       Telemetry.sendEvent('TruffleCommands.writeRPCEndpointAddressToBuffer.getRPCAddress', {
-        data: Telemetry.obfuscate(rpcEndpointAddress),
+        data: obfuscate(rpcEndpointAddress),
       });
 
       if (rpcEndpointAddress) {
@@ -485,7 +485,7 @@ async function createNewDeploymentService(truffleConfigPath: string): Promise<vo
   });
 
   Telemetry.sendEvent('TruffleCommands.deployContracts.createNewDeploymentService.selectedDestination', {
-    url: Telemetry.obfuscate(command.description || ''),
+    url: obfuscate(command.description || ''),
   });
 
   await command.cmd();
