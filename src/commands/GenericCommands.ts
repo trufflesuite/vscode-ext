@@ -7,7 +7,7 @@ import {required} from '../helpers/required';
 import type {GenericProject} from '../Models/TreeItems/GenericProject';
 import {GenericService} from '@/services/generic/GenericService';
 import {TreeManager} from '@/services/tree/TreeManager';
-import {Telemetry} from '../TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 import type {ProjectView} from '@/views/NetworksView';
 
 export namespace GenericCommands {

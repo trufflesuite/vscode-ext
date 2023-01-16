@@ -3,7 +3,7 @@
 
 import {type Memento, type TextDocument, Uri, workspace} from 'vscode';
 import {Constants} from '@/Constants';
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 import * as path from 'path';
 import glob from 'glob';
 import {showQuickPick} from '@/helpers/userInteraction';

@@ -2,15 +2,14 @@
 // Licensed under the MIT license.
 
 import path from 'path';
-import {IConfiguration, INetwork, INetworkOption} from '@/helpers/ConfigurationReader';
+import type {IConfiguration, INetwork, INetworkOption} from '@/helpers/ConfigurationReader';
 import {TreeManager} from '@/services/tree/TreeManager';
 import {ItemType} from '@/Models/ItemType';
 import {Constants} from '@/Constants';
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 import {showQuickPick} from '@/helpers/userInteraction';
-import {QuickPickItem} from 'vscode';
-import {LocalProject} from '@/Models/TreeItems/LocalProject';
-import {LocalNetworkNode} from '@/Models/TreeItems/LocalNetworkNode';
+import type {LocalProject} from '@/Models/TreeItems/LocalProject';
+import type {LocalNetworkNode} from '@/Models/TreeItems/LocalNetworkNode';
 import {ConfigurationReader} from '../helpers/debugConfigurationReader';
 
 /**
@@ -78,7 +77,7 @@ export class DebugNetwork {
       options: networkOptionsForDebug,
     };
 
-    return networkForDebug!;
+    return networkForDebug;
   }
 
   private relativeToAbsolutePath(directory: string) {
@@ -131,10 +130,10 @@ export class DebugNetwork {
         return {
           label: `$(debug-alt) ${project.label}`,
           detail: project.description,
-        } as QuickPickItem;
+        };
       });
 
-      const pick = await showQuickPick(items as QuickPickItem[], {
+      const pick = await showQuickPick(items, {
         placeHolder: Constants.placeholders.selectGanacheServer,
         ignoreFocusOut: true,
       });

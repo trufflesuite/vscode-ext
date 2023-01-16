@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import path from 'path';
-import {debug, DebugConfiguration, QuickPickItem, Uri, QuickPickItemKind, workspace} from 'vscode';
+import {debug, type DebugConfiguration, type QuickPickItem, Uri, QuickPickItemKind, workspace} from 'vscode';
 
 import {DEBUG_TYPE} from '@/debugAdapter/constants/debugAdapter';
 import {DebugNetwork} from '@/debugAdapter/debugNetwork';
@@ -10,13 +10,13 @@ import {TransactionProvider} from '@/debugAdapter/transaction/transactionProvide
 import {Web3Wrapper} from '@/debugAdapter/web3Wrapper';
 import {getTruffleWorkspace, getPathByPlatform} from '@/helpers/workspace';
 import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
-import {Telemetry} from '@/TelemetryClient';
-import {DebuggerTypes} from '@/debugAdapter/models/debuggerTypes';
+import {Telemetry} from '@/Telemetry';
+import type {DebuggerTypes} from '@/debugAdapter/models/debuggerTypes';
 
 const TX_REGEX = /^(?:0x)?[0-9a-fA-F]{64}$/;
 
 export namespace DebuggerCommands {
-  export async function startSolidityDebugger() {
+  export async function startSolidityDebugger(): Promise<void> {
     Telemetry.sendEvent('DebuggerCommands.startSolidityDebugger.commandStarted');
 
     const workspaceUri = (await getTruffleWorkspace()).workspace;

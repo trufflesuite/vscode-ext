@@ -1,16 +1,16 @@
 // Copyright (c) 2022. Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {QuickPickItem, window} from 'vscode';
+import {type QuickPickItem, window} from 'vscode';
 import {Constants} from '@/Constants';
 import {showInputBox, showQuickPick} from '@/helpers/userInteraction';
 import {InfuraProjectItem} from '@/Models/QuickPickItems/InfuraProjectItem';
 import {InfuraNetworkNode} from '@/Models/TreeItems/InfuraNetworkNode';
 import {InfuraProject} from '@/Models/TreeItems/InfuraProject';
 import {InfuraLayer} from '@/Models/TreeItems/InfuraLayer';
-import {IInfuraEndpointDto, IInfuraProjectDto, IInfuraProjectQuickPick} from '@/services/infuraService/InfuraDto';
+import type {IInfuraEndpointDto, IInfuraProjectDto, IInfuraProjectQuickPick} from '@/services/infuraService/InfuraDto';
 import {InfuraServiceClient} from '@/services/infuraService/InfuraServiceClient';
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 
 export class InfuraResourceExplorer {
   public async createProject(existingProjects: string[] = []): Promise<InfuraProject> {

@@ -2,10 +2,10 @@
 // Licensed under the MIT license.
 
 import {Output, OutputLabel} from '@/Output';
-import {Telemetry} from '../../TelemetryClient';
+import {Telemetry} from '../../Telemetry';
 import {NetworkService} from '../NetworkService';
 import {AbstractAdapter} from './AbstractAdapter';
-import {Contract} from './Contract';
+import type {Contract} from './Contract';
 import {ContractInstanceWithMetadata} from './ContractInstanceWithMetadata';
 import {ContractService} from './ContractService';
 import NetworkMap = NetworkService.NetworkMap;

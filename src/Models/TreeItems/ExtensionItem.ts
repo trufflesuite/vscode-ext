@@ -1,11 +1,11 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {commands, TreeItem, TreeItemCollapsibleState, Uri} from 'vscode';
-import {Constants} from '../../Constants';
-import {Telemetry} from '../../TelemetryClient';
-import {ItemType} from '../ItemType';
-import {IExtensionItem} from './IExtensionItem';
+import {commands, TreeItem, TreeItemCollapsibleState, type Uri} from 'vscode';
+import {Constants} from '@/Constants';
+import {obfuscate, Telemetry} from '@/Telemetry';
+import type {ItemType} from '../ItemType';
+import type {IExtensionItem} from './IExtensionItem';
 import Timeout = NodeJS.Timeout;
 
 export interface ExtensionItemData {
@@ -51,9 +51,7 @@ export abstract class ExtensionItem extends TreeItem implements IExtensionItem {
     if (this.children.some((_child) => _child.label === child.label)) {
       Telemetry.sendException(
         new Error(
-          Constants.errorMessageStrings.GetMessageChildAlreadyConnected(
-            Telemetry.obfuscate(child.label?.toString() || '')
-          )
+          Constants.errorMessageStrings.GetMessageChildAlreadyConnected(obfuscate(child.label?.toString() || ''))
         )
       );
       throw new Error(Constants.errorMessageStrings.GetMessageChildAlreadyConnected(child.label?.toString() || ''));

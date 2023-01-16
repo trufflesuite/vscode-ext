@@ -8,8 +8,8 @@ import querystring from 'querystring';
 import requestPromise from 'request-promise';
 import url from 'url';
 import {env, Uri} from 'vscode';
-import {Constants} from '../../Constants';
-import {Telemetry} from '../../TelemetryClient';
+import {Constants} from '@/Constants';
+import {Telemetry} from '@/Telemetry';
 
 interface IDeferred<T> {
   resolve: (result: T | Promise<T>) => void;

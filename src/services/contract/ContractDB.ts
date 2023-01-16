@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 
 import {EventEmitter} from 'events';
-import {Telemetry} from '../../TelemetryClient';
-import {AbstractAdapter} from './AbstractAdapter';
-import {ContractInstance} from './ContractInstance';
+import {Telemetry} from '../../Telemetry';
+import type {AbstractAdapter} from './AbstractAdapter';
+import type {ContractInstance} from './ContractInstance';
 import {InMemoryAdapter} from './InMemoryAdapter';
 import {TruffleDBAdapter} from './TruffleDBAdapter';
 

@@ -1,7 +1,7 @@
 // Copyright (c) Consensys Software Inc. All rights reserved.
 // Licensed under the MIT license.
 
-import {Telemetry} from '../TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 import type {ItemCreator} from './ItemCreators/ItemCreator';
 import {CommandItemCreator} from './ItemCreators/CommandItemCreator';
 import {GenericNetworkNodeItemCreator} from './ItemCreators/GenericNetworkNodeItemCreator';

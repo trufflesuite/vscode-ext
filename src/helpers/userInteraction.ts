@@ -2,10 +2,18 @@
 // Licensed under the MIT license.
 
 import fs from 'fs';
-import {InputBoxOptions, ProgressLocation, QuickPickItem, QuickPickOptions, Uri, window, workspace} from 'vscode';
+import {
+  type InputBoxOptions,
+  ProgressLocation,
+  type QuickPickItem,
+  type QuickPickOptions,
+  Uri,
+  window,
+  workspace,
+} from 'vscode';
 import {Constants, NotificationOptions} from '@/Constants';
 import {CancellationEvent} from '@/Models/CancellationEvent';
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 import {DialogResultValidator} from '@/validators/DialogResultValidator';
 
 export async function showInputBox(options: InputBoxOptions): Promise<string> {
@@ -38,7 +46,7 @@ export async function showQuickPickMany<T extends QuickPickItem>(
 export async function showQuickPick<T extends QuickPickItem>(
   items: T[] | Promise<T[]>,
   options: QuickPickOptions
-): Promise<T> {
+): Promise<T> | never {
   const result = await window.showQuickPick(items, options);
 
   if (result === undefined) {
@@ -49,7 +57,7 @@ export async function showQuickPick<T extends QuickPickItem>(
   return result;
 }
 
-export async function showConfirmPaidOperationDialog() {
+export async function showConfirmPaidOperationDialog(): Promise<void> {
   const answer = await showInputBox({
     ignoreFocusOut: true,
     prompt: Constants.placeholders.confirmPaidOperation,

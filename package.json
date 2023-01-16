@@ -88,6 +88,11 @@
           "enum": [
             "Truffle"
           ]
+        },
+        "truffle-vscode.enableTelemetry": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Indicates whether to collect anonymous product usage data. Regardless of this setting, the extension honors the [`telemetry.telemetryLevel`](https://code.visualstudio.com/docs/getstarted/telemetry#_disable-telemetry-reporting) user setting, _i.e._, if `telemetry.telemetryLevel` is `off` the extension does not send any data regardless of this setting. See <https://trufflesuite.com/analytics/> for the analytics policy used in `truffle`. *Requires reload to take effect.*"
         }
       }
     },
@@ -835,6 +840,7 @@
     "@truffle/fetch-and-compile": "^0.5.19",
     "@truffle/resolver": "^9.0.4",
     "@truffle/workflow-compile": "^4.0.36",
+    "@vscode/extension-telemetry": "^0.6.2",
     "abi-decoder": "^2.4.0",
     "acorn": "^8.7.1",
     "acorn-walk": "^8.2.0",
@@ -852,7 +858,6 @@
     "semver": "^6.0.0",
     "solidity-parser-antlr": "^0.4.11",
     "uuid": "^3.3.2",
-    "vscode-extension-telemetry": "^0.4.5",
     "web3": "1.7.4"
   },
   "extensionDependencies": [

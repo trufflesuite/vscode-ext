@@ -11,7 +11,7 @@ import {LocalService} from '@/Models/TreeItems/LocalService';
 import {GenericService} from '@/Models/TreeItems/GenericService';
 import {Service, type ServiceTypes} from '@/Models/TreeItems/Service';
 import {Output, OutputLabel} from '@/Output';
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 
 class ExtensionTreeManager {
   private items: Service[];

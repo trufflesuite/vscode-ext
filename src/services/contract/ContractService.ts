@@ -6,8 +6,8 @@ import fs from 'fs-extra';
 import path from 'path';
 import {HttpService} from '@/services/HttpService';
 import {Constants} from '@/Constants';
-import {getPathByPlatform, getWorkspaceRoot, TruffleWorkspace} from '@/helpers/workspace';
-import {Telemetry} from '@/TelemetryClient';
+import {getPathByPlatform, getWorkspaceRoot, type TruffleWorkspace} from '@/helpers/workspace';
+import {obfuscate} from '@/Telemetry';
 import {Contract} from './Contract';
 
 export namespace ContractService {
@@ -68,7 +68,7 @@ export namespace ContractService {
     const buildDir = await getBuildFolderPath();
 
     if (!fs.pathExistsSync(buildDir)) {
-      throw new Error(Constants.errorMessageStrings.BuildContractsDirDoesNotExist(Telemetry.obfuscate(buildDir)));
+      throw new Error(Constants.errorMessageStrings.BuildContractsDirDoesNotExist(obfuscate(buildDir)));
     }
 
     return fs

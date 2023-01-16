@@ -6,7 +6,7 @@ import {Constants} from '@/Constants';
 import {required} from '@/helpers/required';
 import {showIgnorableNotification} from '@/helpers/userInteraction';
 import {DashboardService} from '@/services/dashboard/DashboardService';
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 export namespace DashboardCommands {
   // Command to bind to UI commands
   export async function startDashboardCmd(): Promise<void> {

@@ -9,7 +9,7 @@ import {commands, ProgressLocation, window} from 'vscode';
 import {Constants, RequiredApps} from '@/Constants';
 import {getWorkspaceRoot} from '@/helpers/workspace';
 import {Output, OutputLabel} from '@/Output';
-import {Telemetry} from '@/TelemetryClient';
+import {Telemetry} from '@/Telemetry';
 import {executeCommand, tryExecuteCommand} from './command';
 
 export namespace required {

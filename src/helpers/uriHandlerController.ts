@@ -1,6 +1,6 @@
 import {startDebugging} from '@/commands/DebuggerCommands';
-import {Telemetry} from '@/TelemetryClient';
-import {Uri, UriHandler, window} from 'vscode';
+import {Telemetry} from '@/Telemetry';
+import {type Uri, type UriHandler, window} from 'vscode';
 
 /**
  * This enum is used to identify the different types of commands that can be executed.

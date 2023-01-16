@@ -2,8 +2,8 @@
 // Licensed under the MIT license.
 
 import requestPromise from 'request-promise';
-import {Constants} from '../Constants';
-import {Telemetry} from '../TelemetryClient';
+import {Constants} from '@/Constants';
+import {Telemetry} from '@/Telemetry';
 
 const requestTimeout = 10000;
 
@@ -38,9 +38,7 @@ export namespace HttpService {
         timeout: requestTimeout,
         resolveWithFullResponse: true,
       })
-      .then((response) => {
-        return response.statusCode;
-      })
+      .then((response) => response.statusCode)
       .catch((_errorMessage) => {
         Telemetry.sendException(new Error(`HttpService.sendHttpGetRequest has done with error for URL: ${url}`));
         return undefined;
